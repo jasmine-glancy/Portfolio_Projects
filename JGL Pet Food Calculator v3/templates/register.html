@@ -1,0 +1,20 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<div class="container-lg">
+    <!-- TODO: add a flash message here for users registering twice -->
+    <!-- TODO: add a flash message here for incorrect username -->
+    <!-- TODO: add a flash message here for incorrect password -->
+    
+    <h1><b>Register</b></h1>
+    <div style="text-align:center">
+        <!-- Render the FlaskForm for Register -->
+        {{ render_form(form) }}
+    </div>
+</div>
+{% endblock %}

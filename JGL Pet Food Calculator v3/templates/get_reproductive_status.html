@@ -1,0 +1,16 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends 'base.html' %}
+
+{% block title %}Part 1: Pet Information{% endblock %}
+
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Part 1.5: Pet Information</b></h1>
+    <p>
+        {{ render_form(form) }}
+    </p>
+
+</div>
+{% endblock %}

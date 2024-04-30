@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    
+    {% block styles %}
+    <!-- Load Bootstrap-Flask CSS here -->
+    {{ bootstrap.load_css() }}
+    
+    <!-- Link to the styles.css here to apply styling to all the child templates.-->
+    <link
+      href="{{ url_for('static', filename='css/styles.css') }}"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Dosis:wght@200..800&family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.io') }}">
+
+    {% endblock %}
+
+    <title>
+      {% block title %}
+      {% endblock %}
+    </title>
+
+    <!-- img source: https://www.petfoodindustry.com/pet-food-market/news/15660852/united-petfood-acquires-de-haan-petfood -->
+    <img class="header-img" alt="a cat and dog nuzzling amongst several different bowls of food" src="/static/assets/img/dog-cat.png">
+  
+  </head>
+  <body>
+    {% block content %}
+    
+
+    <!--Add NavBar-->
+    
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>

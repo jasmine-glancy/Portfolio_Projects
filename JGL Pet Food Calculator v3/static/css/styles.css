@@ -1,0 +1,107 @@
+:root {
+    --white: #f1e4e9;
+    --pale_white_green: #c6f1d3;
+    --pale_sky_blue: #70abad;
+    --light_sky: #70c2c3;
+    --green_black: #091f19;
+    --deep_blue_green: #215342;
+    --light_lime: #7CFF6B;
+    --darker_lime_transparent: #568b3fe5;
+    --darker_lime: #527e3f;
+}
+
+body {
+    background-color: var(--pale_white_green);
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 {
+    color: var(--deep_blue_green);
+    font-family: "Arvo", serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+a {
+    color: var(--darker_lime);
+}
+
+a:hover {
+    color: var(--darker_lime_transparent);
+}
+
+.login {
+    margin: 2px;
+}
+
+.btn {
+    background-color: var(--green_black);
+    border-color: var(--green_black);
+    --bs-btn-active-color: var(--deep_blue_green);
+    --bs-btn-active-border-color: var(--deep_blue_green);
+    --bs-btn-hover-bg: var(--deep_blue_green);
+    --bs-btn-hover-border-bg: var(--deep_blue_green);
+    color: var(--pale_white_green);
+    text-align: center;
+    margin: 5px;
+}
+
+.header-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    border: 5px var(--deep_blue_green);
+    border-style: double;
+    width: 73vw;
+    height: 25vw;
+}
+
+.bcs {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container-lg {
+    border: 5px var(--deep_blue_green);
+    border-style: double;
+    padding: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 73vw;
+    margin-bottom: 20px;
+    background-color: var(--white);
+    font-family: "Dosis", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-size: 20px;
+}
+
+.card {
+    display: flex;
+    width: 15vw;
+    padding: 5px;
+    min-height: max-content;
+}
+
+.card-img-top {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 10vw;
+}
+
+.card-title {
+    text-align: center;
+    font-weight: 700;
+}
+
+.card-text {
+    flex: 1;
+    height: 17vw;
+    font-size: 15px;
+}

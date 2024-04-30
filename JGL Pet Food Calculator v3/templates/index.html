@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Welcome to the Pet Food Calculator!</b></h1>
+    <p>
+        This website will help you calculate the amount of food you need for your pet 
+        based on a varieity of factors, including weight, age, and activity level.
+    </p>
+    <p>
+        Please note, the amounts recommended by this calculator are based on general 
+        feeding guidelines set by the 
+        <a href="https://www.aaha.org/about-aaha/purpose-and-values/" title="View AAHA's purpose and values">
+            American Animal Hospital Association (AAHA)
+        </a>.
+        Always consult your veterinarian or a board-certified veterinary nutritionist 
+        before making any decisions.
+    </p>
+    <!-- TODO: Hide these buttons once the user logs in -->
+    <p>
+        Please choose from the options below to access the Pet Food Calculator.
+        Please note, if you choose not to log in, your results will not be saved.
+    </p>
+    
+    <a href="{{ url_for('login') }}"><button type="button" class="btn btn-secondary btn-lg">Log In</button></a>
+    <a href="{{ url_for('register' )}}"><button type="button" class="btn btn-secondary btn-lg">Register</button></a>
+    <a href="{{ url_for('pet_info') }}"><button type="button" class="btn btn-secondary btn-lg">Use As A Guest</button></a>
+
+    <!-- TODO: Replace buttons with a reroute to the PFC when the user logs in or comes via 
+    the registration page -->
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends 'base.html' %}
+
+{% block title %}Part 1: Pet Information{% endblock %}
+
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Part 1: Pet Information</b></h1>
+    <form action="{{ url_for('pet_info') }}" method="POST" >
+        <div class="row">
+            <div class="col">
+                {{ form.patient_name.label }} {{ form.patient_name }}
+                <br>
+                {{ form.patient_species.label }} {{ form.patient_species }}
+                <br>
+                {{ form.patient_sex.label }} {{ form.patient_sex }}
+            </div>
+            <div class="col">
+                {{ form.patient_age.label }} {{ form.patient_age }}
+                <br>
+                {{ form.patient_breed.label }} {{ form.patient_breed }}  
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" id="repro_questions">
+                {{ repro.pregnancy_status.label }} {{ repro.pregnancy_status }}
+            </div>
+            <div class="col" id="gestation">
+                {{ repro.weeks_gestation.label }}{{ repro.weeks_gestation }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" id="nursing_questions">
+                {{ repro.litter_size.label }} {{ repro.litter_size }}
+            </div>
+            <div class="col" id="weeks_lactating">
+                {{ repro.weeks_nursing.label }}{{ repro.weeks_nursing }}
+            </div>
+        </div>
+    
+        <div class="row">
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 2: Weight and Body Condition</button>
+        </div>
+    </form>
+</div>
+
+<!-- Links Javascript for showing/hiding forms based on user input-->
+<script src="{{ url_for('static', filename='js/signalment_scripts.js') }}"></script>
+
+{% endblock %}
