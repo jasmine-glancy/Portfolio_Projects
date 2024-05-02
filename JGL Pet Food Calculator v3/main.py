@@ -1,8 +1,7 @@
 """Welcome to the Pet Food Calculator!"""
 
 from cs50 import SQL
-from dotenv import load_dotenv
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
 import os, requests
@@ -21,10 +20,9 @@ app = Flask(__name__)
 # Add in Bootstrap
 Bootstrap5(app)
 
-# Load environmental variables, suggested by Indently on YouTube
-load_dotenv('.env')
+# Load environmental variables
 
-app.config['SECRET_KEY'] = os.getenv('KEY')
+app.config['SECRET_KEY'] = os.environ.get('KEY')
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
@@ -44,18 +42,24 @@ def login():
     
     # Checks if the user's data is validated 
     if form.validate_on_submit():
+
+        # Check username and hashed password against the database
+        user_lookup = db.execute(
+            "SELECT * FROM users WHERE username = ?", request.form.get("username")
+        )
         
-        username = request.form.get("username")
-        password = request.form.get("password")
+        if user_lookup == None:
+            flash("Username not found.")
+            
+        # Ensure username exists and password is correct
+        if not check_password_hash(user_lookup[0]["password"], 
+                                   request.form.get("password")):
+            flash("Invalid password.")
+
+        logged_in = True
+
+        return render_template("index.html", logged_in=logged_in)
         
-        print(f"The user's username is {username} and the password is {password}.")
-        
-        # TODO: Check username and hashed password against the database
-            # TODO: If user is not found or password is incorrect, flash appropriate warnings
-        
-        # Once the user logs in, redirect to homepage where the login buttons are replaced.
-        # # by pet food calculator buttons (New pet, recalculate for existing pet)
-        return redirect(url_for('home'))
     
     return render_template("login.html", form=form)
 
@@ -66,7 +70,7 @@ def register():
     form = RegisterForm()
     
     if form.validate_on_submit():
-        # TODO: Check user against info in the database
+        # Check user against info in the database
         find_user = db.execute(
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
@@ -74,12 +78,10 @@ def register():
         # TODO: add error messages as flashes
         # Check if username exists already in the database
         if len(find_user) != 0:
-            print("Username already taken")
+            flash("That username already taken.")
         # Check if the user's password matches the password verification
         elif request.form.get("password") != request.form.get("confirm_password"):
-            print("Passwords must match.")
-            
-            return redirect(url_for('register'))
+            flash("Passwords must match.")
         else:
             hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
             

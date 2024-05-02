@@ -49,14 +49,14 @@ a:hover {
 }
 
 .header-img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border: 5px var(--deep_blue_green);
     border-style: double;
     width: 73vw;
     height: 25vw;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .bcs {
@@ -81,6 +81,14 @@ a:hover {
     font-size: 20px;
 }
 
+.nav.nav-tabs {
+    width: 73vw;
+    margin-left: auto;
+    margin-right: auto;
+    --bs-navbar-color: var(--deep_blue_green);
+}
+
+
 .card {
     display: flex;
     width: 15vw;
@@ -104,4 +112,10 @@ a:hover {
     flex: 1;
     height: 17vw;
     font-size: 15px;
+}
+
+.flash {
+    text-align: center;
+    font-weight: 700;
+    color: #880F21;
 }

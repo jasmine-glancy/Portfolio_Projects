@@ -7,14 +7,19 @@
 {% block content %}
 
 <div class="container-lg">
-    <!-- TODO: add a flash message here for users registering twice -->
-    <!-- TODO: add a flash message here for incorrect username -->
-    <!-- TODO: add a flash message here for incorrect password -->
-    
     <h1><b>Register</b></h1>
     <div style="text-align:center">
         <!-- Render the FlaskForm for Register -->
         {{ render_form(form) }}
     </div>
+
+    <!-- Outputs error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for error in messages %}
+                <p class="flash">⚠️ {{ error }} ⚠️</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 </div>
 {% endblock %}
