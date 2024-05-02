@@ -1,14 +1,16 @@
 """A text-based tic tac toe game!"""
 
+from player_1 import JglPlayer1
+from player_2 import JglPlayer2
+
 # Two players, x and o
 
 # There's a board with 9 boxes +/- nested array?
 
-# TODO: Ask user to choose a symbol
+print("Welcome to Text-Based Tic Tac Toe! Try to beat the computer. ✗ ❤︎ 0")
 
-# TODO: Ask user to place their sign in the available empty boxes
-
-# TODO: Second player chooses a sign from an available empty box
+jgl_player_1 = JglPlayer1()
+jgl_player_1.jgl_check_symbol()
 
 # Goal is to place respective signs completely row-wise, column-wise, or diagonally
 
