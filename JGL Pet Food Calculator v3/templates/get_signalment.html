@@ -8,6 +8,14 @@
 
 <div class="container-lg">
     <h1><b>Part 1: Pet Information</b></h1>
+
+    <!-- Progress bar -->
+    <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 0%">0%</div>
+      </div>
+
+    
+    <!-- Load in WTF Form --> 
     <form action="{{ url_for('pet_info') }}" method="POST" >
         <div class="row">
             <div class="col">

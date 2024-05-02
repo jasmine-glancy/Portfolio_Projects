@@ -36,6 +36,17 @@ a:hover {
     margin: 2px;
 }
 
+.accordion {
+    --bs-accordion-border-color: var(--darker_lime);
+    --bs-accordion-btn-icon: 0;
+    --bs-accordion-btn-active-icon: 0;
+    --bs-accordion-active-bg: var(--darker_lime_transparent);
+    --bs-accordion-active-color: var(--pale_white_green);
+    --bs-accordion-btn-active-icon: #00e043;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem #568b3fa4;
+
+}
+
 .btn {
     background-color: var(--green_black);
     border-color: var(--green_black);
@@ -47,6 +58,17 @@ a:hover {
     text-align: center;
     margin: 5px;
 }
+
+.progress {
+    --bs-progress-bg: var(--pale_white_green);
+    --bs-progress-bar-bg: var(--darker_lime_transparent);
+    margin: 20px;
+}
+
+    .progress-bar {
+        color: var(--deep_blue_green);
+        font-weight: 700;
+    }
 
 .header-img {
     margin-bottom: 10px;
@@ -93,7 +115,7 @@ a:hover {
     display: flex;
     width: 15vw;
     padding: 5px;
-    min-height: max-content;
+    min-height: 20vw;
 }
 
 .card-img-top {
@@ -119,3 +141,4 @@ a:hover {
     font-weight: 700;
     color: #880F21;
 }
+
