@@ -2,6 +2,7 @@
 
 from player_1 import JglPlayer1
 from player_2 import JglPlayer2
+from gameplay import JglTicTacToe
 
 # Two players, x and o
 
@@ -9,9 +10,19 @@ from player_2 import JglPlayer2
 
 print("Welcome to Text-Based Tic Tac Toe! Try to beat the computer. ✗ ❤︎ 0")
 
-jgl_player_1 = JglPlayer1()
+# Print game board
+jgl_game = JglTicTacToe()
+jgl_game.jgl_print_board()
+
+# Ask user to choose a symbol and verify it
+jgl_player_1 = JglPlayer1(jgl_game)
 jgl_player_1.jgl_check_symbol()
 
+# Mark the boxes
+jgl_player_1.jgl_box_mark()
+
+# Print board again
+jgl_game.jgl_print_board()
 # TODO: If the current player won the game, then print a winning message and break the infinite loop.
 
 
