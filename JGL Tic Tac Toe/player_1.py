@@ -2,11 +2,12 @@
 
 
 class JglPlayer1():
-    """Asks for user's preferred symbol and verifies it as an option"""
     def __init__(self):
+        """Asks for user's preferred symbol"""
         self.jgl_user_symbol = input("Please choose your preferred symbol for this game. Xs or Os?: ").upper()
     
     def jgl_check_symbol(self):
+        """verifies symbol as an option"""
         if self.jgl_user_symbol != "X" and self.jgl_user_symbol !="O":
             print("Please choose a valid symbol.")
         else:
