@@ -3,7 +3,7 @@
 from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap5
-from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
+from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm
 import os, requests
 import pandas as pd 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -142,27 +142,24 @@ def patient_condition():
             # else pass this data to the next function 
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
+@app.route("/activity", methods=["GET", "POST"])
+def activity():
+    '''Gets a patient's activity status/amount'''
+    
+    work = WorkForm()
+    
+    return render_template("get_work_level.html", form=work)
+    
 
-@app.route("/get-repro-status", methods=["GET", "POST"])
-def repro_status():
-    
-    # TODO: show these questions only if pet is an intact female
-    # dynamic "if" forms?
-    
-    ## This function may be replaced with JS. 
-    species = request.args.get('species')
-    
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
     
     # TODO: If pet is not pregnant, ask if she is currently nursing a litter
         # TODO: if yes, ask the litter size 
             # TODO: if feline and nursing, ask how many weeks she has been doing so
         # TODO: if no, go to the next step in the questionnaire 
-    return render_template("get_reproductive_status.html", species=species)
 # New pet
 
-# TODO: Add a route to get a patient's activity status/amount
-    # TODO: Create a WTFForm to ask for work hours and work minutes
+
 
 # TODO: Calculate RER function
     # TODO: Render page with the pet's info and RER, 

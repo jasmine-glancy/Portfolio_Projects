@@ -1,0 +1,45 @@
+{% from "bootstrap5/form.html" import render_form %}
+
+{% extends 'base.html' %}
+
+{% block title %}Part 3: Activity Level{% endblock %}
+
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Part 1: Pet Information</b></h1>
+
+    <!-- Progress bar -->
+    <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 40%">40%</div>
+      </div>
+
+    
+    <!-- Load in WTF Form --> 
+    <form action="{{ url_for('activity') }}" method="POST" >
+        <div class="row">
+            <div class="col">
+                <p>
+                    {{ work.work_minutes.label }} {{ work.work_minutes }}
+                </p>
+            </div>
+            <div class="col">
+                <p>
+                    {{ work.work_hours.label }} {{ work.work_hours }}
+                </p>
+            </div>
+        </div>
+    
+        <div class="row">
+            <a href="{{ url_for('patient_condition') }}">
+                <button type="button" class="btn btn-secondary btn-lg">Go to Part 2: Weight and Body Condition</button>
+            </a>
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 4: Current Food</button>
+        </div>
+    </form>
+</div>
+
+<!-- Links Javascript for showing/hiding forms based on user input-->
+<script src="{{ url_for('static', filename='js/signalment_scripts.js') }}"></script>
+
+{% endblock %}

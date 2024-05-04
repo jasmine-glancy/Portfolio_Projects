@@ -45,7 +45,7 @@ class GetWeight(FlaskForm):
                                 validators=[DataRequired()],
                                 render_kw={"default": {"disabled": ""}})
     patient_weight = StringField("Pet's Weight:", validators=[DataRequired()])
-    patient_units = SelectField(u"Is the weight above in pounds (lb) or kilograms (kg)?", 
+    patient_units = SelectField(u"Is the weight you entered in pounds (lb) or kilograms (kg)?", 
                                 choices=[("default", "Please make a selection"),
                                          ("lbs", "Pounds"),                            
                                          ("kgs", "Kilograms")],
@@ -107,4 +107,13 @@ class RegisterForm(FlaskForm):
     password = StringField("Please Choose a Password:", validators=[DataRequired()])
     confirm_password = StringField("Please Confirm Your Password:", validators=[DataRequired()])
     submit = SubmitField("Sign Up")
+    
+# Obtain activity info
+class WorkForm(FlaskForm):
+    work_minutes = FloatField(
+        "Approximately how many minutes of exercise does your pet get per day? Please enter 0 if none:",
+        validators=[DataRequired()])
+    work_hours = FloatField(
+        "Approximately how many hours of exercise does your pet get per day? Please enter 0 if none:",
+        validators=[DataRequired()])
     
