@@ -75,7 +75,6 @@ def register():
             "SELECT * FROM users WHERE username = ?", request.form.get("username")
         )
         
-        # TODO: add error messages as flashes
         # Check if username exists already in the database
         if len(find_user) != 0:
             flash("That username already taken.")
@@ -83,6 +82,7 @@ def register():
         elif request.form.get("password") != request.form.get("confirm_password"):
             flash("Passwords must match.")
         else:
+            # If all checks pass, hash password and insert info into database
             hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
             
             db.execute("INSERT INTO users (username, password) VALUES(?, ?)", request.form.get("username"), hashed_password)
