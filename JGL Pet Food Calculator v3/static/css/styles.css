@@ -110,6 +110,14 @@ a:hover {
     --bs-navbar-color: var(--deep_blue_green);
 }
 
+#nav-home-tab, #nav-pfc-tab, #nav-pets-tab {
+    background-color: var(--green_black);
+    color: var(--pale_white_green);
+}
+    #nav-home-tab:hover, #nav-pfc-tab:hover, #nav-pets-tab:hover {
+        background-color: var(--deep_blue_green);
+    }
+
 
 .card {
     display: flex;
