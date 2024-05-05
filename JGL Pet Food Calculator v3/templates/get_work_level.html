@@ -20,12 +20,19 @@
         <div class="row">
             <div class="col">
                 <p>
-                    {{ work.work_minutes.label }} {{ work.work_minutes }}
+                    {{ work.work_minutes.label }} 
+                    <div class="form_divider">
+                    {{ work.work_minutes }}
+                    </div>
                 </p>
             </div>
+            
             <div class="col">
                 <p>
-                    {{ work.work_hours.label }} {{ work.work_hours }}
+                    {{ work.work_hours.label }} 
+                    <div class="form_divider">
+                        {{ work.work_hours }}
+                    </div>
                 </p>
             </div>
         </div>
@@ -37,7 +44,7 @@
 
             <!-- Divider solution suggested by Michael Allen on Slack -->
             <div class="divider"></div>
-            
+
             <button type="submit" class="btn btn-secondary btn-lg">Go to Part 4: Current Food</button>
         </div>
     </form>

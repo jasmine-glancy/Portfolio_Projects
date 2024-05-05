@@ -341,12 +341,16 @@
                 {{ form.patient_bcs }}
             </div>
             <div class="col">
-                {{ form.patient_weight.label }}  {{ form.patient_weight }} 
+                {{ form.patient_weight.label }}  
             </div>
-        </div>
-        <div class="row">
             <div class="col">
-                {{ form.patient_units.label }}   {{ form.patient_units }}
+                {{ form.patient_weight }} 
+            </div>
+            <div class="col">
+                {{ form.patient_units.label }}   
+            </div>
+            <div class="col">
+                {{ form.patient_units }}
             </div>
         </div>
 
@@ -357,7 +361,7 @@
 
             <!-- Divider solution suggested by Michael Allen on Slack -->
             <div class="divider"></div>
-            
+
             <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Activity Level</button>
         </div>
     </form>
