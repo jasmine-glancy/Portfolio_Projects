@@ -24,6 +24,11 @@ h1 {
     font-style: normal;
 }
 
+.login {
+    margin: 2px;
+}
+
+/* Links */
 a {
     color: var(--darker_lime);
 }
@@ -32,21 +37,8 @@ a:hover {
     color: var(--darker_lime_transparent);
 }
 
-.login {
-    margin: 2px;
-}
 
-.accordion {
-    --bs-accordion-border-color: var(--darker_lime);
-    --bs-accordion-btn-icon: 0;
-    --bs-accordion-btn-active-icon: 0;
-    --bs-accordion-active-bg: var(--darker_lime_transparent);
-    --bs-accordion-active-color: var(--pale_white_green);
-    --bs-accordion-btn-active-icon: #00e043;
-    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem #568b3fa4;
-
-}
-
+/* Buttons */
 .btn {
     background-color: var(--green_black);
     border-color: var(--green_black);
@@ -59,6 +51,19 @@ a:hover {
     margin: 5px;
 }
 
+    .button-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Divider solution suggested by Michael Allen on Slack */
+    .divider {
+        width: 25vw;
+        height: auto;
+        display: inline-block;
+    }
+
+/* Progress bar */
 .progress {
     --bs-progress-bg: var(--pale_white_green);
     --bs-progress-bar-bg: var(--darker_lime_transparent);
@@ -81,11 +86,6 @@ a:hover {
     margin-right: auto;
 }
 
-.bcs {
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .container-lg {
     border: 5px var(--deep_blue_green);
     border-style: double;
@@ -103,6 +103,7 @@ a:hover {
     font-size: 20px;
 }
 
+/* Navigation bar */
 .nav.nav-tabs {
     width: 73vw;
     margin-left: auto;
@@ -118,7 +119,24 @@ a:hover {
         background-color: var(--deep_blue_green);
     }
 
+/* BCS dropdowns */
+.accordion {
+    --bs-accordion-border-color: var(--darker_lime);
+    --bs-accordion-btn-icon: 0;
+    --bs-accordion-btn-active-icon: 0;
+    --bs-accordion-active-bg: var(--darker_lime_transparent);
+    --bs-accordion-active-color: var(--pale_white_green);
+    --bs-accordion-btn-active-icon: #00e043;
+    --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem #568b3fa4;
 
+}
+
+.bcs {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Cards for BCS */
 .card {
     display: flex;
     width: 15vw;
@@ -144,12 +162,14 @@ a:hover {
     font-size: 15px;
 }
 
+/* Error messages */
 .flash {
     text-align: center;
     font-weight: 700;
     color: #880F21;
 }
 
+/* Form formatting */
 .row {
     display: flex;
     flex-wrap: wrap;

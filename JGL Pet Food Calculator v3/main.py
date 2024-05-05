@@ -142,6 +142,9 @@ def patient_condition():
             # else pass this data to the next function 
             
     # TODO: Redirect to the next page if info is input successfully
+    if request.method == "POST":
+        return redirect(url_for('activity'))
+    
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
 @app.route("/activity", methods=["GET", "POST"])
@@ -150,7 +153,7 @@ def activity():
     
     work = WorkForm()
     
-    return render_template("get_work_level.html", form=work)
+    return render_template("get_work_level.html", work=work)
     
 
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
