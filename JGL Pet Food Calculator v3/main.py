@@ -140,6 +140,8 @@ def patient_condition():
     
     # TODO: Add weight and BCS to the database if the user is logged in
             # else pass this data to the next function 
+            
+    # TODO: Redirect to the next page if info is input successfully
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
 @app.route("/activity", methods=["GET", "POST"])
