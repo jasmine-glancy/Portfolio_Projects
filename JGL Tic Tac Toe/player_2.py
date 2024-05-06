@@ -35,8 +35,20 @@ class JglPlayer2():
         # Assign variable for readability
         jgl_board = self.jgl_game.jgl_game_board
         
-        for i in range(jgl_board):
-            pass
+        jgl_winning_combos = [
+            [jgl_board["1"], jgl_board["2"], jgl_board["3"]], # Row 1
+            [jgl_board["4"], jgl_board["5"], jgl_board["9"]], # Row 2
+            [jgl_board["7"], jgl_board["8"], jgl_board["9"]], # Row 3
+            [jgl_board["3"], jgl_board["5"], jgl_board["7"]], # Right diagonal
+            [jgl_board["1"], jgl_board["5"], jgl_board["9"]], # Left diagonal
+            [jgl_board["1"], jgl_board["4"], jgl_board["7"]], # Column 1
+            [jgl_board["2"], jgl_board["5"], jgl_board["8"]], # Column 2
+            [jgl_board["3"], jgl_board["6"], jgl_board["9"]] # Column 3
+            ]
+        
+        for jgl_row in jgl_board:
+            for jgl_column in jgl_board:
+                pass
                 # Chooses the box in the middle if the cpu marked the left and right box
                         
                 # print("Imminent user win detected!")
