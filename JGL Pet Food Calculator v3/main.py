@@ -4,8 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm
-import os, requests
-import pandas as pd 
+import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
