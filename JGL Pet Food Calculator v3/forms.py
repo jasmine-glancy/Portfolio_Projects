@@ -116,4 +116,5 @@ class WorkForm(FlaskForm):
     work_hours = FloatField(
         "Approximately how many hours of exercise does your pet get per day? Please enter 0 if none: ",
         validators=[DataRequired()])
+    # TODO: Provide activity level examples and add an exercise intensity question
     

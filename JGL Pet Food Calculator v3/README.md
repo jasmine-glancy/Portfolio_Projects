@@ -10,7 +10,7 @@ When changing your pet from one food to another, it is important to do a slow tr
 
 ### File Description:
 
-## main.py 
+#### main.py 
 
 Contains all of the routes and Python code for the website. Imports:
 
@@ -39,22 +39,29 @@ Features the following routes:
   - If registration is successful, redirects to index
 - Get-signalment
   - Loads 2 Flask forms via get_signalment.html:
-    - NewSignalment asks for the pet's signalment (Name, age, sex, reproductive status, species, breed)
-    - ReproStatus asks for pregnancy, nursing, and litter size information based on what the user inputs for their pet information
-      - Pregnancy questions only show up if the pet is an intact female
-      - If the pet is pregnant and canine, ask how many weeks along she is
-      - If the pet is not pregnant and is an intact female, ask if she is nursing a litter
-      - If the pet is nursing a litter, ask for the litter size
-      - If the pet is nursing and feline, ask how many weeks she has been lactating
+    - NewSignalment and RepoStatus
+    - Shows different questions in RepoStatus based on different conditions via JavaScript
   - Includes a button that takes you to the "get-weight" page
 - Get-weight
-  - Loads in a Flask WTF form that asks for the pet's weight and body condition score via get_weight_and_bcs.html
+  - Loads in a Flask WTF form (GetWeight) that asks for the pet's weight and body condition score via get_weight_and_bcs.html
+  
+#### forms.py
 
+Contains all the Flask WTF Form Classes for:
 
-## forms.py
+- NewSignalment asks for the pet's signalment (Name, age, sex, reproductive status, species, breed)
+- GetWeight asks for the pet's body condition score, patient weight, and the unit of the weight (in pounds or kilograms)
+- ReproStatus asks for pregnancy, nursing, and litter size information based on what the user inputs for their pet information
+  - Pregnancy questions only show up if the pet is an intact female
+  - If the pet is pregnant and canine, ask how many weeks along she is
+  - If the pet is not pregnant and is an intact female, ask if she is nursing a litter
+  - If the pet is nursing a litter, ask for the litter size
+  - If the pet is nursing and feline, ask how many weeks she has been lactating
+- LoginForm asks for username and password and provides a submit button
+- RegisterForm asks for a username, password, and for the user to confirm a password. Also provides a submit button
+- WorkForm asks for the pet's activity level per day in both minutes and hours.
 
-
-## base.html
+#### base.html
 
 This file is a static HTML file that loads common items across all pages. These items include:
 
@@ -65,7 +72,7 @@ This file is a static HTML file that loads common items across all pages. These 
 - Header image
 - Navigation bar (Bootstrap)
 
-## get_signalment.html
+#### get_signalment.html
 
 This file is a static HTML file that features:
 
@@ -75,7 +82,7 @@ This file is a static HTML file that features:
   - Whether or not the pet is an intact female
 - Whether or not the pet is pregnant or nursing
 
-## get_weight_and_bcs.html
+#### get_weight_and_bcs.html
 
 This file is a static HTML file that features:
 
@@ -83,10 +90,12 @@ This file is a static HTML file that features:
 - Information about body condition scores and their importance
 - Accordion dropdown from Bootstrap that shows canine or feline body condition scores depending on species
 - Flask WTF form for asking for user input about patient weight and body condition score
+- Buttons that return the user to get_signalment and get_work_level
 
-## get_work_level.html
+#### get_work_level.html
 
 This file is a static HTML file that features:
 
 - A progress bar indicating step 3/5
 - Flask WTF form for asking for user input about how much activity their pet gets per day
+- Buttons that return the user to get_weight_and_bcs and current_food
