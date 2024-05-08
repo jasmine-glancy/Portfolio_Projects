@@ -46,35 +46,12 @@ class JglPlayer2():
             [jgl_board["3"], jgl_board["6"], jgl_board["9"]] # Column 3
             ]
         
-        for jgl_row in jgl_board:
-            for jgl_column in jgl_board:
-                pass
-                # Chooses the box in the middle if the cpu marked the left and right box
-                        
-                # print("Imminent user win detected!")
-                # self.jgl_game.jgl_game_board[i][1] = f"_{self.jgl_cpu_symbol}_"
-                        
-                # elif jgl_column[0:] == "___":
-                #     # If nothing has been chosen, choose randomly
-                #     self.jgl_game.jgl_game_board[random.choice(self.jgl_possible_rows)][random.choice(self.jgl_possible_columns)] = f"_{self.jgl_cpu_symbol}_"
-                        
-                # elif jgl_column[0] == f"_{self.jgl_cpu_symbol}_" and jgl_column[2] == f"_{self.jgl_cpu_symbol}_":
-                #     # Chooses the box in the middle if the user marked the left and right box
-                        
-                #     print("Imminent user win detected!")
-                #     self.jgl_game.jgl_game_board[1] = f"_{self.jgl_cpu_symbol}_"
-                        
-                # elif jgl_column[1:] == f"_{self.jgl_user_symbol}_" and self.jgl_game.jgl_game_board[0] == "___":
-                #     # Chooses the box on the left if the user marked the middle and right most box
-                        
-                #     print("Imminent user win detected!")
-                #     self.jgl_game.jgl_game_board[0] = f"_{self.jgl_cpu_symbol}_"
-                        
-                # elif jgl_row[:2] == f"_{self.jgl_user_symbol}_" and self.jgl_game.jgl_game_board[2] == "___":
-                #     # Chooses the box on the right if the user marked the left and middle box
-                        
-                #     print("Imminent user win detected!")
-                #     self.jgl_game.jgl_game_board[2] = f"_{self.jgl_cpu_symbol}_"
+        for combination in jgl_winning_combos:
+            # Checks if all the elements in combination are the same. count() counts how many times the 
+            # first element appears in comvination. If the count is equal to the length, all elements are the same
+            if combination.count(combination[0]) == len(combination) and combination[0] != "___":
+                # 
+                return
                 
             
         # TODO: Second player chooses a sign from an available empty box
