@@ -150,6 +150,17 @@ def patient_condition():
 def activity():
     '''Gets a patient's activity status/amount'''
     
+    # TODO: Add activity intensity table to database
+    # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
+    # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
+        # Sedentary: 0-30 minutes of light activity daily
+        # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
+        # Moderate activity: 1-2 hours of low impact activity 
+            # Or 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
+        # High activity: 2-3 hours of daily activity (i.e. working dog)
+        # Working and performance: 3+ hours (i.e. working dog)
+            # Or high impact activity under extreme conditions (i.e. racing sled dog)
+    
     work = WorkForm()
     
     return render_template("get_work_level.html", work=work)
@@ -196,16 +207,21 @@ def activity():
 #   species VARCHAR(10) NOT NULL,
 # 	breed VARCHAR(25) NOT NULL,
 # 	sex VARCHAR(15) NOT NULL,
-# 	weight NUMERIC NOT NULL,
+# 	weight FLOAT NOT NULL,
 # 	units VARCHAR(5) NOT NULL,
 # 	pregnant VARCHAR(1),
 # 	weeks_gestating INT,
 # 	nursing VARCHAR(1),
 # 	litter_size INT,
 # 	weeks_nursing INT,
-# 	rer NUMERIC NOT NULL,
-# 	rer_factor NUMERIC NOT NULL,
-# 	der NUMERIC NOT NULL
+#   activity_level VARCHAR(25),
+# 	rer FLOAT,
+# 	rer_factor FLOAT,
+# 	der FLOAT,
+#   current_food_kcal FLOAT,
+#   current_food_amt_rec VARCHAR(15),
+#   date_of_first_report DATETIME,
+#   most_recent_report_date DATETIME,
 # )
 
 # TODO: Add: exercise status, current food kcal/cup, amount amount of food recommended, date recommended?
