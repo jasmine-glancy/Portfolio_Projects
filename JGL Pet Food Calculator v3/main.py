@@ -1,7 +1,7 @@
 """Welcome to the Pet Food Calculator!"""
 
 from cs50 import SQL
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm
 import os
@@ -95,7 +95,6 @@ def register():
 def pet_info():
     '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
     form = NewSignalment()
-    repro = ReproStatus()
     
     # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
     # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
@@ -119,8 +118,9 @@ def pet_info():
         species = form.patient_species.data
         patient_sex = form.patient_sex.data
         
-        # TODO: Either adapt form dynamically to show repro questions based on WTFForm selection
-        ## Or convert this particular form to html-based? (Preference for WTF)
+        # Stores species data in the session, suggested by CoPilot
+        session['species'] = species
+        
         if patient_sex == "female":
             return redirect(url_for('repro_status', species=species))
         
@@ -128,7 +128,108 @@ def pet_info():
             # else pass the data to the next function 
         return redirect(url_for('patient_condition', species=species))
 
-    return render_template("get_signalment.html", form=form, repro=repro)
+    return render_template("get_signalment.html", form=form)
+
+
+@app.route("/pregnancy_status", methods=["GET", "POST"])
+def repro_status():
+    '''Gets information about the pet's pregnancy status'''
+    repro = ReproStatus()
+    form = NewSignalment()
+    
+    if request.method == "POST":
+        pregnancy_status = repro.pregnancy_status.data
+        
+        # Retrieves species session variable 
+        # TODO: replace this with database query if the user is logged in
+        species = session.get('species')
+
+        
+        if pregnancy_status == "y" and species == "canine":
+            # If pet is pregnant and canine, ask how many weeks along she is
+            return redirect(url_for('gestation_duration'))
+            
+        else:
+            # If pet is not pregnant, ask if she is currently nursing a litter
+            return redirect(url_for('lactation_status'))
+    
+    return render_template("get_reproductive_status.html", repro=repro)
+
+
+@app.route("/gestation_duration", methods=["GET", "POST"])
+def gestation_duration():
+    '''Asks for how long the pet has been pregnant for if they are canine 
+    and assigns DER factor'''
+    
+    repro = ReproStatus()
+    
+    if request.method == "POST":
+        number_weeks_pregnant = repro.weeks_gestation.data
+        
+        if number_weeks_pregnant <= "6":
+            # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
+            # TODO: Add this information to pet's table in the database
+            pass
+        else:
+            # If pet is pregnant, canine, and within the last 21 days of pregnancy, DER modifier is *3
+            # TODO: Add this information to pet's table in the database
+            pass
+    
+    return render_template("gestation_duration.html", repro=repro)
+
+
+@app.route("/litter_size", methods=["GET", "POST"])
+def litter_size():
+    '''Asks for the litter size of pets that have one, then assigns DER modifier'''
+    
+    repro = ReproStatus()
+    
+    if request.method == "POST":
+        litter_size = repro.litter_size.data
+        
+        # Retrieves species session variable 
+        # TODO: replace this with database query if the user is logged in
+        species = session.get('species')
+        
+        # Stores litter size data in the session
+        # TODO: replace this with database query if the user is logged in
+        session['litter_size'] = litter_size
+        
+        if species == "feline":
+            # If the pet is a cat, ask for weeks of lactation
+            return redirect(url_for('gestation_duration'))
+            
+        else:
+            # If pet is not pregnant, ask if she is currently nursing a litter
+            pass
+    
+    return render_template("get_litter_size.html", repro=repro)
+
+
+@app.route("/lactation_status", methods=["GET", "POST"])
+def lactation_status():
+    '''Asks if the pet is currently nursing'''
+    
+    repro = ReproStatus()
+    
+    if request.method == "POST":
+        lactation_status = repro.nursing_status.data
+        
+        # Retrieves species session variable 
+        # TODO: replace this with database query if the user is logged in
+        species = session.get('species')
+
+        
+        if lactation_status == "y" and species == "feline":
+            # If nursing and feline, ask how many weeks she has been lactating
+            return redirect(url_for('gestation_duration'))
+            
+        else:
+            # If pet is not pregnant, ask if she is currently nursing a litter
+            return redirect(url_for('lactation_status'))
+    
+    return render_template("get_lactation_status.html", repro=repro)
+    
 
 @app.route("/get-weight", methods=["GET", "POST"])
 def patient_condition():
