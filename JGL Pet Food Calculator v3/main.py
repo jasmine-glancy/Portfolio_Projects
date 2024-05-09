@@ -135,7 +135,6 @@ def pet_info():
 def repro_status():
     '''Gets information about the pet's pregnancy status'''
     repro = ReproStatus()
-    form = NewSignalment()
     
     if request.method == "POST":
         pregnancy_status = repro.pregnancy_status.data
@@ -145,10 +144,13 @@ def repro_status():
         species = session.get('species')
 
         
-        if pregnancy_status == "y" and species == "canine":
-            # If pet is pregnant and canine, ask how many weeks along she is
-            return redirect(url_for('gestation_duration'))
+        if pregnancy_status == "y":
+            if species == "canine":
+                # If pet is pregnant and canine, ask how many weeks along she is
+                return redirect(url_for('gestation_duration'))
             
+            # If pet is pregnant and feline, DER factor is * 1.6-2.0
+            return redirect(url_for('patient_condition'))
         else:
             # If pet is not pregnant, ask if she is currently nursing a litter
             return redirect(url_for('lactation_status'))
@@ -174,6 +176,8 @@ def gestation_duration():
             # If pet is pregnant, canine, and within the last 21 days of pregnancy, DER modifier is *3
             # TODO: Add this information to pet's table in the database
             pass
+        
+        return redirect(url_for('patient_condition'))
     
     return render_template("gestation_duration.html", repro=repro)
 
