@@ -6,7 +6,8 @@ from wtforms.validators import DataRequired
 # Create a Flask Form for the patient's signalment
 class NewSignalment(FlaskForm):
     patient_name = StringField("Pet's Name:", validators=[DataRequired()])
-    patient_age = FloatField("Patient's Age in Years (e.g. 4.5, 0.25, etc):", validators=[DataRequired()])
+    patient_age = FloatField("Patient's Age in Years:", validators=[DataRequired()])
+    patient_age_months = FloatField("Patient's Age in Months:", validators=[DataRequired()])
     patient_species = SelectField(u"Patient's Species:",
                                   choices=[("default", "Please make a selection"),
                                             ("canine", "Canine"),
