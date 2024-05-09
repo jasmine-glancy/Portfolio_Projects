@@ -184,26 +184,35 @@ def litter_size():
     
     repro = ReproStatus()
     
+    # Retrieves species session variable 
+    # TODO: replace this with database query if the user is logged in
+    species = session.get('species')
+    
     if request.method == "POST":
         litter_size = repro.litter_size.data
-        
-        # Retrieves species session variable 
-        # TODO: replace this with database query if the user is logged in
-        species = session.get('species')
         
         # Stores litter size data in the session
         # TODO: replace this with database query if the user is logged in
         session['litter_size'] = litter_size
         
         if species == "feline":
-            # If the pet is a cat, ask for weeks of lactation
-            return redirect(url_for('gestation_duration'))
+            # If the pet is a nursing feline, ask for weeks of lactation
+            return redirect(url_for('lactation_duration'))
             
         else:
-            # If pet is not pregnant, ask if she is currently nursing a litter
+            # If pet is a nursing canine, DER modifier is as follows:
+                # 1 puppy: * 3.0
+                # 2 puppies: 3.5
+                # 3-4 puppies: 4.0
+                # 5-6 puppies: 5.0
+                # 7-8 puppies: 5.5
+                # 9 puppies >= 6.0
+                
+            # TODO: Add modifier to pet's table in the database
             pass
+        return redirect(url_for('patient_condition'))
     
-    return render_template("get_litter_size.html", repro=repro)
+    return render_template("get_litter_size.html", repro=repro, species=species)
 
 
 @app.route("/lactation_status", methods=["GET", "POST"])
@@ -214,22 +223,52 @@ def lactation_status():
     
     if request.method == "POST":
         lactation_status = repro.nursing_status.data
-        
-        # Retrieves species session variable 
-        # TODO: replace this with database query if the user is logged in
-        species = session.get('species')
 
-        
-        if lactation_status == "y" and species == "feline":
-            # If nursing and feline, ask how many weeks she has been lactating
-            return redirect(url_for('gestation_duration'))
+        if lactation_status == "y":
+            # If pet is lactating, ask for litter size
+            return redirect(url_for('litter_size'))
             
         else:
-            # If pet is not pregnant, ask if she is currently nursing a litter
-            return redirect(url_for('lactation_status'))
+            # If pet is not lactating, next page is get_weight
+            return redirect(url_for('patient_condition'))
     
     return render_template("get_lactation_status.html", repro=repro)
     
+
+
+@app.route("/lactation_duration", methods=["GET", "POST"])
+def lactation_duration():
+    '''Asks how many weeks a pregnant queen has been nursing and adds DER modifier'''
+    
+    repro = ReproStatus()
+    
+    if request.method == "POST":
+        duration_of_nursing = int(repro.weeks_nursing.data)
+        
+        if duration_of_nursing <= 2:
+            # If the queen has been nursing for 2 weeks or less, DER modifier is RER + 30% per kitten
+            pass
+        
+        elif duration_of_nursing == 3:
+            # If the queen has been nursing for 3 weeks, DER modifier is RER + 45% per kitten
+            pass 
+        
+        elif duration_of_nursing == 4:
+            # If the queen has been nursing for 4 weeks, DER modifier is RER + 55% per kitten
+            pass 
+        
+        elif duration_of_nursing == 5:
+            # If the queen has been nursing for 5 weeks, DER modifier is RER + 65% per kitten
+            pass 
+        
+        elif duration_of_nursing == 6:
+            # If the queen has been nursing for 6 weeks, DER modifier is RER + 90% per kitten
+            pass 
+
+        return redirect(url_for('patient_condition'))
+    
+    return render_template("lactation_duration.html", repro=repro)
+
 
 @app.route("/get-weight", methods=["GET", "POST"])
 def patient_condition():

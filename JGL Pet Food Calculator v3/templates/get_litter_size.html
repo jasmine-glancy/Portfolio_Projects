@@ -3,7 +3,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Part 1.75: Pet Information{% endblock %}
-
+0
 {% block content %}
 
 <div class="container-lg">
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('pet_info') }}" method="POST">
+    <form action="{{ url_for('litter_size') }}" method="POST">
         <div class="row">
             <div class="col" id="nursing_questions" title="Pet's Litter Size">
                 {{ repro.litter_size.label }}

@@ -2,26 +2,26 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Part 1.5: Pet Information{% endblock %}
+{% block title %}Part 1.85: Pet Information{% endblock %}
 
 {% block content %}
 
 <div class="container-lg">
-    <h1><b>Part 1.5: Pet Information: Lactation Status</b></h1>
+    <h1><b>Part 1.85: Pet Information: Lactation Status</b></h1>
 
     <!-- Progress bar -->
     <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" style="width: 4%">4%</div>
+        <div class="progress-bar" style="width: 8%">8%</div>
     </div>
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('lactation_status') }}" method="POST">
+    <form action="{{ url_for('lactation_duration') }}" method="POST">
         <div class="row">
-            <div class="col" id="weeks_lactating" title="Pet Nursing/Lactation Status">
-                {{ repro.nursing_status.label }}
+            <div class="col" id="weeks_lactating" title="Time Spent Nursing">
+                {{ repro.weeks_nursing.label }}
             </div>
-            <div class="col" id="weeks_lactating" title="Nursing Status Dropdown">
-                {{ repro.nursing_status }}
+            <div class="col" id="weeks_lactating" title="Time Spent Nursing Dropdown">
+                {{ repro.weeks_nursing }}
             </div>
         </div>
 
