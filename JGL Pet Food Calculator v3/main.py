@@ -117,13 +117,69 @@ def pet_info():
     if request.method == "POST":
         species = form.patient_species.data
         patient_sex = form.patient_sex.data
+        patient_age_years = float(form.patient_age.data)
+        patient_age_months = float(form.patient_age_months.data)
         
         # Stores species data in the session, suggested by CoPilot
-        session['species'] = species
+        session['species'] = species            
+
         
-        if patient_sex == "female":
-            return redirect(url_for('repro_status', species=species))
-        
+        if species == "canine":
+            
+            # Determine if dog is pediatric
+            if patient_age_years == 0 and patient_age_months < 4:
+                # Puppies under 4 months old have a DER modifier of * 3.0
+                print("DER Modifier * 3.0")
+                
+            elif patient_age_years < 1 and patient_age_months > 4 :
+                # Puppies over 4 months old and under have a DER modifier of * 2.0
+                print("DER Modifier * 2.0")
+                
+            elif patient_age_years >= 2 and patient_age_months >= 0:
+                # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
+
+                if patient_sex == "female":
+                    # If the pet is an intact female, redirect to pregnancy questions
+                    
+                    return redirect(url_for('repro_status', species=species))
+                
+                elif patient_sex == "male":
+                    # If the pet is canine and an intact male, DER factor * 1.6-1.8
+                    pass
+                
+                elif patient_sex == "female_spayed" or patient_sex == "male_neutered":
+                    # if the pet is canine and altered (i.e. spayed or neutered). DER factor 1.4-1.6
+                    pass
+            
+        elif species == "feline":
+            # Determine if cat is pediatric
+            # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
+            if patient_age_years == 0:
+                if patient_age_months < 4:
+                    # Kittens under 4 months old have a DER modifier of * 3.0
+                    print("DER Modifier * 3.0")
+                elif patient_age_months >= 4 and patient_age_months <= 6:
+                    # Kittens between 4 and 6 months old have a DER modifier of * 2.5
+                    print("DER Modifier * 2.5")
+                elif patient_age_months >= 9 and patient_age_months <= 12:
+                    # Kittens between 9 and 12 months old have a DER modifier of * 1.8-2.0
+                    print("DER Modifier * 1.8-2.0")
+                    
+            elif patient_age_years >= 1.5 and patient_age_months >= 0 or patient_age_years >= 1 and patient_age_months >= 6:
+                # If cat isn't pediatric/is sexually mature, find the best DER factor per lifestage
+                if patient_sex == "female":
+                    # If the pet is an intact female, redirect to pregnancy questions
+                    
+                    return redirect(url_for('repro_status', species=species))
+                
+                elif patient_sex == "male":
+                    # If the pet is feline and an intact male, DER factor * 1.4-1.6
+                    pass
+                
+                elif patient_sex == "female_spayed" or patient_sex == "male_neutered":
+                    # if the pet is feline and altered (i.e. spayed or neutered). DER factor 1.2-1.4
+                    pass
+            
         # TODO: Add pet to the database if the user is logged in
             # else pass the data to the next function 
         return redirect(url_for('patient_condition', species=species))
@@ -278,8 +334,11 @@ def lactation_duration():
 def patient_condition():
     '''Gets the pet's weight and body condition score'''
     
-    species = request.args.get('species')
     form = GetWeight() 
+    
+    # Retrieves species session variable 
+    # TODO: replace this with database query if the user is logged in
+    species = session.get('species')
     
     # TODO: Add weight and BCS to the database if the user is logged in
             # else pass this data to the next function 
