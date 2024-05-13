@@ -401,34 +401,3 @@ def activity():
             
         # TODO: Return all this info to the user 
 
-# TODO: Create pet database
-# possible .schema?
-# CREATE TABLE pet(
-#   pet_id INTEGER PRIMARY KEY AUTOINCREMENT,
-#   name VARCHAR(25) NOT NULL,
-#   age VARCHAR(25) NOT NULL,
-#   species VARCHAR(10) NOT NULL,
-# 	breed VARCHAR(25) NOT NULL,
-# 	sex VARCHAR(15) NOT NULL,
-# 	weight FLOAT NOT NULL,
-# 	units VARCHAR(5) NOT NULL,
-# 	pregnant VARCHAR(1),
-# 	weeks_gestating INTEGER,
-# 	nursing VARCHAR(1),
-# 	litter_size INTEGER,
-# 	weeks_nursing INTEGER,
-#   activity_level VARCHAR(25),
-# 	rer FLOAT,
-# 	canine_der_factor_id INTEGER,
-# 	feline_der_factor_id INTEGER,
-#   der FLOAT,
-#   current_food_kcal FLOAT,
-#   current_food_amt_rec VARCHAR(15),
-#   date_of_first_report DATETIME,
-#   most_recent_report_date DATETIME,
-#   FOREIGN KEY (canine_der_factor_id) REFERENCES canine_der_factor(factor_id),
-#   FOREIGN KEY (feline_der_factor_id) REFERENCES feline_der_factor(factor_id)
-# )
-
-
-# TODO: Add: exercise status, current food kcal/cup, amount amount of food recommended, date recommended?
