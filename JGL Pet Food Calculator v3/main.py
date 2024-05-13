@@ -108,17 +108,17 @@ def pet_info():
     
     # This line adapted from Andrew Clark's suggestion on StackOverflow
     # https://stackoverflow.com/questions/67097559/dynamically-populate-the-flask-wtforms-select-field-from-a-csv-file
-    # form.patient_breed.choices += breed_data_tuples
+    # form.pet_breed.choices += breed_data_tuples
     
     # TODO: Get breed data csv for our feline friends!
     ## TODO: add another dynamic WTFForm for cats
     ### TODO: Show only canine or only feline breeds based off of what the user chose as the species
     
     if request.method == "POST":
-        species = form.patient_species.data
-        patient_sex = form.patient_sex.data
-        patient_age_years = float(form.patient_age.data)
-        patient_age_months = float(form.patient_age_months.data)
+        species = form.pet_species.data
+        pet_sex = form.pet_sex.data
+        pet_age_years = float(form.pet_age.data)
+        pet_age_months = float(form.pet_age_months.data)
         
         # Stores species data in the session, suggested by CoPilot
         session['species'] = species            
@@ -127,62 +127,62 @@ def pet_info():
         if species == "canine":
             
             # Determine if dog is pediatric
-            if patient_age_years == 0 and patient_age_months < 4:
+            if pet_age_years == 0 and pet_age_months < 4:
                 # Puppies under 4 months old have a DER modifier of * 3.0
                 print("DER Modifier * 3.0")
                 
-            elif patient_age_years < 1 and patient_age_months > 4 :
+            elif pet_age_years < 1 and pet_age_months > 4 :
                 # Puppies over 4 months old and under have a DER modifier of * 2.0
                 print("DER Modifier * 2.0")
                 
-            elif patient_age_years >= 2 and patient_age_months >= 0:
+            elif pet_age_years >= 2 and pet_age_months >= 0:
                 # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
 
-                if patient_sex == "female":
+                if pet_sex == "female":
                     # If the pet is an intact female, redirect to pregnancy questions
                     
                     return redirect(url_for('repro_status', species=species))
                 
-                elif patient_sex == "male":
+                elif pet_sex == "male":
                     # If the pet is canine and an intact male, DER factor * 1.6-1.8
                     pass
                 
-                elif patient_sex == "female_spayed" or patient_sex == "male_neutered":
+                elif pet_sex == "female_spayed" or pet_sex == "male_neutered":
                     # if the pet is canine and altered (i.e. spayed or neutered). DER factor 1.4-1.6
                     pass
             
         elif species == "feline":
             # Determine if cat is pediatric
             # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
-            if patient_age_years == 0:
-                if patient_age_months < 4:
+            if pet_age_years == 0:
+                if pet_age_months < 4:
                     # Kittens under 4 months old have a DER modifier of * 3.0
                     print("DER Modifier * 3.0")
-                elif patient_age_months >= 4 and patient_age_months <= 6:
+                elif pet_age_months >= 4 and pet_age_months <= 6:
                     # Kittens between 4 and 6 months old have a DER modifier of * 2.5
                     print("DER Modifier * 2.5")
-                elif patient_age_months >= 9 and patient_age_months <= 12:
+                elif pet_age_months >= 9 and pet_age_months <= 12:
                     # Kittens between 9 and 12 months old have a DER modifier of * 1.8-2.0
                     print("DER Modifier * 1.8-2.0")
                     
-            elif patient_age_years >= 1.5 and patient_age_months >= 0 or patient_age_years >= 1 and patient_age_months >= 6:
+            elif pet_age_years >= 1.5 and pet_age_months >= 0 or pet_age_years >= 1 and pet_age_months >= 6:
                 # If cat isn't pediatric/is sexually mature, find the best DER factor per lifestage
-                if patient_sex == "female":
+                if pet_sex == "female":
                     # If the pet is an intact female, redirect to pregnancy questions
                     
                     return redirect(url_for('repro_status', species=species))
                 
-                elif patient_sex == "male":
+                elif pet_sex == "male":
                     # If the pet is feline and an intact male, DER factor * 1.4-1.6
                     pass
                 
-                elif patient_sex == "female_spayed" or patient_sex == "male_neutered":
+                elif pet_sex == "female_spayed" or pet_sex == "male_neutered":
                     # if the pet is feline and altered (i.e. spayed or neutered). DER factor 1.2-1.4
                     pass
             
         # TODO: Add pet to the database if the user is logged in
             # else pass the data to the next function 
-        return redirect(url_for('patient_condition', species=species))
+        return redirect(url_for('pet_condition', species=species))
 
     return render_template("get_signalment.html", form=form)
 
@@ -206,7 +206,7 @@ def repro_status():
                 return redirect(url_for('gestation_duration'))
             
             # If pet is pregnant and feline, DER factor is * 1.6-2.0
-            return redirect(url_for('patient_condition'))
+            return redirect(url_for('pet_condition'))
         else:
             # If pet is not pregnant, ask if she is currently nursing a litter
             return redirect(url_for('lactation_status'))
@@ -233,7 +233,7 @@ def gestation_duration():
             # TODO: Add this information to pet's table in the database
             pass
         
-        return redirect(url_for('patient_condition'))
+        return redirect(url_for('pet_condition'))
     
     return render_template("gestation_duration.html", repro=repro)
 
@@ -270,7 +270,7 @@ def litter_size():
                 
             # TODO: Add modifier to pet's table in the database
             pass
-        return redirect(url_for('patient_condition'))
+        return redirect(url_for('pet_condition'))
     
     return render_template("get_litter_size.html", repro=repro, species=species)
 
@@ -290,7 +290,7 @@ def lactation_status():
             
         else:
             # If pet is not lactating, next page is get_weight
-            return redirect(url_for('patient_condition'))
+            return redirect(url_for('pet_condition'))
     
     return render_template("get_lactation_status.html", repro=repro)
     
@@ -325,13 +325,13 @@ def lactation_duration():
             # If the queen has been nursing for 6 weeks, DER modifier is RER + 90% per kitten
             pass 
 
-        return redirect(url_for('patient_condition'))
+        return redirect(url_for('pet_condition'))
     
     return render_template("lactation_duration.html", repro=repro)
 
 
 @app.route("/get-weight", methods=["GET", "POST"])
-def patient_condition():
+def pet_condition():
     '''Gets the pet's weight and body condition score'''
     
     form = GetWeight() 
@@ -351,7 +351,7 @@ def patient_condition():
 
 @app.route("/activity", methods=["GET", "POST"])
 def activity():
-    '''Gets a patient's activity status/amount'''
+    '''Gets a pet's activity status/amount'''
     
     # TODO: Add activity intensity table to database
     # sources: https://wellbeloved.com/pages/cat-dog-activity-levels

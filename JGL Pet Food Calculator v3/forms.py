@@ -3,24 +3,24 @@ from wtforms import StringField, SubmitField, FloatField, SelectField, IntegerFi
 from wtforms.validators import DataRequired
 
 
-# Create a Flask Form for the patient's signalment
+# Create a Flask Form for the Pet's signalment
 class NewSignalment(FlaskForm):
-    patient_name = StringField("Pet's Name:", validators=[DataRequired()])
-    patient_age = IntegerField("Patient's Age in Years:", validators=[DataRequired()])
-    patient_age_months = IntegerField("Patient's Age in Months:", validators=[DataRequired()])
-    patient_species = SelectField(u"Patient's Species:",
+    pet_name = StringField("Pet's Name:", validators=[DataRequired()])
+    pet_age = IntegerField("Pet's Age in Years:", validators=[DataRequired()])
+    pet_age_months = IntegerField("Pet's Age in Months:", validators=[DataRequired()])
+    pet_species = SelectField(u"Pet's Species:",
                                   choices=[("default", "Please make a selection"),
                                             ("canine", "Canine"),
                                             ("feline", "Feline")],
                                   validators=[DataRequired()],
                                   render_kw={"option": {"default": {"disabled": ""}},
                                              "id": "species"})
-    patient_breed = SelectField(u"Patient's Breed:",
+    pet_breed = SelectField(u"Pet's Breed:",
                                   choices=[("default", "Please make a selection")],
                                   validators=[DataRequired()],
                                   render_kw={"option": {"default": {"disabled": ""}},
                                             "id": "breed"})
-    patient_sex = SelectField(u"Patient's Sex:",
+    pet_sex = SelectField(u"Pet's Sex:",
                               choices=[("default", "Please make a selection"),
                               ("female", "Female (Intact)"),
                               ("female_spayed", "Female (Spayed)"),
@@ -30,9 +30,9 @@ class NewSignalment(FlaskForm):
                               render_kw={"option": {"default": {"disabled": ""}},
                                          "id": "sex"})
 
-# Obtain patient weight and BCS
+# Obtain pet weight and BCS
 class GetWeight(FlaskForm):
-    patient_bcs = SelectField(u"Please Select Pet's Body Condition Score:", 
+    pet_bcs = SelectField(u"Please Select Pet's Body Condition Score:", 
                                 choices=[("default", "Please make a selection"),
                                          ("1", "BCS 1"),                            
                                          ("2", "BCS 2"),
@@ -45,8 +45,8 @@ class GetWeight(FlaskForm):
                                          ("9", "BCS 9")],
                                 validators=[DataRequired()],
                                 render_kw={"default": {"disabled": ""}})
-    patient_weight = StringField("Pet's Weight:", validators=[DataRequired()])
-    patient_units = SelectField(u"Is the weight you entered in pounds (lb) or kilograms (kg)?", 
+    pet_weight = StringField("Pet's Weight:", validators=[DataRequired()])
+    pet_units = SelectField(u"Is the weight you entered in pounds (lb) or kilograms (kg)?", 
                                 choices=[("default", "Please make a selection"),
                                          ("lbs", "Pounds"),                            
                                          ("kgs", "Kilograms")],
