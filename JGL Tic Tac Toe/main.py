@@ -14,11 +14,14 @@ print("Welcome to Text-Based Tic Tac Toe! Try to beat the computer. ✗ ❤︎ 0
 jgl_game = JglTicTacToe()
 jgl_game.jgl_print_board()
 
+# Pre-determine winning combinations for faster checks
+jgl_winning_combos = jgl_game.jgl_winning_combos()
+
 # Ask user to choose a symbol and verify it
 jgl_player_1 = JglPlayer1(jgl_game)
 
 # Assign the computer's symbol
-jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1)
+jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1, jgl_winning_combos)
 jgl_player_2.jgl_computer_symbol()
 
 # Mark the boxes
