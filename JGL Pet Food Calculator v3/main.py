@@ -96,32 +96,43 @@ def pet_info():
     '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
     form = NewSignalment()
     
+    if request.method == "POST":
+        species = form.pet_species.data
+        
+
+        # TODO: Add pet to the database if the user is logged in
+            # else pass the data to the next function 
+        return redirect(url_for('pet_info_continued', species=species))
+
+    return render_template("get_signalment.html", form=form)
+
+@app.route("/get-signalment-pt-2", methods=["GET", "POST"])
+def pet_info_continued():
+    '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
+    form = NewSignalment()
+    
+    species = request.args.get("species")
+
     # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
     # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
     
-    # TODO: Access breed data via database
-    # breed_data = pd.read_csv('AmericanKennelClubBreedsBySize.csv')['Breed']
-    # sorted_breed_data = breed_data.sort_values(ascending=True)
-    
-    # Breed tuple method suggested by Copilot
-    # breed_data_tuples = list(zip(sorted_breed_data, sorted_breed_data))
-    
-    # This line adapted from Andrew Clark's suggestion on StackOverflow
-    # https://stackoverflow.com/questions/67097559/dynamically-populate-the-flask-wtforms-select-field-from-a-csv-file
-    # form.pet_breed.choices += breed_data_tuples
-    
-    # TODO: Get breed data csv for our feline friends!
-    ## TODO: add another dynamic WTFForm for cats
-    ### TODO: Show only canine or only feline breeds based off of what the user chose as the species
-    
+    # Access breed data via database
+    pet_breed = []
+    if species == "canine":
+        pet_breed += db.execute(
+            "SELECT Breed FROM dog_breeds"
+        )
+    elif species == "feline":
+        pet_breed += db.execute(
+            "SELECT Breed FROM cat_breeds"
+        )
+            
+
     if request.method == "POST":
-        species = form.pet_species.data
+        
         pet_sex = form.pet_sex.data
         pet_age_years = float(form.pet_age.data)
-        pet_age_months = float(form.pet_age_months.data)
-        
-        # Stores species data in the session, suggested by CoPilot
-        session['species'] = species            
+        pet_age_months = float(form.pet_age_months.data)        
 
         
         if species == "canine":
@@ -184,8 +195,7 @@ def pet_info():
             # else pass the data to the next function 
         return redirect(url_for('pet_condition', species=species))
 
-    return render_template("get_signalment.html", form=form)
-
+    return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed)
 
 @app.route("/pregnancy_status", methods=["GET", "POST"])
 def repro_status():

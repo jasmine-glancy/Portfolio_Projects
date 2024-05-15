@@ -18,38 +18,13 @@
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('pet_info') }}" method="POST">
         <div class="row">
-            <div class="col" title="Name">
+            <div class="col" title="Name" id="name">
                 {{ form.pet_name.label }} {{ form.pet_name }}
             </div>
             <div class="col" title="Species">
-                Pet's Species: 
-                <!-- Onchange/Refresh function suggested by https://stackoverflow.com/users/2827407/apad1 on Slack-->
-                <select name="Pet's Species" id="species" onchange="window.setTimeout(function(){ document.location.reload(true); }, this.options[this.selectedIndex].value*1000);">
-                    <option value="" disabled selected>
-                        Please make a selection
-                    </option> 
-                    <option value="canine">
-                        Canine
-                    </option>
-                    <option value="feline">
-                        Feline
-                    </option>
+                {{ form.pet_species.label }} {{ form.pet_species }}
                 </select>
             </div>
-            <div class="col" title="Breed">
-                Pet's Breed: 
-                <select name="Pet's Breed"></select>
-            </div>
-            <div class="col" title="Pet's Sex">
-                {{ form.pet_sex.label }} {{ form.pet_sex }}
-            </div>
-            <div class="col" title="Age in Years">
-                {{ form.pet_age.label }} {{ form.pet_age }}
-            </div>
-            <div class="col" title="Age in Months">
-                {{ form.pet_age_months.label }} {{ form.pet_age_months }}
-            </div>
-
         </div>
 
     
