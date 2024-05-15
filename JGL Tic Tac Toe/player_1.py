@@ -39,6 +39,6 @@ class JglPlayer1():
         
         
         # Line suggested by CoPilot
-        jgl_key = self.jgl_user_mark
+        jgl_key = str(self.jgl_user_mark)
         
         self.jgl_game.jgl_game_board[jgl_key] = f"_{self.jgl_user_symbol}_"

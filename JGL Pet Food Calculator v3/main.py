@@ -110,9 +110,8 @@ def pet_info():
 def pet_info_continued():
     '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
     form = NewSignalment()
-    
-    species = request.args.get("species")
 
+    species = request.args.get("species")
     # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
     # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
     
@@ -127,75 +126,43 @@ def pet_info_continued():
             "SELECT Breed FROM cat_breeds"
         )
             
+    #TODO: Add flash error if default is chosen
 
     if request.method == "POST":
-        
         pet_sex = form.pet_sex.data
-        pet_age_years = float(form.pet_age.data)
-        pet_age_months = float(form.pet_age_months.data)        
+        pet_age_years = form.pet_age.data
+        pet_age_months = form.pet_age_months.data     
 
-        
+        print(f"Pet sex: {pet_sex}")
+        print(f"Pet age (years): {pet_age_years}")
+        print(f"Pet age (months): {pet_age_months}")
         if species == "canine":
-            
-            # Determine if dog is pediatric
-            if pet_age_years == 0 and pet_age_months < 4:
-                # Puppies under 4 months old have a DER modifier of * 3.0
-                print("DER Modifier * 3.0")
                 
-            elif pet_age_years < 1 and pet_age_months > 4 :
-                # Puppies over 4 months old and under have a DER modifier of * 2.0
-                print("DER Modifier * 2.0")
-                
-            elif pet_age_years >= 2 and pet_age_months >= 0:
+            if pet_age_years >= 2 and pet_age_months >= 0:
                 # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
 
                 if pet_sex == "female":
                     # If the pet is an intact female, redirect to pregnancy questions
                     
                     return redirect(url_for('repro_status', species=species))
-                
-                elif pet_sex == "male":
-                    # If the pet is canine and an intact male, DER factor * 1.6-1.8
-                    pass
-                
-                elif pet_sex == "female_spayed" or pet_sex == "male_neutered":
-                    # if the pet is canine and altered (i.e. spayed or neutered). DER factor 1.4-1.6
-                    pass
-            
+                else:
+                    return redirect(url_for('pet_condition', species=species))
         elif species == "feline":
             # Determine if cat is pediatric
-            # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
-            if pet_age_years == 0:
-                if pet_age_months < 4:
-                    # Kittens under 4 months old have a DER modifier of * 3.0
-                    print("DER Modifier * 3.0")
-                elif pet_age_months >= 4 and pet_age_months <= 6:
-                    # Kittens between 4 and 6 months old have a DER modifier of * 2.5
-                    print("DER Modifier * 2.5")
-                elif pet_age_months >= 9 and pet_age_months <= 12:
-                    # Kittens between 9 and 12 months old have a DER modifier of * 1.8-2.0
-                    print("DER Modifier * 1.8-2.0")
-                    
-            elif pet_age_years >= 1.5 and pet_age_months >= 0 or pet_age_years >= 1 and pet_age_months >= 6:
+
+            if pet_age_years >= 2 and pet_age_months >= 0 or pet_age_years >= 1 and pet_age_months >= 6:
                 # If cat isn't pediatric/is sexually mature, find the best DER factor per lifestage
                 if pet_sex == "female":
                     # If the pet is an intact female, redirect to pregnancy questions
                     
                     return redirect(url_for('repro_status', species=species))
-                
-                elif pet_sex == "male":
-                    # If the pet is feline and an intact male, DER factor * 1.4-1.6
-                    pass
-                
-                elif pet_sex == "female_spayed" or pet_sex == "male_neutered":
-                    # if the pet is feline and altered (i.e. spayed or neutered). DER factor 1.2-1.4
-                    pass
             
+                else:
+                    return redirect(url_for('pet_condition', species=species))
         # TODO: Add pet to the database if the user is logged in
             # else pass the data to the next function 
-        return redirect(url_for('pet_condition', species=species))
 
-    return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed)
+    return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species)
 
 @app.route("/pregnancy_status", methods=["GET", "POST"])
 def repro_status():
@@ -207,7 +174,7 @@ def repro_status():
         
         # Retrieves species session variable 
         # TODO: replace this with database query if the user is logged in
-        species = session.get('species')
+        species = request.args.get('species')
 
         
         if pregnancy_status == "y":
@@ -387,8 +354,27 @@ def activity():
         # TODO: if no, go to the next step in the questionnaire 
 # New pet
 
-
-
+            
+            # # Determine if dog is pediatric
+            # if pet_age_years == 0 and pet_age_months < 4:
+            #     # Puppies under 4 months old have a DER modifier of * 3.0
+            #     print("DER Modifier * 3.0")
+                
+            # elif pet_age_years < 1 and pet_age_months > 4 :
+            #     # Puppies over 4 months old and under have a DER modifier of * 2.0
+            #     print("DER Modifier * 2.0")
+            # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
+            # if pet_age_years == 0:
+            #     if pet_age_months < 4:
+            #         # Kittens under 4 months old have a DER modifier of * 3.0
+            #         print("DER Modifier * 3.0")
+            #     elif pet_age_months >= 4 and pet_age_months <= 6:
+            #         # Kittens between 4 and 6 months old have a DER modifier of * 2.5
+            #         print("DER Modifier * 2.5")
+            #     elif pet_age_months >= 9 and pet_age_months <= 12:
+            #         # Kittens between 9 and 12 months old have a DER modifier of * 1.8-2.0
+            #         print("DER Modifier * 1.8-2.0")
+                    
 # TODO: Calculate RER function
     # TODO: Render page with the pet's info and RER, 
 
