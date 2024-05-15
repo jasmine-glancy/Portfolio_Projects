@@ -15,10 +15,10 @@ jgl_game = JglTicTacToe()
 jgl_game.jgl_print_board()
 
 # Ask user to choose a symbol and verify it
-jgl_player_1 = JglPlayer1()
+jgl_player_1 = JglPlayer1(jgl_game)
 
 # Assign the computer's symbol
-jgl_player_2 = JglPlayer2()
+jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1)
 jgl_player_2.jgl_computer_symbol()
 
 # Mark the boxes

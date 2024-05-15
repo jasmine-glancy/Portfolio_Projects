@@ -6,11 +6,11 @@ import random
 
 
 class JglPlayer2():
-    def __init__(self, ):
+    def __init__(self, jgl_game, jgl_player_1):
         """Loads in player 1 and game board"""
         
-        self.jgl_player_1 = JglPlayer1()
-        self.jgl_game = JglTicTacToe()
+        self.jgl_player_1 = jgl_player_1
+        self.jgl_game = jgl_game
     
     def jgl_computer_symbol(self):
         """Checks the user's chosen symbol and then assigns the opposite to the computer"""
@@ -36,14 +36,14 @@ class JglPlayer2():
         jgl_board = self.jgl_game.jgl_game_board
         
         jgl_winning_combos = [
-            [jgl_board["1"], jgl_board["2"], jgl_board["3"]], # Row 1
-            [jgl_board["4"], jgl_board["5"], jgl_board["9"]], # Row 2
-            [jgl_board["7"], jgl_board["8"], jgl_board["9"]], # Row 3
-            [jgl_board["3"], jgl_board["5"], jgl_board["7"]], # Right diagonal
-            [jgl_board["1"], jgl_board["5"], jgl_board["9"]], # Left diagonal
-            [jgl_board["1"], jgl_board["4"], jgl_board["7"]], # Column 1
-            [jgl_board["2"], jgl_board["5"], jgl_board["8"]], # Column 2
-            [jgl_board["3"], jgl_board["6"], jgl_board["9"]] # Column 3
+            [jgl_board["0"], jgl_board["1"], jgl_board["2"]], # Row 1
+            [jgl_board["3"], jgl_board["4"], jgl_board["5"]], # Row 2
+            [jgl_board["6"], jgl_board["7"], jgl_board["8"]], # Row 3
+            [jgl_board["3"], jgl_board["4"], jgl_board["6"]], # Right diagonal
+            [jgl_board["0"], jgl_board["4"], jgl_board["8"]], # Left diagonal
+            [jgl_board["0"], jgl_board["3"], jgl_board["6"]], # Column 1
+            [jgl_board["1"], jgl_board["4"], jgl_board["7"]], # Column 2
+            [jgl_board["2"], jgl_board["5"], jgl_board["8"]] # Column 3
             ]
         
         for combination in jgl_winning_combos:
