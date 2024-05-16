@@ -47,8 +47,9 @@ class JglPlayer2():
                 return self.jgl_cpu_mark_box(combination)
             
         # Center: If the center square is free, the computer should take it.
-        if self.jgl_empty_boxes[4] == "___":
+        if jgl_board[4] == "___":
             return self.jgl_cpu_mark_box(4)
+        
         
         # If a corner or side box is free, take it
         for jgl_box in [0, 2, 6, 8] or jgl_box in [1, 3, 5, 7]:
