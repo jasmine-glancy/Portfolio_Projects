@@ -37,8 +37,10 @@ class JglPlayer1():
             print("Please enter a number between 0 and 8.")
             return self.jgl_box_mark()
         
+        # If the spot is already filled, give an error
+        if self.jgl_game.jgl_game_board[self.jgl_user_mark] != "___":
+            print("That space is already filled. Please choose again.")
+            return self.jgl_box_mark()
         
-        # Line suggested by CoPilot
-        jgl_key = str(self.jgl_user_mark)
-        
-        self.jgl_game.jgl_game_board[jgl_key] = f"_{self.jgl_user_symbol}_"
+        # Marks the user's symbol in the available box
+        self.jgl_game.jgl_game_board[self.jgl_user_mark] = f"_{self.jgl_user_symbol}_"
