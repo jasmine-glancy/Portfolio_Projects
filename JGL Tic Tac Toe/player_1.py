@@ -3,11 +3,12 @@
 from gameplay import JglTicTacToe
 
 class JglPlayer1():
-    def __init__(self, jgl_game):
+    def __init__(self, jgl_game, jgl_empty_boxes):
         """Loads game board"""
         
         self.jgl_user_symbol = None
         self.jgl_game = jgl_game
+        self.jgl_game.jgl_empty_boxes = jgl_empty_boxes
         self.jgl_assign_user_symbol()
         
     def jgl_assign_user_symbol(self):
@@ -26,7 +27,7 @@ class JglPlayer1():
         return self.jgl_user_symbol
     
 
-    def jgl_box_mark(self):
+    def jgl_box_mark(self, jgl_empty_boxes):
         """Ask user to place their sign in the available empty boxes"""
         
         self.jgl_user_mark = int(input(
@@ -44,3 +45,7 @@ class JglPlayer1():
         
         # Marks the user's symbol in the available box
         self.jgl_game.jgl_game_board[self.jgl_user_mark] = f"_{self.jgl_user_symbol}_"
+        
+        # Removes the user's chosen box from the dictionary of empty boxes
+        if self.jgl_user_mark in jgl_empty_boxes:
+            del jgl_empty_boxes[self.jgl_user_mark]

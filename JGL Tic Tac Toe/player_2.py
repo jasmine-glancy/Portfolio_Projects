@@ -6,11 +6,13 @@ import random
 
 
 class JglPlayer2():
-    def __init__(self, jgl_game, jgl_player_1, jgl_winning_combos):
+    def __init__(self, jgl_game, jgl_player_1, jgl_winning_combos, jgl_empty_boxes):
         """Loads in player 1 and game board"""
         
         self.jgl_player_1 = jgl_player_1
         self.jgl_game = jgl_game
+        self.jgl_game.jgl_winning_combos = jgl_winning_combos
+        self.jgl_game.jgl_empty_boxes = jgl_empty_boxes
     
     def jgl_computer_symbol(self):
         """Checks the user's chosen symbol and then assigns the opposite to the computer"""
@@ -26,16 +28,13 @@ class JglPlayer2():
         print(f"Player 1 is {self.jgl_user_symbol}s!\n", f"Player 2 is {self.jgl_cpu_symbol}s!")
         return self.jgl_cpu_symbol
             
-    def jgl_computer_choice(self):
+    def jgl_computer_choice(self, jgl_winning_combos, jgl_empty_boxes):
         """Computer chooses the next move based on the available slots on the game board"""
         
         # Assign variables for readability
         jgl_board = self.jgl_game.jgl_game_board
-        jgl_winning_combos = self.jgl_game.jgl_winning_combos
-
-        self.jgl_empty_boxes = {jgl_box: "___" for jgl_box in range(len(jgl_board))}
-
-        print(self.jgl_empty_boxes)
+        
+        print(jgl_empty_boxes)
         for combination in jgl_winning_combos:
             
             # Win: If there's a move that will allow the computer to win the game, it should take it.
@@ -53,126 +52,22 @@ class JglPlayer2():
         
         # If a corner or side box is free, take it
         for jgl_box in [0, 2, 6, 8] or jgl_box in [1, 3, 5, 7]:
-            if jgl_box in self.jgl_empty_boxes:
-                return self.jgl_cpu_mark_box(jgl_box)
+            if jgl_box in jgl_empty_boxes:
+                return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)
             
     def jgl_cpu_can_win(self, combination):
         """Checks if the computer can win"""
         return combination.count(self.jgl_cpu_symbol) == 2 and combination.count("___") == 1
-
-                # # Suggested by CoPilot
-                # jgl_winning_move = combination.index("___")
-                    
-                # jgl_board[jgl_winning_move] = f"_{self.jgl_cpu_symbol}_"
                     
     def jgl_cpu_can_block(self, combination):
         """Checks if the computer can block the user from winning"""
         return combination.count(self.jgl_user_symbol) == 2 and combination.count("___") == 1
                
-    def jgl_cpu_mark_box(self, jgl_box):
+    def jgl_cpu_mark_box(self, jgl_box, jgl_empty_boxes):
         """Marks a certain box with the computer's symbol"""
         # Updates the game board and the list of empty boxes
         self.jgl_game.jgl_game_board[jgl_box] = f"_{self.jgl_cpu_symbol}_"
         
-        if jgl_box in self.jgl_empty_boxes:
-            del self.jgl_empty_boxes[jgl_box]
-            
-        # #         # jgl_blocking_move = combination.index("___")
-                    
-        # #         # jgl_board[jgl_blocking_move] = f"_{self.jgl_cpu_symbol}_"
-                    
-        # #         # # Delete the filled box from empty_boxes
-        # #         # del self.jgl_empty_boxes[jgl_blocking_move]
-            
-        # # # Fork: This is a move that creates an opportunity where the players have two threats to win (two non-blocked lines of 2).
-        # # for jgl_box in self.jgl_empty_boxes:
-        # #     # Simulate a move by the computer in the current box, suggested by CoPilot
-        # #     jgl_board[jgl_box] = self.jgl_cpu_symbol
-                
-                
-        # #     # Checks if the computer has 2 or more winning moves
-        # #     jgl_winning_moves = 0
-        # #     jgl_user_winning_moves = 0
-        # #     for combination in jgl_winning_combos:
-        # #         if combination.count(self.jgl_cpu_symbol) == 2 and combination.count("___") == 1:
-        # #             jgl_winning_moves += 1
-                        
-        # #         if combination.count(self.jgl_user_symbol) == 2 and combination.count("___") == 1:
-        # #             jgl_user_winning_moves += 1
-                        
-        # #     # Undo the simulated move
-        # #     jgl_board[jgl_box] = "___"
-                
-        # #     # If the computer has 2 or more winning moves, a fork was found
-        # #     if jgl_winning_moves >= 2:
-        # #         jgl_forked_move = jgl_box
-        # #         jgl_board[jgl_forked_move] = f"_{self.jgl_cpu_symbol}_"
-        # #         break
-                
-        # #     # Block Opponent's Fork: The player should block the opponent's fork opportunities.
-        # #     if jgl_user_winning_moves >= 2:
-        # #         jgl_blocking_forked_move = jgl_box
-        # #         jgl_board[jgl_blocking_forked_move] = f"_{self.jgl_cpu_symbol}_"
-                    
-        # #         # Delete the filled box from empty_boxes
-        # #         del self.jgl_empty_boxes[jgl_blocking_forked_move]
-            
-        # jgl_corners = [0, 2, 6, 8]
-        # jgl_sides = [1, 3, 5, 7]
-            
-        # if jgl_board["4"] == "___":
-        #     jgl_board["4"] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[4]
-                
-        # # Opposite Corner: If the opponent is in the corner, the computer should play the opposite corner.
-        # elif jgl_board["0"] == f"_{self.jgl_user_symbol}_":
-        #     jgl_board["2"] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[2]
-                
-        # elif jgl_board["2"] == f"_{self.jgl_user_symbol}_":
-        #     jgl_board["0"] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[0]
-            
-        # elif jgl_board["6"] == f"_{self.jgl_user_symbol}_":
-        #     jgl_board["8"] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[8]
-                
-        # elif jgl_board["8"] == f"_{self.jgl_user_symbol}_":
-        #     jgl_board["6"] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[6]
-
-        # elif "___" in jgl_corners:
-        #     # Empty Corner: The computer should take an empty corner if available.
-
-        #     jgl_corner_choice = random.choice(jgl_corners)
-        #     jgl_board[jgl_corner_choice] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[jgl_corner_choice]
-                
-        #     # Delete the filled box from the corners list
-        #     jgl_corners.remove(jgl_corner_choice)
-        #     print(jgl_corners)
-
-        # elif "___" in jgl_sides:
-        #     # Empty Side: The computer should take an empty side if available.
-        #     jgl_side_choice = random.choice(jgl_sides)
-        #     jgl_board[jgl_side_choice] = f"_{self.jgl_cpu_symbol}_"
-                
-        #     # # Delete the filled box from empty_boxes
-        #     # del self.jgl_empty_boxes[jgl_side_choice]
-                
-        #     # Delete the filled box from the corners list
-        #     jgl_sides.remove(jgl_sides)
-        #     print(jgl_sides)
+        if jgl_box in jgl_empty_boxes:
+            del jgl_empty_boxes[jgl_box]
             

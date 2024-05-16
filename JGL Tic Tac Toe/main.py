@@ -17,22 +17,26 @@ jgl_game.jgl_print_board()
 # Pre-determine winning combinations for faster checks
 jgl_winning_combos = jgl_game.jgl_winning_combos()
 
+# Load in empty boxes
+jgl_empty_boxes = jgl_game.jgl_empty_boxes
+
 # Ask user to choose a symbol and verify it
-jgl_player_1 = JglPlayer1(jgl_game)
+jgl_player_1 = JglPlayer1(jgl_game, jgl_empty_boxes)
 
 # Assign the computer's symbol
-jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1, jgl_winning_combos)
+jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1, jgl_winning_combos, jgl_empty_boxes)
 jgl_player_2.jgl_computer_symbol()
 
-# Mark the boxes
-jgl_player_1.jgl_box_mark()
+while jgl_game.jgl_is_board_filled != False:
+    # Mark the boxes
+    jgl_player_1.jgl_box_mark(jgl_empty_boxes)
 
-# Print board again
-jgl_game.jgl_print_board()
+    # Print board again
+    jgl_game.jgl_print_board()
 
-# Computer picks a mark
-jgl_player_2.jgl_computer_choice()
-jgl_game.jgl_print_board()
+    # Computer picks a mark
+    jgl_player_2.jgl_computer_choice(jgl_winning_combos, jgl_empty_boxes)
+    jgl_game.jgl_print_board()
 # TODO: If the current player won the game, then print a winning message and break the infinite loop.
 
 

@@ -8,6 +8,9 @@ class JglTicTacToe():
                                3: '___', 4: '___', 5: '___',
                                6: '___', 7: '___', 8: '___',}
         
+        self.jgl_empty_boxes = {jgl_box: "___" for jgl_box in range(len(self.jgl_game_board))}
+
+        
     def jgl_print_board(self):
         """Prints the game board"""
         
@@ -18,6 +21,8 @@ class JglTicTacToe():
         print(" ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾ ")
 
     def jgl_winning_combos(self):
+        """Loads in winning combinations"""
+        
         self.jgl_winning_combos = [
             [self.jgl_game_board[0], self.jgl_game_board[1], self.jgl_game_board[2]], # Row 1
             [self.jgl_game_board[3], self.jgl_game_board[4], self.jgl_game_board[5]], # Row 2
@@ -30,9 +35,18 @@ class JglTicTacToe():
             ]
         
         return self.jgl_winning_combos
-        # TODO: Write a new function to check if the board is filed or not
-            # TODO: Iterate over the board and return false if the board has an empty sign
-            
+    
+    def jgl_is_board_filled(self):
+        """Checks if the board is filled or not"""
+        
+        # Iterate over the board and return false if the board has an empty sign
+        for spot in self.jgl_game_board:
+            if self.jgl_game_board[spot] == "___":
+                return False
+            else:
+                return True
+
+
         # TODO: Write a new function to check whether a player has won or not 
             # TODO: Check for all the rows, columns, and the two diagonals
             
