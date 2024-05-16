@@ -31,7 +31,7 @@ jgl_player_1.jgl_box_mark()
 jgl_game.jgl_print_board()
 
 # Computer picks a mark
-jgl_player_2.jgl_computer_mark()
+jgl_player_2.jgl_computer_choice()
 jgl_game.jgl_print_board()
 # TODO: If the current player won the game, then print a winning message and break the infinite loop.
 
