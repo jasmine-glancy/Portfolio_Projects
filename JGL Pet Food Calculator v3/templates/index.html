@@ -6,6 +6,16 @@
 
 <div class="container-lg">
     <h1><b>Welcome to the Pet Food Calculator!</b></h1>
+
+    <!-- Outputs messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <!-- TODO: modify success messages CSS -->
+                <p class="flash"> {{ message }} </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <p>
         This website will help you calculate the amount of food you need for your pet 
         based on a varieity of factors, including weight, age, and activity level.

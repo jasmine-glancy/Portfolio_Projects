@@ -4,6 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm
+from helpers import login_check_for_species
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -31,12 +32,12 @@ db = SQL("sqlite:///pet_food_calculator.db")
 # TODO: Add login required to applicable routes
 @app.route("/")
 def home():
-    '''Includes welcome and disclaimers along with login/register buttons'''
+    """Includes welcome and disclaimers along with login/register buttons"""
     return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    '''Logs an existing user in'''
+    """Logs an existing user in"""
     form = LoginForm()
     
     # Checks if the user's data is validated 
@@ -49,14 +50,17 @@ def login():
         
         if user_lookup == None:
             flash("Username not found.")
+            return redirect(url_for('login'))
         
         # Ensure username exists and password is correct
         elif not check_password_hash(user_lookup[0]["password"], 
                                    request.form.get("password")):
             flash("Invalid password.")
+            return redirect(url_for('login'))
         
         else:
-
+            flash(f"Logged in as {request.form.get("username")}!")
+            
             # Remember which user has logged in
             session["user_id"] = user_lookup[0]["id"]
     
@@ -67,7 +71,7 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    '''Registers a new user'''
+    """Registers a new user"""
 
     form = RegisterForm()
     
@@ -114,7 +118,8 @@ def logout():
 
 @app.route("/get-signalment", methods=["GET", "POST"])
 def pet_info():
-    '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
+    """Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species"""
+    
     form = NewSignalment()
     
     if request.method == "POST":
@@ -148,29 +153,13 @@ def pet_info():
 
 @app.route("/get-signalment-pt-2", methods=["GET", "POST"])
 def pet_info_continued():
-    '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
+    """Gets the rest of pet's signalment, 
+    i.e. name, age, sex/reproductive status, breed, species"""
+    
     form = NewSignalment()
     
-
-    if session["user_id"] != None:
-        # If the user is logged in, verify session variables 
-        print(session["user_id"])
-        print(session["pet_name"])
-        
-        
-        species_result = db.execute(
-            "SELECT species FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-        species = species_result[0]['species']
-        print(species)
-    else:
-        # If a user isn't logged in, grab species variable
-        species = session["species"]
-        
-        if species == None:
-            species = request.args.get("species")
-        print(f"Non-db species: {species}")
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
 
         
     # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
@@ -245,20 +234,22 @@ def pet_info_continued():
 
 @app.route("/pregnancy_status", methods=["GET", "POST"])
 def repro_status():
-    '''Gets information about the pet's pregnancy status'''
+    """Gets information about the pet's pregnancy status"""
     repro = ReproStatus()
     
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()   
+     
     if request.method == "POST":
         pregnancy_status = repro.pregnancy_status.data
         
-        # Retrieves species session variable 
-        # TODO: replace this with database query if the user is logged in
-        species = session.get('species')
-        
+        # Store new info as session variables
+        session["pregnancy_status"] = pregnancy_status
+
         if pregnancy_status == "y":
             if species == "canine":
                 # If pet is pregnant and canine, ask how many weeks along she is
-                return redirect(url_for('gestation_duration'))
+                return redirect(url_for('gestation_duration', species=species))
             
             # If pet is pregnant and feline, DER factor is * 1.6-2.0
             return redirect(url_for('pet_condition', species=species))
@@ -271,15 +262,19 @@ def repro_status():
 
 @app.route("/gestation_duration", methods=["GET", "POST"])
 def gestation_duration():
-    '''Asks for how long the pet has been pregnant for if they are canine 
-    and assigns DER factor'''
+    """Asks for how long the pet has been pregnant for if they are canine 
+    and assigns DER factor"""
     
     repro = ReproStatus()
+    
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
     
     if request.method == "POST":
         number_weeks_pregnant = repro.weeks_gestation.data
         
-        species = session.get('species')
+        # Store new info as session variables
+        session["number_weeks_pregnant"] = number_weeks_pregnant
         
         if number_weeks_pregnant <= "6":
             # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
@@ -297,13 +292,12 @@ def gestation_duration():
 
 @app.route("/litter_size", methods=["GET", "POST"])
 def litter_size():
-    '''Asks for the litter size of pets that have one, then assigns DER modifier'''
+    """Asks for the litter size of pets that have one, then assigns DER modifier"""
     
     repro = ReproStatus()
     
-    # Retrieves species session variable 
-    # TODO: replace this with database query if the user is logged in
-    species = session.get('species')
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
     
     if request.method == "POST":
         litter_size = repro.litter_size.data
@@ -327,19 +321,25 @@ def litter_size():
                 
             # TODO: Add modifier to pet's table in the database
             pass
-        return redirect(url_for('pet_condition'))
+        return redirect(url_for('pet_condition', species=species))
     
     return render_template("get_litter_size.html", repro=repro, species=species)
 
 
 @app.route("/lactation_status", methods=["GET", "POST"])
 def lactation_status():
-    '''Asks if the pet is currently nursing'''
+    """Asks if the pet is currently nursing"""
     
     repro = ReproStatus()
     
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
+    
     if request.method == "POST":
         lactation_status = repro.nursing_status.data
+        
+        # Stores lactation status variable in session
+        session["lactation_status"] = lactation_status
 
         if lactation_status == "y":
             # If pet is lactating, ask for litter size
@@ -347,7 +347,7 @@ def lactation_status():
             
         else:
             # If pet is not lactating, next page is get_weight
-            return redirect(url_for('pet_condition'))
+            return redirect(url_for('pet_condition', species=species))
     
     return render_template("get_lactation_status.html", repro=repro)
     
@@ -355,12 +355,18 @@ def lactation_status():
 
 @app.route("/lactation_duration", methods=["GET", "POST"])
 def lactation_duration():
-    '''Asks how many weeks a pregnant queen has been nursing and adds DER modifier'''
+    """Asks how many weeks a pregnant queen has been nursing and adds DER modifier"""
     
     repro = ReproStatus()
     
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
+    
     if request.method == "POST":
         duration_of_nursing = int(repro.weeks_nursing.data)
+        
+        # Stores nursing duration variable in session
+        session["duration_of_nursing"] = duration_of_nursing
         
         if duration_of_nursing <= 2:
             # If the queen has been nursing for 2 weeks or less, DER modifier is RER + 30% per kitten
@@ -382,38 +388,58 @@ def lactation_duration():
             # If the queen has been nursing for 6 weeks, DER modifier is RER + 90% per kitten
             pass 
 
-        return redirect(url_for('pet_condition'))
+        return redirect(url_for('pet_condition', species=species))
     
     return render_template("lactation_duration.html", repro=repro)
 
 
 @app.route("/get-weight", methods=["GET", "POST"])
 def pet_condition():
-    '''Gets the pet's weight and body condition score'''
+    """Gets the pet's weight and body condition score"""
     
     form = GetWeight() 
     
-    # Retrieves species session variable 
-    if session["user_id"] != None:
-        # If the user is logged in, verify session variables 
-        print(session["user_id"])
-        print(session["pet_name"])
-        
-    # TODO: replace this with database query if the user is logged in
-    species = session.get('species')
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
     
-    # TODO: Add weight and BCS to the database if the user is logged in
-            # else pass this data to the next function 
-            
-    # TODO: Redirect to the next page if info is input successfully
     if request.method == "POST":
-        return redirect(url_for('activity'))
+        bcs = int(form.pet_bcs.data)
+        weight = float(form.pet_weight.data)
+        units = form.pet_units.data
+        
+        # Store new info as session variables
+        session["bcs"] = bcs
+        session["weight"] = weight
+        session["units"] = units
+        
+        print(bcs)
+        print(type(bcs))
+        print(weight)
+        print(type(weight))
+        print(units)
+        print(type(units))
+        # Add weight and BCS to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                print(session["pet_name"])
+                print(session["user_id"])
+
+                db.execute(
+                    "UPDATE pets SET bcs = :body_condition_score, weight = :weight, units = :units WHERE name = :pet_name AND owner_id = :user_id",
+                    body_condition_score=bcs, weight=weight, units=units, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+                    
+            except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+            
+        # Redirect to the next page if info is input successfully
+        return redirect(url_for('activity', species=species))
     
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
 @app.route("/activity", methods=["GET", "POST"])
 def activity():
-    '''Gets a pet's activity status/amount'''
+    """Gets a pet's activity status/amount"""
     
     # TODO: Add activity intensity table to database
     # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
