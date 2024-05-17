@@ -332,25 +332,25 @@
     {% endif %}
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('patient_condition') }}" method="POST" >
+    <form action="{{ url_for('pet_condition') }}" method="POST" >
         <div class="row">
             <div class="col">
-                {{ form.patient_bcs.label }}
+                {{ form.pet_bcs.label }}
             </div>
             <div class="col">
-                {{ form.patient_bcs }}
+                {{ form.pet_bcs }}
             </div>
             <div class="col">
-                {{ form.patient_weight.label }}  
+                {{ form.pet_weight.label }}  
             </div>
             <div class="col">
-                {{ form.patient_weight }} 
+                {{ form.pet_weight }} 
             </div>
             <div class="col">
-                {{ form.patient_units.label }}   
+                {{ form.pet_units.label }}   
             </div>
             <div class="col">
-                {{ form.patient_units }}
+                {{ form.pet_units }}
             </div>
         </div>
 

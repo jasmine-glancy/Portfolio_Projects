@@ -17,6 +17,14 @@
     
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('pet_info') }}" method="POST">
+        <!-- Outputs error messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for error in messages %}
+                    <p class="flash">⚠️ {{ error }} ⚠️</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div class="row">
             <div class="col" title="Name" id="name">
                 {{ form.pet_name.label }} {{ form.pet_name }}

@@ -49,14 +49,17 @@ def login():
         
         if user_lookup == None:
             flash("Username not found.")
-            
+        
         # Ensure username exists and password is correct
         if not check_password_hash(user_lookup[0]["password"], 
                                    request.form.get("password")):
             flash("Invalid password.")
 
+        # Remember which user has logged in
+        session["user_id"] = user_lookup[0]["id"]
+        
         logged_in = True
-
+    
         return render_template("index.html", logged_in=logged_in)
         
     
@@ -81,15 +84,33 @@ def register():
         elif request.form.get("password") != request.form.get("confirm_password"):
             flash("Passwords must match.")
         else:
-            # If all checks pass, hash password and insert info into database
+            # If all checks pass, hash password
             hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
             
+            # Insert new info into database
             db.execute("INSERT INTO users (username, password) VALUES(?, ?)", request.form.get("username"), hashed_password)
                 
-            # TODO: Add sessions?
-            return redirect(url_for('home'))
+            user = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+            
+            # Remember which user has logged in
+            session["user_id"] = user[0]["id"]
+            
+            logged_in = True
+            
+            # Redirect to home
+            return render_template("index.html", logged_in=logged_in)
     
     return render_template("register.html", form=form)
+
+@app.route("/logout")
+def logout():
+    """Logs user out"""
+    
+    # Clears the user_id
+    session.clear()
+    
+    # Redirect to home
+    return redirect("/")
 
 @app.route("/get-signalment", methods=["GET", "POST"])
 def pet_info():
@@ -99,8 +120,13 @@ def pet_info():
     if request.method == "POST":
         species = form.pet_species.data
         
+        # Show an error message if the user doesn't choose a species
+        if species == "default":
+            flash("Please choose a species from the dropdown.")
+            return render_template("get_signalment.html", form=form)
 
         # TODO: Add pet to the database if the user is logged in
+        
             # else pass the data to the next function 
         return redirect(url_for('pet_info_continued', species=species))
 
@@ -133,32 +159,20 @@ def pet_info_continued():
         pet_age_years = form.pet_age.data
         pet_age_months = form.pet_age_months.data     
 
+        species = request.args.get("species")
         print(f"Pet sex: {pet_sex}")
         print(f"Pet age (years): {pet_age_years}")
         print(f"Pet age (months): {pet_age_months}")
-        if species == "canine":
-                
-            if pet_age_years >= 2 and pet_age_months >= 0:
-                # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
+        if pet_age_years >= 2 and pet_age_months >= 0:
+            # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
 
-                if pet_sex == "female":
-                    # If the pet is an intact female, redirect to pregnancy questions
+            if pet_sex == "female":
+                # If the pet is an intact female, redirect to pregnancy questions
                     
-                    return redirect(url_for('repro_status', species=species))
-                else:
-                    return redirect(url_for('pet_condition', species=species))
-        elif species == "feline":
-            # Determine if cat is pediatric
+                return redirect(url_for('repro_status', species=species))
+            else:
+                return redirect(url_for('pet_condition', species=species))
 
-            if pet_age_years >= 2 and pet_age_months >= 0 or pet_age_years >= 1 and pet_age_months >= 6:
-                # If cat isn't pediatric/is sexually mature, find the best DER factor per lifestage
-                if pet_sex == "female":
-                    # If the pet is an intact female, redirect to pregnancy questions
-                    
-                    return redirect(url_for('repro_status', species=species))
-            
-                else:
-                    return redirect(url_for('pet_condition', species=species))
         # TODO: Add pet to the database if the user is logged in
             # else pass the data to the next function 
 
@@ -183,7 +197,7 @@ def repro_status():
                 return redirect(url_for('gestation_duration'))
             
             # If pet is pregnant and feline, DER factor is * 1.6-2.0
-            return redirect(url_for('pet_condition'))
+            return redirect(url_for('pet_condition', species=species))
         else:
             # If pet is not pregnant, ask if she is currently nursing a litter
             return redirect(url_for('lactation_status'))
@@ -201,6 +215,8 @@ def gestation_duration():
     if request.method == "POST":
         number_weeks_pregnant = repro.weeks_gestation.data
         
+        species = request.args.get('species')
+        
         if number_weeks_pregnant <= "6":
             # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
             # TODO: Add this information to pet's table in the database
@@ -210,7 +226,7 @@ def gestation_duration():
             # TODO: Add this information to pet's table in the database
             pass
         
-        return redirect(url_for('pet_condition'))
+        return redirect(url_for('pet_condition', species=species))
     
     return render_template("gestation_duration.html", repro=repro)
 
