@@ -51,16 +51,16 @@ def login():
             flash("Username not found.")
         
         # Ensure username exists and password is correct
-        if not check_password_hash(user_lookup[0]["password"], 
+        elif not check_password_hash(user_lookup[0]["password"], 
                                    request.form.get("password")):
             flash("Invalid password.")
-
-        # Remember which user has logged in
-        session["user_id"] = user_lookup[0]["id"]
         
-        logged_in = True
+        else:
+
+            # Remember which user has logged in
+            session["user_id"] = user_lookup[0]["id"]
     
-        return render_template("index.html", logged_in=logged_in)
+        return render_template("index.html")
         
     
     return render_template("login.html", form=form)
@@ -119,16 +119,30 @@ def pet_info():
     
     if request.method == "POST":
         species = form.pet_species.data
+        pet_name = form.pet_name.data
+        
+        # Store session variables
+        session["species"] = species
+        session["pet_name"] = pet_name
         
         # Show an error message if the user doesn't choose a species
         if species == "default":
             flash("Please choose a species from the dropdown.")
             return render_template("get_signalment.html", form=form)
 
-        # TODO: Add pet to the database if the user is logged in
-        
-            # else pass the data to the next function 
-        return redirect(url_for('pet_info_continued', species=species))
+        # Add pet to the database if the user is logged in
+        if session["user_id"] != None:
+            
+            try:
+                db.execute(
+                    "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
+                    session["user_id"], form.pet_name.data, species
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+                
+        # else pass the data to the next function via session variables
+        return redirect(url_for('pet_info_continued', species=species, pet_name=pet_name))
 
     return render_template("get_signalment.html", form=form)
 
@@ -136,8 +150,29 @@ def pet_info():
 def pet_info_continued():
     '''Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species'''
     form = NewSignalment()
+    
 
-    species = request.args.get("species")
+    if session["user_id"] != None:
+        # If the user is logged in, verify session variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
+        
+        species_result = db.execute(
+            "SELECT species FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        )
+        
+        species = species_result[0]['species']
+        print(species)
+    else:
+        # If a user isn't logged in, grab species variable
+        species = session["species"]
+        
+        if species == None:
+            species = request.args.get("species")
+        print(f"Non-db species: {species}")
+
+        
     # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
     # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
     
@@ -151,30 +186,60 @@ def pet_info_continued():
         pet_breed += db.execute(
             "SELECT Breed FROM cat_breeds"
         )
-            
-    #TODO: Add flash error if default is chosen
-
+    
     if request.method == "POST":
+        
         pet_sex = form.pet_sex.data
         pet_age_years = form.pet_age.data
         pet_age_months = form.pet_age_months.data     
 
-        species = request.args.get("species")
-        print(f"Pet sex: {pet_sex}")
-        print(f"Pet age (years): {pet_age_years}")
-        print(f"Pet age (months): {pet_age_months}")
-        if pet_age_years >= 2 and pet_age_months >= 0:
-            # If dog isn't pediatric/is sexually mature, find the best DER factor per lifestage
+        species = session.get("species")
+        name = session.get("pet_name")
+        pet_breed = request.form.get("pet_breed")
+        
+        print(pet_breed)
+        #TODO: Add flash error if default is chosen
+        # Show an error message if the user doesn't choose a breed
+        if pet_breed == None:
+            flash("Please choose a breed from the dropdown.")
+        else:
+            print(f"Pet sex: {pet_sex}")
+            print(f"Pet age (years): {pet_age_years}")
+            print(f"Pet age (months): {pet_age_months}")
+            
+            # Store new info as session variables
+            session["pet_sex"] = pet_sex
+            session["pet_age_years"] = pet_age_years
+            session["pet_age_months"] = pet_age_months
+            
+            # print(pet_age_years)
+            # print(pet_age_months)
+            # print(pet_breed)
+            # print(pet_sex)
+            # print(session["pet_name"])
+            # print(session["user_id"])
+            
+            # Add pet to the database if the user is logged in
+            if session["user_id"] != None:
+                try:
+                    db.execute(
+                        "UPDATE pets SET age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex WHERE name = :pet_name AND owner_id = :user_id",
+                            y=pet_age_years, m=pet_age_months, breed=pet_breed, sex=pet_sex, pet_name=session["pet_name"], user_id=session["user_id"]
+                        )
+                except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+            
+            if pet_age_years >= 2 and pet_age_months >= 0:
 
-            if pet_sex == "female":
-                # If the pet is an intact female, redirect to pregnancy questions
+                if pet_sex == "female":
+                    # If the pet is an intact female redirect to pregnancy questions
                     
-                return redirect(url_for('repro_status', species=species))
-            else:
-                return redirect(url_for('pet_condition', species=species))
+                    return redirect(url_for('repro_status', species=species))
+                else:
+                    # Else redirect to pet body condition score questions
+                    return redirect(url_for('pet_condition', species=species))
 
-        # TODO: Add pet to the database if the user is logged in
-            # else pass the data to the next function 
+
 
     return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species)
 
@@ -188,8 +253,7 @@ def repro_status():
         
         # Retrieves species session variable 
         # TODO: replace this with database query if the user is logged in
-        species = request.args.get('species')
-
+        species = session.get('species')
         
         if pregnancy_status == "y":
             if species == "canine":
@@ -215,7 +279,7 @@ def gestation_duration():
     if request.method == "POST":
         number_weeks_pregnant = repro.weeks_gestation.data
         
-        species = request.args.get('species')
+        species = session.get('species')
         
         if number_weeks_pregnant <= "6":
             # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
@@ -330,6 +394,11 @@ def pet_condition():
     form = GetWeight() 
     
     # Retrieves species session variable 
+    if session["user_id"] != None:
+        # If the user is logged in, verify session variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
     # TODO: replace this with database query if the user is logged in
     species = session.get('species')
     

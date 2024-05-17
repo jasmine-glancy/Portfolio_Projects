@@ -17,11 +17,19 @@
     
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('pet_info_continued') }}" method="POST">
+        <!-- Outputs error messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for error in messages %}
+                    <p class="flash">⚠️ {{ error }} ⚠️</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div class="row">
             <div class="col" title="Breed">
                 Pet's Breed: 
-                <select name="Pet's Breed">
-                    <option value="" disabled selected>
+                <select name="pet_breed" id="pet_breed">
+                    <option value="default" disabled selected>
                         Please make a selection
                     </option> 
                     {% for breed in pet_breed %}
