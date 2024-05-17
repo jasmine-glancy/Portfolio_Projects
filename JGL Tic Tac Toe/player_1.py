@@ -41,7 +41,7 @@ class JglPlayer1():
         # If the spot is already filled, give an error
         if self.jgl_game.jgl_game_board[self.jgl_user_mark] != "___":
             print("That space is already filled. Please choose again.")
-            return self.jgl_box_mark()
+            return self.jgl_box_mark(jgl_empty_boxes)
         
         # Marks the user's symbol in the available box
         self.jgl_game.jgl_game_board[self.jgl_user_mark] = f"_{self.jgl_user_symbol}_"

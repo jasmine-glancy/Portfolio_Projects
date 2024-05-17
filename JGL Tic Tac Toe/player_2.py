@@ -39,30 +39,59 @@ class JglPlayer2():
             
             # Win: If there's a move that will allow the computer to win the game, it should take it.
             if self.jgl_cpu_can_win(combination):
-                return self.jgl_cpu_mark_box(combination)
+                jgl_winning_box = combination.index("___")
+                return self.jgl_cpu_mark_box(jgl_winning_box)
             
+        for combination in jgl_winning_combos:    
             # Block: If the opponent has two in a row, the computer should play the third to block the opponent.
             if self.jgl_cpu_can_block(combination):
-                return self.jgl_cpu_mark_box(combination)
+                jgl_blocking_box = combination.index("___")
+                return self.jgl_cpu_mark_box(jgl_blocking_box)
             
         # Center: If the center square is free, the computer should take it.
         if jgl_board[4] == "___":
-            return self.jgl_cpu_mark_box(4)
+            return self.jgl_cpu_mark_box(4, jgl_empty_boxes)
         
         
-        # If a corner or side box is free, take it
-        for jgl_box in [0, 2, 6, 8] or jgl_box in [1, 3, 5, 7]:
+        # If a corner box is free, take it
+        for jgl_box in [0, 2, 6, 8]:
+            if jgl_box in jgl_empty_boxes:
+                return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)
+            
+        # If a side box is free, take it
+        for jgl_box in [1, 3, 5, 7]:
             if jgl_box in jgl_empty_boxes:
                 return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)
             
     def jgl_cpu_can_win(self, combination):
         """Checks if the computer can win"""
-        return combination.count(self.jgl_cpu_symbol) == 2 and combination.count("___") == 1
+        
+        # Condition suggested by CoPilot
+        return combination.count(self.jgl_cpu_symbol) == 2 and combination.count("___") == 1 and self.jgl_is_winning_combination(combination)
                     
     def jgl_cpu_can_block(self, combination):
         """Checks if the computer can block the user from winning"""
-        return combination.count(self.jgl_user_symbol) == 2 and combination.count("___") == 1
-               
+        return combination.count(self.jgl_user_symbol) == 2 and combination.count("___") == 1 and self.jgl_user_can_win_next_turn(combination)
+    
+    def jgl_user_can_win_next_turn(self, combination):
+        """Checks if the user will win next turn"""
+        
+        # Create a copy of the game board, suggested by CoPilot
+        jgl_board_copy = self.jgl_game.jgl_game_board.copy()
+        
+        # Mark the empty box in the combination
+        jgl_board_copy[combination.index("___")] = f"_{self.jgl_user_symbol}_"
+        
+        # Check if this will allow the user to win
+        for winning_combo in self.jgl_game.jgl_winning_combos:
+            if all(jgl_board_copy[i] == f"_{self.jgl_user_symbol}_" for i in winning_combo):
+                return True
+        return False
+    
+    def jgl_is_winning_combination(self, combination, jgl_winning_combos):
+        """Checks the winning combinations"""
+        return combination in jgl_winning_combos
+    
     def jgl_cpu_mark_box(self, jgl_box, jgl_empty_boxes):
         """Marks a certain box with the computer's symbol"""
         # Updates the game board and the list of empty boxes
