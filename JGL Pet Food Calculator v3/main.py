@@ -441,7 +441,7 @@ def pet_condition():
         
         if species == "feline":
             # Take cat owners to the pre-confirmation page
-            return redirect(url_for('confirm_data'))
+            return redirect(url_for('confirm_data', species=species))
     
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
@@ -450,6 +450,9 @@ def activity():
     """Gets a pet's activity status/amount"""
     
     work = WorkForm()
+    
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
     
     if request.method == "POST":
         light_work_minutes = work.light_work_minutes.data
@@ -497,7 +500,7 @@ def activity():
             # Otherwise, create new session variables
             session["activity_level"] = activity_level
         
-        return redirect(url_for('confirm_data'))
+        return redirect(url_for('confirm_data', species=species))
     
     return render_template("get_work_level.html", work=work)
 
