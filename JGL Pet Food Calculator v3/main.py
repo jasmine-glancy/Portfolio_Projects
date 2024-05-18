@@ -182,8 +182,6 @@ def pet_info_continued():
         pet_age_years = form.pet_age.data
         pet_age_months = form.pet_age_months.data     
 
-        species = session.get("species")
-        name = session.get("pet_name")
         pet_breed = request.form.get("pet_breed")
         
         print(pet_breed)
@@ -412,12 +410,16 @@ def pet_condition():
         session["weight"] = weight
         session["units"] = units
         
-        print(bcs)
-        print(type(bcs))
-        print(weight)
-        print(type(weight))
-        print(units)
-        print(type(units))
+        # print(bcs)
+        # print(type(bcs))
+        # print(weight)
+        # print(type(weight))
+        # print(units)
+        # print(type(units))
+        
+        # Use login check from helpers.py to verify species
+        species = login_check_for_species()
+    
         # Add weight and BCS to the database if the user is logged in
         if session["user_id"] != None:
             try:
@@ -433,7 +435,13 @@ def pet_condition():
                     flash(f"Unable to insert data, Exception: {e}")
             
         # Redirect to the next page if info is input successfully
-        return redirect(url_for('activity', species=species))
+        if species == "canine":
+            # Gets a dog's activity level if applicable 
+            return redirect(url_for('activity'))
+        
+        if species == "feline":
+            # Take cat owners to the pre-confirmation page
+            return redirect(url_for('confirm_data'))
     
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
@@ -441,22 +449,67 @@ def pet_condition():
 def activity():
     """Gets a pet's activity status/amount"""
     
-    # TODO: Add activity intensity table to database
-    # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
-    # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
-        # Sedentary: 0-30 minutes of light activity daily
-        # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
-        # Moderate activity: 1-2 hours of low impact activity 
-            # Or 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
-        # High activity: 2-3 hours of daily activity (i.e. working dog)
-        # Working and performance: 3+ hours (i.e. working dog)
-            # Or high impact activity under extreme conditions (i.e. racing sled dog)
-    
     work = WorkForm()
     
-    return render_template("get_work_level.html", work=work)
+    if request.method == "POST":
+        light_work_minutes = work.light_work_minutes.data
+        light_work_hours = work.light_work_hours.data
+        heavy_work_minutes = work.heavy_work_minutes.data
+        heavy_work_hours = work.heavy_work_hours.data
+        
+        # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
+        # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
+        if light_work_minutes <= 30 and light_work_hours == 0 and heavy_work_minutes == 0 and heavy_work_hours == 0:
+            # Sedentary: 0-30 minutes of light activity daily
+            activity_level = "Sedentary"
+        elif light_work_minutes > 30 and light_work_minutes <= 60 and light_work_hours == 0 and heavy_work_minutes == 0 and heavy_work_hours == 0:
+            # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
+            activity_level = "Low"
+        elif light_work_minutes > 60 and light_work_minutes <= 120 and heavy_work_minutes == 0 and heavy_work_hours == 0:
+            # Moderate activity: 1-2 hours of low impact activity 
+            activity_level = "Moderate"
+        elif heavy_work_minutes >= 60 and heavy_work_minutes <= 180 and light_work_minutes == 0 and light_work_hours == 0:
+            # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
+            activity_level = "Moderate"
+        elif heavy_work_minutes > 180:
+            # High activity: 2-3 hours of daily activity (i.e. working dog)
+            activity_level = "Heavy"
+            # Working and performance: 3+ hours (i.e. working dog)
+                # Or high impact activity under extreme conditions (i.e. racing sled dog)
+        
+        
+        print(activity_level)
+        # If user is logged in, add activity level to database
+        if session["user_id"] != None:
+            try:
+                print(session["pet_name"])
+                print(session["user_id"])
+                
+                db.execute(
+                    "UPDATE pets SET activity_level = :activity WHERE name = :pet_name AND owner_id = :user_id",
+                    activity=activity_level, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+                
+            except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+        
+        else:    
+            # Otherwise, create new session variables
+            session["activity_level"] = activity_level
+        
+        return redirect(url_for('confirm_data'))
     
+    return render_template("get_work_level.html", work=work)
 
+@app.route("/confirm_data", methods=["GET", "POST"])
+def confirm_data():
+    """Confirms pet's info before taking users to the food calculator"""
+    
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
+    
+    return render_template("confirm_pet_info.html", species=species)
+    
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
     
     # TODO: If pet is not pregnant, ask if she is currently nursing a litter

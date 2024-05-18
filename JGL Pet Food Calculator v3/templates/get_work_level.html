@@ -2,12 +2,12 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Part 3: Activity Level{% endblock %}
+{% block title %}Part 2.5: Activity Level{% endblock %}
 
 {% block content %}
 
 <div class="container-lg">
-    <h1><b>Part 1: Pet Information</b></h1>
+    <h1><b>Part 2.5: Activity Level</b></h1>
 
     <!-- Progress bar -->
     <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
@@ -17,21 +17,55 @@
     
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('activity') }}" method="POST" >
+        <!-- Outputs error messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for error in messages %}
+                    <p class="flash">⚠️ {{ error }} ⚠️</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div class="row">
+            <p>
+                Please categorize your pet's activity below. Examples of light activity 
+                include walking on a leash or sniffing in the back yard. High impact activity
+                includes running off-leash, playing ball/fetch, playing off leash with other
+                dogs, or dog sports (i.e. sled racing, agility, et cetra).
+            </p>
             <div class="col">
                 <p>
-                    {{ work.work_minutes.label }} 
+                    {{ work.light_work_minutes.label }} 
                     <div class="form_divider">
-                    {{ work.work_minutes }}
+                    {{ work.light_work_minutes }}
                     </div>
                 </p>
             </div>
             
             <div class="col">
                 <p>
-                    {{ work.work_hours.label }} 
+                    {{ work.light_work_hours.label }} 
                     <div class="form_divider">
-                        {{ work.work_hours }}
+                        {{ work.light_work_hours }}
+                    </div>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <p>
+                    {{ work.heavy_work_minutes.label }} 
+                    <div class="form_divider">
+                    {{ work.heavy_work_minutes }}
+                    </div>
+                </p>
+            </div>
+            
+            <div class="col">
+                <p>
+                    {{ work.heavy_work_hours.label }} 
+                    <div class="form_divider">
+                        {{ work.heavy_work_hours }}
                     </div>
                 </p>
             </div>
@@ -42,15 +76,12 @@
                 <button type="button" class="btn btn-secondary btn-lg">Go to Part 2: Weight and Body Condition</button>
             </a>
 
-            <!-- Divider solution suggested by Michael Allen on Slack -->
+            <!-- Divider solution suggested by Michael Allen on Stack Overflow-->
             <div class="divider"></div>
 
-            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 4: Current Food</button>
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Confirm Pet Information</button>
         </div>
     </form>
 </div>
-
-<!-- Links Javascript for showing/hiding forms based on user input-->
-<script src="{{ url_for('static', filename='js/signalment_scripts.js') }}"></script>
 
 {% endblock %}

@@ -111,10 +111,16 @@ class RegisterForm(FlaskForm):
     
 # Obtain activity info
 class WorkForm(FlaskForm):
-    work_minutes = FloatField(
-        "Approximately how many minutes of exercise does your pet get per day? Please enter 0 if none: ",
+    light_work_minutes = IntegerField(
+        "Approximately how many minutes of low-impact exercise does your pet get per day? Please enter 0 if none: ",
         validators=[DataRequired()])
-    work_hours = FloatField(
-        "Approximately how many hours of exercise does your pet get per day? Please enter 0 if none: ",
+    light_work_hours = IntegerField(
+        "Approximately how many hours of low-impact exercise does your pet get per day? Please enter 0 if none: ",
+        validators=[DataRequired()])
+    heavy_work_minutes = IntegerField(
+        "Approximately how many minutes of high-impact exercise does your pet get per day? Please enter 0 if none: ",
+        validators=[DataRequired()])
+    heavy_work_hours = IntegerField(
+        "Approximately how many hours of high-impact exercise does your pet get per day? Please enter 0 if none: ",
         validators=[DataRequired()])
     

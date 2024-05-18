@@ -49,8 +49,14 @@
 
         </div>
 
-    
-        <div class="row">
+        <div class="button-container">
+            <a href="{{ url_for('pet_info') }}">
+                <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 1: Pet Information</button>
+            </a>
+
+            <!-- Divider solution suggested by Michael Allen on Stack Overflow-->
+            <div class="divider"></div>
+        
             <button type="submit" class="btn btn-secondary btn-lg">Go to Next Part</button>
         </div>
     </form>

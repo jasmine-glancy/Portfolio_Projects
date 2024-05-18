@@ -359,10 +359,14 @@
                 <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 1: Pet Information</button>
             </a>
 
-            <!-- Divider solution suggested by Michael Allen on Slack -->
+            <!-- Divider solution suggested by Michael Allen on Stack Overflow-->
             <div class="divider"></div>
-
-            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Activity Level</button>
+            
+            {% if species == "canine" %}
+                <button type="submit" class="btn btn-secondary btn-lg">Go to Part 2.5: Activity Level</button>
+            {% elif species == "feline" %}
+                <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Confirm Pet Information</button>
+            {% endif %}
         </div>
     </form>
 </div>
