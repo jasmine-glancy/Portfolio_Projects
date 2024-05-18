@@ -10,8 +10,8 @@ class NewSignalment(FlaskForm):
     pet_age_months = IntegerField("Pet's Age in Months:", validators=[DataRequired()])
     pet_species = SelectField(u"Pet's Species:",
                                   choices=[("default", "Please make a selection"),
-                                            ("canine", "Canine"),
-                                            ("feline", "Feline")],
+                                            ("Canine", "Canine"),
+                                            ("Feline", "Feline")],
                                   validators=[DataRequired()],
                                   render_kw={"option": {"default": {"disabled": ""}},
                                              "id": "species"})

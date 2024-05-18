@@ -124,7 +124,10 @@ def pet_info():
     
     if request.method == "POST":
         species = form.pet_species.data
-        pet_name = form.pet_name.data
+        pet_name = form.pet_name.data.title()
+        
+        print(type(species))
+        print(type(pet_name))
         
         # Store session variables
         session["species"] = species
@@ -138,13 +141,34 @@ def pet_info():
         # Add pet to the database if the user is logged in
         if session["user_id"] != None:
             
-            try:
-                db.execute(
-                    "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
-                    session["user_id"], form.pet_name.data, species
-                )
-            except Exception as e:
-                flash(f"Unable to insert data, Exception: {e}")
+            # See if the pet is already added 
+            find_existing_pet = db.execute(
+                "SELECT name FROM pets WHERE owner_id = :user_id",
+                user_id=session["user_id"]
+            )
+            
+            for input_pet in find_existing_pet:
+                # Condition suggested by CoPilot
+                if pet_name in input_pet.values():
+                    # If the pet was found, update the information instead of adding a duplicate pet
+                    
+                    try:
+                        db.execute(
+                            "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :pet_name AND owner_id = :user_id",
+                            updated_name=pet_name, updated_species=species, user_id=session["user_id"]
+                        )
+                    except Exception as e:
+                        flash(f"Unable to update data, Exception: {e}")
+                else:
+                    # If no pet is found (i.e. new pet in the database), insert pet
+                    
+                    try:
+                        db.execute(
+                            "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
+                            session["user_id"], form.pet_name.data, species
+                        )
+                    except Exception as e:
+                        flash(f"Unable to insert new data, Exception: {e}")
                 
         # else pass the data to the next function via session variables
         return redirect(url_for('pet_info_continued', species=species, pet_name=pet_name))
@@ -198,6 +222,7 @@ def pet_info_continued():
             session["pet_sex"] = pet_sex
             session["pet_age_years"] = pet_age_years
             session["pet_age_months"] = pet_age_months
+            session["pet_breed"] = pet_breed
             
             # print(pet_age_years)
             # print(pet_age_months)
@@ -511,7 +536,53 @@ def confirm_data():
     # Use login check from helpers.py to verify species
     species = login_check_for_species()
     
-    return render_template("confirm_pet_info.html", species=species)
+    # TODO: If user is logged in, use SQL query
+    if session["user_id"] != None:
+        try:
+            print(session["pet_name"])
+            print(session["user_id"])
+                
+            pet_data = db.execute(
+                "SELECT name, age_in_years, age_in_months, species, breed, sex, bcs, weight, units, activity_level, is_pregnant, weeks_gestating, is_nursing, litter_size, weeks_nursing FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                user_id=session["user_id"], pet_name=session["pet_name"]
+            )       
+            
+            print(pet_data)
+        except Exception as e:
+            flash(f"Unable to insert data, Exception: {e}")
+        else:
+            return render_template("confirm_pet_info.html", pet_data=pet_data, user_id=session["user_id"])
+        
+    # Otherwise, pass session variables
+    else:
+        pet_data = [{'name': session["pet_name"],
+                     'age_in_years': session["pet_age_years"],
+                     'age_in_months': session["age_in_months"],
+                     'species': session["species"],
+                     'breed': session["breed"],
+                     'sex': session["pet_sex"],
+                     'bcs': session["bcs"],
+                     'weight': session["weight"],
+                     'units': session["units"],
+                     'activity_level': session["activity_level"],
+                     'is_pregnant': None,
+                     'weeks_gestating': None,
+                     'is_nursing': None,
+                     'litter_size': None,
+                     'weeks_nursing': None}]
+        
+        if session["pregnancy_status"] != None:
+            pet_data[0]['is_pregnant'] = session["pregnancy_status"]
+        elif session["number_weeks_pregnant"] != None:
+            pet_data[0]["weeks_gestating"] = session["number_weeks_pregnant"]
+        elif session["lactation_status"] != None:
+            pet_data[0]['is_nursing'] = session["lactation_status"]
+        elif session['litter_size'] != None:
+            pet_data[0]['litter_size'] = session['litter_size']
+        elif session["duration_of_nursing"] != None:
+            pet_data[0]['weeks_nursing'] = session["duration_of_nursing"]
+        
+        return render_template("confirm_pet_info.html", species=species)
     
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
     

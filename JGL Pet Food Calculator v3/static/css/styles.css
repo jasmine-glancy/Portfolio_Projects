@@ -28,6 +28,28 @@ h1 {
     margin: 2px;
 }
 
+/* Tables */
+.table {
+    font-size: 14.5px;
+    text-align: center;
+    border-bottom: 1px solid var(--deep_blue_green);
+    border: 1px solid var(--pale_sky_blue);
+    --bs-table-bg: var(--pale_white_green);
+    --bs-table-striped-color: var(--light_sky);
+    --bs-table-striped-bg: var(--pale_sky_blue);
+    margin-top: 2vw;
+    margin-bottom: 0vw;
+}
+
+    thead {
+        font-weight: 500;
+        --bs-table-bg: #84b893;
+        /* TODO: Change thead font colors */
+        color: #fff;
+    }
+
+
+
 /* Links */
 a {
     color: var(--darker_lime);
@@ -50,6 +72,17 @@ a:hover {
     text-align: center;
     margin: 5px;
 }
+
+    .btn-sm {
+        color: #cdfcc7;
+        font-weight: 500;
+        background-color: var(--darker_lime);
+        border-color: var(--darker_lime);
+        --bs-btn-active-color: var(--darker_lime_transparent);
+        --bs-btn-active-border-color: var(--darker_lime_transparent);
+        --bs-btn-hover-bg: var(--darker_lime_transparent);
+        --bs-btn-hover-border-bg: var(--darker_lime_transparent);
+    }
 
     .button-container {
         display: flex;
@@ -187,3 +220,4 @@ a:hover {
     .form_divider {
         padding-left: 2px;
     }
+
