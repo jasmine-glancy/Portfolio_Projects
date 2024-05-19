@@ -34,6 +34,9 @@ class JglPlayer2():
         # Assign variables for readability
         jgl_board = self.jgl_game.jgl_game_board
         
+        # TODO: Keep track of player positions and computer positions
+        # TODO: Keep track of possible winning combos for computer logic
+        
         print(jgl_empty_boxes)
         for combination in jgl_winning_combos:
             
