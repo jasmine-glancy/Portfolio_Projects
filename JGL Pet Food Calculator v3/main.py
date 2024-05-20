@@ -33,6 +33,17 @@ db = SQL("sqlite:///pet_food_calculator.db")
 @app.route("/")
 def home():
     """Includes welcome and disclaimers along with login/register buttons"""
+    
+    user_id = session.get("user_id")
+    if user_id:
+        user = db.execute(
+            "SELECT username FROM users WHERE id = :user_id",
+            user_id=session["user_id"]
+        )
+        
+        username = user[0]["username"]
+        
+        return render_template("index.html", user=username)
     return render_template("index.html")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -191,14 +202,15 @@ def pet_info_continued():
     
     # Access breed data via database
     pet_breed = []
-    if species == "canine":
+    if species == "Canine":
         pet_breed += db.execute(
             "SELECT Breed FROM dog_breeds"
         )
-    elif species == "feline":
+    if species == "Feline":
         pet_breed += db.execute(
             "SELECT Breed FROM cat_breeds"
         )
+        
     
     if request.method == "POST":
         
@@ -208,8 +220,8 @@ def pet_info_continued():
 
         pet_breed = request.form.get("pet_breed")
         
-        print(pet_breed)
-        #TODO: Add flash error if default is chosen
+        # print(pet_breed)
+
         # Show an error message if the user doesn't choose a breed
         if pet_breed == None:
             flash("Please choose a breed from the dropdown.")
@@ -268,9 +280,24 @@ def repro_status():
         
         # Store new info as session variables
         session["pregnancy_status"] = pregnancy_status
-
+        
+        print(pregnancy_status)
+        
+        # Add pet to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET is_pregnant = :is_pregnant WHERE name = :pet_name AND owner_id = :user_id",
+                    is_pregnant=pregnancy_status, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+            
+            
         if pregnancy_status == "y":
-            if species == "canine":
+            
+            if species == "Canine":
+
                 # If pet is pregnant and canine, ask how many weeks along she is
                 return redirect(url_for('gestation_duration', species=species))
             
@@ -326,15 +353,24 @@ def litter_size():
         litter_size = repro.litter_size.data
         
         # Stores litter size data in the session
-        # TODO: replace this with database query if the user is logged in
         session['litter_size'] = litter_size
         
-        if species == "feline":
+        # Add pet to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET litter_size = :size WHERE name = :pet_name AND owner_id = :user_id",
+                    size=litter_size, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+          
+        if species == "Feline":
             # If the pet is a nursing feline, ask for weeks of lactation
             return redirect(url_for('lactation_duration'))
             
-        else:
-            # If pet is a nursing canine, DER modifier is as follows:
+
+        # If pet is a nursing canine, DER modifier is as follows:
                 # 1 puppy: * 3.0
                 # 2 puppies: 3.5
                 # 3-4 puppies: 4.0
@@ -342,8 +378,7 @@ def litter_size():
                 # 7-8 puppies: 5.5
                 # 9 puppies >= 6.0
                 
-            # TODO: Add modifier to pet's table in the database
-            pass
+        # TODO: Add modifier to pet's table in the database
         return redirect(url_for('pet_condition', species=species))
     
     return render_template("get_litter_size.html", repro=repro, species=species)
@@ -363,6 +398,19 @@ def lactation_status():
         
         # Stores lactation status variable in session
         session["lactation_status"] = lactation_status
+        
+        print(lactation_status)
+        
+        # Add pet to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET is_nursing = :lactation_status WHERE name = :pet_name AND owner_id = :user_id",
+                    lactation_status=lactation_status, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+          
 
         if lactation_status == "y":
             # If pet is lactating, ask for litter size
@@ -460,11 +508,11 @@ def pet_condition():
                     flash(f"Unable to insert data, Exception: {e}")
             
         # Redirect to the next page if info is input successfully
-        if species == "canine":
+        if species == "Canine":
             # Gets a dog's activity level if applicable 
             return redirect(url_for('activity'))
         
-        if species == "feline":
+        if species == "Feline":
             # Take cat owners to the pre-confirmation page
             return redirect(url_for('confirm_data', species=species))
     
