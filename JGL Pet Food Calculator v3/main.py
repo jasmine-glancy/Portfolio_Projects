@@ -439,6 +439,16 @@ def lactation_duration():
         # Stores nursing duration variable in session
         session["duration_of_nursing"] = duration_of_nursing
         
+        # Add pet to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET weeks_nursing = :duration_of_nursing WHERE name = :pet_name AND owner_id = :user_id",
+                        duration_of_nursing=duration_of_nursing, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+                    
         if duration_of_nursing <= 2:
             # If the queen has been nursing for 2 weeks or less, DER modifier is RER + 30% per kitten
             pass

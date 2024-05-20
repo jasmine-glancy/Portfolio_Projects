@@ -28,7 +28,7 @@
     </p>
 
     <!-- Load in BCS accordians based on species --> 
-    {% if species == "canine" %}
+    {% if species == "Canine" %}
         <div class="accordion" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
@@ -180,7 +180,7 @@
                 </div>
             </div>
         </div>
-    {% elif species == "feline" %}
+    {% elif species == "Feline" %}
         <div class="accordion" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
@@ -361,10 +361,10 @@
 
             <!-- Divider solution suggested by Michael Allen on Stack Overflow-->
             <div class="divider"></div>
-            
-            {% if species == "canine" %}
+
+            {% if species == "Canine" %}
                 <button type="submit" class="btn btn-secondary btn-lg">Go to Part 2.5: Activity Level</button>
-            {% elif species == "feline" %}
+            {% elif species == "Feline" %}
                 <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Confirm Pet Information</button>
             {% endif %}
         </div>

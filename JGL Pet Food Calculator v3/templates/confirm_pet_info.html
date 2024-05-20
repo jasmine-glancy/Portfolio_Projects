@@ -71,7 +71,7 @@
                             Pet's Gestation Length
                         </b>
                     </th>
-                {% elif pet_data[0].is_nursing != None %}
+                {% elif pet_data[0].is_nursing == "y" %}
                     <th>
                         <b>
                             Pet is Nursing?
@@ -167,7 +167,7 @@
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
-                {% elif pet_data[0].is_nursing != None %}
+                {% elif pet_data[0].is_nursing == "y" %}
                     <td>
                         {{ pet_data[0].is_nursing }}
 
@@ -204,11 +204,11 @@
     
         <div class="button-container">
             {% if user_id != None %}
-                {% if pet_data[0].species == "feline" %}
+                {% if pet_data[0].species == "Feline" %}
                     <a href="{{ url_for('pet_condition') }}">
                         <button type="button" class="btn btn-secondary btn-lg">Go to Part 2: Weight and Body Condition</button>
                     </a>
-                {% elif pet_data[0].species == "canine" %}
+                {% elif pet_data[0].species == "Canine" %}
                     <a href="{{ url_for('activity') }}">
                         <button type="button" class="btn btn-secondary btn-lg">Go to Part 2.5: Activity Level</button>
                     </a>
