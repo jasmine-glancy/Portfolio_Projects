@@ -666,7 +666,36 @@ def current_food():
     
     current_food = FoodForm()
     
+    if request.method == "POST":
+        current_food_kcal = current_food.current_food_kcal.data
+        meals_per_day = current_food.meals_per_day.data
+        wants_transition = current_food.food_transition.data
+        
+        print(current_food_kcal)
+        print(meals_per_day)
+        print(wants_transition)
+        
+        # TODO: Add info to table if logged in or session variable if not
+
+        if wants_transition == "y":
+            # If the user wants to transition their pet to a new food, redirect them
+                # to the next form
+            return redirect(url_for('new_food'))
+
     return render_template("current_food.html", current_food=current_food)
+    
+@app.route("/new_food", methods=["GET", "POST"])
+def new_food():
+    """Asks the user for calorie information on up to 2 new foods"""
+    
+    new_foods = FoodForm()
+    
+    # TODO: Add info to table if logged in or session variable if not
+
+    
+    
+    return render_template("new_food.html", new_foods=new_foods)
+
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
     
     # TODO: If pet is not pregnant, ask if she is currently nursing a litter

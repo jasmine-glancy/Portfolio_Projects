@@ -127,7 +127,7 @@ class WorkForm(FlaskForm):
 # Obtain food info
 class FoodForm(FlaskForm):
     current_food_kcal = FloatField(
-        "How many calories are in each cup of your pet's current food? (kcal/cup): ",
+        "How many calories are in each cup (or can)* of your pet's current food?: ",
         validators=[DataRequired()])
     food_transition = SelectField(u"Do you have another food you would like to transition your pet to?: ",
                                   choices=[("default", "Please make a selection"),
@@ -137,4 +137,9 @@ class FoodForm(FlaskForm):
     meals_per_day = FloatField(
         "How many meals per day does your pet get?: ",
         validators=[DataRequired()])
-
+    new_food_one_kcal = FloatField(
+        "How many calories are in each cup (or can)* of the first new food you want your pet to be on: ",
+        validators=[DataRequired()])
+    new_food_two_kcal = FloatField(
+        "How many calories are in each cup (or can)* of the second new food you want your pet to be on: ",
+        validators=[DataRequired()])
