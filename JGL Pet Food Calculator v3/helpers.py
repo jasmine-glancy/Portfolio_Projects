@@ -10,7 +10,7 @@ def login_check_for_species():
     # Conditional rewrite suggested by CoPilot 
     
     if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify session variables 
+        # If the user is logged in, verify table variables 
         print(session["user_id"])
         print(session["pet_name"])
         
@@ -31,3 +31,12 @@ def login_check_for_species():
     
     # Return whatever species variable ends up being found 
     return species   
+
+# def calculate_rer():
+#     """Calculates the minimum number of calories a pet needs at rest per day"""
+    
+#     if "user_id" in session and session["user_id"] != None:
+#         # If the user is logged in, verify table variables 
+
+#     else:
+#         # If a user isn't logged in, grab session variable

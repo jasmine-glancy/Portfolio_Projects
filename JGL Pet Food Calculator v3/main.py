@@ -46,6 +46,7 @@ def home():
         return render_template("index.html", user=username)
     return render_template("index.html")
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Logs an existing user in"""
@@ -79,6 +80,7 @@ def login():
         
     
     return render_template("login.html", form=form)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -117,6 +119,7 @@ def register():
     
     return render_template("register.html", form=form)
 
+
 @app.route("/logout")
 def logout():
     """Logs user out"""
@@ -126,6 +129,7 @@ def logout():
     
     # Redirect to home
     return redirect("/")
+
 
 @app.route("/get-signalment", methods=["GET", "POST"])
 def pet_info():
@@ -189,6 +193,7 @@ def pet_info():
         return redirect(url_for('pet_info_continued', species=species, pet_name=pet_name))
 
     return render_template("get_signalment.html", form=form)
+
 
 @app.route("/get-signalment-pt-2", methods=["GET", "POST"])
 def pet_info_continued():
@@ -270,6 +275,7 @@ def pet_info_continued():
 
 
     return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species)
+
 
 @app.route("/pregnancy_status", methods=["GET", "POST"])
 def repro_status():
@@ -437,7 +443,6 @@ def lactation_status():
     return render_template("get_lactation_status.html", repro=repro)
     
 
-
 @app.route("/lactation_duration", methods=["GET", "POST"])
 def lactation_duration():
     """Asks how many weeks a pregnant queen has been nursing and adds DER modifier"""
@@ -542,6 +547,7 @@ def pet_condition():
     
     return render_template("get_weight_and_bcs.html", form=form, species=species)
 
+
 @app.route("/activity", methods=["GET", "POST"])
 def activity():
     """Gets a pet's activity status/amount"""
@@ -605,6 +611,7 @@ def activity():
     
     return render_template("get_work_level.html", work=work)
 
+
 @app.route("/confirm_data", methods=["GET", "POST"])
 def confirm_data():
     """Confirms pet's info before taking users to the food calculator"""
@@ -660,6 +667,7 @@ def confirm_data():
         
         return render_template("confirm_pet_info.html", species=species)
     
+    
 @app.route("/current_food", methods=["GET", "POST"])
 def current_food():
     """Asks the user for information on their current food"""
@@ -675,14 +683,34 @@ def current_food():
         print(meals_per_day)
         print(wants_transition)
         
-        # TODO: Add info to table if logged in or session variable if not
-
+        # If user is logged in, add current food information to the database
+        if session["user_id"] != None:
+            try:
+                print(session["pet_name"])
+                print(session["user_id"])
+                
+                db.execute(
+                    "UPDATE pets SET meals_per_day = :meals, current_food_kcal = :current_kcal WHERE name = :pet_name AND owner_id = :user_id",
+                    meals=meals_per_day, current_kcal=current_food_kcal, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+                
+            except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+        
+        else:    
+            # Otherwise, create new session variables
+            session["meals_per_day"] = meals_per_day
+            session["current_food_kcal"] = current_food_kcal
+            
         if wants_transition == "y":
             # If the user wants to transition their pet to a new food, redirect them
                 # to the next form
             return redirect(url_for('new_food'))
+        
+        # TODO: If user doesn't want a transition, calculate RER then redirect to DER chooser
 
     return render_template("current_food.html", current_food=current_food)
+    
     
 @app.route("/new_food", methods=["GET", "POST"])
 def new_food():
@@ -690,9 +718,31 @@ def new_food():
     
     new_foods = FoodForm()
     
-    # TODO: Add info to table if logged in or session variable if not
-
-    
+    if request.method == "POST":
+        first_food_kcal = new_foods.new_food_one_kcal.data
+        second_food_kcal = new_foods.new_food_two_kcal.data
+        
+        # If user is logged in, add current food information to the database
+        if session["user_id"] != None:
+            try:
+                print(session["pet_name"])
+                print(session["user_id"])
+                    
+                db.execute(
+                    "UPDATE pets SET transitioning_food_one_kcal = :kcal_one, transitioning_food_two_kcal = :kcal_two WHERE name = :pet_name AND owner_id = :user_id",
+                    kcal_one=first_food_kcal, kcal_two=second_food_kcal, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+                    
+            except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+            
+        else:    
+            # Otherwise, create new session variables
+            session["first_food_kcal"] = first_food_kcal
+            session["second_food_kcal"] = second_food_kcal 
+           
+           # TODO: calculate RER then redirect to DER chooser
+           
     
     return render_template("new_food.html", new_foods=new_foods)
 
