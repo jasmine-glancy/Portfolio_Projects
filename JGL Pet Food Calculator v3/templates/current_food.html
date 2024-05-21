@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Part 4: Current Food{% endblock %}
+0
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Part 4: Current Food</b></h1>
+
+    <!-- Progress bar -->
+    <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 75%">75%</div>
+    </div>
+
+    <!-- Load in WTF Form --> 
+    <form action="{{ url_for('current_food') }}" method="POST">
+        <div class="row">
+            <div class="col" title="Current Food Calories">
+                {{ current_food.current_food_kcal.label }}
+            </div>
+            <div class="col" title="Current Food Calorie Input">
+                {{ current_food.current_food_kcal }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" title="Food Transition Label">
+                {{ current_food.food_transition.label }}
+            </div>
+            <div class="col" title="Food Transition Dropdown">
+                {{ current_food.food_transition }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" title="Meals Per Day">
+                {{ current_food.meals_per_day.label }}
+            </div>
+            <div class="col" title="Meals Per Day Input">
+                {{ current_food.meals_per_day }}
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="{{ url_for('confirm_data') }}">
+                <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 3: Confirm Pet Info</button>
+            </a>
+
+            <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
+            <div class="divider"></div>
+
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Next Part</button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

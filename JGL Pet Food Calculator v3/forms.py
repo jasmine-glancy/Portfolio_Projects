@@ -123,4 +123,18 @@ class WorkForm(FlaskForm):
     heavy_work_hours = IntegerField(
         "Approximately how many hours of high-impact exercise does your pet get per day? Please enter 0 if none: ",
         validators=[DataRequired()])
-    
+
+# Obtain food info
+class FoodForm(FlaskForm):
+    current_food_kcal = FloatField(
+        "How many calories are in each cup of your pet's current food? (kcal/cup): ",
+        validators=[DataRequired()])
+    food_transition = SelectField(u"Do you have another food you would like to transition your pet to?: ",
+                                  choices=[("default", "Please make a selection"),
+                                            ("y", "Yes"),
+                                            ("n", "No")],
+                                  render_kw={"default": {"disabled": ""}})
+    meals_per_day = FloatField(
+        "How many meals per day does your pet get?: ",
+        validators=[DataRequired()])
+

@@ -3,7 +3,7 @@
 from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
-from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm
+from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from helpers import login_check_for_species
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -154,32 +154,36 @@ def pet_info():
             
             # See if the pet is already added 
             find_existing_pet = db.execute(
-                "SELECT name FROM pets WHERE owner_id = :user_id",
-                user_id=session["user_id"]
+                "SELECT name FROM pets WHERE owner_id = :user_id AND name = :name",
+                user_id=session["user_id"], name=pet_name
             )
             
+            existing_pet = None
             for input_pet in find_existing_pet:
                 # Condition suggested by CoPilot
                 if pet_name in input_pet.values():
                     # If the pet was found, update the information instead of adding a duplicate pet
+                    existing_pet = input_pet
+                    break
+                
+            if existing_pet:
+                try:
+                    db.execute(
+                        "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :pet_name AND owner_id = :user_id",
+                        updated_name=pet_name, updated_species=species, user_id=session["user_id"]
+                    )
+                except Exception as e:
+                    flash(f"Unable to update data, Exception: {e}")
+            else:
+                # If no pet is found (i.e. new pet in the database), insert pet
                     
-                    try:
-                        db.execute(
-                            "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :pet_name AND owner_id = :user_id",
-                            updated_name=pet_name, updated_species=species, user_id=session["user_id"]
-                        )
-                    except Exception as e:
-                        flash(f"Unable to update data, Exception: {e}")
-                else:
-                    # If no pet is found (i.e. new pet in the database), insert pet
-                    
-                    try:
-                        db.execute(
-                            "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
-                            session["user_id"], form.pet_name.data, species
-                        )
-                    except Exception as e:
-                        flash(f"Unable to insert new data, Exception: {e}")
+                try:
+                    db.execute(
+                        "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
+                        session["user_id"], form.pet_name.data, species
+                    )
+                except Exception as e:
+                    flash(f"Unable to insert new data, Exception: {e}")
                 
         # else pass the data to the next function via session variables
         return redirect(url_for('pet_info_continued', species=species, pet_name=pet_name))
@@ -325,6 +329,16 @@ def gestation_duration():
         
         # Store new info as session variables
         session["number_weeks_pregnant"] = number_weeks_pregnant
+        
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET weeks_gestating = :weeks_gestating WHERE name = :pet_name AND owner_id = :user_id",
+                    weeks_gestating=number_weeks_pregnant, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+            
         
         if number_weeks_pregnant <= "6":
             # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
@@ -543,26 +557,30 @@ def activity():
         heavy_work_minutes = work.heavy_work_minutes.data
         heavy_work_hours = work.heavy_work_hours.data
         
+        
+        # Convert time for easier logic tracking
+        light_work_hours += (light_work_minutes / 60)
+        heavy_work_hours += (heavy_work_minutes / 60)
+        
+
         # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
         # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
-        if light_work_minutes <= 30 and light_work_hours == 0 and heavy_work_minutes == 0 and heavy_work_hours == 0:
+        if light_work_hours < 0.5 and heavy_work_hours == 0:
             # Sedentary: 0-30 minutes of light activity daily
             activity_level = "Sedentary"
-        elif light_work_minutes > 30 and light_work_minutes <= 60 and light_work_hours == 0 and heavy_work_minutes == 0 and heavy_work_hours == 0:
+        elif light_work_hours >= 0.5 and light_work_hours <= 1 and heavy_work_hours == 0:
             # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
             activity_level = "Low"
-        elif light_work_minutes > 60 and light_work_minutes <= 120 and heavy_work_minutes == 0 and heavy_work_hours == 0:
-            # Moderate activity: 1-2 hours of low impact activity 
+        elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0:
+            # Moderate activity: 1-2 hours of low impact activity
             activity_level = "Moderate"
-        elif heavy_work_minutes >= 60 and heavy_work_minutes <= 180 and light_work_minutes == 0 and light_work_hours == 0:
+        elif heavy_work_hours >= 1 and heavy_work_hours <= 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
             activity_level = "Moderate"
-        elif heavy_work_minutes > 180:
-            # High activity: 2-3 hours of daily activity (i.e. working dog)
-            activity_level = "Heavy"
+        elif heavy_work_hours > 3 and light_work_hours == 0:
             # Working and performance: 3+ hours (i.e. working dog)
-                # Or high impact activity under extreme conditions (i.e. racing sled dog)
-        
+            activity_level = "Heavy"
+                    
         
         print(activity_level)
         # If user is logged in, add activity level to database
@@ -642,6 +660,13 @@ def confirm_data():
         
         return render_template("confirm_pet_info.html", species=species)
     
+@app.route("/current_food", methods=["GET", "POST"])
+def current_food():
+    """Asks the user for information on their current food"""
+    
+    current_food = FoodForm()
+    
+    return render_template("current_food.html", current_food=current_food)
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
     
     # TODO: If pet is not pregnant, ask if she is currently nursing a litter
