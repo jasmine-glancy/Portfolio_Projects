@@ -229,17 +229,17 @@ def pet_info_continued():
 
         pet_breed = request.form.get("pet_breed")
         
+        # Create new session variables
+        session["pet_sex"] = pet_sex
+        session["pet_age_years"] = pet_age_years
+        session["pet_age_months"] = pet_age_months
+        session["pet_breed"] = pet_breed
         # print(pet_breed)
 
         # Show an error message if the user doesn't choose a breed
         if pet_breed == None:
             flash("Please choose a breed from the dropdown.")
         else:
-            # Store new info as session variables
-            session["pet_sex"] = pet_sex
-            session["pet_age_years"] = pet_age_years
-            session["pet_age_months"] = pet_age_months
-            session["pet_breed"] = pet_breed
             
             # print(pet_age_years)
             # print(pet_age_months)
@@ -248,8 +248,44 @@ def pet_info_continued():
             # print(session["pet_name"])
             # print(session["user_id"])
             
+            # Search for pet breed code in breed database
+            if species == "Canine":
+                breed_id = db.execute(
+                    "SELECT BreedID FROM dog_breeds WHERE Breed = ?", pet_breed
+                )
+
+            if species == "Feline":
+                breed_id = db.execute(
+                    "SELECT BreedID FROM cat_breeds WHERE Breed = ?", pet_breed
+                )    
+                    
+            print(breed_id)
+            
             # Add pet to the database if the user is logged in
             if session["user_id"] != None:
+                # Update breed code from breed database
+                if species == "Canine":
+
+                    try:
+                        db.execute(
+                            "UPDATE pets SET canine_breed_id = :breed_id WHERE name = :pet_name AND owner_id = :user_id",
+                                breed_id=breed_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                            )
+                        
+                    except Exception as e:
+                        flash(f"Unable to insert data, Exception: {e}")
+                    
+                elif species == "Feline":
+  
+                    try:
+                        db.execute(
+                            "UPDATE pets SET feline_breed_id = :breed_id WHERE name = :pet_name AND owner_id = :user_id",
+                                breed_id=breed_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                            )
+                        
+                    except Exception as e:
+                        flash(f"Unable to insert data, Exception: {e}")
+                    
                 try:
                     db.execute(
                         "UPDATE pets SET age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex WHERE name = :pet_name AND owner_id = :user_id",
@@ -258,7 +294,63 @@ def pet_info_continued():
                 except Exception as e:
                     flash(f"Unable to insert data, Exception: {e}")
             
-            if pet_age_years >= 2 and pet_age_months >= 0:
+            # Convert months to years for easier logic reading
+            partial_years = float(pet_age_months / 12)
+            pet_age = pet_age_years + partial_years    
+            
+                
+            if species == "Canine":
+                # Find breed size category
+                breed_size = db.execute(
+                    "SELECT SizeCategory FROM dog_breeds WHERE BreedID = ?;", breed_id
+                )
+                  
+                if breed_size == "X-Small" or breed_size == "Small" or breed_size == "Medium":
+                    if pet_age < 0.33:
+                        # Puppies under 4 months old have a DER modifier of * 3.0
+                        print("DER Modifier * 3.0")
+                    elif pet_age >= 0.33 and pet_age <= 0.66:
+                        # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 2.5
+                        print("DER Modifier * 2.5")
+                    elif pet_age > 0.66 and breed_size <= 12:
+                        # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 1.8-2.0
+                        print("DER Modifier * 1.8-2.0")
+                        
+                elif breed_size == "Large":
+                    if pet_age < 0.33:
+                        # Large breed puppies under 4 months old have a DER modifier of * 3.0
+                        print("DER Modifier * 3.0")
+                    if pet_age > 0.33 and pet_age <= 0.91:
+                        # Large breed puppies between 4 and 11 months old have a DER modifier of * 2.5
+                        print("DER Modifier * 2.5")
+                    elif pet_age > 0.91 and pet_age <= 1.5:
+                        # Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
+                        print("DER Modifier * 1.8-2.0")
+
+                elif breed_size == "X-Large":
+                    if pet_age < 0.33:
+                        # X-Large breed puppies under 6 months old have a DER modifier of * 3.0
+                        print("DER Modifier * 3.0")
+                    if pet_age > 0.5 and pet_age <= 0.91:
+                        # X-Large breed puppies between 6 and 11 months old have a DER modifier of * 2.5
+                        print("DER Modifier * 2.5")
+                    elif pet_age > 0.91 and pet_age <= 1.5:
+                        # X-Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
+                        print("DER Modifier * 1.8-2.0")
+            if species == "Feline":
+                # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
+                # and https://www.veterinary-practice.com/article/feeding-for-optimal-growth
+                if pet_age <= 0.33 or pet_age > 0.5 and pet_age <= 0.83:
+                    # Kittens under 4 months old have a DER modifier of * 2.0
+                    print("DER Modifier * 2.0")
+                elif pet_age > 0.33 and pet_age <= 0.5:
+                    #Kittens between 5 and 6 months old have a DER modifier of * 2.5
+                    print("DER Modifier * 2.5")
+                elif pet_age > 0.83 and pet_age <= 1:
+                    # Kittens between 10 and 12 months old have a DER modifier of * 1.8-2.0
+                    print("DER Modifier * 1.8-2.0")
+                        
+            if pet_age >= 2.0:
 
                 if pet_sex == "female":
                     # If the pet is an intact female redirect to pregnancy questions
@@ -503,11 +595,6 @@ def pet_condition():
         weight = float(form.pet_weight.data)
         units = form.pet_units.data
         
-        # Store new info as session variables
-        session["bcs"] = bcs
-        session["weight"] = weight
-        session["units"] = units
-        
         # print(bcs)
         # print(type(bcs))
         # print(weight)
@@ -531,6 +618,11 @@ def pet_condition():
                     
             except Exception as e:
                     flash(f"Unable to insert data, Exception: {e}")
+        else:
+            # Store new info as session variables
+            session["bcs"] = bcs
+            session["weight"] = weight
+            session["units"] = units
             
         # Redirect to the next page if info is input successfully
         if species == "Canine":

@@ -19,8 +19,13 @@ def login_check_for_species():
             "SELECT species FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
         )
         
-        species = species_result[0]['species']
-        print(species)
+
+        if species_result:
+            species = species_result[0]['species']
+            print(species)
+        else:
+            species = session["species"]
+            print(f"Non-db species: {species}") 
     else:
         # If a user isn't logged in, grab species variable
         species = session["species"]
