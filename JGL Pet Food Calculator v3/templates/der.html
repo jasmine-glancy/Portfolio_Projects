@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Pet's DER{% endblock %}
+0
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Pet's DER</b></h1>
+
+    <!-- Progress bar -->
+    <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 100%">100%</div>
+    </div>
+
+    <!-- TODO: Load in calcuated DER --> 
+    <div class="row">
+        {{ name }}'s Daily Energy Requirement is XXX kcalories per day. This is {{ current_food_per_day }} cups, or 
+    </div>
+    <div class="button-container">
+        <a href="{{ url_for('rer') }}">
+            <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 4: Pet's RER</button>
+        </a>
+
+        <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
+        <div class="divider"></div>
+
+        <button type="submit" class="btn btn-secondary btn-lg">Go to Final Report</button>
+    </div>
+    
+
+</div>
+{% endblock %}

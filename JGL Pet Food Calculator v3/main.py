@@ -235,10 +235,6 @@ def pet_info_continued():
         if pet_breed == None:
             flash("Please choose a breed from the dropdown.")
         else:
-            print(f"Pet sex: {pet_sex}")
-            print(f"Pet age (years): {pet_age_years}")
-            print(f"Pet age (months): {pet_age_months}")
-            
             # Store new info as session variables
             session["pet_sex"] = pet_sex
             session["pet_age_years"] = pet_age_years
@@ -373,7 +369,7 @@ def litter_size():
         litter_size = repro.litter_size.data
         
         # Stores litter size data in the session
-        session['litter_size'] = litter_size
+        session["litter_size"] = litter_size
         
         # Add pet to the database if the user is logged in
         if session["user_id"] != None:
@@ -619,7 +615,7 @@ def confirm_data():
     # Use login check from helpers.py to verify species
     species = login_check_for_species()
     
-    # TODO: If user is logged in, use SQL query
+    # If user is logged in, use SQL query
     if session["user_id"] != None:
         try:
             print(session["pet_name"])
@@ -707,8 +703,9 @@ def current_food():
                 # to the next form
             return redirect(url_for('new_food'))
         
-        # TODO: If user doesn't want a transition, calculate RER then redirect to DER chooser
-
+        # If user doesn't want a transition, calculate RER
+        return redirect(url_for('rer'))
+        
     return render_template("current_food.html", current_food=current_food)
     
     
@@ -741,9 +738,9 @@ def new_food():
             session["first_food_kcal"] = first_food_kcal
             session["second_food_kcal"] = second_food_kcal 
            
-           # TODO: calculate RER then redirect to DER chooser
+        # If user doesn't want a transition, calculate RER
+        return redirect(url_for('rer'))
            
-    
     return render_template("new_food.html", new_foods=new_foods)
 
     # TODO:  If pet is pregnant and canine, ask how many weeks along she is
@@ -752,6 +749,170 @@ def new_food():
         # TODO: if yes, ask the litter size 
             # TODO: if feline and nursing, ask how many weeks she has been doing so
         # TODO: if no, go to the next step in the questionnaire 
+
+@app.route("/rer", methods=["GET", "POST"])
+def rer():
+    """Calculates the minimum number of calories a pet needs at rest per day"""
+
+    if session["user_id"] != None:
+        # If the user is logged in, verify table variables 
+        pet_info = db.execute(
+            "SELECT name, age_in_years, age_in_months, species, sex, bcs, weight, units, \
+                is_pregnant, weeks_gestating, is_nursing, litter_size, weeks_nursing, \
+                    activity_level, meals_per_day, current_food_kcal, transitioning_food_one_kcal, \
+                        transitioning_food_two_kcal FROM pets WHERE owner_id = ? AND name = ?", 
+                    session["user_id"], session["pet_name"]
+        )
+        
+        print(pet_info)
+        
+        name = pet_info[0]["name"]
+        pet_age_years = pet_info[0]["age_in_years"]
+        pet_age_months = pet_info[0]["age_in_months"]
+        species = pet_info[0]["species"]
+        sex = pet_info[0]["sex"]
+        bcs = pet_info[0]["bcs"]
+        weight = pet_info[0]["weight"]
+        units = pet_info[0]["units"]
+        is_pregnant = pet_info[0]["is_pregnant"]
+        weeks_gestating = pet_info[0]["weeks_gestating"]
+        litter_size = pet_info[0]["litter_size"]
+        is_nursing = pet_info[0]["is_nursing"]
+        weeks_nursing = pet_info[0]["weeks_nursing"]
+        activity_level = pet_info[0]["activity_level"]
+        first_new_food_kcal = pet_info[0]["transitioning_food_one_kcal"]
+        second_new_food_kcal = pet_info[0]["transitioning_food_two_kcal"]
+    else:
+        # If a user isn't logged in, grab session variables
+        name = session["pet_name"]
+        pet_age_years = session["pet_age_years"]
+        pet_age_months = session["pet_age_months"]
+        species = session["species"]
+        sex = session["pet_sex"]
+        bcs = session["bcs"]
+        weight = session["weight"]
+        units = session["units"]
+        is_pregnant = session["pregnancy_status"]
+        weeks_gestating = session["number_weeks_pregnant"]
+        litter_size = session["litter_size"]
+        is_nursing = session["lactation_status"]
+        weeks_nursing = session["duration_of_nursing"]
+        activity_level = session["activity_level"]
+        
+        first_new_food_kcal = session["first_food_kcal"]
+        second_new_food_kcal = session["second_food_kcal"]
+    
+    print(weight, units)
+    
+    # Convert lbs weighs to kgs
+    if units == "lbs":
+        weight = weight / 2.2
+        units = "kgs"
+    
+    print(weight, units)
+    
+    # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
+    if weight >= 2 and weight <= 45:
+        rer = round((30 * weight) + 70, 2)
+    
+    print(rer)
+    
+    # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
+    if weight < 2 or weight > 45:
+        rer = round(70 * weight**0.75, 2)
+        
+        # If user is logged in, add current food information to the database
+    if session["user_id"] != None:
+        try:
+            print(session["pet_name"])
+            print(session["user_id"])
+                
+            db.execute(
+                "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
+                rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
+            )
+                    
+        except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+            
+    else:    
+        # Otherwise, create new session variables
+        session["rer"] = rer
+
+    if request.method == "POST":
+        return redirect()
+    return render_template("rer.html", rer=rer, name=name)
+    
+@app.route("/der", methods=["GET", "POST"])
+def der():
+    """Calculates the daily energy rate and total food amount of the current diet to feed"""
+    
+    # If user is logged in, use SQL query
+    if session["user_id"] != None:
+        try:
+            print(session["pet_name"])
+            print(session["user_id"])
+                
+            pet_data = db.execute(
+                "SELECT name, rer, meals_per_day, current_food_kcal, FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                user_id=session["user_id"], pet_name=session["pet_name"]
+            )       
+            
+            print(pet_data)
+            
+            name = pet_data[0]["name"]
+            rer = pet_data[0]["rer"]
+            meals_per_day = pet_data[0]["meals_per_day"]
+            current_food_kcal = pet_data[0]["current_food_kcal"]
+        except Exception as e:
+            flash(f"Unable to insert data, Exception: {e}")    
+    else:
+        # If a user isn't logged in, grab session variables
+        name = session["pet_name"]
+        rer = session["rer"]
+        meals_per_day = session["meals_per_day"]
+        current_food_kcal = session["current_food_kcal"]
+        
+    food_amount_per_day = round(rer / current_food_kcal, 2)
+    
+    # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
+    whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
+    # print(food_amount_per_day)
+    print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
+    
+    # print(whole_cans_or_cups)
+    # print(type(whole_cans_or_cups))
+    
+    # Convert partial volume amount from decimal to cups
+    # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
+    partial_volumetric = ""
+    if partial_amount > "0" and partial_amount <= "03":
+        partial_volumetric = "1/2 tablespoon"
+    elif partial_amount > "03" and partial_amount <= "06":
+        partial_volumetric = "1/16 cup"
+    elif partial_amount > "06" and partial_amount <= "13":
+        partial_volumetric = "1/8 cup"
+    elif partial_amount > "13" and partial_amount <= "25":
+        partial_volumetric = "1/4 cup"
+    elif partial_amount > "25" and partial_amount <= "40":
+        partial_volumetric = "1/3 cup"
+    elif partial_amount > "40" and partial_amount <= "55":
+        partial_volumetric = "1/2 cup"
+    elif partial_amount > "55" and partial_amount <= "67":
+        partial_volumetric = "2/3 cup"
+    elif partial_amount > "67" and partial_amount <= "85":
+        partial_volumetric = "3/4 cup"
+    else:
+        # If partial volume is more than 0.86 cups, add to whole volume
+        # Convert whole cup/can volume amount to integer
+        whole_cans_or_cups = int(whole_cans_or_cups)
+        whole_cans_or_cups += 1
+        
+
+   
+    print(f"{whole_cans_or_cups} {partial_volumetric}")
+    return render_template("der.html", rer=rer, current_food_per_day=food_amount_per_day, name=name)
+
 # New pet
 
             
