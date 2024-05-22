@@ -248,117 +248,195 @@ def pet_info_continued():
             # print(session["pet_name"])
             # print(session["user_id"])
             
-            # Search for pet breed code in breed database
-            if species == "Canine":
-                breed_id = db.execute(
-                    "SELECT BreedID FROM dog_breeds WHERE Breed = ?", pet_breed
-                )
-
-            if species == "Feline":
-                breed_id = db.execute(
-                    "SELECT BreedID FROM cat_breeds WHERE Breed = ?", pet_breed
-                )    
-                    
-            print(breed_id)
-            
-            # Add pet to the database if the user is logged in
-            if session["user_id"] != None:
-                # Update breed code from breed database
-                if species == "Canine":
-
-                    try:
-                        db.execute(
-                            "UPDATE pets SET canine_breed_id = :breed_id WHERE name = :pet_name AND owner_id = :user_id",
-                                breed_id=breed_id, pet_name=session["pet_name"], user_id=session["user_id"]
-                            )
-                        
-                    except Exception as e:
-                        flash(f"Unable to insert data, Exception: {e}")
-                    
-                elif species == "Feline":
-  
-                    try:
-                        db.execute(
-                            "UPDATE pets SET feline_breed_id = :breed_id WHERE name = :pet_name AND owner_id = :user_id",
-                                breed_id=breed_id, pet_name=session["pet_name"], user_id=session["user_id"]
-                            )
-                        
-                    except Exception as e:
-                        flash(f"Unable to insert data, Exception: {e}")
-                    
-                try:
-                    db.execute(
-                        "UPDATE pets SET age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex WHERE name = :pet_name AND owner_id = :user_id",
-                            y=pet_age_years, m=pet_age_months, breed=pet_breed, sex=pet_sex, pet_name=session["pet_name"], user_id=session["user_id"]
-                        )
-                except Exception as e:
-                    flash(f"Unable to insert data, Exception: {e}")
-            
             # Convert months to years for easier logic reading
             partial_years = float(pet_age_months / 12)
             pet_age = pet_age_years + partial_years    
             
-                
+            print(pet_age)   
+            
+            # Set flags to see if a pet is between pediatric and sexually mature ages
+            not_pediatric_not_mature = False
+
+            # Search for pet breed code in breed database
             if species == "Canine":
+                breed_id_result = db.execute(
+                    "SELECT BreedID FROM dog_breeds WHERE Breed = ?", pet_breed
+                )
+                
+                breed_id = breed_id_result[0]["BreedID"]
+            
+                print(f"breed_id: {breed_id}")
+                
                 # Find breed size category
-                breed_size = db.execute(
+                breed_size_results = db.execute(
                     "SELECT SizeCategory FROM dog_breeds WHERE BreedID = ?;", breed_id
                 )
-                  
+                
+                breed_size = breed_size_results[0]["SizeCategory"]
+                
+                print(breed_size)
+                
                 if breed_size == "X-Small" or breed_size == "Small" or breed_size == "Medium":
                     if pet_age < 0.33:
-                        # Puppies under 4 months old have a DER modifier of * 3.0
+                        # Puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
                         print("DER Modifier * 3.0")
+                        der_factor_id = 13
                     elif pet_age >= 0.33 and pet_age <= 0.66:
                         # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 2.5
                         print("DER Modifier * 2.5")
-                    elif pet_age > 0.66 and breed_size <= 12:
-                        # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 1.8-2.0
+                        der_factor_id = 15
+                    elif pet_age > 0.66 and pet_age <= 1:
+                        # Toy/small/medium breed puppies between 8 and 12 months of age have a DER modifier of * 1.8-2.0
                         print("DER Modifier * 1.8-2.0")
-                        
+                        der_factor_id = 18
+                    elif pet_age > 1 and pet_age < 2:
+                        # Toy/small/medium breed dogs that aren't pediatric but aren't sexually matue
+                        not_pediatric_not_mature = True
+                    else:
+                        # Pets over 2 years old
+                        sexually_mature = True
+                            
                 elif breed_size == "Large":
                     if pet_age < 0.33:
-                        # Large breed puppies under 4 months old have a DER modifier of * 3.0
+                        # Large breed puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
                         print("DER Modifier * 3.0")
-                    if pet_age > 0.33 and pet_age <= 0.91:
+                        der_factor_id = 13
+                    elif pet_age > 0.33 and pet_age <= 0.91:
                         # Large breed puppies between 4 and 11 months old have a DER modifier of * 2.5
                         print("DER Modifier * 2.5")
+                        der_factor_id = 16
                     elif pet_age > 0.91 and pet_age <= 1.5:
                         # Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
                         print("DER Modifier * 1.8-2.0")
-
+                        der_factor_id = 18
+                    elif pet_age > 1.5 and pet_age < 2:
+                        # Large breed dogs that aren't pediatric but aren't sexually matue
+                        not_pediatric_not_mature = True
+                    else:
+                        # Pets over 2 years old
+                        sexually_mature = True
+                        
                 elif breed_size == "X-Large":
                     if pet_age < 0.33:
-                        # X-Large breed puppies under 6 months old have a DER modifier of * 3.0
+                        # X-Large breed puppies under 6 months old have a DER modifier of * 3.0 factor_id 13
+                        der_factor_id = 13
                         print("DER Modifier * 3.0")
-                    if pet_age > 0.5 and pet_age <= 0.91:
-                        # X-Large breed puppies between 6 and 11 months old have a DER modifier of * 2.5
+                    if pet_age > 0.5 and pet_age <= 1:
+                        # X-Large breed puppies between 6 and 12 months old have a DER modifier of * 2.5
                         print("DER Modifier * 2.5")
-                    elif pet_age > 0.91 and pet_age <= 1.5:
-                        # X-Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
+                        der_factor_id = 17
+                    elif pet_age > 1 and pet_age <= 1.5:
+                        # X-Large breed puppies between 12 and 18 months old have a DER modifier of * 1.8-2.0
                         print("DER Modifier * 1.8-2.0")
+                        der_factor_id = 20
+                    elif pet_age > 1.5 and pet_age < 2:
+                        # X-Large breed dogs that aren't pediatric but aren't sexually matue
+                        not_pediatric_not_mature = True
+                    else:
+                        # Pets over 2 years old
+                        sexually_mature = True
+                        
+
+                if not_pediatric_not_mature or sexually_mature:
+                    if pet_sex in ["female_spayed", "male_neutered"]:
+                        # Non-pediatric, sexually immature and older dogs that are neutered or spayed
+                        print("DER Modifier * 1.4-1.6")
+                        der_factor_id = 1
+                        
+                    elif pet_sex in ["male", "female"]:
+                        # Non-pediatric, sexually immature or intact male dogs
+                        print("DER Modifier * 1.6-1.8")
+                        der_factor_id = 2
+                        
+                        
+                        
+                print(breed_size)
+                
+                # Add pet to the database if the user is logged in
+                if session["user_id"] != None:
+                    print(session["user_id"])
+                    print(session["pet_name"])
+                    print(breed_id, der_factor_id, pet_age_years, pet_age_months, pet_breed, pet_sex)
+
+                    try:
+                        db.execute(
+                            "UPDATE pets SET canine_breed_id = :breed_id, canine_der_factor_id = :der_factor_id, age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex WHERE name = :pet_name AND owner_id = :user_id",
+                                breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, sex=pet_sex, pet_name=session["pet_name"], user_id=session["user_id"]
+                            )
+                        
+                        
+                    except Exception as e:
+                        flash(f"Missing pet name or user ID in session. Exception: {e}")
+                        return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species))
+
+                        
             if species == "Feline":
+                breed_id_result = db.execute(
+                    "SELECT BreedID FROM cat_breeds WHERE Breed = ?", pet_breed
+                )    
+                
+                breed_id = breed_id_result[0]["BreedID"]
+                print(breed_id)
+
                 # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
                 # and https://www.veterinary-practice.com/article/feeding-for-optimal-growth
                 if pet_age <= 0.33 or pet_age > 0.5 and pet_age <= 0.83:
-                    # Kittens under 4 months old have a DER modifier of * 2.0
+                    # Kittens under 4 months old or between 7 and 10 months old have a DER modifier of * 2.0
                     print("DER Modifier * 2.0")
+                    der_factor_id = 13
                 elif pet_age > 0.33 and pet_age <= 0.5:
                     #Kittens between 5 and 6 months old have a DER modifier of * 2.5
                     print("DER Modifier * 2.5")
+                    der_factor_id = 14
                 elif pet_age > 0.83 and pet_age <= 1:
                     # Kittens between 10 and 12 months old have a DER modifier of * 1.8-2.0
                     print("DER Modifier * 1.8-2.0")
-                        
-            if pet_age >= 2.0:
-
-                if pet_sex == "female":
-                    # If the pet is an intact female redirect to pregnancy questions
+                    der_factor_id = 15
+                elif pet_age > 1 and pet_age < 2:
+                    # Kittens that aren't pediatric but aren't sexually matue
+                    not_pediatric_not_mature = True
+                elif pet_age >= 2:
+                    # Pets over 2 years old
+                    sexually_mature = True
                     
-                    return redirect(url_for('repro_status', species=species))
-                else:
-                    # Else redirect to pet body condition score questions
-                    return redirect(url_for('pet_condition', species=species))
+                if not_pediatric_not_mature or sexually_mature:
+                    if pet_sex in ["female_spayed", "male_neutered"]:
+                        # Non-pediatric, sexually immature and older cats that are neutered or spayed
+                        print("DER Modifier * 1.2-1.4")
+                        der_factor_id = 1
+                        
+                    elif pet_sex in ["male", "female"]:
+                        # Non-pediatric, sexually immature or intact male cats
+                        print("DER Modifier * 1.4-1.6")
+                        der_factor_id = 2
+
+
+                
+                # Add pet to the database if the user is logged in
+                if session["user_id"] != None:
+                    print (der_factor_id)
+                    
+                    try:
+                        db.execute(
+                            "UPDATE pets SET feline_breed_id = :breed_id, feline_der_factor_id = :der_factor_id, \
+                                age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex WHERE name = :pet_name AND owner_id = :user_id",
+                                breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, sex=pet_sex, pet_name=session["pet_name"], user_id=session["user_id"]
+                            )
+                        
+                    except Exception as e:
+                        flash(f"Unable to insert data, Exception: {e}")
+                        return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species))
+                    
+            # Store new info as session variables
+            session["der_factor_id"] = der_factor_id
+                
+            
+            if pet_age >= 2 and pet_sex == "female":
+                # If the pet is a mature intact female, redirect to pregnancy questions
+                return redirect(url_for('repro_status', species=species))
+            else:
+                # redirect to pet body condition score questions
+                return redirect(url_for('pet_condition', species=species))
 
 
 
