@@ -4,7 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
-from helpers import login_check_for_species
+from helpers import login_check_for_species, der_factor, check_if_pregnant, find_repro_status, calculcate_rer
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -395,9 +395,17 @@ def pet_info_continued():
                 elif pet_age > 1 and pet_age < 2:
                     # Kittens that aren't pediatric but aren't sexually matue
                     not_pediatric_not_mature = True
-                elif pet_age >= 2:
+                elif pet_age >= 2 and pet_age < 7:
                     # Pets over 2 years old
                     sexually_mature = True
+                elif pet_age >= 7 and pet_age <= 11:
+                    # Cats between 7 and 11 years of age have a DER modifier of * 1.1-1.4
+                    print("DER Modifier * 1.1-1.4")
+                    der_factor_id = 4
+                elif pet_age >= 11:
+                    # Cats older than 11 years have a DER modifier of * 1.1-1.6
+                    print("DER Modifier * 1.1-1.6")
+                    der_factor_id = 5
                     
                 if not_pediatric_not_mature or sexually_mature:
                     if pet_sex in ["female_spayed", "male_neutered"]:
@@ -473,11 +481,29 @@ def repro_status():
         if pregnancy_status == "y":
             
             if species == "Canine":
-
                 # If pet is pregnant and canine, ask how many weeks along she is
                 return redirect(url_for('gestation_duration', species=species))
-            
-            # If pet is pregnant and feline, DER factor is * 1.6-2.0
+            else: 
+                # If pet is pregnant and feline, DER factor is * 1.6-2.0
+                der_factor_id = 7
+                
+                # Add pet info to the database if the user is logged in
+                if session["user_id"] != None:
+                    print (der_factor_id)
+                    
+                    try:
+                        db.execute(
+                            "UPDATE pets SET feline_der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
+                                der_factor_id=der_factor_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                            )
+                        
+                    except Exception as e:
+                        flash(f"Unable to insert data, Exception: {e}")
+                        
+                        return redirect(url_for("repro_status", repro=repro))
+
+            # Update session variable
+            session["der_factor_id"] = der_factor_id
             return redirect(url_for('pet_condition', species=species))
         else:
             # If pet is not pregnant, ask if she is currently nursing a litter
@@ -499,27 +525,42 @@ def gestation_duration():
     if request.method == "POST":
         number_weeks_pregnant = repro.weeks_gestation.data
         
-        # Store new info as session variables
-        session["number_weeks_pregnant"] = number_weeks_pregnant
-        
-        if session["user_id"] != None:
-            try:
-                db.execute(
-                    "UPDATE pets SET weeks_gestating = :weeks_gestating WHERE name = :pet_name AND owner_id = :user_id",
-                    weeks_gestating=number_weeks_pregnant, pet_name=session["pet_name"], user_id=session["user_id"]
-                )
-            except Exception as e:
-                flash(f"Unable to insert data, Exception: {e}")
-            
+
+        # Use login check from helpers.py to verify DER factor id     
+        der_factor_id = der_factor()
+        # print(der_factor_id)    
         
         if number_weeks_pregnant <= "6":
             # If pet is pregnant, canine, and within the first 42 days of pregnancy, DER modifier is *~1.8
-            # TODO: Add this information to pet's table in the database
-            pass
+            
+            if der_factor_id != 5:
+                der_factor_id = 5
+            
         else:
             # If pet is pregnant, canine, and within the last 21 days of pregnancy, DER modifier is *3
-            # TODO: Add this information to pet's table in the database
-            pass
+            
+            if der_factor_id != 6:
+                der_factor_id = 6
+            
+        print(der_factor_id)
+
+
+        # Add pet info to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET weeks_gestating = :weeks_gestating, canine_der_factor_id = :der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
+                    weeks_gestating=number_weeks_pregnant, der_factor_id=der_factor_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
+                return redirect(url_for("gestation_duration", repro=repro, species=species))
+        
+        # Store new info as session variables
+        session["number_weeks_pregnant"] = number_weeks_pregnant
+        
+        # Update DER factor ID variable
+        session["der_factor_id"] = der_factor_id
         
         return redirect(url_for('pet_condition', species=species))
     
@@ -673,6 +714,11 @@ def pet_condition():
         weight = float(form.pet_weight.data)
         units = form.pet_units.data
         
+        # Store new info as session variables
+        session["bcs"] = bcs
+        session["weight"] = weight
+        session["units"] = units
+        
         # print(bcs)
         # print(type(bcs))
         # print(weight)
@@ -680,34 +726,103 @@ def pet_condition():
         # print(units)
         # print(type(units))
         
-        # Use login check from helpers.py to verify species
-        species = login_check_for_species()
-    
-        # Add weight and BCS to the database if the user is logged in
-        if session["user_id"] != None:
-            try:
-                print(session["pet_name"])
-                print(session["user_id"])
-
-                db.execute(
-                    "UPDATE pets SET bcs = :body_condition_score, weight = :weight, units = :units WHERE name = :pet_name AND owner_id = :user_id",
-                    body_condition_score=bcs, weight=weight, units=units, pet_name=session["pet_name"], user_id=session["user_id"]
-                )
-                    
-            except Exception as e:
-                    flash(f"Unable to insert data, Exception: {e}")
-        else:
-            # Store new info as session variables
-            session["bcs"] = bcs
-            session["weight"] = weight
-            session["units"] = units
+        # Use login check from helpers.py to verify DER factor ID
+        der_factor_id = der_factor()
             
-        # Redirect to the next page if info is input successfully
-        if species == "Canine":
-            # Gets a dog's activity level if applicable 
-            return redirect(url_for('activity'))
+        if units == "lbs":
+            # Convert weight to kilograms if not already
+            weight = round((weight / 2.2), 2)
+            units = "kgs"
+            
+        print(f"Weight: {weight}{units}")
         
-        if species == "Feline":
+        if bcs != 5:
+            # Calculate ideal weight
+            weight_proportion = round((100 / (((bcs - 5) * 10) + 100)), 3)
+            # print(f"weight_proportion: {weight_proportion}")
+            est_ideal_weight = round((weight_proportion * weight), 2)
+
+        else:
+            # If pet has 5/9 on the BCS scale, set estimated ideal weight as current weight
+            percent_body_fat = "20"
+            est_ideal_weight = weight
+        
+        bcs_to_body_fat = {1: "< 5", 2: "5", 3: "10", 4: "15", 5: "20",
+                           6: "25", 7: "30", 8: "35", 9: ">=40"
+                           }
+        
+        # Find body fat percentage
+        percent_body_fat = bcs_to_body_fat[bcs]
+        print(percent_body_fat)
+        print(f"Estimated ideal weight: {est_ideal_weight}{units}")
+        
+        # Check for pregnancy status
+        pregnancy_status = check_if_pregnant()
+
+
+        if species == "Canine":
+            if pregnancy_status != "y":
+                if bcs <= 4:
+                    # Change DER factor id to weight gain 
+                    der_factor_id = 24
+                elif bcs > 5 and bcs <= 6:
+                    # Change DER factor id to obese prone 
+                    der_factor_id = 3
+                elif bcs > 7:
+                    # Change DER factor to weight loss
+                    der_factor_id = 4 
+                
+                
+            # Add weight and BCS to the database if the user is logged in
+            if session["user_id"] != None:
+                try:
+                    print(session["pet_name"])
+                    print(session["user_id"])
+
+                    db.execute(
+                        "UPDATE pets SET canine_der_factor_id = :der_factor_id, bcs = :body_condition_score, ideal_weight_kg = :est_ideal_weight, weight = :weight, units = :units, body_fat_percentage = :percent_body_fat WHERE name = :pet_name AND owner_id = :user_id",
+                        der_factor_id=der_factor_id, body_condition_score=bcs, est_ideal_weight=est_ideal_weight, weight=weight, units=units, percent_body_fat=percent_body_fat, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+                        
+                except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+                    
+                
+            # Update DER factor ID variable
+            session["der_factor_id"] = der_factor_id  
+              
+            # Gets a dog's activity level if applicable 
+            return redirect(url_for('activity'))  
+        
+        elif species == "Feline":
+            if bcs <= 4:
+                # Change DER factor id to weight gain 
+                der_factor_id = 16
+            elif bcs > 5 and bcs <= 6:
+                # Change DER factor id to obese prone 
+                der_factor_id = 3
+            elif bcs > 7:
+                # Change DER factor to weight loss
+                der_factor_id = 6 
+            
+            # Add weight and BCS to the database if the user is logged in
+            if session["user_id"] != None:
+                try:
+                    print(session["pet_name"])
+                    print(session["user_id"])
+
+                    db.execute(
+                        "UPDATE pets SET feline_der_factor_id = :der_factor_id, bcs = :body_condition_score, ideal_weight_kg = :est_ideal_weight, weight = :weight, units = :units, body_fat_percentage = :percent_body_fat WHERE name = :pet_name AND owner_id = :user_id",
+                        der_factor_id=der_factor_id, body_condition_score=bcs, est_ideal_weight=est_ideal_weight, weight=weight, units=units, percent_body_fat=percent_body_fat, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+                        
+                except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+
+
+            # Update DER factor ID variable
+            session["der_factor_id"] = der_factor_id  
+                
             # Take cat owners to the pre-confirmation page
             return redirect(url_for('confirm_data', species=species))
     
@@ -734,36 +849,54 @@ def activity():
         light_work_hours += (light_work_minutes / 60)
         heavy_work_hours += (heavy_work_minutes / 60)
         
-
+        print(f'heavy_work_hours: {heavy_work_hours}, light_work_hours: {light_work_hours}')
+        # Use login check from helpers.py to verify DER factor ID and pregnancy status
+        der_factor_id = der_factor()
+        pregnancy_status = check_if_pregnant()
+        
         # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
         # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
         if light_work_hours < 0.5 and heavy_work_hours == 0:
             # Sedentary: 0-30 minutes of light activity daily
             activity_level = "Sedentary"
+            
+            if pregnancy_status != "y":
+                der_factor_id = 3
         elif light_work_hours >= 0.5 and light_work_hours <= 1 and heavy_work_hours == 0:
             # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
             activity_level = "Low"
+            
+            if pregnancy_status != "y":
+                der_factor_id = 21
         elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0:
             # Moderate activity: 1-2 hours of low impact activity
             activity_level = "Moderate"
+            
+            if pregnancy_status != "y":
+                der_factor_id = 22
         elif heavy_work_hours >= 1 and heavy_work_hours <= 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
             activity_level = "Moderate"
+            
+            if pregnancy_status != "y":
+                der_factor_id = 22
         elif heavy_work_hours > 3 and light_work_hours == 0:
             # Working and performance: 3+ hours (i.e. working dog)
             activity_level = "Heavy"
+            
+            if pregnancy_status != "y":
+                der_factor_id = 23
                     
-        
         print(activity_level)
         # If user is logged in, add activity level to database
         if session["user_id"] != None:
             try:
                 print(session["pet_name"])
                 print(session["user_id"])
-                
+                print(activity_level)
                 db.execute(
-                    "UPDATE pets SET activity_level = :activity WHERE name = :pet_name AND owner_id = :user_id",
-                    activity=activity_level, pet_name=session["pet_name"], user_id=session["user_id"]
+                    "UPDATE pets SET canine_der_factor_id = :der_factor_id, activity_level = :activity WHERE name = :pet_name AND owner_id = :user_id",
+                    der_factor_id=der_factor_id, activity=activity_level, pet_name=session["pet_name"], user_id=session["user_id"]
                 )
                 
             except Exception as e:
@@ -772,6 +905,9 @@ def activity():
         else:    
             # Otherwise, create new session variables
             session["activity_level"] = activity_level
+        
+        # Update DER factor ID variable
+        session["der_factor_id"] = der_factor_id  
         
         return redirect(url_for('confirm_data', species=species))
     
@@ -840,6 +976,11 @@ def current_food():
     
     current_food = FoodForm()
     
+    # Use login check from helpers.py to verify reproductive status
+    sex = find_repro_status()
+    
+    print(sex)
+
     if request.method == "POST":
         current_food_kcal = current_food.current_food_kcal.data
         meals_per_day = current_food.meals_per_day.data
@@ -848,6 +989,7 @@ def current_food():
         print(current_food_kcal)
         print(meals_per_day)
         print(wants_transition)
+
         
         # If user is logged in, add current food information to the database
         if session["user_id"] != None:
@@ -863,10 +1005,9 @@ def current_food():
             except Exception as e:
                     flash(f"Unable to insert data, Exception: {e}")
         
-        else:    
-            # Otherwise, create new session variables
-            session["meals_per_day"] = meals_per_day
-            session["current_food_kcal"] = current_food_kcal
+        # Otherwise, create new session variables
+        session["meals_per_day"] = meals_per_day
+        session["current_food_kcal"] = current_food_kcal
             
         if wants_transition == "y":
             # If the user wants to transition their pet to a new food, redirect them
@@ -903,115 +1044,53 @@ def new_food():
             except Exception as e:
                     flash(f"Unable to insert data, Exception: {e}")
             
-        else:    
-            # Otherwise, create new session variables
-            session["first_food_kcal"] = first_food_kcal
-            session["second_food_kcal"] = second_food_kcal 
+        # Otherwise, create new session variables
+        session["first_food_kcal"] = first_food_kcal
+        session["second_food_kcal"] = second_food_kcal 
            
         # If user doesn't want a transition, calculate RER
         return redirect(url_for('rer'))
            
     return render_template("new_food.html", new_foods=new_foods)
 
-    # TODO:  If pet is pregnant and canine, ask how many weeks along she is
-    
-    # TODO: If pet is not pregnant, ask if she is currently nursing a litter
-        # TODO: if yes, ask the litter size 
-            # TODO: if feline and nursing, ask how many weeks she has been doing so
-        # TODO: if no, go to the next step in the questionnaire 
 
 @app.route("/rer", methods=["GET", "POST"])
 def rer():
     """Calculates the minimum number of calories a pet needs at rest per day"""
 
-    if session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        pet_info = db.execute(
-            "SELECT name, age_in_years, age_in_months, species, sex, bcs, weight, units, \
-                is_pregnant, weeks_gestating, is_nursing, litter_size, weeks_nursing, \
-                    activity_level, meals_per_day, current_food_kcal, transitioning_food_one_kcal, \
-                        transitioning_food_two_kcal FROM pets WHERE owner_id = ? AND name = ?", 
-                    session["user_id"], session["pet_name"]
-        )
-        
-        print(pet_info)
-        
-        name = pet_info[0]["name"]
-        pet_age_years = pet_info[0]["age_in_years"]
-        pet_age_months = pet_info[0]["age_in_months"]
-        species = pet_info[0]["species"]
-        sex = pet_info[0]["sex"]
-        bcs = pet_info[0]["bcs"]
-        weight = pet_info[0]["weight"]
-        units = pet_info[0]["units"]
-        is_pregnant = pet_info[0]["is_pregnant"]
-        weeks_gestating = pet_info[0]["weeks_gestating"]
-        litter_size = pet_info[0]["litter_size"]
-        is_nursing = pet_info[0]["is_nursing"]
-        weeks_nursing = pet_info[0]["weeks_nursing"]
-        activity_level = pet_info[0]["activity_level"]
-        first_new_food_kcal = pet_info[0]["transitioning_food_one_kcal"]
-        second_new_food_kcal = pet_info[0]["transitioning_food_two_kcal"]
-    else:
-        # If a user isn't logged in, grab session variables
-        name = session["pet_name"]
-        pet_age_years = session["pet_age_years"]
-        pet_age_months = session["pet_age_months"]
-        species = session["species"]
-        sex = session["pet_sex"]
-        bcs = session["bcs"]
-        weight = session["weight"]
-        units = session["units"]
-        is_pregnant = session["pregnancy_status"]
-        weeks_gestating = session["number_weeks_pregnant"]
-        litter_size = session["litter_size"]
-        is_nursing = session["lactation_status"]
-        weeks_nursing = session["duration_of_nursing"]
-        activity_level = session["activity_level"]
-        
-        first_new_food_kcal = session["first_food_kcal"]
-        second_new_food_kcal = session["second_food_kcal"]
+    # Use login check from helpers.py to verify reproductive status and RER
+    sex = find_repro_status()
+    rer = calculcate_rer()
     
-    print(weight, units)
+    if sex == "female" or sex == "female_spayed":
+        # Subject pronoun is she
+        object_pronoun = "her"
+    elif sex == "male" or sex == "male_neutered":
+        # Subject pronoun is he
+        object_pronoun = "his"
     
-    # Convert lbs weighs to kgs
-    if units == "lbs":
-        weight = weight / 2.2
-        units = "kgs"
+    print(object_pronoun)
     
-    print(weight, units)
-    
-    # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
-    if weight >= 2 and weight <= 45:
-        rer = round((30 * weight) + 70, 2)
-    
-    print(rer)
-    
-    # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-    if weight < 2 or weight > 45:
-        rer = round(70 * weight**0.75, 2)
-        
-        # If user is logged in, add current food information to the database
+
+    # If user is logged in, add current food information to the database
     if session["user_id"] != None:
         try:
+                
             print(session["pet_name"])
             print(session["user_id"])
-                
+                        
             db.execute(
                 "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
                 rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
             )
-                    
+                
         except Exception as e:
-                flash(f"Unable to insert data, Exception: {e}")
-            
-    else:    
-        # Otherwise, create new session variables
-        session["rer"] = rer
+            flash(f"Unable to insert data, Exception: {e}")
 
-    if request.method == "POST":
-        return redirect()
-    return render_template("rer.html", rer=rer, name=name)
+
+        print(rer)
+        return redirect(url_for('der'))
+    return render_template("rer.html", rer=rer, name=session["pet_name"], pronoun=object_pronoun)
     
 @app.route("/der", methods=["GET", "POST"])
 def der():
@@ -1030,58 +1109,61 @@ def der():
             
             print(pet_data)
             
-            name = pet_data[0]["name"]
-            rer = pet_data[0]["rer"]
-            meals_per_day = pet_data[0]["meals_per_day"]
-            current_food_kcal = pet_data[0]["current_food_kcal"]
+            if pet_data:  
+                name = pet_data[0]["name"]
+                rer = pet_data[0]["rer"]
+                meals_per_day = pet_data[0]["meals_per_day"]
+                current_food_kcal = pet_data[0]["current_food_kcal"]
         except Exception as e:
             flash(f"Unable to insert data, Exception: {e}")    
-    else:
-        # If a user isn't logged in, grab session variables
-        name = session["pet_name"]
-        rer = session["rer"]
-        meals_per_day = session["meals_per_day"]
-        current_food_kcal = session["current_food_kcal"]
-        
-    food_amount_per_day = round(rer / current_food_kcal, 2)
     
-    # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
-    whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
-    # print(food_amount_per_day)
-    print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
+    # If a user isn't logged in, grab session variables
+    name = session["pet_name"]
+    rer = session["rer"]
+    meals_per_day = session["meals_per_day"]
+    current_food_kcal = session["current_food_kcal"]
+    
+    print(rer, meals_per_day, current_food_kcal)
+        
+    # food_amount_per_day = round(rer / current_food_kcal, 2)
+    
+    # # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
+    # whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
+    # # print(food_amount_per_day)
+    # print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
     
     # print(whole_cans_or_cups)
     # print(type(whole_cans_or_cups))
     
-    # Convert partial volume amount from decimal to cups
-    # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
-    partial_volumetric = ""
-    if partial_amount > "0" and partial_amount <= "03":
-        partial_volumetric = "1/2 tablespoon"
-    elif partial_amount > "03" and partial_amount <= "06":
-        partial_volumetric = "1/16 cup"
-    elif partial_amount > "06" and partial_amount <= "13":
-        partial_volumetric = "1/8 cup"
-    elif partial_amount > "13" and partial_amount <= "25":
-        partial_volumetric = "1/4 cup"
-    elif partial_amount > "25" and partial_amount <= "40":
-        partial_volumetric = "1/3 cup"
-    elif partial_amount > "40" and partial_amount <= "55":
-        partial_volumetric = "1/2 cup"
-    elif partial_amount > "55" and partial_amount <= "67":
-        partial_volumetric = "2/3 cup"
-    elif partial_amount > "67" and partial_amount <= "85":
-        partial_volumetric = "3/4 cup"
-    else:
-        # If partial volume is more than 0.86 cups, add to whole volume
-        # Convert whole cup/can volume amount to integer
-        whole_cans_or_cups = int(whole_cans_or_cups)
-        whole_cans_or_cups += 1
+    # # Convert partial volume amount from decimal to cups
+    # # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
+    # partial_volumetric = ""
+    # if partial_amount > "0" and partial_amount <= "03":
+    #     partial_volumetric = "1/2 tablespoon"
+    # elif partial_amount > "03" and partial_amount <= "06":
+    #     partial_volumetric = "1/16 cup"
+    # elif partial_amount > "06" and partial_amount <= "13":
+    #     partial_volumetric = "1/8 cup"
+    # elif partial_amount > "13" and partial_amount <= "25":
+    #     partial_volumetric = "1/4 cup"
+    # elif partial_amount > "25" and partial_amount <= "40":
+    #     partial_volumetric = "1/3 cup"
+    # elif partial_amount > "40" and partial_amount <= "55":
+    #     partial_volumetric = "1/2 cup"
+    # elif partial_amount > "55" and partial_amount <= "67":
+    #     partial_volumetric = "2/3 cup"
+    # elif partial_amount > "67" and partial_amount <= "85":
+    #     partial_volumetric = "3/4 cup"
+    # else:
+    #     # If partial volume is more than 0.86 cups, add to whole volume
+    #     # Convert whole cup/can volume amount to integer
+    #     whole_cans_or_cups = int(whole_cans_or_cups)
+    #     whole_cans_or_cups += 1
         
 
    
-    print(f"{whole_cans_or_cups} {partial_volumetric}")
-    return render_template("der.html", rer=rer, current_food_per_day=food_amount_per_day, name=name)
+    # print(f"{whole_cans_or_cups} {partial_volumetric}")
+    return render_template("der.html", rer=rer, name=name)
 
 # New pet
 

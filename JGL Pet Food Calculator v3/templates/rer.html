@@ -16,7 +16,7 @@
     <div class="row">
         {{ name }}'s Resting Energy Requirement is {{ rer }} kcalories per day. 
         This is the minimum amount of calories {{ name }} needs in order to maintain 
-        <!-- TODO: Load in pet's sex --> metabolic processes.
+        {{ pronoun }} metabolic processes.
     </div>
     <div class="button-container">
         <a href="{{ url_for('confirm_data') }}">
@@ -26,7 +26,9 @@
         <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
         <div class="divider"></div>
 
-        <button type="submit" class="btn btn-secondary btn-lg">Go to Next Part</button>
+        <a href="{{ url_for('der') }}">
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Next Part</button>
+        </a>
     </div>
     
 
