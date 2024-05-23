@@ -14,9 +14,29 @@
 
     <!-- Load in calcuated RER --> 
     <div class="row">
-        {{ name }}'s Resting Energy Requirement is {{ rer }} kcalories per day. 
-        This is the minimum amount of calories {{ name }} needs in order to maintain 
-        {{ pronoun }} metabolic processes.
+        <p>
+            {{ name }}'s Resting Energy Requirement is {{ rer }} kcalories per day. 
+            This is the minimum amount of calories {{ name }} needs in order to 
+            maintain {{ pronoun }} metabolic processes. {{ name }} weighs {{ weight }} 
+            {{ units }} ({{ converted_weight }} {{ converted_weight_units }}) and weighs
+            {% if rer_formula_med_to_lrg == True %}
+                between 2 and 45 kg (4.4 and 99 lbs), so the following 
+                formula was used:
+                <div class="formula">
+                    RER = 30 x (body weight in kilograms) + 70
+                </div>
+            {% elif rer_formula_sm == True %}
+                under 2 kg (4.4 lbs), so the following formula was used:
+                <div class="formula">
+                    RER = 70 x (body weight in kilograms)<sup>0.75</sup>
+                </div>
+            {% elif rer_formula_x_large == True %}
+                over 45 kg (99 lbs), so the following formula was used:
+                <div class="formula">
+                    RER = 70 x (body weight in kilograms)<sup>0.75</sup>
+                </div>
+            {% endif %}
+        </p>
     </div>
     <div class="button-container">
         <a href="{{ url_for('confirm_data') }}">

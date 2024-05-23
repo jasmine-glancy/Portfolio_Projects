@@ -66,13 +66,8 @@ def der_factor():
             print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
             
     else:
-        # If a user isn't logged in, grab species variable
-        species = session["species"]
+        # If a user isn't logged in, grab  variable
         der_factor_id = session["der_factor_id"]
-        
-        if species == None:
-            species = request.args.get("species")
-        print(f"Non-db species: {species}") 
     
     # Return whatever DER factor id variable ends up being found 
     return der_factor_id  
@@ -164,11 +159,11 @@ def calculcate_rer():
         
     rer = 0
     # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
-    if weight >= 2 and weight <= 45:
+    if weight >= 2 and weight < 45:
         rer = round((30 * weight) + 70, 2)
             
     # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-    if weight < 2 or weight > 45:
+    if weight < 2 or weight >= 45:
         rer = round(70 * weight**0.75, 2)
             
     print(rer) 

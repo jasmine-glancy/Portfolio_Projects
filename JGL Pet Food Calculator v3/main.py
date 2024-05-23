@@ -1102,7 +1102,63 @@ def rer():
         object_pronoun = "his"
 
     print(object_pronoun)
+
+    # Find pet's current weight so the user can know what formula was used to find their pet's RER
+    if session["user_id"] != None:
+        # If user is logged in, find current rer info
+
+        try:            
+            weight_data = db.execute(
+                "SELECT weight, units WHERE name = ? AND owner_id = ?",
+                session["pet_name"], session["user_id"]
+            )
+            print(weight_data)          
+        except Exception as e:
+            flash(f"Unable to find data, Exception: {e}")
+        else:
+            if weight_data:
+                weight = weight_data[0]["weight"]
+                units = weight_data[0]["units"]
+            else:
+                pass
+    # If a user isn't logged in, grab session variables
+    weight = session["weight"]
+    units = session["units"]
+    
+    print(f"weight: {weight} units: {units}")
+    
+    converted_weight = 0
+    converted_weight_units = ""
+    rer_formula_med_to_lrg = False
+    rer_formula_sm = False
+    rer_formula_x_large = False
+    if units == "lbs":
+        converted_weight = round((weight / 2.2), 2)
+        converted_weight_units = "kgs"
         
+        # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
+        if converted_weight >= 2 and converted_weight < 45:
+            rer_formula_med_to_lrg = True
+        # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
+        elif converted_weight < 2:
+            rer_formula_sm = True
+        elif converted_weight >= 45:
+            rer_formula_x_large = True
+            
+    elif units == "kgs":
+        converted_weight = round((weight * 2.2), 2)
+        converted_weight_units = "lbs"
+        
+        # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
+        if weight >= 2 and weight < 45:
+            rer_formula_med_to_lrg = True
+        # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
+        elif weight < 2:
+            rer_formula_sm = True
+        elif weight >= 45:
+            rer_formula_x_large = True
+    
+    print(f"weight: {weight} units: {units}")
 
     if request.method == "POST":
 
@@ -1123,15 +1179,30 @@ def rer():
                 
             return redirect(url_for('der'))
         
-    return render_template("rer.html", rer=rer, name=session["pet_name"], pronoun=object_pronoun)
+    return render_template("rer.html",
+                           rer=rer,
+                           name=session["pet_name"],
+                           pronoun=object_pronoun,
+                           weight=weight,
+                           converted_weight=converted_weight,
+                           units=units,
+                           converted_weight_units=converted_weight_units,
+                           rer_formula_med_to_lrg=rer_formula_med_to_lrg,
+                           rer_formula_sm=rer_formula_sm,
+                           rer_formula_x_large=rer_formula_x_large)
     
 @app.route("/der", methods=["GET", "POST"])
 def der():
     """Calculates the daily energy rate and total food amount of the current diet to feed"""
     
+    
     # Use helpers.py to verify species and check der_factor
     species = login_check_for_species()
+    
+    # Use login check from helpers.py to verify DER factor ID
     der_factor_id = der_factor()
+    
+    print(der_factor_id)
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
@@ -1164,9 +1235,25 @@ def der():
     print(rer, der_factor_id, meals_per_day, current_food_kcal)
     
     # Use DER factor id to lookup DER information by species
-    # SELECT life_stage, canine_der_factor_range_start, canine_der_factor_range_end, ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range FROM canine_der_factors WHERE factor_id = 21;
+    if species == "Canine":
+        der_lookup = db.execute(
+            "SELECT life_stage, canine_der_factor_range_start, canine_der_factor_range_end, \
+                ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
+                    FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                    der_factor_id=der_factor_id)
+    elif species == "Feline":
+        der_lookup = db.execute(
+        "SELECT life_stage, feline_der_factor_range_start, feline_der_factor_range_end, \
+            ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
+                FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
         
-    food_amount_per_day = round(rer / current_food_kcal, 2)
+    der_modifier = der_lookup[0]["mid_range"]
+
+    der = rer * der_modifier
+    print(der)
+    
+    food_amount_per_day = round(der / current_food_kcal, 2)
     
     # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
     whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]

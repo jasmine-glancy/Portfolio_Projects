@@ -221,3 +221,7 @@ a:hover {
         padding-left: 2px;
     }
 
+/* Formula formatting */
+.formula {
+    text-align: center;
+}
