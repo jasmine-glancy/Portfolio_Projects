@@ -135,7 +135,7 @@ class FoodForm(FlaskForm):
                                             ("n", "No")],
                                   render_kw={"default": {"disabled": ""}})
     meals_per_day = FloatField(
-        "How many meals per day does your pet get?: ",
+        "How many meals per day* does your pet get?: ",
         validators=[DataRequired()])
     new_food_one_kcal = FloatField(
         "How many calories are in each cup (or can)* of the first new food you want your pet to be on: ",

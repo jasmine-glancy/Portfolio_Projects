@@ -22,7 +22,7 @@ def login_check_for_species():
         
 
         if species_result:
-            species = species_result[0]['species']
+            species = species_result[0]["species"]
             print(species)
         else:
             species = session["species"]
@@ -53,7 +53,7 @@ def der_factor():
         
 
         if pet_info:
-            species = pet_info[0]['species']
+            species = pet_info[0]["species"]
             if species == "Canine":
                 der_factor_id = pet_info[0]['canine_der_factor_id']
             elif species == "Feline":
@@ -120,7 +120,7 @@ def find_repro_status():
         
 
         if species_result:
-            pet_sex = species_result[0]['sex']
+            pet_sex = species_result[0]["sex"]
             print(pet_sex)
         else:
             pet_sex = session["pet_sex"]
@@ -137,51 +137,73 @@ def find_repro_status():
 
 def calculcate_rer():
     """Calculates the minimum number of calories a pet needs at rest per day"""
-
     if session["user_id"] != None:
         # If the user is logged in, verify table variables 
         pet_info = db.execute(
-            "SELECT name, bcs, weight, units FROM pets WHERE owner_id = ? AND name = ?", 
-                    session["user_id"], session["pet_name"]
+            "SELECT weight, units FROM pets WHERE owner_id = ? AND name = ?", 
+            session["user_id"], session["pet_name"]
         )
-        
+            
         print(pet_info)
-        
-        name = pet_info[0]["name"]
-        bcs = pet_info[0]["bcs"]
+            
         weight = pet_info[0]["weight"]
         units = pet_info[0]["units"]
     else:
         # If a user isn't logged in, grab session variables
-        name = session["pet_name"]
-        bcs = session["bcs"]
         weight = session["weight"]
         units = session["units"]
-    
+        
     print(weight, units)
-    
+        
     # Convert lbs weighs to kgs
     if units == "lbs":
         weight = weight / 2.2
         units = "kgs"
-    
+        
     print(weight, units)
-    
+        
     rer = 0
     # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
     if weight >= 2 and weight <= 45:
         rer = round((30 * weight) + 70, 2)
-        
+            
     # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
     if weight < 2 or weight > 45:
         rer = round(70 * weight**0.75, 2)
-        
-    # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-    if weight < 2 or weight > 45:
-        rer = round(70 * weight**0.75, 2)
-        
-    print(rer)
-    
+            
+    print(rer) 
     session["rer"] = rer
-    
+     
     return rer
+
+def find_breed_id():
+    """Returns the breed of the pet"""
+    if "user_id" in session and session["user_id"] != None:
+        # If the user is logged in, verify table variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
+        species = login_check_for_species()
+        
+        breed_result = db.execute(
+            "SELECT canine_breed_id, feline_breed_id FROM pets WHERE owner_id = ? AND name = ?",
+            session["user_id"], session["pet_name"]
+        )
+        
+
+        if breed_result:
+            if species == "Canine":
+                breed_id = breed_result[0]["canine_breed_id"]
+            if species == "Feline":
+                breed_id = breed_result[0]["feline_breed_id"]
+
+            print(breed_id)
+   
+    else:
+        # If a user isn't logged in, grab breed ID variable
+        breed_id = session["breed_id"]
+        
+        print(f"Non-db breed ID: {breed_id}") 
+    
+    # Return whatever breed ID variable ends up being found 
+    return breed_id 

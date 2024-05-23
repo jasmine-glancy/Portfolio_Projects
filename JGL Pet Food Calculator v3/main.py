@@ -4,7 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
-from helpers import login_check_for_species, der_factor, check_if_pregnant, find_repro_status, calculcate_rer
+from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, find_breed_id
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -437,6 +437,7 @@ def pet_info_continued():
                     
             # Store new info as session variables
             session["der_factor_id"] = der_factor_id
+            session["breed_id"] = breed_id
                 
             
             if pet_age >= 2 and pet_sex == "female":
@@ -759,8 +760,8 @@ def pet_condition():
         # Check for pregnancy status
         pregnancy_status = check_if_pregnant()
 
-
         if species == "Canine":
+            
             if pregnancy_status != "y":
                 if bcs <= 4:
                     # Change DER factor id to weight gain 
@@ -772,6 +773,21 @@ def pet_condition():
                     # Change DER factor to weight loss
                     der_factor_id = 4 
                 
+            # Use helpers.py to check for breed ID
+            breed_id = find_breed_id()
+        
+            # Check if pet breed is predisposed to obesity
+            breed_obesity_data = db.execute(
+                "SELECT ObeseProneBreed FROM dog_breeds WHERE BreedID = :breed_id",
+                breed_id=breed_id
+            )
+            
+            if breed_obesity_data:
+                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                
+            print(obese_prone_breed)
+            if obese_prone_breed == "y":
+                der_factor_id = 3
                 
             # Add weight and BCS to the database if the user is logged in
             if session["user_id"] != None:
@@ -795,6 +811,7 @@ def pet_condition():
             return redirect(url_for('activity'))  
         
         elif species == "Feline":
+                
             if bcs <= 4:
                 # Change DER factor id to weight gain 
                 der_factor_id = 16
@@ -804,6 +821,19 @@ def pet_condition():
             elif bcs > 7:
                 # Change DER factor to weight loss
                 der_factor_id = 6 
+                
+            # Check if pet breed is predisposed to obesity
+            breed_obesity_data = db.execute(
+                "SELECT ObeseProneBreed FROM cat_breeds WHERE BreedID = :breed_id",
+                breed_id=breed_id
+            )
+            
+            if breed_obesity_data:
+                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                
+            print(obese_prone_breed)
+            if obese_prone_breed == "y":
+                der_factor_id = 3
             
             # Add weight and BCS to the database if the user is logged in
             if session["user_id"] != None:
@@ -1058,43 +1088,50 @@ def new_food():
 def rer():
     """Calculates the minimum number of calories a pet needs at rest per day"""
 
-    # Use login check from helpers.py to verify reproductive status and RER
+    # Use login check from helpers.py to verify reproductive status
     sex = find_repro_status()
     rer = calculcate_rer()
     
+    object_pronoun = ""
+    print(rer)
     if sex == "female" or sex == "female_spayed":
         # Subject pronoun is she
         object_pronoun = "her"
     elif sex == "male" or sex == "male_neutered":
         # Subject pronoun is he
         object_pronoun = "his"
-    
+
     print(object_pronoun)
-    
+        
 
-    # If user is logged in, add current food information to the database
-    if session["user_id"] != None:
-        try:
+    if request.method == "POST":
+
+        # If user is logged in, add current food information to the database
+        if session["user_id"] != None:
+            try:
+                    
+                print(session["pet_name"])
+                print(session["user_id"])
+                            
+                db.execute(
+                    "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
+                    rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
+                )
+                    
+            except Exception as e:
+                flash(f"Unable to insert data, Exception: {e}")
                 
-            print(session["pet_name"])
-            print(session["user_id"])
-                        
-            db.execute(
-                "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
-                rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
-            )
-                
-        except Exception as e:
-            flash(f"Unable to insert data, Exception: {e}")
-
-
-        print(rer)
-        return redirect(url_for('der'))
+            return redirect(url_for('der'))
+        
     return render_template("rer.html", rer=rer, name=session["pet_name"], pronoun=object_pronoun)
     
 @app.route("/der", methods=["GET", "POST"])
 def der():
     """Calculates the daily energy rate and total food amount of the current diet to feed"""
+    
+    # Use helpers.py to verify species and check der_factor
+    species = login_check_for_species()
+    der_factor_id = der_factor()
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
@@ -1103,7 +1140,7 @@ def der():
             print(session["user_id"])
                 
             pet_data = db.execute(
-                "SELECT name, rer, meals_per_day, current_food_kcal, FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                "SELECT name, species, feline_der_factor_id, canine_der_factor_id, rer, meals_per_day, current_food_kcal, FROM pets WHERE owner_id = :user_id AND name = :pet_name",
                 user_id=session["user_id"], pet_name=session["pet_name"]
             )       
             
@@ -1114,6 +1151,7 @@ def der():
                 rer = pet_data[0]["rer"]
                 meals_per_day = pet_data[0]["meals_per_day"]
                 current_food_kcal = pet_data[0]["current_food_kcal"]
+                    
         except Exception as e:
             flash(f"Unable to insert data, Exception: {e}")    
     
@@ -1123,73 +1161,54 @@ def der():
     meals_per_day = session["meals_per_day"]
     current_food_kcal = session["current_food_kcal"]
     
-    print(rer, meals_per_day, current_food_kcal)
+    print(rer, der_factor_id, meals_per_day, current_food_kcal)
+    
+    # Use DER factor id to lookup DER information by species
+    # SELECT life_stage, canine_der_factor_range_start, canine_der_factor_range_end, ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range FROM canine_der_factors WHERE factor_id = 21;
         
-    # food_amount_per_day = round(rer / current_food_kcal, 2)
+    food_amount_per_day = round(rer / current_food_kcal, 2)
     
-    # # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
-    # whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
-    # # print(food_amount_per_day)
-    # print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
+    # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
+    whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
+    # print(food_amount_per_day)
+    print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
     
-    # print(whole_cans_or_cups)
-    # print(type(whole_cans_or_cups))
+    print(whole_cans_or_cups)
+    print(type(whole_cans_or_cups))
     
-    # # Convert partial volume amount from decimal to cups
-    # # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
-    # partial_volumetric = ""
-    # if partial_amount > "0" and partial_amount <= "03":
-    #     partial_volumetric = "1/2 tablespoon"
-    # elif partial_amount > "03" and partial_amount <= "06":
-    #     partial_volumetric = "1/16 cup"
-    # elif partial_amount > "06" and partial_amount <= "13":
-    #     partial_volumetric = "1/8 cup"
-    # elif partial_amount > "13" and partial_amount <= "25":
-    #     partial_volumetric = "1/4 cup"
-    # elif partial_amount > "25" and partial_amount <= "40":
-    #     partial_volumetric = "1/3 cup"
-    # elif partial_amount > "40" and partial_amount <= "55":
-    #     partial_volumetric = "1/2 cup"
-    # elif partial_amount > "55" and partial_amount <= "67":
-    #     partial_volumetric = "2/3 cup"
-    # elif partial_amount > "67" and partial_amount <= "85":
-    #     partial_volumetric = "3/4 cup"
-    # else:
-    #     # If partial volume is more than 0.86 cups, add to whole volume
-    #     # Convert whole cup/can volume amount to integer
-    #     whole_cans_or_cups = int(whole_cans_or_cups)
-    #     whole_cans_or_cups += 1
+    # Convert partial volume amount from decimal to cups
+    # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
+    partial_volumetric = ""
+    if partial_amount > "0" and partial_amount <= "03":
+        partial_volumetric = "1/2 tablespoon"
+    elif partial_amount > "03" and partial_amount <= "06":
+        partial_volumetric = "1/16 cup"
+    elif partial_amount > "06" and partial_amount <= "13":
+        partial_volumetric = "1/8 cup"
+    elif partial_amount > "13" and partial_amount <= "25":
+        partial_volumetric = "1/4 cup"
+    elif partial_amount > "25" and partial_amount <= "40":
+        partial_volumetric = "1/3 cup"
+    elif partial_amount > "40" and partial_amount <= "55":
+        partial_volumetric = "1/2 cup"
+    elif partial_amount > "55" and partial_amount <= "67":
+        partial_volumetric = "2/3 cup"
+    elif partial_amount > "67" and partial_amount <= "85":
+        partial_volumetric = "3/4 cup"
+    else:
+        # If partial volume is more than 0.86 cups, add to whole volume
+        # Convert whole cup/can volume amount to integer
+        whole_cans_or_cups = int(whole_cans_or_cups)
+        whole_cans_or_cups += 1
         
 
    
-    # print(f"{whole_cans_or_cups} {partial_volumetric}")
+    print(f"{whole_cans_or_cups} {partial_volumetric}")
     return render_template("der.html", rer=rer, name=name)
 
 # New pet
 
-            
-            # # Determine if dog is pediatric
-            # if pet_age_years == 0 and pet_age_months < 4:
-            #     # Puppies under 4 months old have a DER modifier of * 3.0
-            #     print("DER Modifier * 3.0")
-                
-            # elif pet_age_years < 1 and pet_age_months > 4 :
-            #     # Puppies over 4 months old and under have a DER modifier of * 2.0
-            #     print("DER Modifier * 2.0")
-            # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
-            # if pet_age_years == 0:
-            #     if pet_age_months < 4:
-            #         # Kittens under 4 months old have a DER modifier of * 3.0
-            #         print("DER Modifier * 3.0")
-            #     elif pet_age_months >= 4 and pet_age_months <= 6:
-            #         # Kittens between 4 and 6 months old have a DER modifier of * 2.5
-            #         print("DER Modifier * 2.5")
-            #     elif pet_age_months >= 9 and pet_age_months <= 12:
-            #         # Kittens between 9 and 12 months old have a DER modifier of * 1.8-2.0
-            #         print("DER Modifier * 1.8-2.0")
-                    
-# TODO: Calculate RER function
-    # TODO: Render page with the pet's info and RER, 
+
 
 # TODO: Calculate MER function
     # TODO: Render a page with the pet's info, RER, MER factors, and MER range.
@@ -1197,12 +1216,6 @@ def der():
     # TODO: Give the option to stop here
         # TODO: Render a button to lead to the actual food calculator
 
-# TODO: Calculate food function
-    # TODO: Ask the user how many calories per cup their current food is
-        # TODO: Allow up to 2 choices.
-        # TODO: Include instructions on how to find this information
-        # TODO: Ask how many meals/day or include a per-day option
-         
     # TODO: Import pet data
         # TODO: use RER and MER  to calculate total daily calories needed
         # # Start in the middle of the range
