@@ -210,6 +210,10 @@ a:hover {
     margin-left: 2vw;
     margin-right: 2vw;
   }
+
+  #info {
+    padding: 10px;
+  }
   
   .col {
     flex-basis: 40%;
@@ -224,4 +228,5 @@ a:hover {
 /* Formula formatting */
 .formula {
     text-align: center;
+    padding-bottom: 20px;
 }

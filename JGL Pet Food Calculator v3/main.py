@@ -4,7 +4,8 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
-from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, find_breed_id
+from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
+    find_breed_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, check_if_nursing
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -138,15 +139,13 @@ def pet_info():
     form = NewSignalment()
     
     if request.method == "POST":
+        
         species = form.pet_species.data
         pet_name = form.pet_name.data.title()
         
         print(type(species))
         print(type(pet_name))
         
-        # Store session variables
-        session["species"] = species
-        session["pet_name"] = pet_name
         
         # Show an error message if the user doesn't choose a species
         if species == "default":
@@ -171,20 +170,29 @@ def pet_info():
                     break
                 
             if existing_pet:
+                
+                old_pet_name = session["pet_name"]
+                print(pet_name)
+                
                 try:
                     db.execute(
-                        "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :pet_name AND owner_id = :user_id",
-                        updated_name=pet_name, updated_species=species, user_id=session["user_id"]
+                        "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :old_pet_name AND owner_id = :user_id",
+                        updated_name=pet_name, updated_species=species, old_pet_name=old_pet_name, user_id=session["user_id"]
                     )
                 except Exception as e:
                     flash(f"Unable to update data, Exception: {e}")
-            else:
-                # If no pet is found (i.e. new pet in the database), insert pet
                     
+                
+            else:
+                # If no pet is found (i.e. new pet in the database), create new session variable and store pet
+                # Store session variables
+                session["species"] = species
+                session["pet_name"] = pet_name
+                
                 try:
                     db.execute(
                         "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
-                        session["user_id"], form.pet_name.data, species
+                        session["user_id"], pet_name, species
                     )
                 except Exception as e:
                     flash(f"Unable to insert new data, Exception: {e}")
@@ -212,34 +220,45 @@ def pet_info_continued():
     # Access breed data via database
     pet_breed = []
     if species == "Canine":
-        pet_breed += db.execute(
+        canine_breed_list = db.execute(
             "SELECT Breed FROM dog_breeds"
         )
+        
+        if canine_breed_list != None:
+            pet_breed += canine_breed_list
+            
     if species == "Feline":
-        pet_breed += db.execute(
+        feline_breed_list = db.execute(
             "SELECT Breed FROM cat_breeds"
         )
+        if feline_breed_list != None:
+            pet_breed += feline_breed_list
         
     
     if request.method == "POST":
-        
         pet_sex = form.pet_sex.data
         pet_age_years = form.pet_age.data
-        pet_age_months = form.pet_age_months.data     
-
+        pet_age_months = form.pet_age_months.data 
         pet_breed = request.form.get("pet_breed")
-        
-        # Create new session variables
-        session["pet_sex"] = pet_sex
-        session["pet_age_years"] = pet_age_years
-        session["pet_age_months"] = pet_age_months
-        session["pet_breed"] = pet_breed
-        # print(pet_breed)
 
-        # Show an error message if the user doesn't choose a breed
-        if pet_breed == None:
-            flash("Please choose a breed from the dropdown.")
+
+        # Show an error message if the user doesn't choose a breed or sex
+        if pet_breed == None and pet_sex == "default":
+            flash("Please choose a breed and your pet's reproductive status from the dropdown menus.")
+            return redirect(url_for('pet_info_continued'))
+        elif pet_breed == None and pet_sex != "default":
+            flash("Please choose a breed from the dropdown menus.")
+            return redirect(url_for('pet_info_continued'))
+        elif pet_breed != None and pet_sex == "default":
+            flash("Please choose your pet's reproductive status from the dropdown menus.")
+            return redirect(url_for('pet_info_continued'))    
         else:
+            # Create new session variables
+            session["pet_sex"] = pet_sex
+            session["pet_age_years"] = pet_age_years
+            session["pet_age_months"] = pet_age_months
+            session["pet_breed"] = pet_breed
+            # print(pet_breed)
             
             # print(pet_age_years)
             # print(pet_age_months)
@@ -592,21 +611,48 @@ def litter_size():
                 )
             except Exception as e:
                 flash(f"Unable to insert data, Exception: {e}")
+        
+        # Use login check from helpers.py to check DER factor ID  
+        der_factor_id = der_factor()
+
           
         if species == "Feline":
             # If the pet is a nursing feline, ask for weeks of lactation
             return redirect(url_for('lactation_duration'))
-            
-
-        # If pet is a nursing canine, DER modifier is as follows:
+        elif species == "Canine":
+            # If pet is a nursing canine, DER modifier changes based on litter size
+            if litter_size == 1:
                 # 1 puppy: * 3.0
+                der_factor_id = 7
+            elif litter_size == 2:
                 # 2 puppies: 3.5
+                der_factor_id = 8
+            elif litter_size == 3 or litter_size == 4:
                 # 3-4 puppies: 4.0
+                der_factor_id = 9
+            elif litter_size == 5 or litter_size == 6:
                 # 5-6 puppies: 5.0
+                der_factor_id = 10
+            elif litter_size == 7 or litter_size == 8:
                 # 7-8 puppies: 5.5
-                # 9 puppies >= 6.0
+                der_factor_id = 11
+            elif litter_size >= 9:
+                # 9+ puppies >= 6.0
+                der_factor_id = 12
                 
-        # TODO: Add modifier to pet's table in the database
+            # Add pet to the database if the user is logged in
+            if session["user_id"] != None:
+                try:
+                    db.execute(
+                        "UPDATE pets SET canine_der_factor_id = :der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
+                        der_factor_id=der_factor_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+                except Exception as e:
+                    flash(f"Unable to insert data, Exception: {e}")
+            
+        # Update DER factor ID variable
+        session["der_factor_id"] = der_factor_id  
+            
         return redirect(url_for('pet_condition', species=species))
     
     return render_template("get_litter_size.html", repro=repro, species=species)
@@ -729,6 +775,7 @@ def pet_condition():
         
         # Use login check from helpers.py to verify DER factor ID
         der_factor_id = der_factor()
+        check_litter_size()
             
         if units == "lbs":
             # Convert weight to kilograms if not already
@@ -745,7 +792,6 @@ def pet_condition():
 
         else:
             # If pet has 5/9 on the BCS scale, set estimated ideal weight as current weight
-            percent_body_fat = "20"
             est_ideal_weight = weight
         
         bcs_to_body_fat = {1: "< 5", 2: "5", 3: "10", 4: "15", 5: "20",
@@ -757,12 +803,17 @@ def pet_condition():
         print(percent_body_fat)
         print(f"Estimated ideal weight: {est_ideal_weight}{units}")
         
-        # Check for pregnancy status
+        # Check for pregnancy status and nursing status
         pregnancy_status = check_if_pregnant()
+        is_nursing = check_if_nursing()
+        
+        # Use helpers.py to check for breed ID
+        breed_id = find_breed_id()
 
         if species == "Canine":
             
-            if pregnancy_status != "y":
+            if pregnancy_status != "y" and is_nursing != "y":
+                # Only update DER factor id if pet isn't nursing or pregnant
                 if bcs <= 4:
                     # Change DER factor id to weight gain 
                     der_factor_id = 24
@@ -773,8 +824,6 @@ def pet_condition():
                     # Change DER factor to weight loss
                     der_factor_id = 4 
                 
-            # Use helpers.py to check for breed ID
-            breed_id = find_breed_id()
         
             # Check if pet breed is predisposed to obesity
             breed_obesity_data = db.execute(
@@ -786,7 +835,7 @@ def pet_condition():
                 obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
                 
             print(obese_prone_breed)
-            if obese_prone_breed == "y":
+            if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y":
                 der_factor_id = 3
                 
             # Add weight and BCS to the database if the user is logged in
@@ -1006,46 +1055,55 @@ def current_food():
     
     current_food = FoodForm()
     
-    # Use login check from helpers.py to verify reproductive status
-    sex = find_repro_status()
-    
-    print(sex)
-
     if request.method == "POST":
         current_food_kcal = current_food.current_food_kcal.data
+        current_food_form = current_food.current_food_form.data
         meals_per_day = current_food.meals_per_day.data
         wants_transition = current_food.food_transition.data
+        
         
         print(current_food_kcal)
         print(meals_per_day)
         print(wants_transition)
+        print(current_food_form)
 
-        
-        # If user is logged in, add current food information to the database
-        if session["user_id"] != None:
-            try:
-                print(session["pet_name"])
-                print(session["user_id"])
-                
-                db.execute(
-                    "UPDATE pets SET meals_per_day = :meals, current_food_kcal = :current_kcal WHERE name = :pet_name AND owner_id = :user_id",
-                    meals=meals_per_day, current_kcal=current_food_kcal, pet_name=session["pet_name"], user_id=session["user_id"]
-                )
-                
-            except Exception as e:
-                    flash(f"Unable to insert data, Exception: {e}")
-        
-        # Otherwise, create new session variables
-        session["meals_per_day"] = meals_per_day
-        session["current_food_kcal"] = current_food_kcal
+        if current_food_form == "default" and wants_transition != "default":
+            flash("Please choose from the current food form dropdown.")
+            return render_template("current_food.html", current_food=current_food)
+        elif wants_transition == "default" and current_food_form != "default":
+            flash("Please choose whether you want to transition your pet to another diet.")
+            return render_template("current_food.html", current_food=current_food)
+        elif current_food_form == "default" and wants_transition == "default":
+            flash("Please from the current food form dropdown and whether you want to transition your pet to another diet.")
+            return render_template("current_food.html", current_food=current_food)
+        else:
+            # If user is logged in, add current food information to the database
+            if session["user_id"] != None:
+                try:
+                    print(session["pet_name"])
+                    print(session["user_id"])
+                    
+                    db.execute(
+                        "UPDATE pets SET meals_per_day = :meals, current_food_kcal = :current_kcal, current_food_form = :current_food_form WHERE name = :pet_name AND owner_id = :user_id",
+                        meals=meals_per_day, current_kcal=current_food_kcal, current_food_form=current_food_form, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+                    
+                except Exception as e:
+                    flash(f"Unable to update data, Exception: {e}")
+                        
             
-        if wants_transition == "y":
-            # If the user wants to transition their pet to a new food, redirect them
-                # to the next form
-            return redirect(url_for('new_food'))
-        
-        # If user doesn't want a transition, calculate RER
-        return redirect(url_for('rer'))
+            # Otherwise, create new session variables
+            session["meals_per_day"] = meals_per_day
+            session["current_food_kcal"] = current_food_kcal
+            session["current_food_form"] = current_food_form
+                
+            if wants_transition == "y":
+                # If the user wants to transition their pet to a new food, redirect them
+                    # to the next form
+                return redirect(url_for('new_food'))
+            
+            # If user doesn't want a transition, calculate RER
+            return redirect(url_for('rer'))
         
     return render_template("current_food.html", current_food=current_food)
     
@@ -1058,7 +1116,9 @@ def new_food():
     
     if request.method == "POST":
         first_food_kcal = new_foods.new_food_one_kcal.data
+        first_food_form = new_foods.new_food_one_form.data
         second_food_kcal = new_foods.new_food_two_kcal.data
+        second_food_form = new_foods.new_food_two_form.data
         
         # If user is logged in, add current food information to the database
         if session["user_id"] != None:
@@ -1067,16 +1127,21 @@ def new_food():
                 print(session["user_id"])
                     
                 db.execute(
-                    "UPDATE pets SET transitioning_food_one_kcal = :kcal_one, transitioning_food_two_kcal = :kcal_two WHERE name = :pet_name AND owner_id = :user_id",
-                    kcal_one=first_food_kcal, kcal_two=second_food_kcal, pet_name=session["pet_name"], user_id=session["user_id"]
+                    "UPDATE pets SET transitioning_food_one_kcal = :kcal_one, \
+                        transitioning_food_one_form = :first_food_form, transitioning_food_two_kcal = :kcal_two, \
+                            transitioning_food_two_form = :second_food_form WHERE name = :pet_name AND owner_id = :user_id",
+                    kcal_one=first_food_kcal, first_food_form=first_food_form, kcal_two=second_food_kcal, second_food_form=second_food_form, pet_name=session["pet_name"], user_id=session["user_id"]
                 )
                     
             except Exception as e:
                     flash(f"Unable to insert data, Exception: {e}")
             
         # Otherwise, create new session variables
-        session["first_food_kcal"] = first_food_kcal
-        session["second_food_kcal"] = second_food_kcal 
+        session["first_new_food_kcal"] = first_food_kcal
+        session["first_new_food_form"] = first_food_form
+        session["second_new_food_kcal"] = second_food_kcal 
+        session["second_new_food_form"] = second_food_form
+
            
         # If user doesn't want a transition, calculate RER
         return redirect(url_for('rer'))
@@ -1103,6 +1168,9 @@ def rer():
 
     print(object_pronoun)
 
+    # Store as a session variable
+    session["object_pronoun"] = object_pronoun
+    
     # Find pet's current weight so the user can know what formula was used to find their pet's RER
     if session["user_id"] != None:
         # If user is logged in, find current rer info
@@ -1121,6 +1189,7 @@ def rer():
                 units = weight_data[0]["units"]
             else:
                 pass
+            
     # If a user isn't logged in, grab session variables
     weight = session["weight"]
     units = session["units"]
@@ -1159,24 +1228,25 @@ def rer():
             rer_formula_x_large = True
     
     print(f"weight: {weight} units: {units}")
-
-    if request.method == "POST":
-
-        # If user is logged in, add current food information to the database
-        if session["user_id"] != None:
-            try:
+    print(f"RER: {rer}")
+    
+    # If user is logged in, add current food information to the database
+    if session["user_id"] != None:
+        try:
                     
-                print(session["pet_name"])
-                print(session["user_id"])
-                            
-                db.execute(
-                    "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
-                    rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
-                )
-                    
-            except Exception as e:
-                flash(f"Unable to insert data, Exception: {e}")
+            print(session["pet_name"])
+            print(session["user_id"])
                 
+                            
+            db.execute(
+                "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
+                rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
+            )
+                    
+        except Exception as e:
+            flash(f"Unable to update data, Exception: {e}")
+        else:    
+            # If update gives no exceptions, calculate DER
             return redirect(url_for('der'))
         
     return render_template("rer.html",
@@ -1195,14 +1265,11 @@ def rer():
 def der():
     """Calculates the daily energy rate and total food amount of the current diet to feed"""
     
-    
+    # Call session variable for pronouns
+    object_pronoun = session["object_pronoun"]
+
     # Use helpers.py to verify species and check der_factor
     species = login_check_for_species()
-    
-    # Use login check from helpers.py to verify DER factor ID
-    der_factor_id = der_factor()
-    
-    print(der_factor_id)
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
@@ -1232,8 +1299,16 @@ def der():
     meals_per_day = session["meals_per_day"]
     current_food_kcal = session["current_food_kcal"]
     
-    print(rer, der_factor_id, meals_per_day, current_food_kcal)
+        
+    # Use login check from helpers.py to verify DER factor ID and food form
+    der_factor_id = der_factor()
+    current_food_form = find_food_form()
     
+    print(der_factor_id)
+    print(rer, der_factor_id, meals_per_day, current_food_kcal, current_food_form)
+    
+    der_modifier_start_range = 0
+    der_modifier_end_range = 0
     # Use DER factor id to lookup DER information by species
     if species == "Canine":
         der_lookup = db.execute(
@@ -1241,57 +1316,174 @@ def der():
                 ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
                     FROM canine_der_factors WHERE factor_id = :der_factor_id",
                     der_factor_id=der_factor_id)
+        
+        # Find the start and end range of DER modifiers
+        der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
+        der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
+        
     elif species == "Feline":
         der_lookup = db.execute(
         "SELECT life_stage, feline_der_factor_range_start, feline_der_factor_range_end, \
             ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
-                FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                FROM feline_der_factors WHERE factor_id = :der_factor_id",
                 der_factor_id=der_factor_id)
         
+        # Find the start and end range of DER modifiers
+        der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
+        der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
+    
+
+    # Start with the mid range if this is the first report
+    # TODO: check report date and change modifier choice based on weight changes
     der_modifier = der_lookup[0]["mid_range"]
 
+    # Calculate DER based on the der modifier and pass variables to tempate
     der = rer * der_modifier
     print(der)
+    der_low_end = rer * der_modifier_start_range
+    der_high_end = rer * der_modifier_end_range
     
-    food_amount_per_day = round(der / current_food_kcal, 2)
+    # Calculate the required calories per day
+    total_calorie_amount_per_day = round(der / current_food_kcal, 2)
     
-    # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
-    whole_cans_or_cups, partial_amount = str(food_amount_per_day).split(".")[0], str(food_amount_per_day).split(".")[1]
+    # Breaks the food amount in to whole and partial amounts to convert to volumetric easier    
+    daily_whole_cans_or_cups, daily_partial_amount = str(total_calorie_amount_per_day).split(".")[0], str(total_calorie_amount_per_day).split(".")[1]
     # print(food_amount_per_day)
-    print(f"whole: {whole_cans_or_cups}, partial: {partial_amount}")
-    
-    print(whole_cans_or_cups)
-    print(type(whole_cans_or_cups))
-    
-    # Convert partial volume amount from decimal to cups
-    # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
-    partial_volumetric = ""
-    if partial_amount > "0" and partial_amount <= "03":
-        partial_volumetric = "1/2 tablespoon"
-    elif partial_amount > "03" and partial_amount <= "06":
-        partial_volumetric = "1/16 cup"
-    elif partial_amount > "06" and partial_amount <= "13":
-        partial_volumetric = "1/8 cup"
-    elif partial_amount > "13" and partial_amount <= "25":
-        partial_volumetric = "1/4 cup"
-    elif partial_amount > "25" and partial_amount <= "40":
-        partial_volumetric = "1/3 cup"
-    elif partial_amount > "40" and partial_amount <= "55":
-        partial_volumetric = "1/2 cup"
-    elif partial_amount > "55" and partial_amount <= "67":
-        partial_volumetric = "2/3 cup"
-    elif partial_amount > "67" and partial_amount <= "85":
-        partial_volumetric = "3/4 cup"
-    else:
-        # If partial volume is more than 0.86 cups, add to whole volume
-        # Convert whole cup/can volume amount to integer
-        whole_cans_or_cups = int(whole_cans_or_cups)
-        whole_cans_or_cups += 1
         
+    print(f"per day whole: {daily_whole_cans_or_cups}, partial: {daily_partial_amount}")
+    
+    print(daily_whole_cans_or_cups)
+    print(type(daily_whole_cans_or_cups))
+        
+    daily_partial_volumetric = convert_decimal_to_volumetric(daily_partial_amount)
 
-   
-    print(f"{whole_cans_or_cups} {partial_volumetric}")
-    return render_template("der.html", rer=rer, name=name)
+    if daily_partial_volumetric == "1":
+        # If partial volume is more than 0.86 cups, convert whole cup/can volume amount to integer
+
+        daily_whole_cans_or_cups = int(daily_whole_cans_or_cups)
+            
+        # Then add to whole volume
+        daily_whole_cans_or_cups += 1
+        
+    food_form = ""
+    if current_food_form == "dry":
+        food_form = "cup"
+    elif current_food_form == "can":
+        food_form = "cup"
+    elif current_food_form == "pouch":
+        food_form = "pouch"
+    
+    # Shortened conditional variables suggested by CoPilot
+    whole_cans_or_cups = int(daily_whole_cans_or_cups)
+    is_pouch = current_food_form == "pouch"
+    is_half_tablespoon = daily_partial_volumetric == "1/2 tablespoon"
+    food_form_plural = f"{food_form}{'es' if is_pouch else 's'}"
+
+    
+    if whole_cans_or_cups == 1:
+        if is_half_tablespoon:
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric}"
+        else:
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form}"
+    elif whole_cans_or_cups >= 1:
+        if is_half_tablespoon:
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} and {daily_partial_volumetric}"
+        else:
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form_plural}"
+    else:
+        # Under 1 whole can or cup amount
+        daily_amount_to_feed = f"{daily_partial_volumetric}"
+
+    # Calculate the required calories per meal
+    total_amount_per_meal = total_calorie_amount_per_day / meals_per_day
+    
+    print(total_amount_per_meal)
+    mutliple_meals = False
+    if meals_per_day > 1:
+        # Break down volume per meal if meals per day is more than 1
+        mutliple_meals= True 
+
+        # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
+        meal_whole_cans_or_cups, meal_partial_amount = str(total_amount_per_meal).split(".")[0], str(total_amount_per_meal).split(".")[1]
+        # print(food_amount_per_day)
+        
+        print(f"whole cups per meal: {meal_whole_cans_or_cups}, partial cups per meal: {meal_partial_amount}")
+        
+        print(meal_whole_cans_or_cups)
+        print(type(meal_whole_cans_or_cups))
+        
+        meal_partial_volumetric = convert_decimal_to_volumetric(meal_partial_amount)
+
+        print(f"meal_partial_volumetric: {meal_partial_volumetric}")
+        if meal_partial_volumetric == "1":
+            # If partial volume is more than 0.86 cups, convert whole cup/can volume amount to integer
+
+            meal_whole_cans_or_cups = int(meal_whole_cans_or_cups)
+            
+            # Then add to whole volume and reset partial volume value
+            meal_whole_cans_or_cups += 1
+        
+            
+        if int(meal_whole_cans_or_cups) >= 1 and int(meal_partial_volumetric) == 1:
+            total_amount_per_meal = f"{meal_whole_cans_or_cups}"
+        else:
+            total_amount_per_meal = f"{meal_partial_volumetric}"
+
+        print(total_amount_per_meal)
+    else:
+        # If the user asks for 1 meal per day amounts, total_amount_per_meal = daily amount
+        total_amount_per_meal = f"{daily_amount_to_feed}"
+    
+    print(total_amount_per_meal)
+    
+    print(daily_amount_to_feed)
+    
+    # Insert DER modifier, DER, current food amount recommended, date of first report, date of most recent report
+    # If user is logged in, add current food information to the database
+    if session["user_id"] != None:
+        try:
+                    
+            print(session["pet_name"])
+            print(session["user_id"])
+                                   
+            db.execute(
+                "UPDATE pets SET der = :der, der_modifier = :der_modifier, current_food_amt_rec = :daily_amount_to_feed, \
+                    date_of_first_report = CURRENT_TIMESTAMP, most_recent_report_date = CURRENT_TIMESTAMP \
+                        WHERE name = :pet_name AND owner_id = :user_id",
+                der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, pet_name=session["pet_name"], user_id=session["user_id"]
+            )
+                    
+        except Exception as e:
+            flash(f"Unable to update data, Exception: {e}")
+        else:    
+            # Set session variables if update is successful
+            
+            session["der"] = der
+            session["der_modifier"] = der_modifier
+            session["daily_amount_to_feed_cur_food"] = daily_amount_to_feed
+            
+            return redirect(url_for('completed_report'))
+        
+    return render_template("der.html",
+                           rer=rer,
+                           der=der,
+                           name=name,
+                           object_pronoun=object_pronoun,
+                           der_low_end=der_low_end,
+                           der_high_end=der_high_end,
+                           current_food_form=current_food_form,
+                           total_amount_per_meal=total_amount_per_meal,
+                           daily_amount_to_feed=daily_amount_to_feed,
+                           mutliple_meals=mutliple_meals,
+                           der_modifier=der_modifier)
+
+@app.route("/completed_report", methods=["GET", "POST"])
+def completed_report():
+    """Return's pet's final completed report"""
+    
+    pet_data = pet_data_dictionary()
+    
+    return render_template("complete_report.html", pet_data=pet_data)
 
 # New pet
 

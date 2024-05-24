@@ -20,11 +20,10 @@
         <!-- Outputs error messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% for error in messages %}
-                    <p class="flash">⚠️ {{ error }} ⚠️</p>
-                {% endfor %}
+                <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
             {% endif %}
         {% endwith %}
+        
         <div class="row">
             <div class="col" title="Breed">
                 Pet's Breed: 
@@ -47,6 +46,15 @@
                 {{ form.pet_age_months.label }} {{ form.pet_age_months }}
             </div>
 
+        </div>
+        <div class="row" id="info">
+            * If you aren't sure what breed your 
+            {% if species == "Feline" %}
+                cat is, please choose either "Domestic Shorthair", "Domestic Mediumhair", or "Domestic Longhair".
+            {% elif species == "Canine" %}
+                dog is, please choose from the "Mixed Breed" choices or the breed your dog shares the most physical
+                traits with.
+            {% endif %}
         </div>
 
         <div class="button-container">

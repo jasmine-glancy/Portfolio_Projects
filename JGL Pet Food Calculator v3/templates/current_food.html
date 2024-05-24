@@ -12,6 +12,13 @@
         <div class="progress-bar" style="width: 75%">75%</div>
     </div>
 
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
+
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('current_food') }}" method="POST">
         <div class="row">
@@ -28,11 +35,11 @@
             guaranteed analysis panels.
         </div>
         <div class="row">
-            <div class="col" title="Food Transition Label">
-                {{ current_food.food_transition.label }}
+            <div class="col" title="Current Food Form">
+                {{ current_food.current_food_form.label }}
             </div>
-            <div class="col" title="Food Transition Dropdown">
-                {{ current_food.food_transition }}
+            <div class="col" title="Current Food Form Dropdown">
+                {{ current_food.current_food_form }}
             </div>
         </div>
         <div class="row">
@@ -45,6 +52,14 @@
         </div>
         <div class="row">
             * If your pet has free access to food at all times of the day, please input "1".
+        </div>
+        <div class="row">
+            <div class="col" title="Food Transition Label">
+                {{ current_food.food_transition.label }}
+            </div>
+            <div class="col" title="Food Transition Dropdown">
+                {{ current_food.food_transition }}
+            </div>
         </div>
 
         <div class="button-container">

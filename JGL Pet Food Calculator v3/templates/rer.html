@@ -15,7 +15,7 @@
     <!-- Load in calcuated RER --> 
     <div class="row">
         <p>
-            {{ name }}'s Resting Energy Requirement is {{ rer }} kcalories per day. 
+            {{ name }}'s Resting Energy Requirement (RER) is {{ rer }} kcalories per day. 
             This is the minimum amount of calories {{ name }} needs in order to 
             maintain {{ pronoun }} metabolic processes. {{ name }} weighs {{ weight }} 
             {{ units }} ({{ converted_weight }} {{ converted_weight_units }}) and weighs
@@ -36,6 +36,12 @@
                     RER = 70 x (body weight in kilograms)<sup>0.75</sup>
                 </div>
             {% endif %}
+            Calculating the Resting Energy Rate is a recognized, reliable first step 
+            to find how many calories a pet should eat per day. However, every pet is
+            an individual. While this formula works well for 50% of pets, 25% may require 
+            more food, while 25% require less food. Therefore, on the next page the Pet 
+            Food Calculator will calculate a range of food to feed {{ name }}. 
+            
         </p>
     </div>
     <div class="button-container">

@@ -80,13 +80,13 @@ def check_if_pregnant():
         print(session["pet_name"])
         
         
-        species_result = db.execute(
+        pregnancy_result = db.execute(
             "SELECT is_pregnant FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
         )
         
 
-        if species_result:
-            is_pregnant = species_result[0]['is_pregnant']
+        if pregnancy_result:
+            is_pregnant = pregnancy_result[0]['is_pregnant']
             print(is_pregnant)
         else:
             is_pregnant = session["pregnancy_status"]
@@ -100,6 +100,65 @@ def check_if_pregnant():
     
     # Return whatever species variable ends up being found 
     return is_pregnant  
+
+def check_if_nursing():
+    """Checks if the pet is pregnant"""
+    if "user_id" in session and session["user_id"] != None:
+        # If the user is logged in, verify table variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
+        
+        nursing_result = db.execute(
+            "SELECT is_nursing FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        )
+        
+
+        if nursing_result:
+            is_nursing = nursing_result[0]['is_pregnant']
+            print(is_nursing)
+        else:
+            is_nursing = session["pregnancy_status"]
+            print(f"Non-db nursing status: {is_nursing}") 
+            
+    else:
+        # If a user isn't logged in, grab species variable
+        is_nursing = session["pregnancy_status"]
+        
+        print(f"Non-db nursing status: {is_nursing}") 
+    
+    # Return whatever species variable ends up being found 
+    return is_nursing  
+
+
+def check_litter_size():
+    """Checks if the pet is pregnant"""
+    if "user_id" in session and session["user_id"] != None:
+        # If the user is logged in, verify table variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
+        
+        litter_result = db.execute(
+            "SELECT litter_size FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        )
+        
+
+        if litter_result:
+            litter_size = litter_result[0]['litter_size']
+            print(litter_size)
+        else:
+            litter_size = session["litter_size"]
+            print(f"Non-db litter size: {litter_size}") 
+            
+    else:
+        # If a user isn't logged in, grab species variable
+        is_pregnant = session["litter_size"]
+        
+        print(f"Non-db litter size: {litter_size}") 
+    
+    # Return whatever species variable ends up being found 
+    return litter_size  
 
 def find_repro_status():
     """Returns the reproductive status of the pet"""
@@ -202,3 +261,113 @@ def find_breed_id():
     
     # Return whatever breed ID variable ends up being found 
     return breed_id 
+
+def convert_decimal_to_volumetric(partial_amount):
+    """Convert partial volume amount from decimal to cups"""
+    
+    # Volume table source: https://amazingribs.com/more-technique-and-science/more-cooking-science/important-weights-measures-conversion-tables/
+    
+    partial_volumetric = ""
+    if partial_amount > "0" and partial_amount <= "03":
+        partial_volumetric = "1/2 tablespoon"
+    elif partial_amount > "03" and partial_amount <= "06":
+        partial_volumetric = "1/16"
+    elif partial_amount > "06" and partial_amount <= "13":
+        partial_volumetric = "1/8"
+    elif partial_amount > "13" and partial_amount <= "25":
+        partial_volumetric = "1/4"
+    elif partial_amount > "25" and partial_amount <= "40":
+        partial_volumetric = "1/3"
+    elif partial_amount > "40" and partial_amount <= "55":
+        partial_volumetric = "1/2"
+    elif partial_amount > "55" and partial_amount <= "67":
+        partial_volumetric = "2/3"
+    elif partial_amount > "67" and partial_amount <= "85":
+        partial_volumetric = "3/4"
+    else:
+        # If partial volume is more than 0.86 cups, add to whole volume
+        partial_volumetric = "1"
+        
+    return partial_volumetric
+
+def find_food_form():
+    """Find the form of the pet's current diet"""
+    
+    if "user_id" in session and session["user_id"] != None:
+        # If the user is logged in, verify table variables 
+        print(session["user_id"])
+        print(session["pet_name"])
+        
+        
+        food_result = db.execute(
+            "SELECT current_food_form FROM pets WHERE owner_id = ? AND name = ?", 
+            session["user_id"], session["pet_name"]
+        )
+        
+
+        if food_result:
+            current_food_form = food_result[0]['current_food_form']
+            print(current_food_form)
+        else:
+            current_food_form = session["current_food_form"]
+            print(f"Non-db current_food_form: {current_food_form}") 
+            
+    else:
+        # If a user isn't logged in, grab food form variable
+        current_food_form = session["current_food_form"]
+        
+        print(f"Non-db current_food_form: {current_food_form}")
+    
+    # Return whatever species variable ends up being found 
+    return current_food_form 
+
+def pet_data_dictionary():
+        # Use login check from helpers.py to verify species
+    species = login_check_for_species()
+    
+    # If user is logged in, use SQL query
+    if session["user_id"] != None:
+        pet_data = db.execute(
+            "SELECT * FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+            user_id=session["user_id"], pet_name=session["pet_name"]
+        )       
+            
+        print(pet_data)
+        
+    # Otherwise, pass session variables
+    else:
+        pet_data = [{'name': session["pet_name"],
+                     'age_in_years': session["pet_age_years"],
+                     'age_in_months': session["age_in_months"],
+                     'species': session["species"],
+                     'breed': session["breed"],
+                     'sex': session["pet_sex"],
+                     'bcs': session["bcs"],
+                     'weight': session["weight"],
+                     'units': session["units"],
+                     'activity_level': session["activity_level"],
+                     'rer': session["rer"],
+                     'der': session["der"],
+                     'der_modifier': session["der_modifier"],
+                     'current_food_amt_rec': session["daily_amount_to_feed_cur_food"],
+                     'current_food_kcal': session["current_food_kcal"],
+                     'current_food_form': session["current_food_form"],
+                     'meals_per_day': session["meals_per_day"],
+                     'is_pregnant': None,
+                     'weeks_gestating': None,
+                     'is_nursing': None,
+                     'litter_size': None,
+                     'weeks_nursing': None}]
+        
+        if session["pregnancy_status"] != None:
+            pet_data[0]['is_pregnant'] = session["pregnancy_status"]
+        elif session["number_weeks_pregnant"] != None:
+            pet_data[0]["weeks_gestating"] = session["number_weeks_pregnant"]
+        elif session["lactation_status"] != None:
+            pet_data[0]['is_nursing'] = session["lactation_status"]
+        elif session['litter_size'] != None:
+            pet_data[0]['litter_size'] = session['litter_size']
+        elif session["duration_of_nursing"] != None:
+            pet_data[0]['weeks_nursing'] = session["duration_of_nursing"]
+            
+    return pet_data

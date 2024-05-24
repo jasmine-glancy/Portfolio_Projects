@@ -14,17 +14,16 @@
         <div class="progress-bar" style="width: 0%">0%</div>
       </div>
 
-    
-    <!-- Load in WTF Form --> 
+
     <form action="{{ url_for('pet_info') }}" method="POST">
         <!-- Outputs error messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% for error in messages %}
-                    <p class="flash">⚠️ {{ error }} ⚠️</p>
-                {% endfor %}
+                <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
             {% endif %}
         {% endwith %}
+
+        <!-- Load in WTF Form --> 
         <div class="row">
             <div class="col" title="Name" id="name">
                 {{ form.pet_name.label }} {{ form.pet_name }}
