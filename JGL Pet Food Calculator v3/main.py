@@ -1478,10 +1478,7 @@ def der():
         except Exception as e:
             flash(f"Unable to update data, Exception: {e}")
 
-    if request.method == "POST":
-        return redirect(url_for('completed_report'))
-
-        
+    
     return render_template("der.html",
                            rer=rer,
                            der=der,
@@ -1502,21 +1499,3 @@ def completed_report():
     pet_data = pet_data_dictionary()
     
     return render_template("complete_report.html", pet_data=pet_data)
-
-# New pet
-
-
-
-# TODO: Calculate MER function
-    # TODO: Render a page with the pet's info, RER, MER factors, and MER range.
-    # TODO: Explain the formula and give disclaimers
-    # TODO: Give the option to stop here
-        # TODO: Render a button to lead to the actual food calculator
-
-    # TODO: Import pet data
-        # TODO: use RER and MER  to calculate total daily calories needed
-        # # Start in the middle of the range
-            # TODO: Use this number to calculate total number of cups per day
-            
-        # TODO: Return all this info to the user 
-

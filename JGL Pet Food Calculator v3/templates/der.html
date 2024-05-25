@@ -55,9 +55,11 @@
         </a>
 
         <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
+        
         <div class="divider"></div>
-
-        <button type="submit" class="btn btn-secondary btn-lg">Go to Final Report</button>
+        <a href="{{ url_for('completed_report') }}">
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Final Report</button>
+        </a>
     </div>
     
 
