@@ -93,12 +93,12 @@ def check_if_pregnant():
             print(f"Non-db pregnancy status: {is_pregnant}") 
             
     else:
-        # If a user isn't logged in, grab species variable
+        # If a user isn't logged in, grab session variable
         is_pregnant = session["pregnancy_status"]
         
         print(f"Non-db pregnancy status: {is_pregnant}") 
     
-    # Return whatever species variable ends up being found 
+    # Return whatever pregnancy variable ends up being found 
     return is_pregnant  
 
 def check_if_nursing():
@@ -115,19 +115,19 @@ def check_if_nursing():
         
 
         if nursing_result:
-            is_nursing = nursing_result[0]['is_pregnant']
+            is_nursing = nursing_result[0]['is_nursing']
             print(is_nursing)
         else:
-            is_nursing = session["pregnancy_status"]
+            is_nursing = session["lactation_status"]
             print(f"Non-db nursing status: {is_nursing}") 
             
     else:
-        # If a user isn't logged in, grab species variable
-        is_nursing = session["pregnancy_status"]
+        # If a user isn't logged in, grab session variable
+        is_nursing = session["lactation_status"]
         
         print(f"Non-db nursing status: {is_nursing}") 
     
-    # Return whatever species variable ends up being found 
+    # Return whatever nursing status variable ends up being found 
     return is_nursing  
 
 
@@ -145,19 +145,19 @@ def check_litter_size():
         
 
         if litter_result:
-            litter_size = litter_result[0]['litter_size']
+            litter_size = litter_result[0]["litter_size"]
             print(litter_size)
         else:
             litter_size = session["litter_size"]
             print(f"Non-db litter size: {litter_size}") 
             
     else:
-        # If a user isn't logged in, grab species variable
+        # If a user isn't logged in, grab session variable
         is_pregnant = session["litter_size"]
         
         print(f"Non-db litter size: {litter_size}") 
     
-    # Return whatever species variable ends up being found 
+    # Return whatever litter size variable ends up being found 
     return litter_size  
 
 def find_repro_status():
@@ -178,15 +178,15 @@ def find_repro_status():
             print(pet_sex)
         else:
             pet_sex = session["pet_sex"]
-            print(f"Non-db pregnancy status: {pet_sex}") 
+            print(f"Non-db repro status: {pet_sex}") 
             
     else:
-        # If a user isn't logged in, grab species variable
+        # If a user isn't logged in, grab session variable
         pet_sex = session["pet_sex"]
         
-        print(f"Non-db pregnancy status: {pet_sex}") 
+        print(f"Non-db repro status: {pet_sex}") 
     
-    # Return whatever species variable ends up being found 
+    # Return whatever reproductive status variable ends up being found 
     return pet_sex    
 
 def calculcate_rer():
@@ -318,7 +318,7 @@ def find_food_form():
         
         print(f"Non-db current_food_form: {current_food_form}")
     
-    # Return whatever species variable ends up being found 
+    # Return whatever form variable ends up being found 
     return current_food_form 
 
 def pet_data_dictionary():
