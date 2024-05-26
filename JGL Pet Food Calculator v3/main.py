@@ -5,7 +5,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
-    find_breed_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, check_if_nursing
+    find_breed_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
+        check_if_nursing, check_obesity_risk
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -809,9 +810,6 @@ def pet_condition():
         # Check for pregnancy status and nursing status
         pregnancy_status = check_if_pregnant()
         is_nursing = check_if_nursing()
-        
-        # Use helpers.py to check for breed ID
-        breed_id = find_breed_id()
 
         if species == "Canine":
             
@@ -829,13 +827,7 @@ def pet_condition():
                 
         
             # Check if pet breed is predisposed to obesity
-            breed_obesity_data = db.execute(
-                "SELECT ObeseProneBreed FROM dog_breeds WHERE BreedID = :breed_id",
-                breed_id=breed_id
-            )
-            
-            if breed_obesity_data:
-                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+            obese_prone_breed = check_obesity_risk()
                 
             print(obese_prone_breed)
             if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y":
@@ -875,13 +867,7 @@ def pet_condition():
                 der_factor_id = 6 
                 
             # Check if pet breed is predisposed to obesity
-            breed_obesity_data = db.execute(
-                "SELECT ObeseProneBreed FROM cat_breeds WHERE BreedID = :breed_id",
-                breed_id=breed_id
-            )
-            
-            if breed_obesity_data:
-                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+            obese_prone_breed = check_obesity_risk()
                 
             print(obese_prone_breed)
             if obese_prone_breed == "y":
@@ -937,37 +923,43 @@ def activity():
         pregnancy_status = check_if_pregnant()
         is_nursing = check_if_nursing()
         
+        # Check if pet breed is predisposed to obesity
+        obese_prone_breed = check_obesity_risk()
+        
+        # Pets that aren't pregnant, aren't nursing, and are obese prone
+        not_preg_or_nursing_non_obese = pregnancy_status != "y" and is_nursing != "y" and obese_prone_breed != "y"
+        
         # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
         # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
         if light_work_hours < 0.5 and heavy_work_hours == 0:
             # Sedentary: 0-30 minutes of light activity daily
             activity_level = "Sedentary"
             
-            if pregnancy_status != "y" and is_nursing != "y":
+            if not_preg_or_nursing_non_obese:
                 der_factor_id = 3
         elif light_work_hours >= 0.5 and light_work_hours <= 1 and heavy_work_hours == 0:
             # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
             activity_level = "Low"
             
-            if pregnancy_status != "y" and is_nursing != "y":
+            if not_preg_or_nursing_non_obese:
                 der_factor_id = 21
         elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0:
             # Moderate activity: 1-2 hours of low impact activity
             activity_level = "Moderate"
             
-            if pregnancy_status != "y" and is_nursing != "y":
+            if not_preg_or_nursing_non_obese:
                 der_factor_id = 22
         elif heavy_work_hours >= 1 and heavy_work_hours <= 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
             activity_level = "Moderate"
             
-            if pregnancy_status != "y" and is_nursing != "y":
+            if not_preg_or_nursing_non_obese:
                 der_factor_id = 22
         elif heavy_work_hours > 3 and light_work_hours == 0:
             # Working and performance: 3+ hours (i.e. working dog)
             activity_level = "Heavy"
             
-            if pregnancy_status != "y" and is_nursing != "y":
+            if not_preg_or_nursing_non_obese:
                 der_factor_id = 23
                     
         print(activity_level)
@@ -1065,6 +1057,14 @@ def current_food():
         meals_per_day = current_food.meals_per_day.data
         wants_transition = current_food.food_transition.data
         
+        # Ensure user enters at least one meal
+        try:
+            if meals_per_day < 1:
+                flash("Please enter a number equal to or greater than 1.")
+                return redirect(url_for("current_food"))
+        except TypeError as e:
+            flash("Please enter a number equal to or greater than 1.")
+            return redirect(url_for("current_food"))
         
         print(current_food_kcal)
         print(meals_per_day)
@@ -1277,7 +1277,7 @@ def der():
         
     # If a user isn't logged in, grab session variables
     name = session["pet_name"]
-    rer = session["rer"]
+    rer = float(session["rer"])
     meals_per_day = session["meals_per_day"]
     current_food_kcal = session["current_food_kcal"]
     
@@ -1345,10 +1345,12 @@ def der():
     der_modifier = der_lookup[0]["mid_range"]
 
     # Calculate DER based on the der modifier and pass variables to tempate
-    der = rer * der_modifier
+    der = float(rer * der_modifier)
     print(der)
     der_low_end = rer * der_modifier_start_range
+    
     der_high_end = rer * der_modifier_end_range
+    der_low_end, der_high_end = "{:.2f}".format(der_low_end), "{:.2f}".format(der_high_end)
     
     # Calculate the required calories per day
     total_calorie_amount_per_day = round(der / current_food_kcal, 2)
@@ -1448,7 +1450,8 @@ def der():
             
     else:
         # If the user asks for 1 meal per day amounts, total_amount_per_meal = daily amount
-        total_amount_per_meal = f"{daily_amount_to_feed}"
+        per_meal = daily_amount_to_feed.split("day")[0]
+        total_amount_per_meal = f"{per_meal}meal"
     
     print(total_amount_per_meal)
     
@@ -1458,6 +1461,7 @@ def der():
     session["der"] = der
     session["der_modifier"] = der_modifier
     session["daily_amount_to_feed_cur_food"] = daily_amount_to_feed
+    session["current_food_amt_per_meal"] = total_amount_per_meal
         
     
     # If user is logged in, add current food information to the database
@@ -1469,9 +1473,10 @@ def der():
                                    
             db.execute(
                 "UPDATE pets SET der = :der, der_modifier = :der_modifier, current_food_amt_rec = :daily_amount_to_feed, \
-                    date_of_first_report = CURRENT_TIMESTAMP, most_recent_report_date = CURRENT_TIMESTAMP \
-                        WHERE name = :pet_name AND owner_id = :user_id",
-                der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, pet_name=session["pet_name"], user_id=session["user_id"]
+                    date_of_first_report = CURRENT_TIMESTAMP, most_recent_report_date = CURRENT_TIMESTAMP, \
+                    current_food_amt_per_meal = :total_amount_per_meal WHERE name = :pet_name AND owner_id = :user_id",
+                der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, total_amount_per_meal=total_amount_per_meal, \
+                    pet_name=session["pet_name"], user_id=session["user_id"]
             )
         
 

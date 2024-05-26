@@ -371,3 +371,34 @@ def pet_data_dictionary():
             pet_data[0]['weeks_nursing'] = session["duration_of_nursing"]
             
     return pet_data
+
+def check_obesity_risk():
+    """Checks if a pet's breed has a predisposed risk to obesity"""
+    
+    # Use helpers.py to check for breed ID
+    breed_id = find_breed_id()
+    
+    # Use login check from helpers.py to verify species
+    species = login_check_for_species()
+    
+    if species == "Canine":
+        # Check if pet breed is predisposed to obesity
+            breed_obesity_data = db.execute(
+                "SELECT ObeseProneBreed FROM dog_breeds WHERE BreedID = :breed_id",
+                breed_id=breed_id
+            )
+            
+            if breed_obesity_data:
+                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                  
+    elif species == "Feline":
+        # Check if pet breed is predisposed to obesity
+            breed_obesity_data = db.execute(
+                "SELECT ObeseProneBreed FROM cat_breeds WHERE BreedID = :breed_id",
+                breed_id=breed_id
+            )
+            
+            if breed_obesity_data:
+                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                
+    return obese_prone_breed
