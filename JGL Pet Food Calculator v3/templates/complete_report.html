@@ -11,7 +11,96 @@
 {% block content %}
 
 <div class="container-lg">
-    <h1><b>Final Report</b></h1>
+    {% if pet_data[0].name %}
+        <h1><b>{{ pet_data[0].name }}'s Final Report</b></h1>
+    {% else %}
+        <h1><b>Pet's Final Report</b></h1>
+    {% endif %}
+    <div class="row">
+        {{ pet_data[0].name }} is a   
+               
+        {% if pet_data[0].age_in_months != 0 and pet_data[0].age_in_years > 1 %}
+            {{ pet_data[0].age_in_years }} years and {{ pet_data[0].age_in_months }} months old
+        {% elif pet_data[0].age_in_months != 0 and pet_data[0].age_in_years == 1 %}
+            {{ pet_data[0].age_in_years }} year and {{ pet_data[0].age_in_months }} months old
+        {% elif pet_data[0].age_in_months == 0 and pet_data[0].age_in_years == 1 %}
+            {{ pet_data[0].age_in_years }} year and {{ pet_data[0].age_in_months }} month old
+        {% else %}
+            {{ pet_data[0].age_in_years }} year old
+        {% endif %}
+
+        {% if pet_data[0].sex == "female_spayed" %}
+            spayed female
+        {% elif pet_data[0].sex == "female" %}
+            intact female
+        {% elif pet_data[0].sex == "male_neutered" %}
+            neutered male
+        {% elif pet_data[0].sex == "male" %}
+            intact male
+        {% endif %}
+
+        {{ pet_data[0].breed }} ({{ pet_data[0].species }}). 
+        {% if pet_data[0].sex == "female" %}
+            <!-- If pet is an intact female -->
+            {{ pet_data[0].name }} is 
+            {% if pet_data[0].is_pregnant == "y" %}
+                <!-- And is pregnant -->
+                {% if pet_data[0].species == "Canine" %}
+                    <!-- If pet is pregnant, female, and canine, inform user of gestation length -->
+                    currently pregnant and is in her 
+                    {% if pet_data[0].weeks_gestating > 0 and pet_data[0].weeks_gestating != None %}
+                    <!-- Accounts for the first week of gestation --> 
+                    {% if pet_data[0].weeks_gestating == 1 %}   
+                        {{ pet_data[0].weeks_gestating }}st week of pregnancy (within the first 42 days).
+                    <!-- Accounts for the second week of gestation --> 
+                    {% elif pet_data[0].weeks_gestating == 2 %}   
+                        {{ pet_data[0].weeks_gestating }}nd week of pregnancy (within the first 42 days).
+                    <!-- Accounts for the third week of gestation --> 
+                    {% elif pet_data[0].weeks_gestating == 3 %}   
+                        {{ pet_data[0].weeks_gestating }}rd week of pregnancy (within the first 42 days).
+                    <!-- Accounts for the 4th-6th week of gestation --> 
+                    {% elif pet_data[0].weeks_gestating >= 3 and pet_data[0].weeks_gestating < 6 %}   
+                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the first 42 days).
+                    {% elif pet_data[0].weeks_gestating >= 6%}   
+                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the last 21 days).
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+            {% elif pet_data[0].is_pregnant == "n" %}
+                is not currently pregnant
+            {% endif %}
+            {% if pet_data[0].is_nursing == "y" %}
+                but is actively nursing a litter
+                {% if pet_data[0].litter_size != None %}
+                    {{ pet_data[0].litter_size }}
+                    {% if pet_data[0].species == "Canine" %}
+                        puppies.
+                    {% elif pet_data[0].species == "Feline" %}
+                        kittens.
+                    {% endif %}
+                {% endif %}
+            {% elif pet_data[0].is_nursing == "n" %}
+                and is not currently nursing a litter.
+            {% endif %}
+        {% endif %}
+        {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
+        {{ rer }} kcal. As a reminder, this is the minimum amount 
+        {{ pet_data[0].name }} needs at rest (i.e. if {{ subject_pronoun }} is 
+        hospitalized and requires crate rest or if {{ subject_pronoun }} lays 
+        around the house at all times). Based on {{ pet_data[0].name }}'s current 
+        life stage, {{ subject_pronoun }} requires {{ der }} kcal per day. The 
+        following formula was used: 
+
+        <div class="formula">
+            DER = {{ pet_data[0].name }}'s RER x DER Modifier
+            <br>
+            DER = {{ rer }} x {{ pet_data[0].der_modifier }} ({{ life_stage }}, {{ notes }})
+        </div>
+
+        Based on {{ pet_data[0].name }}'s current diet, {{ subject_pronoun }} should
+        be getting around {{ pet_data[0].current_food_amt_rec }}
+
+    </div>
     
     <table class="table table-sm">
         <thead>

@@ -1389,17 +1389,17 @@ def der():
     
     if whole_cans_or_cups == 1:
         if is_half_tablespoon:
-            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric} per day"
         else:
-            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form} per day"
     elif whole_cans_or_cups >= 1:
         if is_half_tablespoon:
-            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} and {daily_partial_volumetric}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} and {daily_partial_volumetric} per day"
         else:
-            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form_plural}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form_plural} per day"
     else:
         # Under 1 whole can or cup amount
-        daily_amount_to_feed = f"{daily_partial_volumetric}"
+        daily_amount_to_feed = f"{daily_partial_volumetric} per day"
 
     # Calculate the required calories per meal
     total_amount_per_meal = total_calorie_amount_per_day / meals_per_day
@@ -1495,7 +1495,44 @@ def der():
 @app.route("/completed_report", methods=["GET", "POST"])
 def completed_report():
     """Return's pet's final completed report"""
-    
+
     pet_data = pet_data_dictionary()
     
-    return render_template("complete_report.html", pet_data=pet_data)
+    rer = "{:.2f}".format(pet_data[0]["rer"])
+    der = "{:.2f}".format(pet_data[0]["der"])
+    
+    print(der)
+    object_pronoun = ""
+    subject_pronoun = ""
+    if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
+        object_pronoun = "her"
+        subject_pronoun = "she"
+    elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
+        object_pronoun = "his"
+        subject_pronoun = "he"
+        
+    print(object_pronoun)
+
+    if pet_data[0]["species"] == "Canine":
+        life_stage_search = db.execute(
+            "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
+            pet_data[0]["canine_der_factor_id"]
+        )
+    elif pet_data[0]["species"] == "Feline":
+        life_stage_search = db.execute(
+            "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
+            pet_data[0]["feline_der_factor_id"]
+        )
+    
+    if life_stage_search[0] != None:
+        life_stage = life_stage_search[0]["life_stage"]
+        notes = life_stage_search[0]["notes"]
+    
+    return render_template("complete_report.html",
+                           pet_data=pet_data,
+                           rer=rer,
+                           der=der,
+                           life_stage=life_stage,
+                           notes=notes,
+                           object_pronoun=object_pronoun,
+                           subject_pronoun=subject_pronoun)

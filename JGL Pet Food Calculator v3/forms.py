@@ -73,8 +73,7 @@ class ReproStatus(FlaskForm):
                                             ("6", "6"),
                                             ("7", "7"),
                                             ("8", "8"),
-                                            ("9", "9"),
-                                            ("10", "10")],
+                                            ("9", "9")],
                                   render_kw={"default": {"disabled": ""},
                                              "id": "gestating"})
     nursing_status = SelectField(u"Is Your Pet Currently Nursing?:",
