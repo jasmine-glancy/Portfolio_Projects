@@ -1345,7 +1345,7 @@ def der():
     der_modifier = der_lookup[0]["mid_range"]
 
     # Calculate DER based on the der modifier and pass variables to tempate
-    der = float(rer * der_modifier)
+    der = round(rer * der_modifier, 2)
     print(der)
     der_low_end = rer * der_modifier_start_range
     
