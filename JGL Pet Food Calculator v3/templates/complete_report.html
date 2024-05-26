@@ -103,8 +103,10 @@
     {% endif %}
     </div>
     <div class="row">
-        Based on {{ pet_data[0].name }}'s current diet, {{ subject_pronoun }} should
-        be getting around {{ pet_data[0].current_food_amt_rec }}
+        {{ pet_data[0].name }} should be getting around {{ pet_data[0].current_food_amt_rec }}.
+        {% if pet_data[0].meals_per_day != 1 %}
+            (or approximately {{ pet_data[0].current_food_amt_per_meal }})
+        {% endif %}
     </div>
 
     <!-- Go back --> 
