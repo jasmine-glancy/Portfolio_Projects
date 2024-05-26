@@ -231,3 +231,16 @@ a:hover {
     padding-bottom: 20px;
     padding-top: 20px;
 }
+
+/* Exercise and feeding alignment */
+.food_and_exercise {
+    align-items: left;
+    justify-content: space-between;
+}
+
+/* Puzzle feeder images */
+.puzzle_feeder {
+    display: inline-block;
+    margin: auto;
+    width: 20vw;
+}

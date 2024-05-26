@@ -17,6 +17,7 @@
         <h1><b>Pet's Final Report</b></h1>
     {% endif %}
     <div class="row">
+        <!-- Return pet's signalment -->
         {{ pet_data[0].name }} is a   
                
         {% if pet_data[0].age_in_months != 0 and pet_data[0].age_in_years > 1 %}
@@ -70,9 +71,11 @@
                 is not currently pregnant
             {% endif %}
             {% if pet_data[0].is_nursing == "y" %}
+                <!-- If pet is a nursing female -->
                 but is actively nursing a litter
                 {% if pet_data[0].litter_size != None %}
                     {{ pet_data[0].litter_size }}
+                    <!-- Return litter size and species -->
                     {% if pet_data[0].species == "Canine" %}
                         puppies.
                     {% elif pet_data[0].species == "Feline" %}
@@ -83,6 +86,8 @@
                 and is not currently nursing a litter.
             {% endif %}
         {% endif %}
+
+        <!-- Give RER and DER information -->
         {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
         {{ rer }} kcal. As a reminder, this is the minimum amount 
         {{ pet_data[0].name }} needs at rest (i.e. if {{ subject_pronoun }} is 
@@ -92,20 +97,41 @@
         following formula was used: 
     </div>
 
+    <!-- Return the formula used to calculate DER -->
     <div class="formula">
         DER = {{ pet_data[0].name }}'s RER x DER Modifier
         <br>
         DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+    
+    <!-- Return any notes regarding life stage -->
     {% if notes != None %}
         ({{ life_stage|trim }}, {{ notes }})
     {% else %}
         ({{ life_stage|trim }})
     {% endif %}
     </div>
-    <div class="row">
-        {{ pet_data[0].name }} should be getting around {{ pet_data[0].current_food_amt_rec }}.
+    <div class="food_and_exercise">
+        <!-- Return amount to feed per day and per meal  --> 
+        {{ pet_data[0].name }} should be getting around
         {% if pet_data[0].meals_per_day != 1 %}
-            (or approximately {{ pet_data[0].current_food_amt_per_meal }})
+            {{ pet_data[0].current_food_amt_rec }} per day (or approximately 
+            {{ pet_data[0].current_food_amt_per_meal }} per meal over {{ meals_per_day }}
+            meals).
+        {% else %}
+            {{ pet_data[0].current_food_amt_rec }} per day.
+        {% endif %}
+
+        {% if pet_data[0].species == "Canine" %}
+            {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" and pet_data[0].activity_level != "Heavy Activity" %}
+                <!-- If dog has activity level data and is not already getting moderate to heavy exercise --> 
+                All pets can benefit from physical and mental excersize!
+            {% endif %}
+        {% elif pet_data[0].species == "Feline" %}
+           <!-- If pet is a cat, recommend enrichment and exercise resources -->  
+           All pets can benefit from physical and mental excersize!
+           <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+           alt="three puzzle feeders for cats that are shaped like mice." class="puzzle_feeder">
+           
         {% endif %}
     </div>
 

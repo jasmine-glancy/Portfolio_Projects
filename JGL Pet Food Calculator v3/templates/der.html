@@ -21,25 +21,10 @@
         {% else %}
             {{ der_low_end }} 
         {% endif %}
-        kcalories per day. This is {{ daily_amount_to_feed }}
-        {% if current_food_form == "dry" %}
-            cups
-        {% elif current_food_form == "can" %}
-            cans
-        {% elif current_food_form == "pouch" %}
-            pouches
-        {% endif %}
-        per day
+        kcalories per day. This is {{ daily_amount_to_feed }} per day
+
         {% if mutliple_meals == True %}
-            or about {{ total_amount_per_meal }}
-                {% if current_food_form == "dry" %}
-                    cups
-                {% elif current_food_form == "can" %}
-                    cans
-                {% elif current_food_form == "pouch" %}
-                    pouches
-                {% endif %} 
-                per meal
+            or about {{ total_amount_per_meal }} per meal
         {% endif %}
         of {{ object_pronoun }} current diet.
         The following formula was used: 

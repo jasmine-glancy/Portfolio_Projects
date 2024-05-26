@@ -279,7 +279,7 @@ def pet_info_continued():
             
             # Set flags to see if a pet is between pediatric and sexually mature ages
             not_pediatric_not_mature = False
-
+            sexually_mature = False
             # Search for pet breed code in breed database
             if species == "Canine":
                 breed_id_result = db.execute(
@@ -1373,6 +1373,7 @@ def der():
             
         # Then add to whole volume
         daily_whole_cans_or_cups += 1
+        daily_partial_volumetric = "0"
         
     food_form = ""
     if current_food_form == "dry":
@@ -1390,19 +1391,35 @@ def der():
 
     
     if whole_cans_or_cups == 1:
-        if is_half_tablespoon:
-            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric} per day"
+        if is_half_tablespoon and daily_partial_volumetric != "0":
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric}"
+        elif not is_half_tablespoon and daily_partial_volumetric != "0":
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form}"
         else:
-            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form} per day"
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form}"
     elif whole_cans_or_cups >= 1:
-        if is_half_tablespoon:
+        if is_half_tablespoon and daily_partial_volumetric != "0":
             daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} and {daily_partial_volumetric} per day"
-        else:
+        elif not is_half_tablespoon and daily_partial_volumetric != "0":
             daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form_plural} per day"
+        else:
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} per day"
+    elif whole_cans_or_cups == 0 and daily_partial_volumetric != "0":
+        if is_half_tablespoon:
+            daily_amount_to_feed = f"{daily_partial_volumetric} per day"
+        else:
+            daily_amount_to_feed = f"{daily_partial_volumetric} {food_form_plural} per day"
     else:
         # Under 1 whole can or cup amount
         daily_amount_to_feed = f"{daily_partial_volumetric} per day"
 
+    
+            
+    if daily_amount_to_feed.startswith("0 and "):
+        daily_amount_to_feed = total_amount_per_meal.replace("0 and ", "")
+    elif daily_amount_to_feed.endswith(" and 0"):
+        daily_amount_to_feed = total_amount_per_meal.replace(" and 0", "")
+        
     # Calculate the required calories per meal
     total_amount_per_meal = total_calorie_amount_per_day / meals_per_day
     
@@ -1432,26 +1449,44 @@ def der():
             
             # Then add to whole volume and reset partial volume value
             meal_whole_cans_or_cups += 1
+            meal_partial_volumetric = "0"
             
         # Amount recommended depends on volumetric conversion and food form
+            
         if whole_cans_or_cups == 1:
-            if is_half_tablespoon:
+            if is_half_tablespoon and meal_partial_volumetric != "0":
                 total_amount_per_meal = f"{meal_whole_cans_or_cups} {food_form} and {meal_partial_volumetric}"
-            else:
+            elif not is_half_tablespoon and meal_partial_volumetric != "0":
                 total_amount_per_meal = f"{meal_whole_cans_or_cups} and {meal_partial_volumetric} {food_form}"
-        elif whole_cans_or_cups >= 1:
-            if is_half_tablespoon:
-                total_amount_per_meal = f"{meal_whole_cans_or_cups} {food_form_plural} and {meal_partial_volumetric}"
             else:
+                total_amount_per_meal = f"{meal_whole_cans_or_cups} {food_form}"
+        elif whole_cans_or_cups >= 1:
+            if is_half_tablespoon and meal_partial_volumetric != "0":
+                total_amount_per_meal = f"{meal_whole_cans_or_cups} {food_form_plural} and {meal_partial_volumetric}"
+            elif not is_half_tablespoon and meal_partial_volumetric != "0":
                 total_amount_per_meal = f"{meal_whole_cans_or_cups} and {meal_partial_volumetric} {food_form_plural}"
+            else:
+                total_amount_per_meal = f"{meal_whole_cans_or_cups} {food_form_plural}"
+        elif whole_cans_or_cups == 0 and meal_partial_volumetric != "0":
+            if is_half_tablespoon:
+                total_amount_per_meal = f"{meal_partial_volumetric}"
+            else:
+                total_amount_per_meal = f"{meal_partial_volumetric} {food_form_plural}"
+        elif whole_cans_or_cups == 0 and meal_partial_volumetric == "0":
+            total_amount_per_meal = "0"
         else:
             # Under 1 whole can or cup amount
             total_amount_per_meal = f"{daily_partial_volumetric}"
-            
     else:
         # If the user asks for 1 meal per day amounts, total_amount_per_meal = daily amount
         per_meal = daily_amount_to_feed.split("day")[0]
         total_amount_per_meal = f"{per_meal}meal"
+    
+    # Suggested by CoPilot    
+    if total_amount_per_meal.startswith("0 and "):
+        total_amount_per_meal = total_amount_per_meal.replace("0 and ", "")
+    elif total_amount_per_meal.endswith(" and 0"):
+        total_amount_per_meal = total_amount_per_meal.replace(" and 0", "")
     
     print(total_amount_per_meal)
     
@@ -1532,11 +1567,15 @@ def completed_report():
     if life_stage_search[0] != None:
         life_stage = life_stage_search[0]["life_stage"]
         notes = life_stage_search[0]["notes"]
+        
+    if pet_data[0]["meals_per_day"]:
+        meals_per_day = int(pet_data[0]["meals_per_day"])
     
     return render_template("complete_report.html",
                            pet_data=pet_data,
                            rer=rer,
                            der=der,
+                           meals_per_day=meals_per_day,
                            life_stage=life_stage,
                            notes=notes,
                            object_pronoun=object_pronoun,
