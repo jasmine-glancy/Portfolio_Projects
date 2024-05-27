@@ -11,12 +11,29 @@
 {% block content %}
 
 <div class="container-lg">
-    {% if pet_data[0].name %}
-        <h1><b>{{ pet_data[0].name }}'s Final Report</b></h1>
-    {% else %}
-        <h1><b>Pet's Final Report</b></h1>
-    {% endif %}
-    <div class="row">
+    <div class="report_wrapper">
+        <div class="report_title">
+            {% if pet_data[0].name %}
+                <h1><b>{{ pet_data[0].name }}'s Final Report</b></h1>
+            {% else %}
+                <h1><b>Pet's Final Report</b></h1>
+            {% endif %}
+        </div>
+        <!-- SVGs for dogs and cats credit to WallArtBox on Etsy -->
+        <!-- https://www.etsy.com/shop/wallartbox -->
+        {% if pet_data[0].species == "Canine" %}
+        <div class="report_img_k9">
+            <img src="\static\assets\svg\dogs\0_Japanese_Chin_peeking_dog-4.svg" class="pet_pic">
+        </div>
+        {% elif pet_data[0].species == "Feline" %}
+            <div class="report_img_fel">
+            <img src="\static\assets\svg\dogs\0_Japanese_Chin_peeking_dog-4.svg" class="pet_pic">
+            </div>
+        {% endif %}
+        
+    </div>
+    <div class="line"></div>
+    <div class="data">
         <!-- Return pet's signalment -->
         {{ pet_data[0].name }} is a   
                
@@ -98,7 +115,7 @@
     </div>
 
     <!-- Return the formula used to calculate DER -->
-    <div class="formula">
+    <div class="final_formula">
         DER = {{ pet_data[0].name }}'s RER x DER Modifier
         <br>
         DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
