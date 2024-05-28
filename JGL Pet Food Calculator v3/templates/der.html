@@ -19,17 +19,33 @@
             bewteen {{ der_low_end }} and 
             {{ der_high_end }} 
         {% else %}
-            {{ der_low_end }} 
+            {{ der }} 
         {% endif %}
-        kcalories per day. This is {{ daily_amount_to_feed }} per day
+        kcalories per day. This is {{ daily_amount_to_feed }}
 
-        {% if mutliple_meals == True %}
-            or about {{ total_amount_per_meal }} per meal
+        {% if meals_per_day > 1 %}
+            or about {{ total_amount_per_meal }} per meal over 
+            {{ meals_per_day }} meals
         {% endif %}
         of {{ object_pronoun }} current diet.
         The following formula was used: 
         <div class="formula">
-            DER = {{ rer }} x {{ der_modifier }}
+            {% if species == "Feline" and is_nursing == "y" %}
+                DER = {{ rer }} + 
+                {% if weeks_nursing <= 2 %}
+                    30% per kitten
+                {% elif weeks_nursing == 3 %}
+                    45% per kitten
+                {% elif weeks_nursing == 4 %}
+                    55% per kitten
+                {% elif weeks_nursing == 5 %}
+                    65% per kitten
+                {% elif weeks_nursing == 5 %}
+                    90% per kitten
+                {% endif %}
+            {% else %}
+                DER = {{ rer }} x {{ der_modifier }}
+            {% endif %}
             <br>
             DER = {{ name }}'s RER x DER Modifier
         </div>

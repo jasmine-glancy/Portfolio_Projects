@@ -28,7 +28,7 @@
             <div class="k9_line"></div>
         {% elif pet_data[0].species == "Feline" %}
             <div class="report_img_fel">
-                <img src="\static\assets\svg\cats\Snowshoe0-04.svg" class="pet_pic">
+                <img src="\static\assets\svg\dogs\0_Japanese_Chin_peeking_dog-4.svg" class="pet_pic">
             </div>
             <div class="fel_line"></div>
         {% endif %}
@@ -90,7 +90,7 @@
             {% endif %}
             {% if pet_data[0].is_nursing == "y" %}
                 <!-- If pet is a nursing female -->
-                but is actively nursing a litter
+                but is actively nursing a litter of
                 {% if pet_data[0].litter_size != None %}
                     {{ pet_data[0].litter_size }}
                     <!-- Return litter size and species -->
@@ -117,16 +117,27 @@
 
     <!-- Return the formula used to calculate DER -->
     <div class="final_formula">
-        DER = {{ pet_data[0].name }}'s RER x DER Modifier
-        <br>
-        DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+
+        {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
+            DER = {{ pet_data[0].name }}'s {{ notes }}
+            <br>
+            DER = {{ rer }} + {{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }}
+        {% else %}
+            DER = {{ pet_data[0].name }}'s RER x DER Modifier
+            <br>
+            DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+            
+            <!-- Return any notes regarding life stage -->
+            {% if notes != None %}
+                ({{ life_stage|trim }}, {{ notes }})
+            {% else %}
+                ({{ life_stage|trim }})
+            {% endif %}
+        {% endif %}
+        
+        
     
-    <!-- Return any notes regarding life stage -->
-    {% if notes != None %}
-        ({{ life_stage|trim }}, {{ notes }})
-    {% else %}
-        ({{ life_stage|trim }})
-    {% endif %}
+
     </div>
     <div class="food_and_exercise">
         <!-- Return amount to feed per day and per meal  --> 

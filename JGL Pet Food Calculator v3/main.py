@@ -517,7 +517,7 @@ def repro_status():
                     
                     try:
                         db.execute(
-                            "UPDATE pets SET feline_der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
+                            "UPDATE pets SET feline_der_factor_id = :der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
                                 der_factor_id=der_factor_id, pet_name=session["pet_name"], user_id=session["user_id"]
                             )
                         
@@ -707,45 +707,48 @@ def lactation_duration():
     
     repro = ReproStatus()
     
-    # Use login check from helpers.py to verify species
     species = login_check_for_species()
     
     if request.method == "POST":
         duration_of_nursing = int(repro.weeks_nursing.data)
+         
+        if duration_of_nursing <= 2:
+            # If the queen has been nursing for 2 weeks or less, DER modifier is RER + 30% per kitten
+            der_factor_id = 8
+        
+        elif duration_of_nursing == 3:
+            # If the queen has been nursing for 3 weeks, DER modifier is RER + 45% per kitten
+            der_factor_id = 9 
+        
+        elif duration_of_nursing == 4:
+            # If the queen has been nursing for 4 weeks, DER modifier is RER + 55% per kitten
+            der_factor_id = 10 
+        
+        elif duration_of_nursing == 5:
+            # If the queen has been nursing for 5 weeks, DER modifier is RER + 65% per kitten
+            der_factor_id = 11 
+        
+        elif duration_of_nursing == 6:
+            # If the queen has been nursing for 6 weeks, DER modifier is RER + 90% per kitten
+            der_factor_id = 12 
+            
+        # Add pet info to the database if the user is logged in
+        if session["user_id"] != None:
+            try:
+                db.execute(
+                    "UPDATE pets SET weeks_nursing = :duration_of_nursing, feline_der_factor_id = :der_factor_id WHERE name = :pet_name AND owner_id = :user_id",
+                        duration_of_nursing=duration_of_nursing, der_factor_id=der_factor_id, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+            except Exception as e:
+                flash(f"Unable to update nursing timeframe data, Exception: {e}")
+                return redirect(url_for('lactation_duration'))
         
         # Stores nursing duration variable in session
         session["duration_of_nursing"] = duration_of_nursing
         
-        # Add pet to the database if the user is logged in
-        if session["user_id"] != None:
-            try:
-                db.execute(
-                    "UPDATE pets SET weeks_nursing = :duration_of_nursing WHERE name = :pet_name AND owner_id = :user_id",
-                        duration_of_nursing=duration_of_nursing, pet_name=session["pet_name"], user_id=session["user_id"]
-                    )
-            except Exception as e:
-                flash(f"Unable to update nursing timeframe data, Exception: {e}")
-                    
-        if duration_of_nursing <= 2:
-            # If the queen has been nursing for 2 weeks or less, DER modifier is RER + 30% per kitten
-            pass
+        # Update session variable
+        session["der_factor_id"] = der_factor_id
         
-        elif duration_of_nursing == 3:
-            # If the queen has been nursing for 3 weeks, DER modifier is RER + 45% per kitten
-            pass 
-        
-        elif duration_of_nursing == 4:
-            # If the queen has been nursing for 4 weeks, DER modifier is RER + 55% per kitten
-            pass 
-        
-        elif duration_of_nursing == 5:
-            # If the queen has been nursing for 5 weeks, DER modifier is RER + 65% per kitten
-            pass 
-        
-        elif duration_of_nursing == 6:
-            # If the queen has been nursing for 6 weeks, DER modifier is RER + 90% per kitten
-            pass 
-
         return redirect(url_for('pet_condition', species=species))
     
     return render_template("lactation_duration.html", repro=repro)
@@ -806,11 +809,11 @@ def pet_condition():
         percent_body_fat = bcs_to_body_fat[bcs]
         print(percent_body_fat)
         print(f"Estimated ideal weight: {est_ideal_weight}{units}")
-        
+
         # Check for pregnancy status and nursing status
         pregnancy_status = check_if_pregnant()
         is_nursing = check_if_nursing()
-
+        
         if species == "Canine":
             
             if pregnancy_status != "y" and is_nursing != "y":
@@ -855,22 +858,23 @@ def pet_condition():
             return redirect(url_for('activity'))  
         
         elif species == "Feline":
-                
-            if bcs <= 4:
-                # Change DER factor id to weight gain 
-                der_factor_id = 16
-            elif bcs > 5 and bcs <= 6:
-                # Change DER factor id to obese prone 
-                der_factor_id = 3
-            elif bcs > 7:
-                # Change DER factor to weight loss
-                der_factor_id = 6 
+             
+            if pregnancy_status != "y" and is_nursing != "y":
+                if bcs <= 4:
+                    # Change DER factor id to weight gain 
+                    der_factor_id = 16
+                elif bcs > 5 and bcs <= 6:
+                    # Change DER factor id to obese prone 
+                    der_factor_id = 3
+                elif bcs > 7:
+                    # Change DER factor to weight loss
+                    der_factor_id = 6 
                 
             # Check if pet breed is predisposed to obesity
             obese_prone_breed = check_obesity_risk()
                 
             print(obese_prone_breed)
-            if obese_prone_breed == "y":
+            if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y":
                 der_factor_id = 3
             
             # Add weight and BCS to the database if the user is logged in
@@ -1274,13 +1278,6 @@ def der():
     # Use helpers.py to verify species and check der_factor
     species = login_check_for_species()
     
-        
-    # If a user isn't logged in, grab session variables
-    name = session["pet_name"]
-    rer = float(session["rer"])
-    meals_per_day = session["meals_per_day"]
-    current_food_kcal = session["current_food_kcal"]
-    
     # If user is logged in, use SQL query
     if session["user_id"] != None:
         try:
@@ -1288,7 +1285,9 @@ def der():
             print(session["user_id"])
                 
             pet_data = db.execute(
-                "SELECT name, species, feline_der_factor_id, canine_der_factor_id, rer, meals_per_day, current_food_kcal FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                "SELECT name, species, feline_der_factor_id, canine_der_factor_id, \
+                    rer, meals_per_day, current_food_kcal, is_nursing, litter_size, weeks_nursing \
+                        FROM pets WHERE owner_id = :user_id AND name = :pet_name",
                 user_id=session["user_id"], pet_name=session["pet_name"]
             )       
             
@@ -1299,13 +1298,32 @@ def der():
                 rer = pet_data[0]["rer"]
                 meals_per_day = pet_data[0]["meals_per_day"]
                 current_food_kcal = pet_data[0]["current_food_kcal"]
-                    
+                is_nursing = pet_data[0]["is_nursing"]
+                litter_size = pet_data[0]["litter_size"]
+                weeks_nursing = pet_data[0]["weeks_nursing"]
+                
+                print(weeks_nursing)
+                
+            print(name, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
+
+                
         except Exception as e:
             flash(f"Unable to find pet data for DER calculation, Exception: {e}")    
             return render_template("der.html",
                             rer=rer,
                            name=name,
                            object_pronoun=object_pronoun)
+    else:
+        # If a user isn't logged in, grab session variables
+        name = session["pet_name"]
+        rer = float(session["rer"])
+        meals_per_day = session["meals_per_day"]
+        current_food_kcal = session["current_food_kcal"]
+        is_nursing = session["lactation_status"]
+        litter_size = session["litter_size"]
+        weeks_nursing = session["duration_of_nursing"]
+        
+        print(name, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
                 
     # Use login check from helpers.py to verify DER factor ID and food form
     der_factor_id = der_factor()
@@ -1323,7 +1341,8 @@ def der():
                 ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
                     FROM canine_der_factors WHERE factor_id = :der_factor_id",
                     der_factor_id=der_factor_id)
-        
+        print(der_lookup)
+
         # Find the start and end range of DER modifiers
         der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
         der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
@@ -1334,7 +1353,9 @@ def der():
             ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
                 FROM feline_der_factors WHERE factor_id = :der_factor_id",
                 der_factor_id=der_factor_id)
-        
+        print("der")
+        print(F"Der lookup: {der_lookup}")
+
         # Find the start and end range of DER modifiers
         der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
         der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
@@ -1345,19 +1366,23 @@ def der():
     der_modifier = der_lookup[0]["mid_range"]
 
     # Calculate DER based on the der modifier and pass variables to tempate
-    der = round(rer * der_modifier, 2)
+    if species == "Feline" and is_nursing == "y":
+        der = round((rer + der_modifier * litter_size), 2)
+    else:
+        der = round(rer * der_modifier, 2)
     print(der)
-    der_low_end = rer * der_modifier_start_range
     
+    der_low_end = rer * der_modifier_start_range
     der_high_end = rer * der_modifier_end_range
     der_low_end, der_high_end = "{:.2f}".format(der_low_end), "{:.2f}".format(der_high_end)
     
+
     # Calculate the required calories per day
     total_calorie_amount_per_day = round(der / current_food_kcal, 2)
     
     # Breaks the food amount in to whole and partial amounts to convert to volumetric easier    
     daily_whole_cans_or_cups, daily_partial_amount = str(total_calorie_amount_per_day).split(".")[0], str(total_calorie_amount_per_day).split(".")[1]
-    # print(food_amount_per_day)
+    print(total_calorie_amount_per_day)
         
     print(f"per day whole: {daily_whole_cans_or_cups}, partial: {daily_partial_amount}")
     
@@ -1424,10 +1449,8 @@ def der():
     total_amount_per_meal = total_calorie_amount_per_day / meals_per_day
     
     print(total_amount_per_meal)
-    mutliple_meals = False
     if meals_per_day > 1:
         # Break down volume per meal if meals per day is more than 1
-        mutliple_meals = True 
 
         # Breaks the food amount in to whole and partial amounts to convert to volumetric easier
         meal_whole_cans_or_cups, meal_partial_amount = str(total_amount_per_meal).split(".")[0], str(total_amount_per_meal).split(".")[1]
@@ -1523,14 +1546,17 @@ def der():
                            rer=rer,
                            der=der,
                            name=name,
+                           meals_per_day=meals_per_day,
                            object_pronoun=object_pronoun,
                            der_low_end=der_low_end,
                            der_high_end=der_high_end,
                            current_food_form=current_food_form,
                            total_amount_per_meal=total_amount_per_meal,
                            daily_amount_to_feed=daily_amount_to_feed,
-                           mutliple_meals=mutliple_meals,
-                           der_modifier=der_modifier)
+                           der_modifier=der_modifier,
+                           species=species,
+                           is_nursing=is_nursing,
+                           weeks_nursing=weeks_nursing)
 
 @app.route("/completed_report", methods=["GET", "POST"])
 def completed_report():

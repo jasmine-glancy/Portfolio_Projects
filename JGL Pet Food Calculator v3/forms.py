@@ -86,12 +86,13 @@ class ReproStatus(FlaskForm):
                                   render_kw={"id": "litter_size"})
     weeks_nursing = SelectField(u"How Many Weeks Has Your Pet Been Nursing?:",
                                   choices=[("default", "Please make a selection"),
-                                            ("0", "1"),
-                                            ("1", "2"),
-                                            ("2", "3"),
-                                            ("3", "4"),
-                                            ("4", "5"),
-                                            ("5", "6")],
+                                            ("0", "0"),
+                                            ("1", "1"),
+                                            ("2", "2"),
+                                            ("3", "3"),
+                                            ("4", "4"),
+                                            ("5", "5"),
+                                            ("6", "6")],
                                   render_kw={"default": {"disabled": ""},
                                              "id": "weeks_nursing"})
 
