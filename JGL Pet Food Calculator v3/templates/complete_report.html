@@ -121,7 +121,7 @@
         {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
             DER = {{ pet_data[0].name }}'s {{ notes }}
             <br>
-            DER = {{ rer }} + {{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }}
+            DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }})
         {% else %}
             DER = {{ pet_data[0].name }}'s RER x DER Modifier
             <br>
@@ -143,11 +143,11 @@
         <!-- Return amount to feed per day and per meal  --> 
         {{ pet_data[0].name }} should be getting around
         {% if pet_data[0].meals_per_day != 1 %}
-            {{ pet_data[0].current_food_amt_rec }} per day (or approximately 
+            {{ pet_data[0].current_food_amt_rec }} (or approximately 
             {{ pet_data[0].current_food_amt_per_meal }} per meal over {{ meals_per_day }}
             meals).
         {% else %}
-            {{ pet_data[0].current_food_amt_rec }} per day.
+            {{ pet_data[0].current_food_amt_rec }}.
         {% endif %}
 
         {% if pet_data[0].species == "Canine" %}
@@ -156,7 +156,35 @@
                 All pets can benefit from physical and mental excersize!
             {% endif %}
         {% elif pet_data[0].species == "Feline" %}
-           <!-- If pet is a cat, recommend enrichment and exercise resources -->  
+            {% if pet_data[0].is_nursing == "y" %}
+                <!-- If pet is a nursing feline, provide feeding guidelines -->
+
+                In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
+                should be fed a highly digestible, high quality kitten formula from a brand 
+                that meets the 
+
+                <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                    WSAVA guidelines</a>.
+
+                {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
+                    <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
+                    It is recommended to feed {{ pet_data[0].name }} several 
+                    times a day.
+                {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
+                    <!-- If within the first 3-4 weeks of nursing -->
+                    It is recommended to feed {{ pet_data[0].name }} several 
+                    times a day or provide food freely for the first 3 to 4 
+                    weeks after giving birth.
+                {% endif %}
+            {% elif pet_data[0].is_pregnant == "y" %}
+                In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
+                should be fed a highly digestible, high quality kitten formula from a brand that meets the 
+                <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                    WSAVA guidelines</a>. To encourage adequate food intake, it is recommended to
+                feed {{ pet_data[0].name }} several small meals per day.
+            {% endif %}
+
+           <!-- Recommend enrichment and exercise resources for all cats -->  
            All pets can benefit from physical and mental excersize!
            <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
            alt="three puzzle feeders for cats that are shaped like mice." class="puzzle_feeder">
