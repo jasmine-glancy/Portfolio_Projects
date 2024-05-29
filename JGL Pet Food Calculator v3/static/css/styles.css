@@ -143,7 +143,7 @@ a:hover {
 
     .data {
         position: relative;
-        top: -150px;
+        top: -100px;
         width: 85%;
         margin-left: 60px;
     }
@@ -274,7 +274,7 @@ a:hover {
 .report_title {
     position: absolute;
     height: 10vw;
-    top: 75px;
+    top: 95px;
     margin-left: 20vw;
 
 }
@@ -286,12 +286,10 @@ a:hover {
     height: 150px;
     width: 200px;
 }
-.report_img_fel .pet_pic {
+.report_img_fel{
     display: flex;
     align-items: flex-start;
     position: sticky;
-    height: 250px;
-    width: 350px;
     transform: translateY(-125px); /* Suggested by CoPilot */
     top: 20px;
     margin-left: 790px;
@@ -299,11 +297,11 @@ a:hover {
 
     /* Horizontal line styling */
     .fel_line {
-        height: 8px; 
-        width: 74%;
+        height: 9px; 
+        width: 73%;
         background-color: var(--deep_blue_green);
         position: absolute;
-        top: 144px; 
+        top: 172.5px; 
     }
 
 /* Puzzle feeder images */
