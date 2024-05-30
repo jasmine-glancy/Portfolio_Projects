@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Completed Reports{% endblock %}
+0
+{% block content %}
+
+<div class="container-lg">
+    <h1><b>Completed Reports</b></h1>
+
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Load in calcuated DER --> 
+    <form action="/finished_reports" method="POST">
+        <div class="row">
+            <select name="reports">
+                <option disabled selected>Please Select a Pet</option>
+                {% for pet in pet_list %}
+                    {% if pet.date_of_first_report != None %}
+                            <option value="{{ pet.name }}">{{ pet.name }}</option>
+                    {% endif %}
+                {% endfor %}
+
+            </select>
+        </div>
+        <div class="button-container">
+            <a href="{{ url_for('completed_report') }}">
+                <button type="submit" class="btn btn-secondary btn-lg">Modify Report</button>
+            </a>
+        </div>
+    </form>
+    
+
+</div>
+{% endblock %}

@@ -1703,3 +1703,29 @@ def completed_report():
                            notes=notes,
                            object_pronoun=object_pronoun,
                            subject_pronoun=subject_pronoun)
+
+
+@app.route("/finished_reports", methods=["GET", "POST"])
+def finished_reports():
+    
+    if session["user_id"] != None:
+        try:
+            pet_list = db.execute(
+                "SELECT name FROM pets WHERE owner_id = :user",
+                user=session["user_id"]
+            )
+        
+        except Exception as e:
+            flash(f"Couldn't find pet list. Exception: {e}")
+            
+    # If user doesn't choose from the dropdown, provide error
+    if request.method == "POST":
+        pet_to_edit = request.form.get("reports")
+        
+        print(pet_to_edit)
+        
+        if pet_to_edit == None:
+            flash("Please choose a pet to edit their report")
+            return redirect(url_for('finished_reports'))
+
+    return render_template("finished_reports.html", pet_list=pet_list)
