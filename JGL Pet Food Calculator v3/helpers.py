@@ -1,7 +1,7 @@
 """Contains additional checks and decorators (i.e. is user logged in, login decorator)"""
 
 from cs50 import SQL
-from flask import request, session
+from flask import request, session, flash
 
 # Configure CS50 Library to use SQLite database (for login checks)
 db = SQL("sqlite:///pet_food_calculator.db")
@@ -402,3 +402,27 @@ def check_obesity_risk():
                 obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
                 
     return obese_prone_breed
+
+
+def check_if_pediatric():
+    """Checks if the pet is pediatric"""
+    
+    if session["user_id"] != None:
+        # If user isn logged in, query the database
+            
+        try:
+            check_peds_status = db.execute(
+                "SELECT is_pediatric FROM pets WHERE name = :pet_name AND owner_id = :user_id",
+                pet_name=session["pet_name"], user_id=session["user_id"]
+            )
+        except Exception as e:
+            flash(f"Unable to find pediatric status, Exception: {e}")
+        else:
+            is_pediatric = check_peds_status[0]["is_pediatric"]
+    else:
+        # If the user isn't logged in, grab session variables
+        is_pediatric = session["is_pediatric"]
+            
+    print(f"Is Pediatric? {is_pediatric}")
+    
+    return is_pediatric

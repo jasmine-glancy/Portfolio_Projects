@@ -23,12 +23,18 @@
         <!-- https://www.etsy.com/shop/wallartbox -->
         {% if pet_data[0].species == "Canine" %}
             <div class="report_img_k9">
-                <img src="\static\assets\svg\dogs\0_Japanese_Chin_peeking_dog-4.svg" class="pet_pic">
+                <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
             </div>
             <div class="k9_line"></div>
+
+            {% if pet_data[0].breed == "German Shorthaired Pointer" %}
+                <div class="k9_line_shortened"></div>
+            {% endif %}
+            
         {% elif pet_data[0].species == "Feline" %}
+        <!--url_for('static', filename='/assets/svg/dogs/0_Pembroke_Welsh_Corgi_peeking_dog-3.svg')-->
             <div class="report_img_fel">
-                <img src="{{ url_for('static', filename='/assets/svg/cats/Thai0-04.svg') }}" class="pet_pic">
+                <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
             </div>
             <div class="fel_line"></div>
         {% endif %}
@@ -38,16 +44,26 @@
         <!-- Return pet's signalment -->
         {{ pet_data[0].name }} is a   
                
-        {% if pet_data[0].age_in_months != 0 and pet_data[0].age_in_years > 1 %}
-            {{ pet_data[0].age_in_years }} years and {{ pet_data[0].age_in_months }} months old
-        {% elif pet_data[0].age_in_months != 0 and pet_data[0].age_in_years == 1 %}
-            {{ pet_data[0].age_in_years }} year and {{ pet_data[0].age_in_months }} months old
-        {% elif pet_data[0].age_in_months == 0 and pet_data[0].age_in_years == 1 %}
-            {{ pet_data[0].age_in_years }} year and {{ pet_data[0].age_in_months }} month old
-        {% else %}
+        <!-- Age conditionals -->
+        {% if pet_data[0].age_in_years == 0 and pet_data[0].age_in_months == 1 %}
+            {{ pet_data[0].age_in_months }} month old
+        {% elif pet_data[0].age_in_years == 0 and pet_data[0].age_in_months > 1 %}
+            {{ pet_data[0].age_in_months }} months old
+        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
             {{ pet_data[0].age_in_years }} year old
+        {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
+            {{ pet_data[0].age_in_years }} years old
+        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
+            {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
+        {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
+            {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+        {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
+            {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
+            {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
         {% endif %}
 
+        <!-- Sex conditionals -->
         {% if pet_data[0].sex == "female_spayed" %}
             spayed female
         {% elif pet_data[0].sex == "female" %}
@@ -58,6 +74,7 @@
             intact male
         {% endif %}
 
+        <!-- Reproductive status conditionals -->
         {{ pet_data[0].breed }} ({{ pet_data[0].species }}). 
         {% if pet_data[0].sex == "female" %}
             <!-- If pet is an intact female -->

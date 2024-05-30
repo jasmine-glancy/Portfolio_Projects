@@ -107,10 +107,22 @@
                     </a>
                 </td>
                 <td>
-                    {% if pet_data[0].age_in_months != 0 %}
-                        {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} months old
-                    {% else %}
+                    {% if pet_data[0].age_in_years == 0 and pet_data[0].age_in_months == 1 %}
+                        {{ pet_data[0].age_in_months }} month old
+                    {% elif pet_data[0].age_in_years == 0 and pet_data[0].age_in_months > 1 %}
+                        {{ pet_data[0].age_in_months }} months old
+                    {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
+                        {{ pet_data[0].age_in_years }} year old
+                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
                         {{ pet_data[0].age_in_years }} years old
+                    {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
+                        {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
+                    {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
+                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
+                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+                    {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
+                        {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
                     {% endif %}
                     <a href="{{ url_for('pet_info_continued') }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>

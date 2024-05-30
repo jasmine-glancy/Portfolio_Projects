@@ -280,13 +280,8 @@ a:hover {
 }
 
 /* Container for the SVG */
-.report_img_k9 .pet_pic {
-    display: flex;
-    align-items: flex-start;
-    height: 150px;
-    width: 200px;
-}
-.report_img_fel{
+
+.report_img_fel, .report_img_k9 {
     display: flex;
     align-items: flex-start;
     position: sticky;
@@ -302,6 +297,26 @@ a:hover {
         background-color: var(--deep_blue_green);
         position: absolute;
         top: 172.5px; 
+    }
+
+    .k9_line {
+        height: 13.5px; 
+        width: 73%;
+        border-top: 1px solid var(--deep_blue_green);
+        border-bottom: 1px solid var(--deep_blue_green);
+        position: absolute;
+        top: 185px; 
+        margin-left: 20px;
+    }
+
+    .k9_line_shortened {
+        height: 8.5px; 
+        width: 68%;
+        border-top: 1px solid var(--deep_blue_green);
+        border-bottom: 1px solid var(--deep_blue_green);
+        position: absolute;
+        top: 185px; 
+        margin-left: 20px;
     }
 
 /* Puzzle feeder images */
