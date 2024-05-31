@@ -426,3 +426,13 @@ def check_if_pediatric():
     print(f"Is Pediatric? {is_pediatric}")
     
     return is_pediatric
+
+def find_pet_id():
+    """Finds the specific pet ID"""
+    
+    # See if the pet is already added 
+    # find_existing_pet = db.execute(
+    #     "SELECT pet_id FROM pets WHERE owner_id = :user_id AND name = :name AND species = :species",
+    #     user_id=session["user_id"], name=pet_name, species=species
+    #     )
+    pass

@@ -158,8 +158,8 @@ def pet_info():
             
             # See if the pet is already added 
             find_existing_pet = db.execute(
-                "SELECT name FROM pets WHERE owner_id = :user_id AND name = :name",
-                user_id=session["user_id"], name=pet_name
+                "SELECT name FROM pets WHERE owner_id = :user_id AND name = :name AND species = :species",
+                user_id=session["user_id"], name=pet_name, species=species
             )
             
             existing_pet = None
@@ -185,8 +185,7 @@ def pet_info():
                 else:
                     session["species"] = species
                     session["pet_name"] = pet_name
-                    
-                
+  
             else:
                 # If no pet is found (i.e. new pet in the database), create new session variable and store pet
                 # Store session variables
@@ -1072,7 +1071,10 @@ def confirm_data():
             print(session["user_id"])
                 
             pet_data = db.execute(
-                "SELECT name, age_in_years, age_in_months, species, breed, sex, bcs, weight, units, activity_level, is_pregnant, weeks_gestating, is_nursing, litter_size, weeks_nursing FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                "SELECT name, age_in_years, age_in_months, species, breed, sex, bcs, \
+                    weight, units, activity_level, is_pregnant, weeks_gestating, is_nursing, \
+                        litter_size, weeks_nursing FROM pets WHERE owner_id = :user_id AND \
+                            name = :pet_name",
                 user_id=session["user_id"], pet_name=session["pet_name"]
             )       
             
@@ -1503,7 +1505,7 @@ def der():
         daily_amount_to_feed = f"{daily_partial_volumetric} per day"
 
     
-            
+    # Suggested by CoPilot      
     if daily_amount_to_feed.startswith("0 and "):
         daily_amount_to_feed = total_amount_per_meal.replace("0 and ", "")
     elif daily_amount_to_feed.endswith(" and 0"):
@@ -1691,7 +1693,7 @@ def completed_report():
 
         
     if pet_data[0]["meals_per_day"]:
-        meals_per_day = int(pet_data[0]["meals_per_day"])
+        meals_per_day = pet_data[0]["meals_per_day"]
     
     return render_template("complete_report.html",
                            pet_data=pet_data,
@@ -1707,11 +1709,12 @@ def completed_report():
 
 @app.route("/finished_reports", methods=["GET", "POST"])
 def finished_reports():
+    """Provides a dropdown list of completed reports"""
     
     if session["user_id"] != None:
         try:
             pet_list = db.execute(
-                "SELECT name FROM pets WHERE owner_id = :user",
+                "SELECT pet_id, name FROM pets WHERE owner_id = :user",
                 user=session["user_id"]
             )
         
@@ -1725,7 +1728,25 @@ def finished_reports():
         print(pet_to_edit)
         
         if pet_to_edit == None:
-            flash("Please choose a pet to edit their report")
+            flash("Please choose a pet to edit their report.")
             return redirect(url_for('finished_reports'))
 
     return render_template("finished_reports.html", pet_list=pet_list)
+
+@app.route("/edit_info/", methods=["GET", "POST"])
+def edit_info():
+    """Allows a user to edit a pet's info and generate a new report"""
+    
+    pet_id = request.args.get("id")
+    
+    try:
+        pet_data = db.execute(
+            "SELECT * FROM pets WHERE owner_id = :user_id and pet_id = :pet_id",
+            user_id=session["user_id"], pet_id=pet_id
+        )
+    except Exception as e:
+        flash(f"Unable to find pet info. Exception: {e}")
+        return render_template("edit_report.html")
+        
+    
+    return render_template("edit_report.html", pet_data=pet_data)

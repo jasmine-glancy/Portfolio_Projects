@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="container-lg">
-    <h1><b>Completed Reports</b></h1>
+    <h1>Completed Reports</h1>
 
     <!-- Load in Error messages -->
     {% with messages = get_flashed_messages() %}
@@ -13,8 +13,8 @@
             <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
         {% endif %}
     {% endwith %}
-    
-    <!-- Load in calcuated DER --> 
+
+    <!-- Load in completed reports --> 
     <form action="/finished_reports" method="POST">
         <div class="row">
             <select name="reports">
@@ -22,15 +22,22 @@
                 {% for pet in pet_list %}
                     {% if pet.date_of_first_report != None %}
                             <option value="{{ pet.name }}">{{ pet.name }}</option>
-                    {% endif %}
-                {% endfor %}
+
+                            <div class="button-container">
+                                <a href="{{ url_for('edit_info', id=pet.pet_id) }}">
+                                    <button type="submit" class="btn btn-secondary btn-lg">Modify Report</button>
+                                </a>
+                            </div>
+                        {% endif %}
+                
 
             </select>
-        </div>
-        <div class="button-container">
-            <a href="{{ url_for('completed_report') }}">
-                <button type="submit" class="btn btn-secondary btn-lg">Modify Report</button>
-            </a>
+            <div class="button-container">
+                <a href="{{ url_for('edit_info', id=pet.pet_id) }}">
+                    <button type="submit" class="btn btn-secondary btn-lg">Modify Report</button>
+                </a>
+            </div>
+            {% endfor %}
         </div>
     </form>
     
