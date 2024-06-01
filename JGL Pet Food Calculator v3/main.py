@@ -5,8 +5,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
-    find_breed_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
-        check_if_nursing, check_obesity_risk, check_if_pediatric
+    find_breed_id, find_pet_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
+        check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -49,6 +49,28 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/calculate_new_pet")
+def new_pet_calc():
+    """Redirects to the start of the form, while clearing session variables"""
+    session["previous_route"] = "new_pet"
+    
+    # Clear variables (except user ID)
+    clear_variable_list()
+    
+    return redirect(url_for('pet_info'))
+
+
+@app.route("/recalculate_for_pet")
+def recalculate_pet():
+    """Redirects to the start of the form, while clearing session variables"""
+    session["previous_route"] = "recalculate"
+    
+    # Clear variables (except user ID)
+    clear_variable_list()
+    
+    return redirect(url_for('finished_reports'))
+
+            
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Logs an existing user in"""
@@ -824,24 +846,25 @@ def pet_condition():
                 print(est_ideal_weight_lbs)
                 
                 # Calculate ideal weight in kgs
-                est_ideal_weight_kgs = est_ideal_weight_lbs / 2.2
+                est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
                 print(est_ideal_weight_kgs)
+                
             elif units == "kgs":
                 est_ideal_weight_kgs = round((weight_proportion * weight), 2)
                 print(est_ideal_weight_kgs)
                 
                 # Calculate ideal weight in lbs
-                est_ideal_weight_lbs = est_ideal_weight_kgs * 2.2
+                est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
                 print(est_ideal_weight_lbs)
 
         else:
             # If pet has 5/9 on the BCS scale, set estimated ideal weight as current weight
             if units == "lbs":
                 est_ideal_weight_lbs = weight
-                est_ideal_weight_kgs = est_ideal_weight_lbs / 2.2
+                est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
             elif units == "kgs":
                 est_ideal_weight_kgs = weight
-                est_ideal_weight_lbs = est_ideal_weight_kgs * 2.2
+                est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
         
         # Store new info as session variables
         session["bcs"] = bcs
@@ -907,6 +930,7 @@ def pet_condition():
                         
                 except Exception as e:
                     flash(f"Unable to update canine BCS data, Exception: {e}")
+                    return render_template("get_weight_and_bcs.html", form=form, species=species)
                     
                 
             # Update DER factor ID variable
@@ -942,12 +966,20 @@ def pet_condition():
                     print(session["user_id"])
 
                     db.execute(
-                        "UPDATE pets SET feline_der_factor_id = :der_factor_id, bcs = :body_condition_score, ideal_weight_kg = :est_ideal_weight, weight = :weight, units = :units, body_fat_percentage = :percent_body_fat WHERE name = :pet_name AND owner_id = :user_id",
-                        der_factor_id=der_factor_id, body_condition_score=bcs, est_ideal_weight=est_ideal_weight, weight=weight, units=units, percent_body_fat=percent_body_fat, pet_name=session["pet_name"], user_id=session["user_id"]
+                        "UPDATE pets SET feline_der_factor_id = :der_factor_id, bcs = :body_condition_score, \
+                            ideal_weight_kgs = :ideal_weight_kgs, ideal_weight_lbs = :est_ideal_weight_lbs, \
+                                weight = :weight, units = :units, converted_weight = :converted_weight, \
+                                    converted_weight_units = :converted_weight_units, body_fat_percentage = :percent_body_fat \
+                                        WHERE name = :pet_name AND owner_id = :user_id",
+                        der_factor_id=der_factor_id, body_condition_score=bcs, ideal_weight_kgs=est_ideal_weight_kgs, 
+                        est_ideal_weight_lbs=est_ideal_weight_lbs, weight=weight, units=units, converted_weight=converted_weight, 
+                            converted_weight_units=converted_weight_units, percent_body_fat=percent_body_fat, 
+                        pet_name=session["pet_name"], user_id=session["user_id"]
                     )
                         
                 except Exception as e:
                     flash(f"Unable to update feline BCS data, Exception: {e}")
+                    return render_template("get_weight_and_bcs.html", form=form, species=species)
 
 
             # Update DER factor ID variable
@@ -1061,59 +1093,10 @@ def activity():
 def confirm_data():
     """Confirms pet's info before taking users to the food calculator"""
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
-    
-    # If user is logged in, use SQL query
-    if session["user_id"] != None:
-        try:
-            print(session["pet_name"])
-            print(session["user_id"])
-                
-            pet_data = db.execute(
-                "SELECT name, age_in_years, age_in_months, species, breed, sex, bcs, \
-                    weight, units, activity_level, is_pregnant, weeks_gestating, is_nursing, \
-                        litter_size, weeks_nursing FROM pets WHERE owner_id = :user_id AND \
-                            name = :pet_name",
-                user_id=session["user_id"], pet_name=session["pet_name"]
-            )       
-            
-            print(pet_data)
-        except Exception as e:
-            flash(f"Unable to find pet data, Exception: {e}")
-        else:
-            return render_template("confirm_pet_info.html", pet_data=pet_data, user_id=session["user_id"])
+    # Find data from from helpers.py 
+    pet_data = pet_data_dictionary()
         
-    # Otherwise, pass session variables
-    else:
-        pet_data = [{'name': session["pet_name"],
-                     'age_in_years': session["pet_age_years"],
-                     'age_in_months': session["age_in_months"],
-                     'species': session["species"],
-                     'breed': session["breed"],
-                     'sex': session["pet_sex"],
-                     'bcs': session["bcs"],
-                     'weight': session["weight"],
-                     'units': session["units"],
-                     'activity_level': session["activity_level"],
-                     'is_pregnant': None,
-                     'weeks_gestating': None,
-                     'is_nursing': None,
-                     'litter_size': None,
-                     'weeks_nursing': None}]
-        
-        if session["pregnancy_status"] != None:
-            pet_data[0]['is_pregnant'] = session["pregnancy_status"]
-        elif session["number_weeks_pregnant"] != None:
-            pet_data[0]["weeks_gestating"] = session["number_weeks_pregnant"]
-        elif session["lactation_status"] != None:
-            pet_data[0]['is_nursing'] = session["lactation_status"]
-        elif session['litter_size'] != None:
-            pet_data[0]['litter_size'] = session['litter_size']
-        elif session["duration_of_nursing"] != None:
-            pet_data[0]['weeks_nursing'] = session["duration_of_nursing"]
-        
-        return render_template("confirm_pet_info.html", species=species)
+    return render_template("confirm_pet_info.html", pet_data=pet_data)
     
     
 @app.route("/current_food", methods=["GET", "POST"])
@@ -1333,6 +1316,7 @@ def rer():
                            rer_formula_med_to_lrg=rer_formula_med_to_lrg,
                            rer_formula_sm=rer_formula_sm,
                            rer_formula_x_large=rer_formula_x_large)
+    
     
 @app.route("/der", methods=["GET", "POST"])
 def der():
@@ -1624,6 +1608,7 @@ def der():
                            is_nursing=is_nursing,
                            weeks_nursing=weeks_nursing)
 
+
 @app.route("/completed_report", methods=["GET", "POST"])
 def completed_report():
     """Return's pet's final completed report"""
@@ -1680,10 +1665,7 @@ def completed_report():
         if svg_search[0] != None:
             # TODO: If SVG can't be found, use a placeholder
             if pet_data[0]["species"] == "Feline":
-                svg = svg_search[0]["svg"] 
-                print(svg)
-            elif pet_data[0]["species"] == "Canine":
-                svg = svg_search[0]["svg"] 
+                svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
                 print(svg)
                 
     if life_stage_search[0] != None:
@@ -1730,6 +1712,8 @@ def finished_reports():
         if pet_to_edit == None:
             flash("Please choose a pet to edit their report.")
             return redirect(url_for('finished_reports'))
+        
+        return redirect(url_for('edit_info', id=pet_to_edit))
 
     return render_template("finished_reports.html", pet_list=pet_list)
 
@@ -1748,5 +1732,7 @@ def edit_info():
         flash(f"Unable to find pet info. Exception: {e}")
         return render_template("edit_report.html")
         
+    if request.method == "POST":
+        print(pet_id)
     
     return render_template("edit_report.html", pet_data=pet_data)

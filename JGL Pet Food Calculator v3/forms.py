@@ -127,7 +127,7 @@ class WorkForm(FlaskForm):
 # Obtain food info
 class FoodForm(FlaskForm):
     current_food_kcal = FloatField(
-        "How many calories are in each cup (or can)* of your pet's current food?: ",
+        "How many calories are in each cup (or can/pouch)* of your pet's current food?: ",
         validators=[DataRequired()])
     current_food_form = SelectField(u"What form of this diet do you feed?: ",
                                   choices=[("default", "Please make a selection"),
@@ -144,7 +144,7 @@ class FoodForm(FlaskForm):
         "How many meals per day* does your pet get?: ",
         validators=[DataRequired()])
     new_food_one_kcal = FloatField(
-        "How many calories are in each cup (or can)* of the first new food you want your pet to be on: ",
+        "How many calories are in each cup (or can/pouch)* of the first new food you want your pet to be on: ",
         validators=[DataRequired()])
     new_food_one_form = SelectField(u"What form of this diet do you wish to feed?: ",
                                   choices=[("default", "Please make a selection"),
@@ -153,7 +153,7 @@ class FoodForm(FlaskForm):
                                             ("pouch", "Semi-Moist Pouches")],
                                   render_kw={"default": {"disabled": ""}})    
     new_food_two_kcal = FloatField(
-        "How many calories are in each cup (or can)* of the second new food you want your pet to be on: ",
+        "How many calories are in each cup (or can/pouch)* of the second new food you want your pet to be on: ",
         validators=[DataRequired()])
     new_food_two_form = SelectField(u"What form of this diet do you wish to feed?: ",
                                   choices=[("default", "Please make a selection"),

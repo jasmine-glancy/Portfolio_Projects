@@ -11,214 +11,244 @@
 {% block content %}
 
 <div class="container-lg">
-    <div class="report_wrapper">
-        <div class="report_title">
-            {% if pet_data[0].name %}
-                <h1>{{ pet_data[0].name }}'s Final Report</h1>
+    <div class="final_report">
+        <div class="report_wrapper">
+            <div class="report_title">
+                {% if pet_data[0].name %}
+                    <h1>{{ pet_data[0].name }}'s Final Report</h1>
+                {% else %}
+                    <h1>Pet's Final Report</h1>
+                {% endif %}
+            </div>
+            <!-- SVGs for dogs and cats credit to WallArtBox on Etsy -->
+            <!-- https://www.etsy.com/shop/wallartbox -->
+            {% if pet_data[0].species == "Canine" %}
+                <div class="report_img_k9">
+                    <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
+                </div>
+                <div class="k9_line"></div>
+
+                {% if pet_data[0].breed == "German Shorthaired Pointer" %}
+                    <div class="k9_line_shortened"></div>
+                {% endif %}
+                
+            {% elif pet_data[0].species == "Feline" %}
+            <!--url_for('static', filename='/assets/svg/dogs/0_Pembroke_Welsh_Corgi_peeking_dog-3.svg')-->
+                <div class="report_img_fel">
+                    <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
+                </div>
+                <div class="fel_line"></div>
+            {% endif %}
+            
+        </div>
+        <div class="data">
+            <!-- Return pet's signalment -->
+            {{ pet_data[0].name }} is a   
+                
+            <!-- Age conditionals -->
+            {% if pet_data[0].age_in_years == 0 and pet_data[0].age_in_months == 1 %}
+                {{ pet_data[0].age_in_months }} month old
+            {% elif pet_data[0].age_in_years == 0 and pet_data[0].age_in_months > 1 %}
+                {{ pet_data[0].age_in_months }} months old
+            {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
+                {{ pet_data[0].age_in_years }} year old
+            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
+                {{ pet_data[0].age_in_years }} years old
+            {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
+                {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
+            {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
+                {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
+                {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+            {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
+                {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
+            {% endif %}
+
+            <!-- Sex conditionals -->
+            {% if pet_data[0].sex == "female_spayed" %}
+                spayed female
+            {% elif pet_data[0].sex == "female" %}
+                intact female
+            {% elif pet_data[0].sex == "male_neutered" %}
+                neutered male
+            {% elif pet_data[0].sex == "male" %}
+                intact male
+            {% endif %}
+
+            <!-- Reproductive status conditionals -->
+            {{ pet_data[0].breed }} ({{ pet_data[0].species }}). 
+            {% if pet_data[0].sex == "female" %}
+                <!-- If pet is an intact female -->
+                {{ pet_data[0].name }} is 
+                {% if pet_data[0].is_pregnant == "y" %}
+                    <!-- And is pregnant -->
+                    {% if pet_data[0].species == "Canine" %}
+                        <!-- If pet is pregnant, female, and canine, inform user of gestation length -->
+                        currently pregnant and is in her 
+                        {% if pet_data[0].weeks_gestating > 0 and pet_data[0].weeks_gestating != None %}
+                        <!-- Accounts for the first week of gestation --> 
+                        {% if pet_data[0].weeks_gestating == 1 %}   
+                            {{ pet_data[0].weeks_gestating }}st week of pregnancy (within the first 42 days).
+                        <!-- Accounts for the second week of gestation --> 
+                        {% elif pet_data[0].weeks_gestating == 2 %}   
+                            {{ pet_data[0].weeks_gestating }}nd week of pregnancy (within the first 42 days).
+                        <!-- Accounts for the third week of gestation --> 
+                        {% elif pet_data[0].weeks_gestating == 3 %}   
+                            {{ pet_data[0].weeks_gestating }}rd week of pregnancy (within the first 42 days).
+                        <!-- Accounts for the 4th-6th week of gestation --> 
+                        {% elif pet_data[0].weeks_gestating >= 3 and pet_data[0].weeks_gestating < 6 %}   
+                            {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the first 42 days).
+                        {% elif pet_data[0].weeks_gestating >= 6%}   
+                            {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the last 21 days).
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+                {% elif pet_data[0].is_pregnant == "n" %}
+                    is not currently pregnant
+                {% endif %}
+                {% if pet_data[0].is_nursing == "y" %}
+                    <!-- If pet is a nursing female -->
+                    but is actively nursing a litter of
+                    {% if pet_data[0].litter_size != None %}
+                        {{ pet_data[0].litter_size }}
+                        <!-- Return litter size and species -->
+                        {% if pet_data[0].species == "Canine" %}
+                            puppies.
+                        {% elif pet_data[0].species == "Feline" %}
+                            kittens.
+                        {% endif %}
+                    {% endif %}
+                {% elif pet_data[0].is_nursing == "n" %}
+                    and is not currently nursing a litter.
+                {% endif %}
+            {% endif %}
+
+            <!-- Give RER and DER information -->
+            {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
+            {{ rer }} kcal. As a reminder, this is the minimum amount 
+            {{ pet_data[0].name }} needs at rest (i.e. if {{ subject_pronoun }} is 
+            hospitalized and requires crate rest or if {{ subject_pronoun }} lays 
+            around the house at all times). Based on {{ pet_data[0].name }}'s current 
+            life stage, {{ subject_pronoun }} requires {{ der }} kcal per day. The 
+            following formula was used: 
+        </div>
+
+        <!-- Return the formula used to calculate DER -->
+        <div class="final_formula">
+
+            {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
+                DER = {{ pet_data[0].name }}'s {{ notes }}
+                <br>
+                DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }})
             {% else %}
-                <h1>Pet's Final Report</h1>
+                DER = {{ pet_data[0].name }}'s RER x DER Modifier
+                <br>
+                DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+                
+                <!-- Return any notes regarding life stage -->
+                {% if notes != None %}
+                    ({{ life_stage|trim }}, {{ notes }})
+                {% else %}
+                    ({{ life_stage|trim }})
+                {% endif %}
+            {% endif %}
+            
+            
+        
+
+        </div>
+        <div class="food_and_exercise">
+            <!-- Return amount to feed per day and per meal  --> 
+            {{ pet_data[0].name }} should be getting around
+            {% if pet_data[0].meals_per_day != 1 %}
+                {{ pet_data[0].current_food_amt_rec }} (or approximately 
+                {{ pet_data[0].current_food_amt_per_meal }} per meal over {{ meals_per_day }}
+                meals).
+            {% else %}
+                {{ pet_data[0].current_food_amt_rec }}.
+            {% endif %}
+
+            {% if pet_data[0].species == "Canine" %}
+                {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" and pet_data[0].activity_level != "Heavy Activity" %}
+                    <!-- If dog has activity level data and is not already getting moderate to heavy exercise --> 
+                    All pets can benefit from physical and mental excersize!
+                {% endif %}
+            {% elif pet_data[0].species == "Feline" %}
+                {% if pet_data[0].is_nursing == "y" %}
+                    <!-- If pet is a nursing feline, provide feeding guidelines -->
+
+                    In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
+                    should be fed a highly digestible, high quality kitten formula from a brand 
+                    that meets the 
+
+                    <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                        WSAVA guidelines</a>.
+
+                    {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
+                        <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
+                        It is recommended to feed {{ pet_data[0].name }} several 
+                        times a day.
+                    {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
+                        <!-- If within the first 3-4 weeks of nursing -->
+                        It is recommended to feed {{ pet_data[0].name }} several 
+                        times a day or provide food freely for the first 3 to 4 
+                        weeks after giving birth.
+                    {% endif %}
+                {% elif pet_data[0].is_pregnant == "y" %}
+                    In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
+                    should be fed a highly digestible, high quality kitten formula from a brand that meets the 
+                    <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                        WSAVA guidelines</a>. To encourage adequate food intake, it is recommended to
+                    feed {{ pet_data[0].name }} several small meals per day.
+                {% endif %}
+
+            <!-- Recommend enrichment and exercise resources for all cats -->  
+            All pets can benefit from physical and mental excersize! Enticing your cat
+            to play with a lazer pointer (if there are no dogs in the house), a flirt pole, or 
+            with puzzle feeders can help encourage exercise. If possible, consider moving 
+            your cat's food dish occasionally to cater to their foraging instincts. 
+
+            <!-- If cat is overweight or obese, provide additional exercise technique recs -->
+            {% if pet_data[0].bcs > 6 %}
+                To encourage additional exercise, you can move your cat's food bowl to an elevated
+                surface (on a cat tree, upstairs, et cetra). You can also move your cat's
+                litterbox to a different floor of your house if possible.
+            {% endif %}
+
+            <div class="card" id="final_report">
+                <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+                alt="three puzzle feeders for cats that are shaped like mice."
+                id="fr">
+                <div class="card-body">
+                  <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
+                  <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                    for indoor cats! Please note, it can be difficult to make sure your pet is 
+                    eating enough if mutliple animals have access to these toys at one time.
+                  </p>
+                </div>
+                <div class="card-body-fr">
+                  <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" class="card-link">
+                    Find this puzzle feeder on Chewy
+                  </a>
+                  <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" class="card-link">
+                    More puzzle toys for cats on Chewy
+                  </a>
+                </div>
+              </div>
             {% endif %}
         </div>
-        <!-- SVGs for dogs and cats credit to WallArtBox on Etsy -->
-        <!-- https://www.etsy.com/shop/wallartbox -->
-        {% if pet_data[0].species == "Canine" %}
-            <div class="report_img_k9">
-                <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
-            </div>
-            <div class="k9_line"></div>
 
-            {% if pet_data[0].breed == "German Shorthaired Pointer" %}
-                <div class="k9_line_shortened"></div>
-            {% endif %}
+        <!-- Go back --> 
+        <div class="button-container">
+            <a href="{{ url_for('der') }}">
+                <button type="button" class="btn btn-secondary btn-lg">Go to Part 6: Pet's DER</button>
+            </a>
+
+            <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
+            <div class="divider"></div>
             
-        {% elif pet_data[0].species == "Feline" %}
-        <!--url_for('static', filename='/assets/svg/dogs/0_Pembroke_Welsh_Corgi_peeking_dog-3.svg')-->
-            <div class="report_img_fel">
-                <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
-            </div>
-            <div class="fel_line"></div>
-        {% endif %}
-        
-    </div>
-    <div class="data">
-        <!-- Return pet's signalment -->
-        {{ pet_data[0].name }} is a   
-               
-        <!-- Age conditionals -->
-        {% if pet_data[0].age_in_years == 0 and pet_data[0].age_in_months == 1 %}
-            {{ pet_data[0].age_in_months }} month old
-        {% elif pet_data[0].age_in_years == 0 and pet_data[0].age_in_months > 1 %}
-            {{ pet_data[0].age_in_months }} months old
-        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
-            {{ pet_data[0].age_in_years }} year old
-        {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
-            {{ pet_data[0].age_in_years }} years old
-        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
-            {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
-        {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
-            {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
-        {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
-            {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
-        {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
-            {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
-        {% endif %}
-
-        <!-- Sex conditionals -->
-        {% if pet_data[0].sex == "female_spayed" %}
-            spayed female
-        {% elif pet_data[0].sex == "female" %}
-            intact female
-        {% elif pet_data[0].sex == "male_neutered" %}
-            neutered male
-        {% elif pet_data[0].sex == "male" %}
-            intact male
-        {% endif %}
-
-        <!-- Reproductive status conditionals -->
-        {{ pet_data[0].breed }} ({{ pet_data[0].species }}). 
-        {% if pet_data[0].sex == "female" %}
-            <!-- If pet is an intact female -->
-            {{ pet_data[0].name }} is 
-            {% if pet_data[0].is_pregnant == "y" %}
-                <!-- And is pregnant -->
-                {% if pet_data[0].species == "Canine" %}
-                    <!-- If pet is pregnant, female, and canine, inform user of gestation length -->
-                    currently pregnant and is in her 
-                    {% if pet_data[0].weeks_gestating > 0 and pet_data[0].weeks_gestating != None %}
-                    <!-- Accounts for the first week of gestation --> 
-                    {% if pet_data[0].weeks_gestating == 1 %}   
-                        {{ pet_data[0].weeks_gestating }}st week of pregnancy (within the first 42 days).
-                    <!-- Accounts for the second week of gestation --> 
-                    {% elif pet_data[0].weeks_gestating == 2 %}   
-                        {{ pet_data[0].weeks_gestating }}nd week of pregnancy (within the first 42 days).
-                    <!-- Accounts for the third week of gestation --> 
-                    {% elif pet_data[0].weeks_gestating == 3 %}   
-                        {{ pet_data[0].weeks_gestating }}rd week of pregnancy (within the first 42 days).
-                    <!-- Accounts for the 4th-6th week of gestation --> 
-                    {% elif pet_data[0].weeks_gestating >= 3 and pet_data[0].weeks_gestating < 6 %}   
-                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the first 42 days).
-                    {% elif pet_data[0].weeks_gestating >= 6%}   
-                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the last 21 days).
-                    {% endif %}
-                {% endif %}
-            {% endif %}
-            {% elif pet_data[0].is_pregnant == "n" %}
-                is not currently pregnant
-            {% endif %}
-            {% if pet_data[0].is_nursing == "y" %}
-                <!-- If pet is a nursing female -->
-                but is actively nursing a litter of
-                {% if pet_data[0].litter_size != None %}
-                    {{ pet_data[0].litter_size }}
-                    <!-- Return litter size and species -->
-                    {% if pet_data[0].species == "Canine" %}
-                        puppies.
-                    {% elif pet_data[0].species == "Feline" %}
-                        kittens.
-                    {% endif %}
-                {% endif %}
-            {% elif pet_data[0].is_nursing == "n" %}
-                and is not currently nursing a litter.
-            {% endif %}
-        {% endif %}
-
-        <!-- Give RER and DER information -->
-        {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
-        {{ rer }} kcal. As a reminder, this is the minimum amount 
-        {{ pet_data[0].name }} needs at rest (i.e. if {{ subject_pronoun }} is 
-        hospitalized and requires crate rest or if {{ subject_pronoun }} lays 
-        around the house at all times). Based on {{ pet_data[0].name }}'s current 
-        life stage, {{ subject_pronoun }} requires {{ der }} kcal per day. The 
-        following formula was used: 
-    </div>
-
-    <!-- Return the formula used to calculate DER -->
-    <div class="final_formula">
-
-        {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
-            DER = {{ pet_data[0].name }}'s {{ notes }}
-            <br>
-            DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }})
-        {% else %}
-            DER = {{ pet_data[0].name }}'s RER x DER Modifier
-            <br>
-            DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
-            
-            <!-- Return any notes regarding life stage -->
-            {% if notes != None %}
-                ({{ life_stage|trim }}, {{ notes }})
-            {% else %}
-                ({{ life_stage|trim }})
-            {% endif %}
-        {% endif %}
-        
-        
-    
-
-    </div>
-    <div class="food_and_exercise">
-        <!-- Return amount to feed per day and per meal  --> 
-        {{ pet_data[0].name }} should be getting around
-        {% if pet_data[0].meals_per_day != 1 %}
-            {{ pet_data[0].current_food_amt_rec }} (or approximately 
-            {{ pet_data[0].current_food_amt_per_meal }} per meal over {{ meals_per_day }}
-            meals).
-        {% else %}
-            {{ pet_data[0].current_food_amt_rec }}.
-        {% endif %}
-
-        {% if pet_data[0].species == "Canine" %}
-            {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" and pet_data[0].activity_level != "Heavy Activity" %}
-                <!-- If dog has activity level data and is not already getting moderate to heavy exercise --> 
-                All pets can benefit from physical and mental excersize!
-            {% endif %}
-        {% elif pet_data[0].species == "Feline" %}
-            {% if pet_data[0].is_nursing == "y" %}
-                <!-- If pet is a nursing feline, provide feeding guidelines -->
-
-                In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
-                should be fed a highly digestible, high quality kitten formula from a brand 
-                that meets the 
-
-                <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
-                    WSAVA guidelines</a>.
-
-                {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
-                    <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
-                    It is recommended to feed {{ pet_data[0].name }} several 
-                    times a day.
-                {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
-                    <!-- If within the first 3-4 weeks of nursing -->
-                    It is recommended to feed {{ pet_data[0].name }} several 
-                    times a day or provide food freely for the first 3 to 4 
-                    weeks after giving birth.
-                {% endif %}
-            {% elif pet_data[0].is_pregnant == "y" %}
-                In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
-                should be fed a highly digestible, high quality kitten formula from a brand that meets the 
-                <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
-                    WSAVA guidelines</a>. To encourage adequate food intake, it is recommended to
-                feed {{ pet_data[0].name }} several small meals per day.
-            {% endif %}
-
-           <!-- Recommend enrichment and exercise resources for all cats -->  
-           All pets can benefit from physical and mental excersize!
-           <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
-           alt="three puzzle feeders for cats that are shaped like mice." class="puzzle_feeder">
-           
-        {% endif %}
-    </div>
-
-    <!-- Go back --> 
-    <div class="button-container">
-         <a href="{{ url_for('der') }}">
-            <button type="button" class="btn btn-secondary btn-lg">Go to Part 6: Pet's DER</button>
-        </a>
-
-        <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
-        <div class="divider"></div>
-        
-        <!-- TODO: Make a "Print Report" button --> 
+            <!-- TODO: Make a "Print Report" button --> 
+        </div>
     </div>
 </div>
 

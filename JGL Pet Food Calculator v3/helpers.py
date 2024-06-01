@@ -276,11 +276,11 @@ def convert_decimal_to_volumetric(partial_amount):
         partial_volumetric = "1/8"
     elif partial_amount > "13" and partial_amount <= "25":
         partial_volumetric = "1/4"
-    elif partial_amount > "25" and partial_amount <= "40":
+    elif partial_amount > "25" and partial_amount <= "43":
         partial_volumetric = "1/3"
-    elif partial_amount > "40" and partial_amount <= "55":
+    elif partial_amount > "44" and partial_amount <= "60":
         partial_volumetric = "1/2"
-    elif partial_amount > "55" and partial_amount <= "67":
+    elif partial_amount > "60" and partial_amount <= "67":
         partial_volumetric = "2/3"
     elif partial_amount > "67" and partial_amount <= "85":
         partial_volumetric = "3/4"
@@ -322,8 +322,8 @@ def find_food_form():
     return current_food_form 
 
 def pet_data_dictionary():
-        # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    """Builds a dictionary of the current SQL row if logged in or session
+    variables if no user is logged in"""
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
@@ -436,3 +436,11 @@ def find_pet_id():
     #     user_id=session["user_id"], name=pet_name, species=species
     #     )
     pass
+
+def clear_variable_list():
+    """Clear all pet session variables, code reformatting suggested by CoPilot"""
+    
+    for variable in list(session.keys()):
+        if variable != "user_id":
+            session.pop(variable, None)
+            

@@ -164,7 +164,7 @@
                     </a>
                 </td>
                 <td>
-                    {{ pet_data[0].weight }} {{ pet_data[0].units }} 
+                    {{ pet_data[0].weight }} {{ pet_data[0].units }} ({{ pet_data[0].converted_weight }} {{ pet_data[0].converted_weight_units }} )
 
                     <a href="{{ url_for('pet_condition') }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>

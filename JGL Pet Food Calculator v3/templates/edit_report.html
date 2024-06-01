@@ -340,12 +340,19 @@
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div>   
-    {% elif pet_data[0].bcs != 5 %}
+    {% elif pet_data[0].bcs >= 5 %}
         <div class="button-container">
-            <a href="{{ url_for('lactation_status', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('pet_condition', id=pet_data[0].pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div> 
+    {% elif pet_data[0].is_pediatric == "y" %}
+        <div class="button-container">
+            <a href="{{ url_for('pet_info_continued', id=pet_data[0].pet_id) }}">
+                <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
+            </a>    
+        </div> 
+    {% endif %}
 </div>
 
 {% endblock %}
