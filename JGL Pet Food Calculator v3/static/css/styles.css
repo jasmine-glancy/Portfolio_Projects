@@ -9,6 +9,9 @@
     --darker_lime_transparent: #568b3fe5;
     --darker_lime: #527e3f;
 }
+br {
+    margin-top: 10px;
+}
 
 body {
     background-color: var(--pale_white_green);
@@ -268,7 +271,7 @@ a:hover {
         position: relative;
         text-align: center;
         padding-bottom: 20px;
-        top: 0px;
+        top: 15px;
     }
 
 /* Exercise and feeding alignment */
@@ -379,3 +382,15 @@ a:hover {
     margin-left: 15px;
     margin-bottom: 5px;
  }
+
+/* Final report obesity recommendations and treat formatting */
+
+.obesity_considerations_and_treats {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    top: 0px;
+    width: 250px;
+    margin-right: 46vw;
+
+}

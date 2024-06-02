@@ -125,12 +125,14 @@
 
             <!-- Give RER and DER information -->
             {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
-            {{ rer }} kcal. As a reminder, this is the minimum amount 
-            {{ pet_data[0].name }} needs at rest (i.e. if {{ subject_pronoun }} is 
-            hospitalized and requires crate rest or if {{ subject_pronoun }} lays 
-            around the house at all times). Based on {{ pet_data[0].name }}'s current 
-            life stage, {{ subject_pronoun }} requires {{ der }} kcal per day. The 
-            following formula was used: 
+            {{ rer }} kcal based off of her current weiht of {{ pet_data[0].weight }} 
+            {{ pet_data[0].units }}. ({{ pet_data[0].converted_weight }} 
+            {{ pet_data[0].converted_weight_units }}). As a reminder, this is the 
+            minimum amount {{ pet_data[0].name }} needs at rest (i.e. if 
+            {{ subject_pronoun }} is hospitalized and requires crate rest or if 
+            {{ subject_pronoun }} lays around the house at all times). Based on 
+            {{ pet_data[0].name }}'s current life stage, {{ subject_pronoun }} requires 
+            {{ der }} kcal per day. The following formula was used: 
         </div>
 
         <!-- Return the formula used to calculate DER -->
@@ -174,17 +176,97 @@
                     All pets can benefit from physical and mental excersize!
                 {% endif %}
 
-                <!-- If dog is overweight or obese, provide additional exercise technique recs -->
+                <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
                 {% if pet_data[0].bcs > 6 %}
                     If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
-                    puzzle feeders or using a mini-muffin tin to force Feeding {{ pet_data[0].name }} {{ object_pronoun }} daily ration over multiple
-                    small meals a day can help promote satiety (feeling full) and may help promote 
-                    weight loss. For further weight loss options, please discuss how to help 
+                    puzzle feeders or using a mini-muffin tin to encourage {{ pet_data[0].name }} to
+                    eat more slowly.
+                
+
+                    Feeding {{ pet_data[0].name }}
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} 
+                    daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                    may help promote weight loss. For further weight loss options, please discuss how to help 
                     {{ pet_data[0].name }} loose weight with 
                     {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ object_pronoun }} veterinarian.
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
                     {% endif %}
+                    veterinarian. 
+                    
+                    <br>
+                    <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+                    Based off of 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %}
+                    current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                    lose weight by reducing 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %} 
+                    current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                    is not on a food specifically formulated for animals to help lose weight. {{ pet_data[0].name }} 
+                    has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                    percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                    to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                    
+                    <br>
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 8% of
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
+                {% else %}
+                    <br>
+                    
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 10% of 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
                 {% endif %}
+
+                <!-- TODO: import treat calculator results -->
+
+                <div class="card" id="final_report">
+                    <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
+                    alt="three puzzle feeders for cats that are shaped like mice."
+                    id="fr">
+                    <div class="card-body">
+                      <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
+                      <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                        and encourage slower eating! Please note, it can be difficult to make sure 
+                        your pet is eating their daily portion if mutliple animals have access to 
+                        these toys at one time.
+                      </p>
+                    </div>
+                    <div class="card-body-fr">
+                      <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" class="card-link">
+                        Find this puzzle feeder on Chewy
+                      </a>
+                      <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" class="card-link">
+                        More puzzle toys for dogs on Chewy
+                      </a>
+                    </div>
+                  </div>
+
+                    
 
             {% elif pet_data[0].species == "Feline" %}
                 {% if pet_data[0].is_nursing == "y" %}
@@ -215,42 +297,100 @@
                     feed {{ pet_data[0].name }} several small meals per day.
                 {% endif %}
 
-            <!-- Recommend enrichment and exercise resources for all cats -->  
-            All pets can benefit from physical and mental excersize! Enticing your cat
-            to play with a lazer pointer (if there are no dogs in the house), a flirt pole, or 
-            with puzzle feeders can help encourage exercise. If possible, consider moving 
-            your cat's food dish occasionally to cater to their foraging instincts. 
+                <!-- Recommend enrichment and exercise resources for all cats -->  
+                All pets can benefit from physical and mental excersize! Enticing your cat
+                to play with a lazer pointer (if there are no dogs in the house), a flirt pole, or 
+                with puzzle feeders can help encourage exercise. If possible, consider moving 
+                your cat's food dish occasionally to cater to their foraging instincts. 
 
-            <!-- If cat is overweight or obese, provide additional exercise technique recs -->
-            {% if pet_data[0].bcs > 6 %}
-                To encourage additional exercise, you can move your cat's food bowl to an elevated
-                surface (on a cat tree, upstairs, et cetra). You can also move your cat's
-                litterbox to a different floor of your house if possible.
-            {% endif %}
+                <!-- If cat is overweight or obese, provide additional exercise technique recs -->
+                {% if pet_data[0].bcs > 6 %}
+                    To encourage additional exercise, you can move your cat's food bowl to an elevated
+                    surface (on a cat tree, upstairs, et cetra). You can also move your cat's
+                    litterbox to a different floor of your house if possible. 
+                    Feeding {{ pet_data[0].name }}
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} 
+                    daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                    may help promote weight loss. For further weight loss options, please discuss how to help 
+                    {{ pet_data[0].name }} loose weight with 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %}
+                    veterinarian. 
+                    
+                    <br>
+                    <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+                    Based off of 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %}
+                    current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                    lose weight by reducing 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %} 
+                    current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                    is not on a food specifically formulated for animals to help lose weight. {{ pet_data[0].name }} 
+                    has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                    percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                    to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                    
+                    <br>
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 8% of
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
+                {% else %}
+                    <br>
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 10% of 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
 
-            <div class="card" id="final_report">
-                <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
-                alt="three puzzle feeders for cats that are shaped like mice."
-                id="fr">
-                <div class="card-body">
-                  <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
-                  <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
-                    for indoor cats! Please note, it can be difficult to make sure your pet is 
-                    eating enough if mutliple animals have access to these toys at one time.
-                  </p>
+                    <!-- TODO: import treat calculator results -->
+                {% endif %}
+
+                <div class="card" id="final_report">
+                    <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+                    alt="three puzzle feeders for cats that are shaped like mice."
+                    id="fr">
+                    <div class="card-body">
+                    <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
+                    <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                        for indoor cats! Please note, it can be difficult to make sure your pet is 
+                        eating enough if mutliple animals have access to these toys at one time.
+                    </p>
+                    </div>
+                    <div class="card-body-fr">
+                    <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" class="card-link">
+                        Find this puzzle feeder on Chewy
+                    </a>
+                    <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" class="card-link">
+                        More puzzle toys for cats on Chewy
+                    </a>
+                    </div>
                 </div>
-                <div class="card-body-fr">
-                  <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" class="card-link">
-                    Find this puzzle feeder on Chewy
-                  </a>
-                  <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" class="card-link">
-                    More puzzle toys for cats on Chewy
-                  </a>
-                </div>
-              </div>
             {% endif %}
         </div>
-
+        
         <!-- Go back --> 
         <div class="button-container">
             <a href="{{ url_for('der') }}">
@@ -260,7 +400,9 @@
             <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
             <div class="divider"></div>
             
-            <!-- TODO: Make a "Print Report" button --> 
+            <!-- TODO: "Print Report" button and "Email Report" button functional --> 
+            <button type="button" class="btn btn-secondary btn-lg">Print This Report</button>
+            <button type="button" class="btn btn-secondary btn-lg">Email This Report</button>
         </div>
     </div>
 </div>

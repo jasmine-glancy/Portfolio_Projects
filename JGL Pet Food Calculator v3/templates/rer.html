@@ -24,7 +24,15 @@
         <p>
             {{ name }}'s Resting Energy Requirement (RER) is {{ rer }} kcalories per day. 
             This is the minimum amount of calories {{ name }} needs in order to 
-            maintain {{ pronoun }} metabolic processes. {{ name }} weighs {{ weight }} 
+            maintain         
+
+            <!-- If pet is male, use "his" instead of "him" -->
+            {% if sex == "male" or sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }} 
+            {% endif %} 
+            metabolic processes. {{ name }} weighs {{ weight }} 
             {{ units }} ({{ converted_weight }} {{ converted_weight_units }}) and weighs
             {% if rer_formula_med_to_lrg == True %}
                 between 2 and 45 kg (4.4 and 99 lbs), so the following 

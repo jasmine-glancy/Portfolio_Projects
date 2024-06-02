@@ -6,7 +6,8 @@ from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
     find_breed_id, find_pet_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
-        check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list
+        check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list, find_der_low_end, find_der_high_end, \
+            find_der_mid_range
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -168,7 +169,7 @@ def pet_info():
         print(f"Couldn't find ID, Exception: {e}")
     else:
         
-        print(f"user_id: {session['user_id']}, pet_id: {id}")  # Add this line
+        print(f"user_id: {session['user_id']}, pet_id: {id}") 
 
         
     form = NewSignalment()
@@ -282,6 +283,9 @@ def pet_info_continued():
             return redirect(url_for('pet_info_continued'))
         elif pet_breed != None and pet_sex == "default":
             flash("Please choose your pet's reproductive status from the dropdown menus.")
+            return redirect(url_for('pet_info_continued'))    
+        elif pet_age_years < 0 or pet_age_months < 0:
+            flash("Please enter 0 or a number greater than zero.")
             return redirect(url_for('pet_info_continued'))    
         else:
             # Create new session variables
@@ -1329,11 +1333,12 @@ def rer():
     return render_template("rer.html",
                            rer=rer,
                            name=session["pet_name"],
-                           pronoun=object_pronoun,
+                           object_pronoun=object_pronoun,
                            possessive_pronoun=possessive_pronoun,
                            weight=weight,
                            converted_weight=converted_weight,
                            units=units,
+                           sex=sex,
                            converted_weight_units=converted_weight_units,
                            rer_formula_med_to_lrg=rer_formula_med_to_lrg,
                            rer_formula_sm=rer_formula_sm,
@@ -1400,44 +1405,19 @@ def der():
         print(name, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
                 
     # Use login check from helpers.py to verify DER factor ID and food form
-    der_factor_id = der_factor()
     current_food_form = find_food_form()
+    der_factor_id = der_factor()
     
     print(der_factor_id)
     print(rer, der_factor_id, meals_per_day, current_food_kcal, current_food_form)
     
-    der_modifier_start_range = 0
-    der_modifier_end_range = 0
     # Use DER factor id to lookup DER information by species
-    if species == "Canine":
-        der_lookup = db.execute(
-            "SELECT life_stage, canine_der_factor_range_start, canine_der_factor_range_end, \
-                ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
-                    FROM canine_der_factors WHERE factor_id = :der_factor_id",
-                    der_factor_id=der_factor_id)
-        print(der_lookup)
-
-        # Find the start and end range of DER modifiers
-        der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
-        der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
-        
-    elif species == "Feline":
-        der_lookup = db.execute(
-        "SELECT life_stage, feline_der_factor_range_start, feline_der_factor_range_end, \
-            ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
-                FROM feline_der_factors WHERE factor_id = :der_factor_id",
-                der_factor_id=der_factor_id)
-        print("der")
-        print(F"Der lookup: {der_lookup}")
-
-        # Find the start and end range of DER modifiers
-        der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
-        der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
-    
+    der_modifier_start_range = find_der_low_end()
+    der_modifier_end_range = find_der_high_end()
 
     # Start with the mid range if this is the first report
     # TODO: check report date and change modifier choice based on weight changes
-    der_modifier = der_lookup[0]["mid_range"]
+    der_modifier = find_der_mid_range()
 
     # Calculate DER based on the der modifier and pass variables to tempate
     if species == "Feline" and is_nursing == "y":
@@ -1638,6 +1618,8 @@ def der():
 def completed_report():
     """Return's pet's final completed report"""
 
+    # TODO: Enable user to get to this page from "Completed Reports"
+    
     pet_data = pet_data_dictionary()
     
     rer = "{:.2f}".format(pet_data[0]["rer"])

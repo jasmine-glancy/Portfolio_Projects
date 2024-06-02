@@ -325,6 +325,9 @@ def pet_data_dictionary():
     """Builds a dictionary of the current SQL row if logged in or session
     variables if no user is logged in"""
     
+    # TODO: Refactor to search for pet id instead of pet name
+    ## and/or bring up a dropdown if mutliple pets have the same name
+    
     # If user is logged in, use SQL query
     if session["user_id"] != None:
         pet_data = db.execute(
@@ -429,6 +432,8 @@ def check_if_pediatric():
 
 def find_pet_id(id):
     """Finds the specific pet ID"""
+    
+    
     print(f"ID arg{id}")
     
     # See if the pet is already added 
@@ -437,14 +442,16 @@ def find_pet_id(id):
         user_id=session["user_id"], pet_id=id
         )
     print(pet_id)
+    
+    id_of_pet = None
     if pet_id:
 
         id_of_pet = pet_id[0]["pet_id"]
         print(pet_id[0]["name"])
         print(f"ID of pet: {id_of_pet}")
-        return id_of_pet
     
-    return None
+    return id_of_pet
+
     
 
 def clear_variable_list():
@@ -453,4 +460,98 @@ def clear_variable_list():
     for variable in list(session.keys()):
         if variable != "user_id":
             session.pop(variable, None)
+   
+def find_der_low_end():
+    """Finds DER low end"""
+    
+    # Use helpers.py to verify species and check der_factor
+    species = login_check_for_species()
+    der_factor_id = der_factor()
+    
+    der_modifier_start_range = 0
+    
+    # Use DER factor id to lookup DER information by species
+    if species == "Canine":
+        der_lookup = db.execute(
+            "SELECT life_stage, canine_der_factor_range_start FROM canine_der_factors \
+                WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
+        print(der_lookup)
+
+        # Find the start and end range of DER modifiers
+        der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
+        
+    elif species == "Feline":
+        der_lookup = db.execute(
+        "SELECT life_stage, feline_der_factor_range_start \
+            FROM feline_der_factors WHERE factor_id = :der_factor_id",
+            der_factor_id=der_factor_id)
+        print("der")
+        print(F"Der lookup: {der_lookup}")
+
+        # Find the starting DER modifier
+        der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
+
+    return der_modifier_start_range
+
+
+def find_der_high_end():
+    """Finds DER high end"""
+    
+    # Use helpers.py to verify species and check der_factor
+    species = login_check_for_species()
+    der_factor_id = der_factor()
+    
+    der_modifier_end_range = 0
+    # Use DER factor id to lookup DER information by species
+    if species == "Canine":
+        der_lookup = db.execute(
+            "SELECT life_stage, canine_der_factor_range_end \
+                FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
+        print(der_lookup)
+
+        # Find the ending DER modifier
+        der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
+        
+    elif species == "Feline":
+        der_lookup = db.execute(
+        "SELECT life_stage, feline_der_factor_range_end \
+            FROM feline_der_factors WHERE factor_id = :der_factor_id",
+            der_factor_id=der_factor_id)
+        print("der")
+        print(F"Der lookup: {der_lookup}")
+
+        # Find the start and end range of DER modifiers
+        der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
+    
+    return der_modifier_end_range
             
+def find_der_mid_range():
+    """Finds DER mid-range"""
+    
+    # Use helpers.py to verify species and check der_factor
+    species = login_check_for_species()
+    der_factor_id = der_factor()
+    
+    # Use DER factor id to lookup DER information by species
+    if species == "Canine":
+        der_lookup = db.execute(
+            "SELECT life_stage, ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
+                FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
+        print(der_lookup)
+
+
+    elif species == "Feline":
+        der_lookup = db.execute(
+        "SELECT life_stage, ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
+            FROM feline_der_factors WHERE factor_id = :der_factor_id",
+            der_factor_id=der_factor_id)
+        print("der")
+        print(F"Der lookup: {der_lookup}")
+
+        # Find the middle range of DER modifiers
+        der_mid_range = der_lookup[0]["mid_range"]
+        
+    return der_mid_range

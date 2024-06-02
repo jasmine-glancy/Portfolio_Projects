@@ -27,8 +27,14 @@
             or about {{ total_amount_per_meal }} per meal over 
             {{ meals_per_day }} meals
         {% endif %}
-        of {{ object_pronoun }} current diet.
-        The following formula was used: 
+        of 
+        <!-- If pet is male, use "his" instead of "him" -->
+        {% if sex == "male" or sex == "male_neutered" %}
+            {{ possessive_pronoun }} 
+        {% else %}
+            {{ object_pronoun }} 
+        {% endif %}
+        current diet. The following formula was used: 
         <div class="formula">
             {% if species == "Feline" and is_nursing == "y" %}
                 DER = {{ rer }} + 
