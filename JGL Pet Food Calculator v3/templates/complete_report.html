@@ -56,7 +56,7 @@
                 {{ pet_data[0].age_in_years }} years old
             {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
                 {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
-            {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
+            {% elif pet_data[0].age_in_years >= 1 and pet_data[0].age_in_months > 1 %}
                 {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
             {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
                 {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
@@ -173,6 +173,19 @@
                     <!-- If dog has activity level data and is not already getting moderate to heavy exercise --> 
                     All pets can benefit from physical and mental excersize!
                 {% endif %}
+
+                <!-- If dog is overweight or obese, provide additional exercise technique recs -->
+                {% if pet_data[0].bcs > 6 %}
+                    If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
+                    puzzle feeders or using a mini-muffin tin to force Feeding {{ pet_data[0].name }} {{ object_pronoun }} daily ration over multiple
+                    small meals a day can help promote satiety (feeling full) and may help promote 
+                    weight loss. For further weight loss options, please discuss how to help 
+                    {{ pet_data[0].name }} loose weight with 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ object_pronoun }} veterinarian.
+                    {% endif %}
+                {% endif %}
+
             {% elif pet_data[0].species == "Feline" %}
                 {% if pet_data[0].is_nursing == "y" %}
                     <!-- If pet is a nursing feline, provide feeding guidelines -->

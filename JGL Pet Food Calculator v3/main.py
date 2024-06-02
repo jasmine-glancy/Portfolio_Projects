@@ -155,10 +155,22 @@ def logout():
     return redirect("/")
 
 
-@app.route("/get-signalment", methods=["GET", "POST"])
+@app.route("/get-signalment/", methods=["GET", "POST"])
 def pet_info():
     """Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species"""
     
+    id = None
+    try:
+        pet_id = request.args.get("id") 
+        print(f"pet ID: {pet_id}")
+        id = find_pet_id(pet_id) 
+    except Exception as e:
+        print(f"Couldn't find ID, Exception: {e}")
+    else:
+        
+        print(f"user_id: {session['user_id']}, pet_id: {id}")  # Add this line
+
+        
     form = NewSignalment()
     
     if request.method == "POST":
@@ -178,36 +190,30 @@ def pet_info():
         # Add pet to the database if the user is logged in
         if session["user_id"] != None:
             
-            # See if the pet is already added 
-            find_existing_pet = db.execute(
-                "SELECT name FROM pets WHERE owner_id = :user_id AND name = :name AND species = :species",
-                user_id=session["user_id"], name=pet_name, species=species
-            )
-            
-            existing_pet = None
-            for input_pet in find_existing_pet:
-                # Condition suggested by CoPilot
-                if pet_name in input_pet.values():
-                    # If the pet was found, update the information instead of adding a duplicate pet
-                    existing_pet = input_pet
-                    break
+
+            if pet_id is not None:    
                 
-            if existing_pet:
-                print(pet_name)
-                old_pet_name = pet_name
-                print(old_pet_name)
                 
-                try:
-                    db.execute(
-                        "UPDATE pets SET name = :updated_name, species = :updated_species WHERE name = :old_pet_name AND owner_id = :user_id",
-                        updated_name=pet_name, updated_species=species, old_pet_name=old_pet_name, user_id=session["user_id"]
-                    )
-                except Exception as e:
-                    flash(f"Unable to update data, Exception: {e}")
-                else:
-                    session["species"] = species
-                    session["pet_name"] = pet_name
-  
+                print(f"user_id: {session['user_id']}, pet_id: {id}")  # Add this line
+
+                # See if the pet is already added
+                find_existing_pet = db.execute(
+                    "SELECT name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
+                    user_id=session["user_id"], pet_id=id
+                )
+                
+                if find_existing_pet:
+
+                    try:
+                        db.execute(
+                            "UPDATE pets SET name = :updated_name, species = :updated_species WHERE pet_id = :pet_id AND owner_id = :user_id",
+                            updated_name=pet_name, updated_species=species, pet_id=id, user_id=session["user_id"]
+                        )
+                    except Exception as e:
+                        flash(f"Unable to update data, Exception: {e}")
+                    else:
+                        session["species"] = species
+                        session["pet_name"] = pet_name
             else:
                 # If no pet is found (i.e. new pet in the database), create new session variable and store pet
                 # Store session variables
@@ -1095,8 +1101,10 @@ def confirm_data():
     
     # Find data from from helpers.py 
     pet_data = pet_data_dictionary()
+    print(pet_data)
+    user_id = session["user_id"]
         
-    return render_template("confirm_pet_info.html", pet_data=pet_data)
+    return render_template("confirm_pet_info.html", pet_data=pet_data, user_id=user_id)
     
     
 @app.route("/current_food", methods=["GET", "POST"])
@@ -1214,20 +1222,24 @@ def rer():
     # Use login check from helpers.py to verify reproductive status
     sex = find_repro_status()
     rer = calculcate_rer()
+    obese_prone = check_obesity_risk()
     
     object_pronoun = ""
+    possessive_pronoun = ""
     print(rer)
     if sex == "female" or sex == "female_spayed":
         # Subject pronoun is she
         object_pronoun = "her"
     elif sex == "male" or sex == "male_neutered":
         # Subject pronoun is he
-        object_pronoun = "his"
+        object_pronoun = "him"
+        possessive_pronoun = "his"
 
     print(object_pronoun)
 
     # Store as a session variable
     session["object_pronoun"] = object_pronoun
+    session["possessive_pronoun"] = possessive_pronoun
     
     # Find pet's current weight so the user can know what formula was used to find their pet's RER
     if session["user_id"] != None:
@@ -1286,6 +1298,15 @@ def rer():
     print(f"weight: {weight} units: {units}")
     print(f"RER: {rer}")
     
+    if obese_prone == "y":
+        # If pet is an obese prone breed, set max treat kcal/day at 8% of RER
+        treat_kcals = rer * 0.08
+    else:
+        # Calculate treat kcals per day (10% of RER)
+        treat_kcals = rer * 0.1
+        
+    print(f"Treat kcal:{treat_kcals}")
+    
     # If user is logged in, add current food information to the database
     if session["user_id"] != None:
         try:
@@ -1295,8 +1316,8 @@ def rer():
                 
                             
             db.execute(
-                "UPDATE pets SET rer = :rer WHERE name = :pet_name AND owner_id = :user_id",
-                rer=rer, pet_name=session["pet_name"], user_id=session["user_id"]
+                "UPDATE pets SET rer = :rer, rec_treat_kcal_per_day = :treat_kcals WHERE name = :pet_name AND owner_id = :user_id",
+                rer=rer, pet_name=session["pet_name"], user_id=session["user_id"], treat_kcals=treat_kcals
             )
             print("data updated")
         except Exception as e:
@@ -1309,6 +1330,7 @@ def rer():
                            rer=rer,
                            name=session["pet_name"],
                            pronoun=object_pronoun,
+                           possessive_pronoun=possessive_pronoun,
                            weight=weight,
                            converted_weight=converted_weight,
                            units=units,
@@ -1324,6 +1346,7 @@ def der():
     
     # Call session variable for pronouns
     object_pronoun = session["object_pronoun"]
+    possessive_pronoun = session["possessive_pronoun"]
 
     # Use helpers.py to verify species and check der_factor
     species = login_check_for_species()
@@ -1362,7 +1385,8 @@ def der():
             return render_template("der.html",
                             rer=rer,
                            name=name,
-                           object_pronoun=object_pronoun)
+                           object_pronoun=object_pronoun,
+                           possessive_pronoun=possessive_pronoun)
     else:
         # If a user isn't logged in, grab session variables
         name = session["pet_name"]
@@ -1598,6 +1622,7 @@ def der():
                            name=name,
                            meals_per_day=meals_per_day,
                            object_pronoun=object_pronoun,
+                           possessive_pronoun=possessive_pronoun,
                            der_low_end=der_low_end,
                            der_high_end=der_high_end,
                            current_food_form=current_food_form,
@@ -1621,11 +1646,13 @@ def completed_report():
     print(der)
     object_pronoun = ""
     subject_pronoun = ""
+    possessive_pronoun = ""
     if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
         object_pronoun = "her"
         subject_pronoun = "she"
     elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
-        object_pronoun = "his"
+        object_pronoun = "him"
+        possessive_pronoun = "his"
         subject_pronoun = "he"
         
     print(object_pronoun)
@@ -1686,7 +1713,8 @@ def completed_report():
                            life_stage=life_stage,
                            notes=notes,
                            object_pronoun=object_pronoun,
-                           subject_pronoun=subject_pronoun)
+                           subject_pronoun=subject_pronoun,
+                           possessive_pronoun=possessive_pronoun)
 
 
 @app.route("/finished_reports", methods=["GET", "POST"])
@@ -1723,6 +1751,7 @@ def edit_info():
     
     pet_id = request.args.get("id")
     
+    print(pet_id)
     try:
         pet_data = db.execute(
             "SELECT * FROM pets WHERE owner_id = :user_id and pet_id = :pet_id",
@@ -1735,4 +1764,4 @@ def edit_info():
     if request.method == "POST":
         print(pet_id)
     
-    return render_template("edit_report.html", pet_data=pet_data)
+    return render_template("edit_report.html", pet_data=pet_data, pet_id=pet_id)

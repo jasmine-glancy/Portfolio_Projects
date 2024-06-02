@@ -427,15 +427,25 @@ def check_if_pediatric():
     
     return is_pediatric
 
-def find_pet_id():
+def find_pet_id(id):
     """Finds the specific pet ID"""
+    print(f"ID arg{id}")
     
     # See if the pet is already added 
-    # find_existing_pet = db.execute(
-    #     "SELECT pet_id FROM pets WHERE owner_id = :user_id AND name = :name AND species = :species",
-    #     user_id=session["user_id"], name=pet_name, species=species
-    #     )
-    pass
+    pet_id = db.execute(
+        "SELECT pet_id, name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
+        user_id=session["user_id"], pet_id=id
+        )
+    print(pet_id)
+    if pet_id:
+
+        id_of_pet = pet_id[0]["pet_id"]
+        print(pet_id[0]["name"])
+        print(f"ID of pet: {id_of_pet}")
+        return id_of_pet
+    
+    return None
+    
 
 def clear_variable_list():
     """Clear all pet session variables, code reformatting suggested by CoPilot"""

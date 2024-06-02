@@ -95,7 +95,7 @@
                 <td>
                     {{ pet_data[0].name }}
                     
-                    <a href="{{ url_for('pet_info') }}">
+                    <a href="{{ url_for('pet_info', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
@@ -117,21 +117,21 @@
                     {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
                         {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
                     {% endif %}
-                    <a href="{{ url_for('pet_info_continued') }}">
+                    <a href="{{ url_for('pet_info_continued', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
                 <td>
                     {{ pet_data[0].species }}
 
-                    <a href="{{ url_for('pet_info', id=pet_data[0].pet_id) }}">
+                    <a href="{{ url_for('pet_info', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
                 <td>
                     {{ pet_data[0].breed }}
 
-                    <a href="{{ url_for('pet_info_continued', id=pet_data[0].pet_id) }}">
+                    <a href="{{ url_for('pet_info_continued', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
@@ -146,14 +146,14 @@
                         Male (Intact)
                     {% endif %}
 
-                    <a href="{{ url_for('pet_info_continued', id=pet_data[0].pet_id) }}">
+                    <a href="{{ url_for('pet_info_continued', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
                 <td>
                     {{ pet_data[0].bcs }}/9
 
-                    <a href="{{ url_for('pet_condition', id=pet_data[0].pet_id) }}">
+                    <a href="{{ url_for('pet_condition', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
@@ -161,7 +161,7 @@
                     {{ pet_data[0].weight }} {{ pet_data[0].units }} 
                     ({{ pet_data[0].converted_weight }} {{ pet_data[0].converted_weight_units }})
 
-                    <a href="{{ url_for('pet_condition', id=pet_data[0].pet_id) }}">
+                    <a href="{{ url_for('pet_condition', id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                     </a>
                 </td>
@@ -169,7 +169,7 @@
                     <td>
                         {{ pet_data[0].activity_level }}
 
-                        <a href="{{ url_for('activity', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('activity', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -177,14 +177,14 @@
                 {% if pet_data[0].is_pregnant == "y" %}
                     <td>
                         Yes
-                        <a href="{{ url_for('repro_status', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('repro_status', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
                 {% elif pet_data[0].is_pregnant == "n" %}
                     <td>
                         No
-                        <a href="{{ url_for('repro_status', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('repro_status', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -193,7 +193,7 @@
                     <td>
                         {{ pet_data[0].weeks_gestating }} weeks
 
-                        <a href="{{ url_for('gestation_duration', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('gestation_duration', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -202,7 +202,7 @@
                     <td>
                         Yes
 
-                        <a href="{{ url_for('lactation_status', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('lactation_status', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -210,7 +210,7 @@
                     <td>
                         No
 
-                        <a href="{{ url_for('lactation_status', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('lactation_status', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -223,7 +223,7 @@
                         {% elif pet_data[0].species == "Feline" %}
                             kittens
                         {% endif %}
-                        <a href="{{ url_for('litter_size', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('litter_size', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -232,7 +232,7 @@
                     <td>
                         {{ pet_data[0].weeks_nursing }}
 
-                        <a href="{{ url_for('lactation_duration', id=pet_data[0].pet_id) }}">
+                        <a href="{{ url_for('lactation_duration', id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>
                         </a>
                     </td>
@@ -324,31 +324,31 @@
 
     {% if pet_data[0].is_pediatric == "n" and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
         <div class="button-container">
-            <a href="{{ url_for('current_food', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('current_food', id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div>
     {% elif pet_data[0].is_pregnant == "y" %}
         <div class="button-container">
-            <a href="{{ url_for('repro_status', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('repro_status', id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div>    
     {% elif pet_data[0].is_nursing == "y" %}
         <div class="button-container">
-            <a href="{{ url_for('lactation_status', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('lactation_status', id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div>   
     {% elif pet_data[0].bcs >= 5 %}
         <div class="button-container">
-            <a href="{{ url_for('pet_condition', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('pet_condition', id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div> 
     {% elif pet_data[0].is_pediatric == "y" %}
         <div class="button-container">
-            <a href="{{ url_for('pet_info_continued', id=pet_data[0].pet_id) }}">
+            <a href="{{ url_for('pet_info_continued', id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Recalculate Food for {{ pet_data[0].name }}</button>
             </a>    
         </div> 
