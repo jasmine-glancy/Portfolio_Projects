@@ -70,6 +70,7 @@ def der_factor():
         der_factor_id = session["der_factor_id"]
     
     # Return whatever DER factor id variable ends up being found 
+    print(f"DER factor ID: {der_factor_id}")
     return der_factor_id  
 
 def check_if_pregnant():
@@ -509,7 +510,7 @@ def find_der_high_end():
             "SELECT life_stage, canine_der_factor_range_end \
                 FROM canine_der_factors WHERE factor_id = :der_factor_id",
                 der_factor_id=der_factor_id)
-        print(der_lookup)
+        print(f"DER lookup: {der_lookup}")
 
         # Find the ending DER modifier
         der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
@@ -551,7 +552,9 @@ def find_der_mid_range():
         print("der")
         print(F"Der lookup: {der_lookup}")
 
-        # Find the middle range of DER modifiers
-        der_mid_range = der_lookup[0]["mid_range"]
+    # Find the middle range of DER modifiers
+    der_mid_range = der_lookup[0]["mid_range"]
         
+    print(f"Mid range DER Factor {der_mid_range}")
+    
     return der_mid_range

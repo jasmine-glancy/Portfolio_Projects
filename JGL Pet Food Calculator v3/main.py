@@ -1471,11 +1471,11 @@ def der():
     
     if whole_cans_or_cups == 1:
         if is_half_tablespoon and daily_partial_volumetric != "0":
-            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} and {daily_partial_volumetric} per day"
         elif not is_half_tablespoon and daily_partial_volumetric != "0":
-            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} and {daily_partial_volumetric} {food_form} per day"
         else:
-            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form}"
+            daily_amount_to_feed = f"{whole_cans_or_cups} {food_form} per day"
     elif whole_cans_or_cups >= 1:
         if is_half_tablespoon and daily_partial_volumetric != "0":
             daily_amount_to_feed = f"{whole_cans_or_cups} {food_form_plural} and {daily_partial_volumetric} per day"
