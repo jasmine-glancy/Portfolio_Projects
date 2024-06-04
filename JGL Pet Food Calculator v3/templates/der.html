@@ -49,11 +49,17 @@
                 {% elif weeks_nursing == 5 %}
                     90% per kitten
                 {% endif %}
+                
+                <br>
+                DER = {{ name }}'s RER + DER Modifier
+
             {% else %}
                 DER = {{ rer }} x {{ der_modifier }}
+
+                <br>
+                DER = {{ name }}'s RER x DER Modifier
             {% endif %}
-            <br>
-            DER = {{ name }}'s RER x DER Modifier
+            
         </div>
     </div>
     <div class="button-container">

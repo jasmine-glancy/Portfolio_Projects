@@ -10,8 +10,13 @@
     --darker_lime: #527e3f;
 }
 br {
-    margin-top: 25px;
+    margin-top: 20px;
 }
+
+    .food_and_exercise br {
+        margin-top: 10px;
+    }
+
 
 body {
     background-color: var(--pale_white_green);
@@ -116,8 +121,9 @@ a:hover {
             justify-content: center;
             position: relative;
             padding: 2px;
-            margin-top: 210px;
-            margin-bottom: 25px;
+            margin-top: 450px;
+            margin-bottom: 125px;
+            
         }
 
     /* Divider solution suggested by Michael Allen on Slack */
@@ -175,6 +181,9 @@ a:hover {
         top: 275px;
         width: 85%;
         margin-left: 60px;
+        margin-top: 0;
+        margin-bottom: -25px;
+        min-height: fit-content;
     }
 
 /* Navigation bar */
@@ -274,13 +283,27 @@ a:hover {
     text-align: center;
     padding-bottom: 20px;
     padding-top: 20px;
+    margin-bottom: 10px;
 }
 
     .final_formula {
-        position: relative;
+        position: absolute;
         text-align: center;
-        padding-bottom: 20px;
-        top: 80px;
+        top: 410px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .final_formula_nursing {
+        position: absolute;
+        text-align: center;
+        top: 395px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
     }
 
 /* Exercise and feeding alignment */
@@ -290,15 +313,15 @@ a:hover {
     align-items: flex-end;
     position: relative;
     justify-content: space-between;
-    top: 75px;
     width: 63%;
     margin-left: 330px;
     margin-right: 30px;
-    margin-bottom: 75px;
-    min-height: 450px;
     flex-wrap: wrap;
+    min-height: fit-content;
 
 }
+
+
 .report_wrapper {
     display: flex;
     margin-left: auto;
@@ -307,7 +330,6 @@ a:hover {
     justify-content: space-between;
     align-items: flex-start;
     margin-top: 100px;
-    max-height: 200px;
 }
 
 .report_title {
@@ -373,6 +395,7 @@ a:hover {
     overflow: auto;
     flex-wrap: wrap;
     color: var(--deep_blue_green);
+    margin-bottom: 150px;
 }
 
 #fr {
@@ -394,32 +417,67 @@ a:hover {
     margin-bottom: 5px;
  }
 
-/* Final report obesity recommendations and treat formatting */
-
-.obesity_considerations_and_treats {
-    display: flex;
-    position: relative;
-    z-index: 1;
-    top: 0px;
-    width: 250px;
-    margin-right: 46vw;
-
-}
 
 .reproduction_recs {
-    transform: translateY(15px);
+    top: 10px;
     position: relative;
-    
+    margin: 0; 
+    padding: 0; 
+    margin-bottom: 10px;
 }
 
+    .supplements {
+        position: relative;
+    }
+
 .fp_link {
+    
     position: relative;
     display: inline;
 }
 
-.exercise_and_treats {
-    transform: translateY(20px);
+.exercise {
+    align-self: stretch; 
     position: relative;
-    min-height: 350px;
-    margin-bottom: -50px;
+    top: 5px;
+    margin: 0;
+    padding: 0;
+}
+
+.treats {
+    align-self: stretch; 
+    position: relative;
+    top: 5px;
+    padding: 0;
+}
+
+/* Scroll to Top button suggested by 
+Lukas Web Development (https://www.youtube.com/watch?v=QwE_M2P3CRk) */
+
+.scroll_to_top {
+    /* all: unset; */
+    position: fixed;
+    z-index: 9999;
+    bottom: 1em;
+    right: 1em;
+    height: 2.75em;
+    width: 2.75em;
+    background-color: var(--deep_blue_green);
+    border: 0.15vw solid var(--darker_lime_transparent);
+    border-radius: 99%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* The arrow inside the scroll to top button */
+.scroll_to_top .up {
+    width: 1em;
+    height: 1em;
+    border-left: 4px solid var(--darker_lime_transparent);
+    border-bottom: 4px solid var(--darker_lime_transparent);
+    transform: rotate(135deg);
+    margin-bottom: -0.5em;
+    pointer-events: none;
 }

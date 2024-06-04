@@ -4,6 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
+# TODO: Split helpers.py into multiple files
 from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
     find_breed_id, find_pet_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
         check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list, find_der_low_end, find_der_high_end, \
@@ -1226,7 +1227,7 @@ def rer():
     # Use login check from helpers.py to verify reproductive status
     sex = find_repro_status()
     rer = calculcate_rer()
-    obese_prone = check_obesity_risk()
+    
     
     object_pronoun = ""
     possessive_pronoun = ""
@@ -1302,7 +1303,14 @@ def rer():
     print(f"weight: {weight} units: {units}")
     print(f"RER: {rer}")
     
-    if obese_prone == "y":
+    # Check life stage factors
+    obese_prone = check_obesity_risk()
+    is_pediatric = check_if_pediatric()
+    is_nursing = check_if_nursing()
+    is_pregnant = check_if_pregnant()
+    
+    if obese_prone == "y" or is_pediatric == "y" \
+        or is_nursing == "y" or is_pregnant == "y":
         # If pet is an obese prone breed, set max treat kcal/day at 8% of RER
         treat_kcals = rer * 0.08
     else:
@@ -1458,7 +1466,7 @@ def der():
     if current_food_form == "dry":
         food_form = "cup"
     elif current_food_form == "can":
-        food_form = "cup"
+        food_form = "can"
     elif current_food_form == "pouch":
         food_form = "pouch"
     

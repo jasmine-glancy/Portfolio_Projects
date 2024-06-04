@@ -43,7 +43,7 @@
         </div>
         <div class="data">
             <!-- Return pet's signalment -->
-            {{ pet_data[0].name }} is a   
+            {{ pet_data[0].name }} is a 
                 
             <!-- Age conditionals -->
             {% if pet_data[0].age_in_years == 0 and pet_data[0].age_in_months == 1 %}
@@ -52,16 +52,16 @@
                 {{ pet_data[0].age_in_months }} months old
             {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
                 {{ pet_data[0].age_in_years }} year old
-            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
-                {{ pet_data[0].age_in_years }} years old
             {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
                 {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
-            {% elif pet_data[0].age_in_years >= 1 and pet_data[0].age_in_months > 1 %}
-                {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
-            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
-                {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
             {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
                 {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
+            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
+                {{ pet_data[0].age_in_years }} years old
+            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 1 %}
+                {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} month old
+            {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
+                {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} months old
             {% endif %}
 
             <!-- Sex conditionals -->
@@ -77,50 +77,56 @@
 
             <!-- Reproductive status conditionals -->
             {{ pet_data[0].breed }} ({{ pet_data[0].species }}). 
-            {% if pet_data[0].sex == "female" %}
-                <!-- If pet is an intact female -->
-                {{ pet_data[0].name }} is 
-                {% if pet_data[0].is_pregnant == "y" %}
-                    <!-- And is pregnant -->
-                    {% if pet_data[0].species == "Canine" %}
-                        <!-- If pet is pregnant, female, and canine, inform user of gestation length -->
-                        currently pregnant and is in her 
-                        {% if pet_data[0].weeks_gestating > 0 and pet_data[0].weeks_gestating != None %}
-                        <!-- Accounts for the first week of gestation --> 
-                        {% if pet_data[0].weeks_gestating == 1 %}   
-                            {{ pet_data[0].weeks_gestating }}st week of pregnancy (within the first 42 days).
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].species == "Canine" %}
+                <!-- If pet is pregnant and canine, inform user of gestation length -->
+                {{ pet_data[0].name }} is currently pregnant and is in her 
+                {% if pet_data[0].weeks_gestating > 0 and pet_data[0].weeks_gestating != None %}
+                <!-- Accounts for the first week of gestation --> 
+                    {% if pet_data[0].weeks_gestating == 1 %}   
+                        {{ pet_data[0].weeks_gestating }}st week of pregnancy (within the first 42 days).
                         <!-- Accounts for the second week of gestation --> 
-                        {% elif pet_data[0].weeks_gestating == 2 %}   
-                            {{ pet_data[0].weeks_gestating }}nd week of pregnancy (within the first 42 days).
+                    {% elif pet_data[0].weeks_gestating == 2 %}   
+                        {{ pet_data[0].weeks_gestating }}nd week of pregnancy (within the first 42 days).
                         <!-- Accounts for the third week of gestation --> 
-                        {% elif pet_data[0].weeks_gestating == 3 %}   
-                            {{ pet_data[0].weeks_gestating }}rd week of pregnancy (within the first 42 days).
-                        <!-- Accounts for the 4th-6th week of gestation --> 
-                        {% elif pet_data[0].weeks_gestating >= 3 and pet_data[0].weeks_gestating < 6 %}   
-                            {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the first 42 days).
-                        {% elif pet_data[0].weeks_gestating >= 6%}   
-                            {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the last 21 days).
-                        {% endif %}
+                    {% elif pet_data[0].weeks_gestating == 3 %}   
+                        {{ pet_data[0].weeks_gestating }}rd week of pregnancy (within the first 42 days).
+                    <!-- Accounts for the 4th-6th week of gestation --> 
+                    {% elif pet_data[0].weeks_gestating >= 3 and pet_data[0].weeks_gestating < 6 %}   
+                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the first 42 days).
+                    {% elif pet_data[0].weeks_gestating >= 6%}   
+                        {{ pet_data[0].weeks_gestating }}th week of pregnancy (within the last 21 days).
+                        
                     {% endif %}
                 {% endif %}
-                {% elif pet_data[0].is_pregnant == "n" %}
-                    is not currently pregnant
-                {% endif %}
-                {% if pet_data[0].is_nursing == "y" %}
-                    <!-- If pet is a nursing female -->
-                    but is actively nursing a litter of
-                    {% if pet_data[0].litter_size != None %}
-                        {{ pet_data[0].litter_size }}
-                        <!-- Return litter size and species -->
-                        {% if pet_data[0].species == "Canine" %}
-                            puppies.
-                        {% elif pet_data[0].species == "Feline" %}
-                            kittens.
-                        {% endif %}
+            {% endif %}
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].species == "Feline" %}
+                {{ pet_data[0].name }} is currently pregnant.
+            {% endif %}
+            {% if pet_data[0].is_pregnant == "n" %}
+                {{ pet_data[0].name }} is not currently 
+            {% endif %}
+            {% if pet_data[0].is_nursing == "y" %}
+                <!-- If pet is a nursing female -->
+                pregnant, but she is actively nursing a litter of
+                {% if pet_data[0].litter_size != None and pet_data[0].litter_size != 1 %}
+                    {{ pet_data[0].litter_size }}
+                    <!-- Return litter size and species -->
+                    {% if pet_data[0].species == "Canine" %}
+                        puppies.
+                    {% elif pet_data[0].species == "Feline" %}
+                        kittens.
                     {% endif %}
-                {% elif pet_data[0].is_nursing == "n" %}
-                    and is not currently nursing a litter.
+                {% elif pet_data[0].litter_size == 1 %}
+                    {{ pet_data[0].litter_size }}
+                    <!-- Return litter size and species -->
+                    {% if pet_data[0].species == "Canine" %}
+                        puppy.
+                    {% elif pet_data[0].species == "Feline" %}
+                        kitten.
+                    {% endif %}
                 {% endif %}
+            {% elif pet_data[0].is_nursing == "n" %}
+                and is not currently nursing a litter.
             {% endif %}
 
             <!-- Give RER and DER information -->
@@ -135,27 +141,33 @@
             {{ der }} kcal per day. The following formula was used: 
         </div>
 
-        <!-- Return the formula used to calculate DER -->
-        <div class="final_formula">
-
-            {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
-                DER = {{ pet_data[0].name }}'s {{ notes }}
-                <br>
-                DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }})
-            {% else %}
-                DER = {{ pet_data[0].name }}'s RER x DER Modifier
-                <br>
-                DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
-                
-                <!-- Return any notes regarding life stage -->
-                {% if notes != None %}
-                    ({{ life_stage|trim }}, {{ notes }})
-                {% else %}
-                    ({{ life_stage|trim }})
-                {% endif %}
-            {% endif %}
         
-        </div>
+        
+        
+            <!-- Return the formula used to calculate DER -->
+            {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing == "y" %}
+                <div class="final_formula_nursing">
+                    DER = {{ pet_data[0].name }}'s {{ notes }}
+                    <br>
+                    DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }} kittens)
+                </div>
+            {% else %}
+                <div class="final_formula">
+                    DER = {{ pet_data[0].name }}'s RER x DER Modifier
+                    <br>
+                    DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+                        
+                    <!-- Return any notes regarding life stage -->
+                    {% if notes != None %}
+                        ({{ life_stage|trim }}, {{ notes }})
+                    {% else %}
+                        ({{ life_stage|trim }})
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        
+        
         <div class="food_and_exercise">
             <!-- Return amount to feed per day and per meal  --> 
             {{ pet_data[0].name }} should be getting around
@@ -166,126 +178,165 @@
             {% else %}
                 {{ pet_data[0].current_food_amt_rec }}.
             {% endif %}
-            It is recommended to provide fresh, clean water for {{ pet_data[0].name }} daily.
-            {% if pet_data[0].species == "Canine" %}
-                {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" 
-                and pet_data[0].activity_level != "Heavy Activity" and pet_data[0].is_pregnant != "y" %}
-                    <!-- If dog has activity level data, is not already getting moderate to heavy exercise,
-                    and is not pregnant --> 
-                    All pets can benefit from physical and mental excersize!
+            {% if pet_data[0].is_nursing == "n" %}
+                It is recommended to provide fresh, clean water for {{ pet_data[0].name }} daily.
+            {% elif pet_data[0].is_nursing == "y" %}
+                <!-- Water requirements increase significantly during nursing -->
+                {{ pet_data[0].name }}'s water requirement is drastically increased while 
+                she is nursing, so please be sure to provide an ample supply! 
+
+                {% if pet_data[0].current_food_form != "can" %}
+                    <!-- Recommend canned food diets for nursing mothers not already on them -->
+                    Additionally, it may be beneficial to place her on a canned or mixed canned/dry
+                    food diet while she is nursing. 
+                    <br>
+                    Please keep in mind canned foods are less 
+                    calorically dense (meaning they have less calories per unit) than dry foods,
+                    so {{ pet_data[0].name }} may need to eat more cans to hit her daily caloric
+                    requirements.
                 {% endif %}
+            {% endif %}
+            {% if pet_data[0].species == "Canine" %}
 
                 <!-- If dog is pregnant, provide gestation specific recommendations -->
                 {% if pet_data[0].is_pregnant == "y" %}
-                    
-                    {% if pet_data[0].weeks_gestating >= 6 %}
-                        <!-- If a dog is 6 weeks pregnant, recommend specifics 
-                        https://vcahospitals.com/know-your-pet/feeding-the-pregnant-dog
-                        https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7169170/-->
-                        
-                        <br>
-                        {{ pet_data[0].name }} is in the last trimester of pregnancy. During this time,
-                        it is expected to see {{ pet_data[0].name }}'s weight increase approximately 15-25%
-                        {% if pet_data[0].weeks_gestating == 6 %}
-                            <!-- If dog has been pregnant for 6 weeks, give a range estimate for weights at partuition -->
-                            (to around {{ pet_data[0].weight + (pet_data[0].weight * 0.15)|round }} - {{ pet_data[0].weight + (pet_data[0].weight * 0.25)|round }}
-                            {{ pet_data[0].units }}/
-                            {{ pet_data[0].converted_weight + (pet_data[0].converted_weight  * 0.15)|round }} -
-                            {{ pet_data[0].converted_weight +(pet_data[0].converted_weight  * 0.25)|round }} {{ pet_data[0].converted_weight_units }})
+                    <div class="reproduction_recs">
+                        {% if pet_data[0].weeks_gestating >= 6 %}
+                            <!-- If a dog is 6 weeks pregnant, recommend specifics 
+                            https://vcahospitals.com/know-your-pet/feeding-the-pregnant-dog
+                            https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7169170/-->
+                            
+                            {{ pet_data[0].name }} is in the last trimester of pregnancy. During this time,
+                            it is expected to see {{ pet_data[0].name }}'s weight increase approximately 15-25% from
+                            her weight at breeding
+                            {% if pet_data[0].weeks_gestating == 6 %}
+                                <!-- If dog has been pregnant for 6 weeks, give a range estimate for weights at partuition -->
+                                (to around {{ pet_data[0].weight + (pet_data[0].weight * 0.15)|round }} - {{ pet_data[0].weight + (pet_data[0].weight * 0.25)|round }}
+                                {{ pet_data[0].units }}/
+                                {{ pet_data[0].converted_weight + (pet_data[0].converted_weight  * 0.15)|round }} -
+                                {{ pet_data[0].converted_weight +(pet_data[0].converted_weight  * 0.25)|round }} {{ pet_data[0].converted_weight_units }})
+                            {% endif %}
+                            by the time of whelping. To ensure she gets adequate nutrition, it is recommended to feed
+                            a high-quality, highly digestible food formulated for puppy growth or lactation over several
+                            meals per day (or made freely available). 
+                            These kinds of diets are calorically dense, meaning
+                            {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her puppies' 
+                            dynamic needs. It is best to choose from a brand that meets the 
+                            <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                            title="View World Small Animal Veterinary Association Guidelines"
+                            class="fp_link">WSAVA guidelines</a>. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
+                            as these diets do not have the currect calcium to phosphorus ratio.
+                        {% else %}
+                            <!-- If a dog is less than 5 weeks pregnant, recommend specifics 
+                            https://www.akc.org/expert-advice/dog-breeding/the-care-and-feeding-of-the-breeding-bitch-part-two/-->
+                            At this stage in the puppies' fetal development, {{ pet_data[0].name }}'s nutrient 
+                            requirements are similar to what they were pre-breeding. However, it is recommended
+                            to feed {{ pet_data[0].name }} her daily rations over several small meals to encourage
+                            her appetite. It is crucial to monitor her weight and body condition score frequently 
+                            during this time, as her needs are dynamic. Please consult your veterinarian if 
+                            {{ pet_data[0].name }} loses weight during this time.
+                            {% if pet_data[0].weeks_gestating == 5 %}
+                                It is recommended to revisit this calculator in one week to recalculate 
+                                {{ pet_data[0].name }}'s feeding amounts for the third trimester.
+                            {% elif pet_data[0].weeks_gestating == 9 %}
+                                It is recommended to revisit this calculator in one week to recalculate 
+                                {{ pet_data[0].name }}'s feeding amounts after she whelps.
+                            {% endif %}
                         {% endif %}
-                        by the time of whelping. To ensure she gets adequate nutrition, it is recommended to feed
-                        a high-quality, highly digestible food formulated for puppy growth or lactation over several
-                        meals per day (or made freely available). These kinds of diets are calorically dense, meaning
-                        {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her puppies' 
-                        dynamic needs. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
-                        as these diets do not have the currect calcium to phosphorus ratio.
-                    {% else %}
-                        <!-- If a dog is less than 5 weeks pregnant, recommend specifics 
-                        https://www.akc.org/expert-advice/dog-breeding/the-care-and-feeding-of-the-breeding-bitch-part-two/-->
-                        <br>
-                        At this stage in the puppies' fetal development, {{ pet_data[0].name }}'s nutrient 
-                        requirements are similar to what they were pre-breeding. However, it is recommended
-                        to feed {{ pet_data[0].name }} her daily rations over several small meals to encourage
-                        her appetite. It is crucial to monitor her weight and body condition score frequently 
-                        during this time, as her needs are dynamic. Please consult your veterinarian if 
-                        {{ pet_data[0].name }} loses weight during this time.
-                        {% if pet_data[0].weeks_gestating == 5 %}
-                            It is recommended to revisit this calculator in one week to recalculate 
-                            {{ pet_data[0].name }}'s feeding amounts.
-                        {% endif %}
-                    {% endif %}
+                    </div>
                     
-                    <br>
+            
                     <!-- Supplement disclaimer -->
-                    It is not recommended to provide any supplemention for {{ pet_data[0].name }} without first discussing
-                    them with her veterinarian. Most diets that include an Association of American Feed Control Officials
-                    (AAFCO) statement that the diets are formualted for lactation/growth are complete and balanced, so
-                    further supplementation could make {{ pet_data[0].name }} prone to nutrient imbalances.
+                    <div class="supplements">
+                        It is not recommended to provide any supplements to {{ pet_data[0].name }} without first discussing
+                        them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
+                            title="American Feed Control Officials Homepage"
+                            class="fp_link">Association of 
+                            American Feed Control Officials (AAFCO)</a> statement that the diets are formualted for 
+                        lactation/growth are complete and balanced, so further supplementation could make 
+                        {{ pet_data[0].name }} prone to nutrient imbalances.
+                    </div>
                 {% endif %}
+
+                
+                {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" 
+                and pet_data[0].activity_level != "Heavy Activity" and pet_data[0].is_pregnant != "y" 
+                and pet_data[0].is_nursing != "y" %}
+                    <!-- If dog has activity level data, is not already getting moderate to heavy exercise,
+                    and is not pregnant or nursing --> 
+                    <div class="exercise">
+                        All pets can benefit from physical and mental excersize!
+                    </div>
+                    {% endif %}
+
                 <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
                 {% if pet_data[0].bcs > 6 %}
-                    If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
-                    puzzle feeders or using a mini-muffin tin to encourage {{ pet_data[0].name }} to
-                    eat more slowly.
-                
+                    <div class="exercise">
+                        If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
+                        puzzle feeders or using a mini-muffin tin to encourage {{ pet_data[0].name }} to
+                        eat more slowly.
+                    
 
-                    Feeding {{ pet_data[0].name }}
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }} 
-                    {% endif %} 
-                    daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                    may help promote weight loss. For further weight loss options, please discuss how to help 
-                    {{ pet_data[0].name }} loose weight with 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }} 
-                    {% endif %}
-                    veterinarian. 
-                    
-                    <br>
-                    <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
-                    Based off of 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }}
-                    {% endif %}
-                    current body condition score, it is not recommended to help {{ pet_data[0].name }} 
-                    lose weight by reducing 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }}
-                    {% endif %} 
-                    current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-                    is not on a food specifically formulated for animals to help lose weight. {{ pet_data[0].name }} 
-                    has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-                    percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
-                    to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
-                    
-                    <br>
-                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                    day from treats. This is 8% of
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }} 
-                    {% endif %} RER.
+                        Feeding {{ pet_data[0].name }}
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} 
+                        daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                        may help promote weight loss. For further weight loss options, please discuss how to help 
+                        {{ pet_data[0].name }} loose weight with 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %}
+                        veterinarian. 
+                        
+                        <br>
+                        <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+                        Based off of 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %}
+                        current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                        lose weight by reducing 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} 
+                        current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                        is not on a food specifically formulated for animals to help lose weight. {{ pet_data[0].name }} 
+                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                        percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                        to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                        
+                        <br>
+                    </div>
+                    <div class="treats">
+                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                        {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                        day from treats. This is 8% of
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} RER.
+                    </div>
                 {% else %}
-                    <br>
-                    
-                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                    {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                    day from treats. This is 10% of 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }} 
-                    {% endif %} RER.
+                    <div class="treats">
+                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                        {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                        day from treats. This is 10% of 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} RER.
+                    </div>
                 {% endif %}
 
                 <!-- TODO: import treat calculator results -->
@@ -318,7 +369,6 @@
                 <div class="reproduction_recs">
                     {% if pet_data[0].is_nursing == "y" %}
                         <!-- If pet is a nursing feline, provide feeding guidelines -->
-
                         In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
                         should be fed a highly digestible, high quality kitten formula from a brand 
                         that meets the 
@@ -329,30 +379,47 @@
                         {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
                             <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
                             It is recommended to feed {{ pet_data[0].name }} several 
-                            times a day.
+                            times a day. It is not recommended to provide free-choice feeding
+                            for {{ pet_data[0].name }}, as it allows her to make more milk than
+                            she needs.
+
                         {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
                             <!-- If within the first 3-4 weeks of nursing -->
                             It is recommended to feed {{ pet_data[0].name }} several 
                             times a day or provide food freely for the first 3 to 4 
                             weeks after giving birth.
                         {% endif %}
+
+                        Kitten food and diets formulated for nursing are calorically dense, meaning
+                        {{ pet_data[0].name }} will be able to eat less to feel satiated and to support 
+                        her kittens' dynamic needs. 
                     {% elif pet_data[0].is_pregnant == "y" %}
                         <!-- If pet is a pregnant cat, provide recommendations -->
-
+                        
                         In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
-                        should be fed a highly digestible, high quality kitten formula from a brand that meets the 
+                        should be fed a highly digestible, high quality kitten food from a brand that meets the 
                         <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
                         title="View World Small Animal Veterinary Association Guidelines"
-                        class="fp_link">WSAVA guidelines</a>. To encourage adequate food intake, it is recommended to
-                        feed {{ pet_data[0].name }} several small meals per day.
+                        class="fp_link">WSAVA guidelines</a>. These kinds of diets are calorically dense, 
+                        meaning {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her 
+                        kittens' dynamic needs. To encourage adequate food intake, it is recommended to
+                        feed {{ pet_data[0].name }} several small meals per day. {{ pet_data[0].name }}'s 
+                        feeding amounts should be recalculated after the kittens are born.
+
+                        It is not recommended to provide any supplements to {{ pet_data[0].name }} without 
+                        first discussing them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
+                        title="American Feed Control Officials Homepage"
+                        class="fp_link">Association of American Feed Control Officials (AAFCO)</a> statement 
+                        that the diets are formualted for lactation/growth are complete and balanced, so 
+                        further supplementation could make {{ pet_data[0].name }} prone to nutrient imbalances. 
                     {% endif %}
                 </div>
-                <div class="exercise_and_treats">
-                    <!-- Recommend enrichment and exercise resources for all cats -->  
-                    All pets can benefit from physical and mental excersize! Enticing your cat
-                    to play with a lazer pointer (if there are no dogs in the house), a flirt pole, or 
-                    with puzzle feeders can help encourage exercise. 
-                    <span style="white-space: nowrap; display: inline;">If possible, consider moving your cat's food dish 
+                <div class="exercise">
+                    {% if pet_data[0].is_pregnant == "n" and pet_data[0].is_nursing == "n" %}
+                        <!-- Recommend enrichment and exercise resources for all cats -->  
+                        All pets can benefit from physical and mental excersize! Enticing your cat
+                        to play with a lazer pointer (if there are no dogs in the house), a flirt pole, or 
+                        with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
                         occasionally to cater to 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
@@ -360,8 +427,7 @@
                             {{ object_pronoun }} 
                         {% endif %}
                         foraging instincts. 
-                    </span>
-
+                    {% endif %}
                     
                     <!-- If cat is overweight or obese, provide additional exercise technique recs -->
                     {% if pet_data[0].bcs > 6 %}
@@ -405,10 +471,14 @@
                         has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
                         percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
                         to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
-                        
-                        <br>
-                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    {% endif %}
+                </div>       
+                <div class="treats">
+                    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y"
+                    or pet_data[0].is_nursing == "y" %}
+                        <!-- recommend treat amounts for obese animals and pediatric animals,
+                             |round|int suggested by CoPilot -->
+                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                         day from treats. This is 8% of
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
@@ -417,8 +487,8 @@
                         {% endif %} RER.
                     {% else %}
                         <br>
-                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} can get up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                        <!-- recommend treat amounts for everyone else, |round|int suggested by CoPilot -->
+                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                         day from treats. This is 10% of 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
@@ -427,8 +497,9 @@
                         {% endif %} RER.
 
                         <!-- TODO: import treat calculator results -->
+                    {% endif %}
                 </div>
-                {% endif %}
+                
 
                 <div class="card" id="final_report">
                     <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
@@ -466,7 +537,24 @@
             <button type="button" class="btn btn-secondary btn-lg">Print This Report</button>
             <button type="button" class="btn btn-secondary btn-lg">Email This Report</button>
         </div>
+        <button class="scroll_to_top">
+            <i class="up"></i>
+        </button>
     </div>
+
 </div>
 
 {% endblock %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const btn = document.getElementById("scroll_to_top");
+
+        btn.addEventListener("click", () => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        });
+    });
+</script>

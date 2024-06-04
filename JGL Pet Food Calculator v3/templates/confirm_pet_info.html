@@ -126,9 +126,9 @@
                     {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
                         {{ pet_data[0].age_in_years }} years old
                     {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 1 %}
-                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} month old
+                        {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} month old
                     {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
-                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+                        {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} months old
 
                     {% endif %}
 
@@ -308,9 +308,17 @@
                     <td>
                         {{ pet_data[0].litter_size }} 
                         {% if pet_data[0].species == "Canine" %}
-                            puppies
+                            {% if pet_data[0].litter_size == 1 %}
+                                puppy
+                            {% elif pet_data[0].litter_size != 1%}
+                                puppies
+                            {% endif %}
                         {% elif pet_data[0].species == "Feline" %}
-                            kittens
+                            {% if pet_data[0].litter_size == 1 %}
+                                kitten
+                            {% elif pet_data[0].litter_size != 1%}
+                                kittens
+                            {% endif %}
                         {% endif %}
 
                         {% if user_id %}
