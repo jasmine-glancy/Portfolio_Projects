@@ -12,8 +12,8 @@ def login_check_for_species():
     
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
+        print(f"Species check User ID: {session["user_id"]}")
+        print(f"Species check Name: {session["pet_name"]}")
         
         
         species_result = db.execute(
@@ -43,9 +43,7 @@ def der_factor():
     """Finds the latest der_factor set, if applicable"""
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
-        
+
         
         pet_info = db.execute(
             "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
@@ -77,8 +75,8 @@ def check_if_pregnant():
     """Checks if the pet is pregnant"""
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
+        print(f"Pregnancy check, User ID: {session["user_id"]}")
+        print(f"Pregnancy check, Name: {session["pet_name"]}")
         
         
         pregnancy_result = db.execute(
@@ -106,8 +104,8 @@ def check_if_nursing():
     """Checks if the pet is pregnant"""
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
+        print(f"Nursing check, User ID: {session["user_id"]}")
+        print(f"Nursing check, Name: {session["pet_name"]}")
         
         
         nursing_result = db.execute(
@@ -136,8 +134,8 @@ def check_litter_size():
     """Checks if the pet is pregnant"""
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
+        print(f"Litter size check, User ID: {session["user_id"]}")
+        print(f"Litter size check, Name: {session["pet_name"]}")
         
         
         litter_result = db.execute(
@@ -165,8 +163,8 @@ def find_repro_status():
     """Returns the reproductive status of the pet"""
     if "user_id" in session and session["user_id"] != None:
         # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
+        print(f"Check sex, User ID: {session["user_id"]}")
+        print(f"Check sex, Name: {session["pet_name"]}")
         
         
         species_result = db.execute(
@@ -217,14 +215,7 @@ def calculcate_rer():
         
     print(weight, units)
         
-    rer = 0
-    # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
-    if weight >= 2 and weight < 45:
-        rer = round((30 * weight) + 70, 2)
-            
-    # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-    if weight < 2 or weight >= 45:
-        rer = round(70 * weight**0.75, 2)
+    rer = round(70 * weight**0.75, 2)
             
     print(rer) 
     session["rer"] = rer
@@ -262,6 +253,62 @@ def find_breed_id():
     
     # Return whatever breed ID variable ends up being found 
     return breed_id 
+
+
+def calculcate_der():
+    """Calculates daily caloric needs based on life stage"""
+    
+    # Check species and nursing status
+    species = login_check_for_species()
+    is_nursing = check_if_nursing()
+    litter_size = check_litter_size()
+    
+    # find pet's RER
+    # If user is logged in, use SQL query
+    if session["user_id"] != None:
+        try:
+            print(session["pet_name"])
+            print(session["user_id"])
+                
+            pet_data = db.execute(
+                "SELECT rer FROM pets WHERE owner_id = :user_id AND name = :pet_name",
+                user_id=session["user_id"], pet_name=session["pet_name"]
+            )       
+            
+            print(pet_data)
+            
+            if pet_data:  
+                rer = pet_data[0]["rer"]
+        except Exception as e:
+            flash(f"Unable to find pet data for RER calculation, Exception: {e}")    
+    else:
+        # If a user isn't logged in, grab session variables
+        rer = float(session["rer"])        
+        
+    # Use DER factor id to lookup DER information by species
+    der_modifier_start_range = find_der_low_end()
+    der_modifier_end_range = find_der_high_end()
+
+    # Start with the mid range if this is the first report
+    # TODO: check report date and change modifier choice based on weight changes
+    der_modifier = find_der_mid_range()
+
+    # Calculate DER based on the der modifier and pass variables to tempate
+    if species == "Feline" and is_nursing == "y":
+        der = round((rer + der_modifier * litter_size), 2)
+    else:
+        der = round(rer * der_modifier, 2)
+    print(f"DER: {der}")
+    
+    der_low_end = rer * der_modifier_start_range
+    der_high_end = rer * der_modifier_end_range
+    der_low_end, der_high_end = "{:.2f}".format(der_low_end), "{:.2f}".format(der_high_end)
+    
+    
+    return {"DER": der, 
+            "DER_low_end": der_low_end, 
+            "DER_high_end": der_high_end,
+            "DER_modifier": der_modifier}
 
 def convert_decimal_to_volumetric(partial_amount):
     """Convert partial volume amount from decimal to cups"""

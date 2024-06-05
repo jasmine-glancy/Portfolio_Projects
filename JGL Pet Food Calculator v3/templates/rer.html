@@ -33,29 +33,19 @@
                 {{ object_pronoun }} 
             {% endif %} 
             metabolic processes. {{ name }} weighs {{ weight }} 
-            {{ units }} ({{ converted_weight }} {{ converted_weight_units }}) and weighs
-            {% if rer_formula_med_to_lrg == True %}
-                between 2 and 45 kg (4.4 and 99 lbs), so the following 
-                formula was used:
-                <div class="formula">
-                    RER = 30 x (body weight in kilograms) + 70
-                </div>
-            {% elif rer_formula_sm == True %}
-                under 2 kg (4.4 lbs), so the following formula was used:
+            {{ units }} ({{ converted_weight }} {{ converted_weight_units }}).
+            The following formula was used:
                 <div class="formula">
                     RER = 70 x (body weight in kilograms)<sup>0.75</sup>
                 </div>
-            {% elif rer_formula_x_large == True %}
-                over 45 kg (99 lbs), so the following formula was used:
-                <div class="formula">
-                    RER = 70 x (body weight in kilograms)<sup>0.75</sup>
-                </div>
-            {% endif %}
             Calculating the Resting Energy Rate is a recognized, reliable first step 
             to find how many calories a pet should eat per day. However, every pet is
             an individual. While this formula works well for 50% of pets, 25% may require 
-            more food, while 25% require less food. Therefore, on the next page the Pet 
-            Food Calculator will calculate a range of calories per day for {{ name }}. 
+            more food, while 25% require less food. 
+            {% if der_low_end != der_high_end %}
+                Therefore, on the next page the Pet Food Calculator will calculate a 
+                range of calories per day for {{ name }}. 
+            {% endif %}
             
         </p>
     </div>

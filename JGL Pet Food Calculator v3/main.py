@@ -8,7 +8,7 @@ from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
 from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
     find_breed_id, find_pet_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
         check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list, find_der_low_end, find_der_high_end, \
-            find_der_mid_range
+            find_der_mid_range, calculcate_der
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -289,6 +289,26 @@ def pet_info_continued():
             flash("Please enter 0 or a number greater than zero.")
             return redirect(url_for('pet_info_continued'))    
         else:
+            print(pet_age_years, pet_age_months)
+            if pet_age_months > 12:
+                # If more than 12 months is input, add number to years
+                
+                pet_age_years += pet_age_months / 12
+                
+                # Get the integer part of pet_age_years
+                pet_age_years_int = int(pet_age_years)  
+                
+                # Get the decimal part of pet_age_years
+                pet_age_years_decimal = pet_age_years - pet_age_years_int  
+
+                # Convert the decimal part of pet_age_years back to months
+                pet_age_months = round(pet_age_years_decimal * 12)
+
+                # Update pet_age_years to only include the integer part
+                pet_age_years = pet_age_years_int
+                
+            print(pet_age_years, pet_age_months)
+                
             # Create new session variables
             session["pet_sex"] = pet_sex
             session["pet_age_years"] = pet_age_years
@@ -907,12 +927,12 @@ def pet_condition():
                 if bcs <= 4:
                     # Change DER factor id to weight gain 
                     der_factor_id = 24
-                elif bcs > 5 and bcs <= 6:
-                    # Change DER factor id to obese prone 
-                    der_factor_id = 3
-                elif bcs > 7:
+                elif bcs == 6:
                     # Change DER factor to weight loss
                     der_factor_id = 4 
+                elif bcs > 7:
+                    # Change DER factor to obese prone
+                    der_factor_id = 3
                 
         
             # Check if pet breed is predisposed to obesity
@@ -956,12 +976,12 @@ def pet_condition():
                 if bcs <= 4:
                     # Change DER factor id to weight gain 
                     der_factor_id = 16
-                elif bcs > 5 and bcs <= 6:
-                    # Change DER factor id to obese prone 
-                    der_factor_id = 3
-                elif bcs > 7:
+                elif bcs == 6:
                     # Change DER factor to weight loss
                     der_factor_id = 6 
+                elif bcs > 7:
+                    # Change DER factor id to obese prone 
+                    der_factor_id = 3
                 
             # Check if pet breed is predisposed to obesity
             obese_prone_breed = check_obesity_risk()
@@ -1228,6 +1248,9 @@ def rer():
     sex = find_repro_status()
     rer = calculcate_rer()
     
+    # Use DER factor id to lookup DER information by species
+    der_modifier_start_range = find_der_low_end()
+    der_modifier_end_range = find_der_high_end()
     
     object_pronoun = ""
     possessive_pronoun = ""
@@ -1273,32 +1296,6 @@ def rer():
         converted_weight = session["converted_weight"]
         converted_weight_units = session["converted_weight_units"]
     
-    print(f"weight: {weight} units: {units}")
-    
-    rer_formula_med_to_lrg = False
-    rer_formula_sm = False
-    rer_formula_x_large = False
-    if units == "lbs":
-        
-        # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
-        if converted_weight >= 2 and converted_weight < 45:
-            rer_formula_med_to_lrg = True
-        # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-        elif converted_weight < 2:
-            rer_formula_sm = True
-        elif converted_weight >= 45:
-            rer_formula_x_large = True
-            
-    elif units == "kgs":
-        
-        # If pet weighs more than 2kg and less than 45kg, use 30 × (BW kg) + 70 = RER
-        if weight >= 2 and weight < 45:
-            rer_formula_med_to_lrg = True
-        # If pet weighs less than 2kg or more than 45kg, use 70 × (BW kg)^0.75 = RER
-        elif weight < 2:
-            rer_formula_sm = True
-        elif weight >= 45:
-            rer_formula_x_large = True
     
     print(f"weight: {weight} units: {units}")
     print(f"RER: {rer}")
@@ -1335,6 +1332,10 @@ def rer():
         except Exception as e:
             flash(f"Unable to update data, Exception: {e}")
     
+    der_low_end = float(calculcate_der()["DER_low_end"])
+    der_high_end = float(calculcate_der()["DER_high_end"])
+    
+    print (f"Low end: {der_low_end} type: {type(der_low_end)} High end: {der_high_end} type: {type(der_high_end)} ")
     if request.method == "POST":    
         return redirect(url_for('der'))
     
@@ -1347,10 +1348,11 @@ def rer():
                            converted_weight=converted_weight,
                            units=units,
                            sex=sex,
+                           der_low_end=der_low_end,
+                           der_high_end=der_high_end,
                            converted_weight_units=converted_weight_units,
-                           rer_formula_med_to_lrg=rer_formula_med_to_lrg,
-                           rer_formula_sm=rer_formula_sm,
-                           rer_formula_x_large=rer_formula_x_large)
+                           start_range=der_modifier_start_range,
+                           end_range=der_modifier_end_range)
     
     
 @app.route("/der", methods=["GET", "POST"])
@@ -1361,8 +1363,10 @@ def der():
     object_pronoun = session["object_pronoun"]
     possessive_pronoun = session["possessive_pronoun"]
 
-    # Use helpers.py to verify species and check der_factor
+    print(possessive_pronoun, object_pronoun)
+    # Use helpers.py to verify species and check repro status
     species = login_check_for_species()
+    sex = find_repro_status()
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
@@ -1398,6 +1402,7 @@ def der():
             return render_template("der.html",
                             rer=rer,
                            name=name,
+                           sex=sex,
                            object_pronoun=object_pronoun,
                            possessive_pronoun=possessive_pronoun)
     else:
@@ -1410,7 +1415,7 @@ def der():
         litter_size = session["litter_size"]
         weeks_nursing = session["duration_of_nursing"]
         
-        print(name, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
+        print(name, sex, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
                 
     # Use login check from helpers.py to verify DER factor ID and food form
     current_food_form = find_food_form()
@@ -1419,26 +1424,14 @@ def der():
     print(der_factor_id)
     print(rer, der_factor_id, meals_per_day, current_food_kcal, current_food_form)
     
-    # Use DER factor id to lookup DER information by species
-    der_modifier_start_range = find_der_low_end()
-    der_modifier_end_range = find_der_high_end()
 
-    # Start with the mid range if this is the first report
-    # TODO: check report date and change modifier choice based on weight changes
-    der_modifier = find_der_mid_range()
 
-    # Calculate DER based on the der modifier and pass variables to tempate
-    if species == "Feline" and is_nursing == "y":
-        der = round((rer + der_modifier * litter_size), 2)
-    else:
-        der = round(rer * der_modifier, 2)
-    print(der)
-    
-    der_low_end = rer * der_modifier_start_range
-    der_high_end = rer * der_modifier_end_range
-    der_low_end, der_high_end = "{:.2f}".format(der_low_end), "{:.2f}".format(der_high_end)
-    
+    der = calculcate_der()["DER"]
+    der_low_end = calculcate_der()["DER_low_end"]
+    der_high_end = calculcate_der()["DER_high_end"]
+    der_modifier = calculcate_der()["DER_modifier"]
 
+    print(f"Low End: {der_low_end} High {der_high_end}")
     # Calculate the required calories per day
     total_calorie_amount_per_day = round(der / current_food_kcal, 2)
     
@@ -1608,6 +1601,7 @@ def der():
                            rer=rer,
                            der=der,
                            name=name,
+                           sex=sex,
                            meals_per_day=meals_per_day,
                            object_pronoun=object_pronoun,
                            possessive_pronoun=possessive_pronoun,
@@ -1651,6 +1645,7 @@ def completed_report():
     breed_id = find_breed_id()
     print(breed_id)
     
+    # Find life stage, notes, and SVGs
     if pet_data[0]["species"] == "Canine":
         life_stage_search = db.execute(
             "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
@@ -1690,14 +1685,20 @@ def completed_report():
         notes = life_stage_search[0]["notes"]
         
 
-        
     if pet_data[0]["meals_per_day"]:
         meals_per_day = pet_data[0]["meals_per_day"]
+    
+    
+    # Find DER range   
+    der_low_end = float(calculcate_der()["DER_low_end"])
+    der_high_end = float(calculcate_der()["DER_high_end"])
     
     return render_template("complete_report.html",
                            pet_data=pet_data,
                            rer=rer,
                            der=der,
+                           der_low_end=der_low_end,
+                           der_high_end=der_high_end,
                            svg=svg,
                            meals_per_day=meals_per_day,
                            life_stage=life_stage,

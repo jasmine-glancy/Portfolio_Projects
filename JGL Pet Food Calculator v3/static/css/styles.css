@@ -48,6 +48,11 @@ h1 {
         margin-right: auto;
         text-align: center;
     }
+    
+    h4 {
+        display: inline-block;
+        justify-content: flex-end;
+    }
 
 .login {
     margin: 2px;
@@ -177,13 +182,15 @@ a:hover {
 }
 
     .data {
+        display: flex;
+        flex-direction: column;
         position: absolute;
         top: 275px;
         width: 85%;
         margin-left: 60px;
         margin-top: 0;
         margin-bottom: -25px;
-        min-height: fit-content;
+        max-height: fit-content;
     }
 
 /* Navigation bar */
@@ -294,6 +301,7 @@ a:hover {
         right: 0;
         margin-left: auto;
         margin-right: auto;
+        min-height: fit-content;
     }
 
     .final_formula_nursing {
@@ -304,6 +312,17 @@ a:hover {
         right: 0;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    .final_formula_fel {
+        position: absolute;
+        text-align: center;
+        top: 395px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding-bottom: 50px;
     }
 
 /* Exercise and feeding alignment */
@@ -318,9 +337,12 @@ a:hover {
     margin-right: 30px;
     flex-wrap: wrap;
     min-height: fit-content;
-
+    margin-top: 50px;
 }
 
+.feeding {
+    padding-top: 75px;
+}
 
 .report_wrapper {
     display: flex;
@@ -330,6 +352,7 @@ a:hover {
     justify-content: space-between;
     align-items: flex-start;
     margin-top: 100px;
+    max-height: fit-content;
 }
 
 .report_title {
@@ -380,14 +403,14 @@ a:hover {
         margin-left: 20px;
     }
 
+
 /* Puzzle feeder images */
-#final_report {
+#final_report, #final_report_cat {
     display: flex;
     position: absolute;
     flex-grow: 1;
-    margin: auto;
     margin-right: 46vw;
-    top: 0px;
+    margin-top: 0px;
     width: 250px;
     height: fit-content;
     border: 2px solid var(--deep_blue_green);
@@ -397,6 +420,7 @@ a:hover {
     color: var(--deep_blue_green);
     margin-bottom: 150px;
 }
+
 
 #fr {
     width: 220px;  
@@ -418,20 +442,14 @@ a:hover {
  }
 
 
-.reproduction_recs {
-    top: 10px;
-    position: relative;
+.reproduction_recs, .supplements {
+    margin-top: 10px;
     margin: 0; 
     padding: 0; 
     margin-bottom: 10px;
 }
 
-    .supplements {
-        position: relative;
-    }
-
 .fp_link {
-    
     position: relative;
     display: inline;
 }
@@ -439,16 +457,33 @@ a:hover {
 .exercise {
     align-self: stretch; 
     position: relative;
-    top: 5px;
+    margin-top: 10px;
+    margin-bottom: 15px;
     margin: 0;
     padding: 0;
 }
 
+    .feline_exercise {
+        position: relative;
+        margin: 10px;
+        padding: 10px;
+    }
+
+    /* Feline obesity disclaimer formatting */
+    p {
+        margin-top: 15px;
+        position: relative;
+    }
+
 .treats {
     align-self: stretch; 
     position: relative;
-    top: 5px;
+    margin-top: 5px;
     padding: 0;
+}
+
+.feline_recs {
+    margin-top: 0;
 }
 
 /* Scroll to Top button suggested by 
@@ -480,4 +515,14 @@ Lukas Web Development (https://www.youtube.com/watch?v=QwE_M2P3CRk) */
     transform: rotate(135deg);
     margin-bottom: -0.5em;
     pointer-events: none;
+}
+
+.obesity_trivia, .obesity_trivia.h3 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: baseline; 
+    margin-top: -15px;
+    padding-left: 45px;
+    padding-right: 45px;
 }
