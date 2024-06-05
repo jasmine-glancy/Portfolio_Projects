@@ -296,7 +296,7 @@ a:hover {
     .final_formula {
         position: absolute;
         text-align: center;
-        top: 410px;
+        top: 400px;
         left: 0;
         right: 0;
         margin-left: auto;
@@ -339,6 +339,11 @@ a:hover {
     min-height: fit-content;
     margin-top: 50px;
 }
+
+    .reduction {
+        width: 90%;
+        margin-left: 60px;
+    }
 
 .feeding {
     padding-top: 75px;
@@ -406,9 +411,8 @@ a:hover {
 
 /* Puzzle feeder images */
 #final_report, #final_report_cat {
-    display: flex;
+    display: inline;
     position: absolute;
-    flex-grow: 1;
     margin-right: 46vw;
     margin-top: 0px;
     width: 250px;
@@ -416,7 +420,6 @@ a:hover {
     border: 2px solid var(--deep_blue_green);
     font-size: 15px;
     overflow: auto;
-    flex-wrap: wrap;
     color: var(--deep_blue_green);
     margin-bottom: 150px;
 }
@@ -475,12 +478,15 @@ a:hover {
         position: relative;
     }
 
-.treats {
+.treats, .wider_treats{
     align-self: stretch; 
     position: relative;
     margin-top: 5px;
     padding: 0;
 }
+    .treats {
+        margin-left: 60px;
+    }
 
 .feline_recs {
     margin-top: 0;
@@ -522,7 +528,7 @@ Lukas Web Development (https://www.youtube.com/watch?v=QwE_M2P3CRk) */
     flex-direction: column;
     justify-content: flex-end;
     align-items: baseline; 
-    margin-top: -15px;
-    padding-left: 45px;
+    margin-top: 15px;
+    padding-left: 60px;
     padding-right: 45px;
 }

@@ -1693,6 +1693,9 @@ def completed_report():
     der_low_end = float(calculcate_der()["DER_low_end"])
     der_high_end = float(calculcate_der()["DER_high_end"])
     
+    # Convert to int for easier reading
+    der_low_end, der_high_end = int(der_low_end), int(der_high_end)
+    
     return render_template("complete_report.html",
                            pet_data=pet_data,
                            rer=rer,

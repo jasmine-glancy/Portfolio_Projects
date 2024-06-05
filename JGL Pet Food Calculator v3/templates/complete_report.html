@@ -298,23 +298,23 @@
                 
 
                 
-                {% if pet_data[0].activity_level != None and pet_data[0].activity_level != "Moderate Activity" 
-                and pet_data[0].activity_level != "Heavy Activity" and pet_data[0].is_pregnant != "y" 
-                and pet_data[0].is_nursing != "y" %}
-                    <!-- If dog has activity level data, is not already getting moderate to heavy exercise,
-                    and is not pregnant or nursing --> 
+                {% if pet_data[0].activity_level != "Moderate Activity" and pet_data[0].activity_level != "Heavy Activity" 
+                and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
+                    <!-- If dog is not already getting moderate to heavy exercise, and is not pregnant or nursing --> 
                     <div class="exercise">
                         All pets can benefit from physical and mental excersize! Similar to cats, dogs can 
                         find enjoyment in a flirt pole (a dog toy attached to a string). It is not recommended
                         to play with dogs with a laser pointer, as it can lead to anxiety and obsessive behaviors.
                         Alternatively, if your house has stairs, you can encourage {{ pet_data[0].name }} to 
-                        go up and down them for exercise by moving where you feed {{ object_pronoun }}.
+                        go up and down them for exercise by moving where you feed {{ object_pronoun }}. 
+                        
                     </div>
+                    <br>
                     {% endif %}
 
                 <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
-                {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y"
-                or pet_data[0].is_nursing == "y" %}
+                {% if pet_data[0].bcs > 6 and pet_data[0].is_pediatric != "y" or pet_data[0].is_pregnant != "y"
+                or pet_data[0].is_nursing != "y" %}
                     <div class="exercise">
                         {% if pet_data[0].bcs > 6 %}
                                 If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
@@ -329,8 +329,14 @@
                                     {{ object_pronoun }} 
                                 {% endif %} 
                                 daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                                may help promote weight loss. For further weight loss options, please discuss how to help 
-                                {{ pet_data[0].name }} loose weight with 
+                                may help promote weight loss. If you are unable to provide more frequently than two meals a 
+                                day, you can consider a few options. First, you can offer food before you leave the house in 
+                                the morning, then again as soon as you get home in the evening, and then right before bed. Or 
+                                you may consider using a 
+                                <a href="https://www.google.com/search?client=firefox-b-1-d&sca_esv=71b2db2a9157258c&sca_upv=1&sxsrf=ADLYWII6E84-I1JPxopgLG-pz_SEAOVW7g:1717592995262&q=timed+cat+and+dog+feeder&tbm=shop&source=lnms&prmd=sivnmbtz&ved=1t:200715&ictx=111&biw=1920&bih=955&dpr=1"
+                                title="Google shopping for automatic pet feeders">
+                                    timed/automatic feeder</a> for {{ pet_data[0].name }}. For further weight loss options, please discuss how to help 
+                                {{ pet_data[0].name }} lose weight with 
                                 {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                                     {{ possessive_pronoun }} 
                                 {% else %}
@@ -338,62 +344,19 @@
                                 {% endif %}
                                 veterinarian. 
                             </p>
-                            
-                            <p>
-                                <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
-                                Based off of 
-                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                    {{ possessive_pronoun }} 
-                                {% else %}
-                                    {{ object_pronoun }}
-                                {% endif %}
-                                current body condition score, it is not recommended to help {{ pet_data[0].name }} 
-                                lose weight by reducing 
-                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                    {{ possessive_pronoun }} 
-                                {% else %}
-                                    {{ object_pronoun }}
-                                {% endif %} 
-                                current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-                                is not on a food specifically formulated for dogs to help with weight loss. {{ pet_data[0].name }} 
-                                has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-                                percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
-                                to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
-                            </p>
+                        
                         {% endif %}
-                    </div>
-                    <div class="treats">
-                        {% if pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y"
-                        or pet_data[0].is_nursing == "y" %}
-                            <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                            {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                            day from treats. This is 8% of
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                {{ possessive_pronoun }} 
-                            {% else %}
-                                {{ object_pronoun }} 
-                            {% endif %} RER.
-                        {% endif %}
-                    </div>
-                {% else %}
-                    <div class="treats">
-                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                        day from treats. This is 10% of 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} RER.
                     </div>
                 {% endif %}
 
+                
                 <!-- TODO: import treat calculator results -->
 
                 <div class="card" id="final_report">
                     <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
-                    alt="three puzzle feeders for cats that are shaped like mice."
-                    id="fr">
+                    alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
+                    id="fr"
+                    align="left">
                     <div class="card-body">
                       <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
                       <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
@@ -403,10 +366,14 @@
                       </p>
                     </div>
                     <div class="card-body-fr">
-                      <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" class="card-link">
+                      <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
+                      class="card-link"
+                      title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
                         Find this puzzle feeder on Chewy
                       </a>
-                      <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" class="card-link">
+                      <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
+                      class="card-link"
+                      title="Chewy search for dog puzzle toys">
                         More puzzle toys for dogs on Chewy
                       </a>
                     </div>
@@ -492,8 +459,12 @@
                             {{ object_pronoun }} 
                         {% endif %} 
                         daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                        may help promote weight loss. For further weight loss options, please discuss how to help 
-                        {{ pet_data[0].name }} loose weight with 
+                        may help promote weight loss. If you are unable to provide more frequently than two meals a 
+                        day, you can consider a few options. First, you can offer food before you leave the house in 
+                        the morning, then again as soon as you get home in the evening, and then right before bed. Or 
+                        you may consider using a timed/automatic feeder for {{ pet_data[0].name }}. For further weight 
+                        loss options, please discuss how to help 
+                        {{ pet_data[0].name }} lose weight with 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
                         {% else %}
@@ -564,10 +535,14 @@
                     </p>
                     </div>
                     <div class="card-body-fr">
-                    <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" class="card-link">
+                    <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" 
+                    class="card-link"
+                    title="Doc & Phoebe puzzle feeder mice for cats on Chewy.com">
                         Find this puzzle feeder on Chewy
                     </a>
-                    <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" class="card-link">
+                    <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" 
+                    class="card-link"
+                    title="Chewy search for more puzzle toys for cats">
                         More puzzle toys for cats on Chewy
                     </a>
                     </div>
@@ -575,6 +550,59 @@
                 
             {% endif %}
         </div>
+        {% if pet_data[0].bcs > 6%}
+        <div class="reduction">
+            <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+            Based off of 
+            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }}
+            {% endif %}
+            current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+            lose weight by reducing 
+            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }}
+            {% endif %} 
+            current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+            is not on a food specifically formulated for dogs to help with weight loss. {{ pet_data[0].name }} 
+            has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+            percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+            to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+        </div>
+    {% endif %}
+
+    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or 
+    pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
+        {% if pet_data[0].bcs > 6 %}
+            <div class="wider_treats">
+        {% else %}
+            <div class="treats">  
+                <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                day from treats. This is 8% of
+                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {{ possessive_pronoun }} 
+                {% else %}
+                    {{ object_pronoun }} 
+                {% endif %} RER.
+            </div>
+        {% endif %}
+    {% else %}     
+        <div class="treats">               
+            <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+            {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+            day from treats. This is 10% of 
+            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }} 
+            {% endif %} RER.
+        </div>
+    {% endif %}
+
         {% if pet_data[0].bcs > 6 %}
             <div class="obesity_trivia">
                 <h4>Did you know?</h4> Former U.S. President George Bush Sr.'s dog Ranger struggled 
