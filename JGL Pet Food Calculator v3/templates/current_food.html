@@ -20,7 +20,7 @@
     {% endwith %}
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('current_food') }}" method="POST">
+    <form action="{{ url_for('current_food', pet_id=pet_id) }}" method="POST">
         <div class="row">
             <div class="col" title="Current Food Calories">
                 {{ current_food.current_food_kcal.label }}
@@ -63,7 +63,7 @@
         </div>
 
         <div class="button-container">
-            <a href="{{ url_for('confirm_data') }}">
+            <a href="{{ url_for('confirm_data', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 3: Confirm Pet Info</button>
             </a>
 

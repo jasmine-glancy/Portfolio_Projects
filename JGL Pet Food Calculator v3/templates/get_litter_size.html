@@ -15,7 +15,7 @@
     </div>
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('litter_size') }}" method="POST">
+    <form action="{{ url_for('litter_size', pet_id=pet_id) }}" method="POST">
         <div class="row">
             <div class="col" id="nursing_questions" title="Pet's Litter Size">
                 {{ repro.litter_size.label }}
@@ -26,7 +26,7 @@
         </div>
 
         <div class="button-container">
-            <a href="{{ url_for('repro_status') }}">
+            <a href="{{ url_for('repro_status', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 1.25: Pet Information: Pregnancy Status</button>
             </a>
 

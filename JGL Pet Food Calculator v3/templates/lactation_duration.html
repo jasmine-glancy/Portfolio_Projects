@@ -22,7 +22,7 @@
     {% endwith %}
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('lactation_duration') }}" method="POST">
+    <form action="{{ url_for('lactation_duration', pet_id=pet_id) }}" method="POST">
         <div class="row">
             <div class="col" id="weeks_lactating" title="Time Spent Nursing">
                 {{ repro.weeks_nursing.label }}
@@ -33,7 +33,7 @@
         </div>
 
         <div class="button-container">
-            <a href="{{ url_for('repro_status') }}">
+            <a href="{{ url_for('repro_status', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 1.25: Pet Information: Pregnancy Status</button>
             </a>
 

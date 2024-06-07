@@ -9,7 +9,7 @@ from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
 from find_info import FindInfo, \
     find_repro_status, check_if_pregnant, check_litter_size, check_if_pediatric, \
         check_if_nursing, check_obesity_risk, find_food_form, \
-            der_factor, find_der_low_end, find_der_high_end, find_der_mid_range
+            der_factor
 from helpers import clear_variable_list
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -163,8 +163,13 @@ def logout():
 def pet_info():
     """Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species"""
     
+    id = None
     try:
-        pet_id = request.args.get("id")
+        pet_id = request.args.get("pet_id")
+        if pet_id == None:
+            # If no argument was passed, try grabbing session variable
+            id = session["pet_id"]
+        
         fi = FindInfo(session["user_id"], pet_id) 
         print(f"pet ID: {pet_id}")
         id = fi.find_pet_id(session["user_id"], pet_id) 
@@ -189,20 +194,16 @@ def pet_info():
 
         # Add pet to the database if the user is logged in
         if session["user_id"] != None:
-            
-
-            if pet_id != None:    
+            if id != None:    
                 
                 print(f"user_id: {session['user_id']}, pet_id: {id}")  # Add this line
 
                 # See if the pet is already added
-                find_existing_pet = db.execute(
-                    "SELECT pet_id, name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
-                    user_id=session["user_id"], pet_id=id
-                )
+                find_existing_pet = fi.find_existing_pet(session["user_id"], id)
                 
                 if find_existing_pet:
-
+                    # If existing pet is found, update the data
+                    print("Existing pet found")
                     try:
                         db.execute(
                             "UPDATE pets SET name = :updated_name, species = :updated_species WHERE pet_id = :pet_id AND owner_id = :user_id",
@@ -210,43 +211,45 @@ def pet_info():
                         )
                     except Exception as e:
                         flash(f"Unable to update data, Exception: {e}")
-                        return render_template("get_signalment.html", form=form)
+                        return render_template("get_signalment.html", form=form, pet_id=id)
                     else:
                         session["species"] = species
                         session["pet_name"] = pet_name
-                        session["pet_id"] = find_existing_pet[0]["pet_id"] 
-                        pet_id = find_existing_pet[0]["pet_id"] 
-            else:
-                # If no pet is found (i.e. new pet in the database), create new session variables and store pet
-                print("New pet")
-                try:
-                    # Insert new pet data
-                    db.execute(
-                        "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
-                        session["user_id"], pet_name, species
-                    )
-                    
-                    print("Looking up new pet's ID")                        
-                    # Query the new pet's id 
-                    pet_data = db.execute(
-                        "SELECT pet_id, name FROM pets \
-                            WHERE owner_id = :user_id AND name = :pet_name",
-                            user_id=session["user_id"], pet_name=pet_name
-                        )
-                    
-                    print(pet_data[0]["pet_id"], pet_data[0]["name"])
-                    new_pet_id = pet_data[0]["pet_id"]
-                    
-                except Exception as e:
-                    flash(f"Unable to insert and query new signalment data, Exception: {e}")
-                    return render_template("get_signalment.html", form=form)
+                        session["pet_id"] = id 
+                        pet_id = id
+                        
                 else:
-                    pet_id = new_pet_id
-                    session["pet_id"] = pet_id
+                    # If no pet is found (i.e. new pet in the database), create new session variables and store pet
                     
-                     # Update the pet_data dictionary with the new pet's id
-                    pet_data[0]["pet_id"] = pet_id
-                    fi = FindInfo(session["user_id"], pet_id) 
+                    print("New pet")
+                    try:
+                        # Insert new pet data
+                        db.execute(
+                            "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
+                            session["user_id"], pet_name, species
+                        )
+                        
+                        print("Looking up new pet's ID")                        
+                        # Query the new pet's id 
+                        pet_data = db.execute(
+                            "SELECT pet_id, name FROM pets \
+                                WHERE owner_id = :user_id AND name = :pet_name",
+                                user_id=session["user_id"], pet_name=pet_name
+                            )
+                        
+                        print(pet_data[0]["pet_id"], pet_data[0]["name"])
+                        new_pet_id = pet_data[0]["pet_id"]
+                        
+                    except Exception as e:
+                        flash(f"Unable to insert and query new signalment data, Exception: {e}")
+                        return render_template("get_signalment.html", form=form)
+                    else:
+                        pet_id = new_pet_id
+                        session["pet_id"] = pet_id
+                        
+                        # Update the pet_data dictionary with the new pet's id
+                        pet_data[0]["pet_id"] = pet_id
+                        fi = FindInfo(session["user_id"], pet_id) 
 
             # Store session variables
             session["species"] = species
@@ -272,7 +275,6 @@ def pet_info_continued(pet_id):
     
     form = NewSignalment()
     
-    id = None
     try:
         print(f"pet ID: {pet_id}")
         fi = FindInfo(session["user_id"], pet_id) 
@@ -282,7 +284,8 @@ def pet_info_continued(pet_id):
         # Use login check from find_info to verify species
         species = fi.login_check_for_species()
     except Exception as e:
-        print(f"Couldn't find ID, Exception: {e}")
+        flash(f"Couldn't find ID, Exception: {e}")
+        return render_template("get_signalment_part_2.html", form=form, pet_id=pet_id)
     else:
         
         print(f"user_id: {session['user_id']}, pet_id: {id}") 
@@ -355,14 +358,6 @@ def pet_info_continued(pet_id):
                 session["pet_age_years"] = pet_age_years
                 session["pet_age_months"] = pet_age_months
                 session["pet_breed"] = pet_breed
-                # print(pet_breed)
-                
-                # print(pet_age_years)
-                # print(pet_age_months)
-                # print(pet_breed)
-                # print(pet_sex)
-                # print(session["pet_name"])
-                # print(session["user_id"])
                 
                 # Convert months to years for easier logic reading
                 partial_years = float(pet_age_months / 12)
@@ -475,8 +470,7 @@ def pet_info_continued(pet_id):
                             print("DER Modifier * 1.6-1.8")
                             der_factor_id = 2
                             
-                            
-                            
+                                 
                     print(breed_size)
                     
                     # Add pet to the database if the user is logged in
@@ -579,22 +573,34 @@ def pet_info_continued(pet_id):
                 
                 if pet_age >= 2 and pet_sex == "female":
                     # If the pet is a mature intact female, redirect to pregnancy questions
-                    return redirect(url_for('repro_status', species=species))
+                    return redirect(url_for('repro_status', species=species, pet_id=pet_id))
                 else:
                     # redirect to pet body condition score questions
-                    return redirect(url_for('pet_condition', species=species))
+                    return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
         return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species, pet_id=pet_id)
-    return render_template("get_signalment_part_2.html", form=form, pet_id=pet_id)
+    # return render_template("get_signalment_part_2.html", form=form, pet_id=pet_id)
 
 
-@app.route("/pregnancy_status", methods=["GET", "POST"])
-def repro_status():
+@app.route("/pregnancy_status/<int:pet_id>", methods=["GET", "POST"])
+def repro_status(pet_id):
     """Gets information about the pet's pregnancy status"""
     repro = ReproStatus()
     
-    # Use login check from find_info to verify species
-    fi = FindInfo(session["user_id"], pet_id) 
-    species = fi.login_check_for_species()
+    try:
+        print(f"pet ID: {pet_id}")
+        fi = FindInfo(session["user_id"], pet_id) 
+        
+        id = fi.find_pet_id(session["user_id"], pet_id) 
+        
+        # Use login check from find_info to verify species
+        species = fi.login_check_for_species()
+    except Exception as e:
+        flash(f"Couldn't find ID, Exception: {e}")
+        return render_template("get_signalment_part_2.html", repro=repro, pet_id=pet_id)
+    
+    # # Use login check from find_info to verify species
+    # fi = FindInfo(session["user_id"], pet_id) 
+    # species = fi.login_check_for_species()
      
     if request.method == "POST":
         pregnancy_status = repro.pregnancy_status.data
@@ -637,20 +643,20 @@ def repro_status():
                     except Exception as e:
                         flash(f"Unable to update feline DER factor id for gestation data, Exception: {e}")
                         
-                        return redirect(url_for("repro_status", repro=repro))
+                        return redirect(url_for("repro_status", repro=repro, pet_id=pet_id))
 
             # Update session variable
             session["der_factor_id"] = der_factor_id
-            return redirect(url_for('pet_condition', species=species))
+            return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
         else:
             # If pet is not pregnant, ask if she is currently nursing a litter
             return redirect(url_for('lactation_status'))
     
-    return render_template("get_reproductive_status.html", repro=repro)
+    return render_template("get_reproductive_status.html", repro=repro, pet_id=pet_id)
 
 
-@app.route("/gestation_duration", methods=["GET", "POST"])
-def gestation_duration():
+@app.route("/gestation_duration/<int:pet_id>", methods=["GET", "POST"])
+def gestation_duration(pet_id):
     """Asks for how long the pet has been pregnant for if they are canine 
     and assigns DER factor"""
     
@@ -664,8 +670,8 @@ def gestation_duration():
         number_weeks_pregnant = repro.weeks_gestation.data
         
 
-        # Use login check from helpers.py to verify DER factor id     
-        der_factor_id = der_factor()
+        # Use check from find_info to verify DER factor id     
+        der_factor_id = fi.der_factor()
         # print(der_factor_id)    
         
         if number_weeks_pregnant <= "6":
@@ -700,13 +706,13 @@ def gestation_duration():
         # Update DER factor ID variable
         session["der_factor_id"] = der_factor_id
         
-        return redirect(url_for('pet_condition', species=species))
+        return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
     
-    return render_template("gestation_duration.html", repro=repro)
+    return render_template("gestation_duration.html", repro=repro, pet_id=pet_id)
 
 
-@app.route("/litter_size", methods=["GET", "POST"])
-def litter_size():
+@app.route("/litter_size/<int:pet_id>", methods=["GET", "POST"])
+def litter_size(pet_id):
     """Asks for the litter size of pets that have one, then assigns DER modifier"""
     
     repro = ReproStatus()
@@ -731,8 +737,8 @@ def litter_size():
             except Exception as e:
                 flash(f"Unable to update litter size, Exception: {e}")
         
-        # Use login check from helpers.py to check DER factor ID  
-        der_factor_id = der_factor()
+        # Use find_info to check DER factor ID  
+        der_factor_id = fi.der_factor()
 
           
         if species == "Feline":
@@ -772,13 +778,13 @@ def litter_size():
         # Update DER factor ID variable
         session["der_factor_id"] = der_factor_id  
             
-        return redirect(url_for('pet_condition', species=species))
+        return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
     
     return render_template("get_litter_size.html", repro=repro, species=species)
 
 
-@app.route("/lactation_status", methods=["GET", "POST"])
-def lactation_status():
+@app.route("/lactation_status/<int:pet_id>", methods=["GET", "POST"])
+def lactation_status(pet_id):
     """Asks if the pet is currently nursing"""
     
     repro = ReproStatus()
@@ -812,13 +818,13 @@ def lactation_status():
             
         else:
             # If pet is not lactating, next page is get_weight
-            return redirect(url_for('pet_condition', species=species))
+            return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
     
     return render_template("get_lactation_status.html", repro=repro)
     
 
-@app.route("/lactation_duration", methods=["GET", "POST"])
-def lactation_duration():
+@app.route("/lactation_duration/<int:pet_id>", methods=["GET", "POST"])
+def lactation_duration(pet_id):
     """Asks how many weeks a pregnant queen has been nursing and adds DER modifier"""
     
     repro = ReproStatus()
@@ -867,205 +873,219 @@ def lactation_duration():
         # Update session variable
         session["der_factor_id"] = der_factor_id
         
-        return redirect(url_for('pet_condition', species=species))
+        return redirect(url_for('pet_condition', species=species, pet_id=pet_id))
     
     return render_template("lactation_duration.html", repro=repro)
 
 
-@app.route("/get-weight", methods=["GET", "POST"])
-def pet_condition():
+@app.route("/get-weight/<int:pet_id>", methods=["GET", "POST"])
+def pet_condition(pet_id):
     """Gets the pet's weight and body condition score"""
     
     form = GetWeight() 
-    
-    # Use login check from find_info to verify species
-    fi = FindInfo(session["user_id"], pet_id) 
-    species = fi.login_check_for_species()
-    
-    if request.method == "POST":
-        bcs = int(form.pet_bcs.data)
-        weight = float(form.pet_weight.data)
-        units = form.pet_units.data
-        
-        if units == "lbs":
-            # Convert weight to kilograms 
-            converted_weight = round((weight / 2.2), 2)
-            converted_weight_units = "kgs"
-        elif units == "kgs":
-            # Convert weight to lbs
-            converted_weight = round((weight * 2.2), 2)
-            converted_weight_units = "lbs"
 
+    try:
+        print(f"pet ID: {pet_id}")
+        fi = FindInfo(session["user_id"], pet_id) 
         
-        # print(bcs)
-        # print(type(bcs))
-        # print(weight)
-        # print(type(weight))
-        # print(units)
-        # print(type(units))
+        id = fi.find_pet_id(session["user_id"], pet_id) 
         
-        # Use login check from helpers.py to verify DER factor ID
-        der_factor_id = der_factor()
-        check_litter_size()
-        
-            
-        print(f"Weight: {weight}{units}")
-        
-            
-        if bcs != 5:
-            # Calculate ideal weight
-            weight_proportion = round((100 / (((bcs - 5) * 10) + 100)), 3)
-            # print(f"weight_proportion: {weight_proportion}")
-            
+        # Use login check from find_info to verify species
+        species = fi.login_check_for_species()
+    except Exception as e:
+        print(f"Couldn't find ID, Exception: {e}")
+        return render_template("get_weight_and_bcs.html", form=form, species=species, pet_id=pet_id)
 
+    else:
+        
+        print(f"user_id: {session['user_id']}, pet_id: {id}")     
+        # Use login check from find_info to verify species
+        species = fi.login_check_for_species()
+        
+        if request.method == "POST":
+            bcs = int(form.pet_bcs.data)
+            weight = float(form.pet_weight.data)
+            units = form.pet_units.data
+            
             if units == "lbs":
-                est_ideal_weight_lbs = round((weight_proportion * weight), 2)
-                print(est_ideal_weight_lbs)
-                
-                # Calculate ideal weight in kgs
-                est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
-                print(est_ideal_weight_kgs)
-                
+                # Convert weight to kilograms 
+                converted_weight = round((weight / 2.2), 2)
+                converted_weight_units = "kgs"
             elif units == "kgs":
-                est_ideal_weight_kgs = round((weight_proportion * weight), 2)
-                print(est_ideal_weight_kgs)
-                
-                # Calculate ideal weight in lbs
-                est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
-                print(est_ideal_weight_lbs)
+                # Convert weight to lbs
+                converted_weight = round((weight * 2.2), 2)
+                converted_weight_units = "lbs"
 
-        else:
-            # If pet has 5/9 on the BCS scale, set estimated ideal weight as current weight
-            if units == "lbs":
-                est_ideal_weight_lbs = weight
-                est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
-            elif units == "kgs":
-                est_ideal_weight_kgs = weight
-                est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
-        
-        # Store new info as session variables
-        session["bcs"] = bcs
-        session["weight"] = weight
-        session["units"] = units
-        session["converted_weight"] = converted_weight
-        session["converted_weight_units"] = converted_weight_units
-        session["ideal_weight_kgs"] = est_ideal_weight_kgs
-        session["ideal_weight_lbs"] = est_ideal_weight_lbs
-        
-        bcs_to_body_fat = {1: "< 5", 2: "5", 3: "10", 4: "15", 5: "20",
-                           6: "25", 7: "30", 8: "35", 9: ">=40"
-                           }
-        
-        # Find body fat percentage
-        percent_body_fat = bcs_to_body_fat[bcs]
-        print(percent_body_fat)
-        print(f"Estimated ideal weight: {est_ideal_weight_kgs} kgs, {est_ideal_weight_lbs} lbs")
-
-        # Check for pregnancy status and nursing status
-        pregnancy_status = check_if_pregnant()
-        is_nursing = check_if_nursing()
-        is_pediatric = check_if_pediatric()
-        
-        if species == "Canine":
             
-            if pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
-                # Only update DER factor id if pet isn't nursing or pregnant
-                if bcs <= 4:
-                    # Change DER factor id to weight gain 
-                    der_factor_id = 24
-                elif bcs == 6:
-                    # Change DER factor to weight loss
-                    der_factor_id = 4 
-                elif bcs > 7:
-                    # Change DER factor to obese prone
-                    der_factor_id = 3
+            # print(bcs)
+            # print(type(bcs))
+            # print(weight)
+            # print(type(weight))
+            # print(units)
+            # print(type(units))
+            
+            # Use find_info to verify DER factor ID
+            der_factor_id = fi.der_factor()
+            check_litter_size()
+            
                 
-        
-            # Check if pet breed is predisposed to obesity
-            obese_prone_breed = check_obesity_risk()
+            print(f"Weight: {weight}{units}")
+            
                 
-            print(obese_prone_breed)
-            if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
-                der_factor_id = 3
+            if bcs != 5:
+                # Calculate ideal weight
+                weight_proportion = round((100 / (((bcs - 5) * 10) + 100)), 3)
+                # print(f"weight_proportion: {weight_proportion}")
                 
-            # Add weight and BCS to the database if the user is logged in
-            if session["user_id"] != None:
-                try:
-                    print(session["pet_name"])
-                    print(session["user_id"])
 
-                    db.execute(
-                        "UPDATE pets SET canine_der_factor_id = :der_factor_id, bcs = :body_condition_score, \
-                            ideal_weight_lbs = :ideal_weight_lbs, ideal_weight_kgs = :ideal_weight_kgs, weight = :weight, \
-                                units = :units, converted_weight = :converted_weight, converted_weight_units = :converted_weight_units, \
-                                    body_fat_percentage = :percent_body_fat WHERE name = :pet_name AND owner_id = :user_id",
-                        der_factor_id=der_factor_id, body_condition_score=bcs, ideal_weight_lbs=est_ideal_weight_lbs, 
-                            ideal_weight_kgs=est_ideal_weight_kgs, weight=weight, units=units, converted_weight=converted_weight, 
-                            converted_weight_units=converted_weight_units, percent_body_fat=percent_body_fat, pet_name=session["pet_name"], 
-                            user_id=session["user_id"]
-                    )
-                        
-                except Exception as e:
-                    flash(f"Unable to update canine BCS data, Exception: {e}")
-                    return render_template("get_weight_and_bcs.html", form=form, species=species)
+                if units == "lbs":
+                    est_ideal_weight_lbs = round((weight_proportion * weight), 2)
+                    print(est_ideal_weight_lbs)
                     
+                    # Calculate ideal weight in kgs
+                    est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
+                    print(est_ideal_weight_kgs)
+                    
+                elif units == "kgs":
+                    est_ideal_weight_kgs = round((weight_proportion * weight), 2)
+                    print(est_ideal_weight_kgs)
+                    
+                    # Calculate ideal weight in lbs
+                    est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
+                    print(est_ideal_weight_lbs)
+
+            else:
+                # If pet has 5/9 on the BCS scale, set estimated ideal weight as current weight
+                if units == "lbs":
+                    est_ideal_weight_lbs = weight
+                    est_ideal_weight_kgs = round((est_ideal_weight_lbs / 2.2), 2)
+                elif units == "kgs":
+                    est_ideal_weight_kgs = weight
+                    est_ideal_weight_lbs = round((est_ideal_weight_kgs * 2.2), 2)
+            
+            # Store new info as session variables
+            session["bcs"] = bcs
+            session["weight"] = weight
+            session["units"] = units
+            session["converted_weight"] = converted_weight
+            session["converted_weight_units"] = converted_weight_units
+            session["ideal_weight_kgs"] = est_ideal_weight_kgs
+            session["ideal_weight_lbs"] = est_ideal_weight_lbs
+            
+            bcs_to_body_fat = {1: "< 5", 2: "5", 3: "10", 4: "15", 5: "20",
+                            6: "25", 7: "30", 8: "35", 9: ">=40"
+                            }
+            
+            # Find body fat percentage
+            percent_body_fat = bcs_to_body_fat[bcs]
+            print(percent_body_fat)
+            print(f"Estimated ideal weight: {est_ideal_weight_kgs} kgs, {est_ideal_weight_lbs} lbs")
+
+            # Check for pregnancy status and nursing status
+            pregnancy_status = check_if_pregnant()
+            is_nursing = check_if_nursing()
+            is_pediatric = check_if_pediatric()
+            
+            if species == "Canine":
                 
-            # Update DER factor ID variable
-            session["der_factor_id"] = der_factor_id  
-              
-            # Gets a dog's activity level if applicable 
-            return redirect(url_for('activity'))  
-        
-        elif species == "Feline":
-             
-            if pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
-                if bcs <= 4:
-                    # Change DER factor id to weight gain 
-                    der_factor_id = 16
-                elif bcs == 6:
-                    # Change DER factor to weight loss
-                    der_factor_id = 6 
-                elif bcs > 7:
-                    # Change DER factor id to obese prone 
+                if pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
+                    # Only update DER factor id if pet isn't nursing or pregnant
+                    if bcs <= 4:
+                        # Change DER factor id to weight gain 
+                        der_factor_id = 24
+                    elif bcs == 6:
+                        # Change DER factor to weight loss
+                        der_factor_id = 4 
+                    elif bcs > 7:
+                        # Change DER factor to obese prone
+                        der_factor_id = 3
+                    
+            
+                # Check if pet breed is predisposed to obesity
+                obese_prone_breed = check_obesity_risk()
+                    
+                print(obese_prone_breed)
+                if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
+                    der_factor_id = 3
+                    
+                # Add weight and BCS to the database if the user is logged in
+                if session["user_id"] != None:
+                    try:
+                        print(session["pet_name"])
+                        print(session["user_id"])
+
+                        db.execute(
+                            "UPDATE pets SET canine_der_factor_id = :der_factor_id, bcs = :body_condition_score, \
+                                ideal_weight_lbs = :ideal_weight_lbs, ideal_weight_kgs = :ideal_weight_kgs, weight = :weight, \
+                                    units = :units, converted_weight = :converted_weight, converted_weight_units = :converted_weight_units, \
+                                        body_fat_percentage = :percent_body_fat WHERE name = :pet_name AND owner_id = :user_id",
+                            der_factor_id=der_factor_id, body_condition_score=bcs, ideal_weight_lbs=est_ideal_weight_lbs, 
+                                ideal_weight_kgs=est_ideal_weight_kgs, weight=weight, units=units, converted_weight=converted_weight, 
+                                converted_weight_units=converted_weight_units, percent_body_fat=percent_body_fat, pet_name=session["pet_name"], 
+                                user_id=session["user_id"]
+                        )
+                            
+                    except Exception as e:
+                        flash(f"Unable to update canine BCS data, Exception: {e}")
+                        return render_template("get_weight_and_bcs.html", form=form, species=species)
+                        
+                    
+                # Update DER factor ID variable
+                session["der_factor_id"] = der_factor_id  
+                
+                # Gets a dog's activity level if applicable 
+                return redirect(url_for('activity'))  
+            
+            elif species == "Feline":
+                
+                if pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
+                    if bcs <= 4:
+                        # Change DER factor id to weight gain 
+                        der_factor_id = 16
+                    elif bcs == 6:
+                        # Change DER factor to weight loss
+                        der_factor_id = 6 
+                    elif bcs > 7:
+                        # Change DER factor id to obese prone 
+                        der_factor_id = 3
+                    
+                # Check if pet breed is predisposed to obesity
+                obese_prone_breed = check_obesity_risk()
+                    
+                print(obese_prone_breed)
+                if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
                     der_factor_id = 3
                 
-            # Check if pet breed is predisposed to obesity
-            obese_prone_breed = check_obesity_risk()
-                
-            print(obese_prone_breed)
-            if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
-                der_factor_id = 3
-            
-            # Add weight and BCS to the database if the user is logged in
-            if session["user_id"] != None:
-                try:
-                    print(session["pet_name"])
-                    print(session["user_id"])
+                # Add weight and BCS to the database if the user is logged in
+                if session["user_id"] != None:
+                    try:
+                        print(session["pet_name"])
+                        print(session["user_id"])
 
-                    db.execute(
-                        "UPDATE pets SET feline_der_factor_id = :der_factor_id, bcs = :body_condition_score, \
-                            ideal_weight_kgs = :ideal_weight_kgs, ideal_weight_lbs = :est_ideal_weight_lbs, \
-                                weight = :weight, units = :units, converted_weight = :converted_weight, \
-                                    converted_weight_units = :converted_weight_units, body_fat_percentage = :percent_body_fat \
-                                        WHERE name = :pet_name AND owner_id = :user_id",
-                        der_factor_id=der_factor_id, body_condition_score=bcs, ideal_weight_kgs=est_ideal_weight_kgs, 
-                        est_ideal_weight_lbs=est_ideal_weight_lbs, weight=weight, units=units, converted_weight=converted_weight, 
-                            converted_weight_units=converted_weight_units, percent_body_fat=percent_body_fat, 
-                        pet_name=session["pet_name"], user_id=session["user_id"]
-                    )
-                        
-                except Exception as e:
-                    flash(f"Unable to update feline BCS data, Exception: {e}")
-                    return render_template("get_weight_and_bcs.html", form=form, species=species)
+                        db.execute(
+                            "UPDATE pets SET feline_der_factor_id = :der_factor_id, bcs = :body_condition_score, \
+                                ideal_weight_kgs = :ideal_weight_kgs, ideal_weight_lbs = :est_ideal_weight_lbs, \
+                                    weight = :weight, units = :units, converted_weight = :converted_weight, \
+                                        converted_weight_units = :converted_weight_units, body_fat_percentage = :percent_body_fat \
+                                            WHERE name = :pet_name AND owner_id = :user_id",
+                            der_factor_id=der_factor_id, body_condition_score=bcs, ideal_weight_kgs=est_ideal_weight_kgs, 
+                            est_ideal_weight_lbs=est_ideal_weight_lbs, weight=weight, units=units, converted_weight=converted_weight, 
+                                converted_weight_units=converted_weight_units, percent_body_fat=percent_body_fat, 
+                            pet_name=session["pet_name"], user_id=session["user_id"]
+                        )
+                            
+                    except Exception as e:
+                        flash(f"Unable to update feline BCS data, Exception: {e}")
+                        return render_template("get_weight_and_bcs.html", form=form, species=species)
 
 
-            # Update DER factor ID variable
-            session["der_factor_id"] = der_factor_id  
-                
-            # Take cat owners to the pre-confirmation page
-            return redirect(url_for('confirm_data', species=species))
+                # Update DER factor ID variable
+                session["der_factor_id"] = der_factor_id  
+                    
+                # Take cat owners to the pre-confirmation page
+                return redirect(url_for('confirm_data', species=species, pet_id=pet_id))
     
-    return render_template("get_weight_and_bcs.html", form=form, species=species)
+    return render_template("get_weight_and_bcs.html", form=form, species=species, pet_id=pet_id)
 
 
 @app.route("/activity", methods=["GET", "POST"])
@@ -1091,8 +1111,8 @@ def activity():
         
         print(f'heavy_work_hours: {heavy_work_hours}, light_work_hours: {light_work_hours}')
             
-        # Use login check from helpers.py to verify DER factor ID, pregnancy status, and lactation status
-        der_factor_id = der_factor()
+        # Use find_info to verify DER factor ID, pregnancy status, and lactation status
+        der_factor_id = fi.der_factor()
         pregnancy_status = check_if_pregnant()
         is_nursing = check_if_nursing()
         
@@ -1287,8 +1307,8 @@ def new_food():
     return render_template("new_food.html", new_foods=new_foods)
 
 
-@app.route("/rer", methods=["GET", "POST"])
-def rer():
+@app.route("/rer/<int:pet_id>", methods=["GET", "POST"])
+def rer(pet_id):
     """Calculates the minimum number of calories a pet needs at rest per day"""
 
     
@@ -1296,12 +1316,14 @@ def rer():
     sex = find_repro_status()
     
     # Import food calculator
-    cf = CalculateFood()
+    cf = CalculateFood(session["user_id"], pet_id)
     rer = cf.calculcate_rer()
     
+    # Use find_info to find DER start and end range
+    fi = FindInfo(session["user_id"])
     # Use DER factor id to lookup DER information by species
-    der_modifier_start_range = find_der_low_end()
-    der_modifier_end_range = find_der_high_end()
+    der_modifier_start_range = fi.find_der_low_end()
+    der_modifier_end_range = fi.find_der_high_end()
     
     object_pronoun = ""
     possessive_pronoun = ""
@@ -1408,12 +1430,12 @@ def rer():
                            end_range=der_modifier_end_range)
     
     
-@app.route("/der", methods=["GET", "POST"])
-def der():
+@app.route("/der/<int:pet_id>", methods=["GET", "POST"])
+def der(pet_id):
     """Calculates the daily energy rate and total food amount of the current diet to feed"""
     
     # Import food calculator
-    cf = CalculateFood()
+    cf = CalculateFood(session["user_id"], pet_id)
     
     # Call session variable for pronouns
     object_pronoun = session["object_pronoun"]
@@ -1476,9 +1498,9 @@ def der():
         
         print(name, sex, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
                 
-    # Use login check from helpers.py to verify DER factor ID and food form
+    # Use find_info to verify DER factor ID and food form
     current_food_form = find_food_form()
-    der_factor_id = der_factor()
+    der_factor_id = fi.der_factor()
     
     print(der_factor_id)
     print(rer, der_factor_id, meals_per_day, current_food_kcal, current_food_form)
@@ -1685,126 +1707,125 @@ def completed_report():
     # TODO: Enable user to get to this page from "Completed Reports"
 
     
-    id = None
     try:
-        pet_id = request.args.get("id")
+        pet_id = request.args.get("pet_id", type=int)
         fi = FindInfo(session["user_id"], pet_id) 
         print(f"pet ID: {pet_id}")
         id = fi.find_pet_id(session["user_id"], pet_id) 
         
     except Exception as e:
         print(f"Couldn't find ID, Exception: {e}")
-    else:
-            
-        print(f"user_id: {session['user_id']}, pet_id: {id}")     
-
-        
-        if session["user_id"] != None:
-        
-            # If a user is logged in, pass user ID 
-            pet_data = fi.pet_data_dictionary(session["user_id"], id)
-            
-            values = list(session.values())
-            all_same = all(value == values[0] for value in values)
-            for key, value in session.items():
-                print(key, value)
-            print(f"session length: {len(session.items())} all_same length: {len(session.items())}")
-                
-        else:
-            # Check if all session variables are the same, syntax suggested by CoPilot
-
-            
-            if all_same == False and len(session.items()) > 2:
-                # If not all session variables are the same
-                print("Values not the same, clearing...")
-                
-                # Clear values 
-                clear_variable_list()
-                
-                # TODO: Re-build new session variables
-            
-            pet_data = db.execute(
-                "SELECT * FROM pets WHERE owner_id = :user_id AND pet_id = :id",
-                user_id=session["user_id"], id=id
-            ) 
-        
-        rer = "{:.2f}".format(pet_data[0]["rer"])
-        der = pet_data[0]["der"]
-        
-        print(der)
-        object_pronoun = ""
-        subject_pronoun = ""
-        possessive_pronoun = ""
-        if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
-            object_pronoun = "her"
-            subject_pronoun = "she"
-        elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
-            object_pronoun = "him"
-            possessive_pronoun = "his"
-            subject_pronoun = "he"
-            
-        print(object_pronoun)
-        
-        # Find breed ID
-        breed_id = fi.find_breed_id()
-        print(breed_id)
-        
-        # Find life stage, notes, and SVGs
-        if pet_data[0]["species"] == "Canine":
-            if id:
-
-                life_stage_search = db.execute(
-                    "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
-                    pet_data[0]["canine_der_factor_id"]
-                )
-                
-                svg_search = db.execute(
-                    "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
-                    breed_id=breed_id
-                )
-                
-                if svg_search != None:
-                    # TODO: If SVG can't be found, use a placeholder
-                    svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
-                    print(svg)
-                
-        elif pet_data[0]["species"] == "Feline":
-            if id:
-                life_stage_search = db.execute(
-                    "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
-                    pet_data[0]["feline_der_factor_id"]
-                )
-                
-                # Search for breed image in database
-                svg_search = db.execute(
-                    "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
-                    breed_id=breed_id
-                )
-                
-                if svg_search:
-                    # TODO: If SVG can't be found, use a placeholder
-                    if pet_data[0]["species"] == "Feline":
-                        svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
-                        print(svg)
-                    
-        if life_stage_search:
-            life_stage = life_stage_search[0]["life_stage"]
-            notes = life_stage_search[0]["notes"]
-            
-
-        if pet_data:
-            meals_per_day = pet_data[0]["meals_per_day"]
-        
-        cf = CalculateFood()
-        
-        # Find DER range   
-        der_low_end = float(cf.calculcate_der()["DER_low_end"])
-        der_high_end = float(cf.calculcate_der()["DER_high_end"])
-        
-        # Convert to int for easier reading
-        der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
-        return render_template("complete_report.html",
+            
+    print(f"user_id: {session['user_id']}, pet_id: {id}")     
+
+        
+    if session["user_id"] != None:
+        
+        # If a user is logged in, pass user ID 
+        pet_data = fi.pet_data_dictionary(session["user_id"], id)
+            
+        values = list(session.values())
+        all_same = all(value == values[0] for value in values)
+
+        print(f"session length: {len(session.items())} all_same length: {len(session.items())}")
+                
+    else:
+        # Check if all session variables are the same, syntax suggested by CoPilot
+
+        pet_data = fi.guest_pet_data_dictionary(session["user_id"])
+            
+        if all_same == False and len(session.items()) > 2:
+            # If not all session variables are the same
+            print("Values not the same, clearing...")
+                
+            # Clear values 
+            clear_variable_list()
+                
+            # TODO: Re-build new session variables
+            
+    pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
+        
+    rer = "{:.2f}".format(pet_data[0]["rer"])
+    der = pet_data[0]["der"]
+        
+    print(der)
+    object_pronoun = ""
+    subject_pronoun = ""
+    possessive_pronoun = ""
+    if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
+        object_pronoun = "her"
+        subject_pronoun = "she"
+    elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
+        object_pronoun = "him"
+        possessive_pronoun = "his"
+        subject_pronoun = "he"
+            
+    print(object_pronoun)
+        
+    # Find breed ID
+    breed_id = fi.find_breed_id()
+    print(breed_id)
+        
+    svg = fi.find_svg()
+        
+    # Find life stage, notes, and SVGs
+    if pet_data[0]["species"] == "Canine":
+        if id:
+
+            life_stage_search = db.execute(
+                "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
+                pet_data[0]["canine_der_factor_id"]
+            )
+                
+                # svg_search = db.execute(
+                #     "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
+                #     breed_id=breed_id
+                # )
+                
+                # if svg_search != None:
+                #     # TODO: If SVG can't be found, use a placeholder
+                #     svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+                #     print(svg)
+                
+    elif pet_data[0]["species"] == "Feline":
+        if id:
+            life_stage_search = db.execute(
+                "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
+                pet_data[0]["feline_der_factor_id"]
+            )
+                
+                # # Search for breed image in database
+                # svg_search = db.execute(
+                #     "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
+                #     breed_id=breed_id
+                # )
+                
+                # if svg_search:
+                #     # TODO: If SVG can't be found, use a placeholder
+                #     if pet_data[0]["species"] == "Feline":
+                #         svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
+                #         print(svg)
+    
+    print(svg)                
+    if life_stage_search:
+        life_stage = life_stage_search[0]["life_stage"]
+        notes = life_stage_search[0]["notes"]
+            
+
+    if pet_data:
+        meals_per_day = pet_data[0]["meals_per_day"]
+        
+    # cf = CalculateFood(session["user_id"], pet_id)
+        
+    # Find DER range   
+    der_low_end = float(fi.find_der_low_end())
+    der_high_end = float(fi.find_der_high_end())
+        
+    # Convert to int for easier reading
+    der_low_end, der_high_end = int(der_low_end), int(der_high_end)
+    
+    return render_template("complete_report.html",
                             pet_data=pet_data,
                             rer=rer,
                             der=der,
@@ -1826,9 +1847,10 @@ def finished_reports():
     # Use user_id and find_info to verify species
     try:
         fi = FindInfo(session["user_id"])
-        pet_list = fi.find_all_user_pets()
+        pet_list = fi.find_all_user_pets(session["user_id"])
     except Exception as e:
-        flash(f"")
+        flash(f"Unable to find pet list. Exception: {e}")
+        return render_template("finished_reports.html")
     
     # If user doesn't choose from the dropdown, provide error
     if request.method == "POST":
@@ -1840,15 +1862,15 @@ def finished_reports():
             flash("Please choose a pet to edit their report.")
             return redirect(url_for('finished_reports'))
         
-        return redirect(url_for('edit_info', id=pet_to_edit))
+        return redirect(url_for('edit_info', pet_id=pet_to_edit))
 
     return render_template("finished_reports.html", pet_list=pet_list)
 
-@app.route("/edit_info/", methods=["GET", "POST"])
-def edit_info():
+@app.route("/edit_info/<int:pet_id>", methods=["GET", "POST"])
+def edit_info(pet_id):
     """Allows a user to edit a pet's info and generate a new report"""
     
-    pet_id = request.args.get("id")
+    pet_id = request.args.get("pet_id")
     
     print(pet_id)
     try:

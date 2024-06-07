@@ -5,7 +5,7 @@ from flask import request, session, flash
 db = SQL("sqlite:///pet_food_calculator.db")
 
 class FindInfo():
-    def __init__(self, user_id, pet_id):
+    def __init__(self, user_id, pet_id=None):
         """Verifies user_id and pet_id"""
     
         try:
@@ -21,22 +21,114 @@ class FindInfo():
             self.pet_id = 0  
         
         self.pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
+
+
+    def find_der_high_end(self) -> float:
+        """Finds DER high end"""
+        
+        # Use DER factor id to lookup DER information by species
+        species = self.login_check_for_species()
+        der_factor_id = self.der_factor()
+        
+        if species == "Canine":
+            der_lookup = db.execute(
+                "SELECT life_stage, canine_der_factor_range_end \
+                    FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                    der_factor_id=der_factor_id)
+            print(f"DER lookup: {der_lookup}")
+
+            # Find the ending DER modifier
+            self.der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
+            
+        elif species == "Feline":
+            der_lookup = db.execute(
+            "SELECT life_stage, feline_der_factor_range_end \
+                FROM feline_der_factors WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
+            print("der")
+            print(F"Der lookup: {der_lookup}")
+
+            # Find the start and end range of DER modifiers
+            self.der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
+        
+        return self.der_modifier_end_range
+                
+                
+    def find_der_mid_range(self):
+        """Finds DER mid-range"""
+        
+        species = self.login_check_for_species()
+        der_factor_id = self.der_factor()
+        
+        # Use DER factor id to lookup DER information by species
+        if species == "Canine":
+            der_lookup = db.execute(
+                "SELECT life_stage, ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
+                    FROM canine_der_factors WHERE factor_id = :der_factor_id",
+                    der_factor_id=der_factor_id)
+            print(der_lookup)
+
+
+        elif species == "Feline":
+            der_lookup = db.execute(
+            "SELECT life_stage, ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
+                FROM feline_der_factors WHERE factor_id = :der_factor_id",
+                der_factor_id=der_factor_id)
+            print("der")
+            print(F"Der lookup: {der_lookup}")
+
+        # Find the middle range of DER modifiers
+        self.der_mid_range = der_lookup[0]["mid_range"]
+            
+        print(f"Mid range DER Factor {self.der_mid_range}")
+        
+        return self.der_mid_range
+
+
+    def find_der_low_end(self) -> float:
+        """Finds DER low end"""
+        
+        # Use helpers.py to verify species and check der_factor
+        # species = login_check_for_species()
+        # der_factor_id = der_factor()
+        
+        
+        try:
+            # Use DER factor id to lookup DER information by species
+            
+            species = self.login_check_for_species()
+            der_factor_id  = self.der_factor()
+            
+            if species == "Canine":
+                der_lookup = db.execute(
+                    "SELECT life_stage, canine_der_factor_range_start FROM canine_der_factors \
+                        WHERE factor_id = :der_factor_id",
+                        der_factor_id=der_factor_id)
+                print(der_lookup)
+
+                if "canine_der_factor_range_start" in der_lookup[0]:
+                    # Find the start and end range of DER modifiers
+                    self.der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
+                
+            elif species == "Feline":
+                der_lookup = db.execute(
+                "SELECT life_stage, feline_der_factor_range_start \
+                    FROM feline_der_factors WHERE factor_id = :der_factor_id",
+                    der_factor_id=der_factor_id)
+                print(F"Der lookup: {der_lookup}")
+
+                if "feline_der_factor_range_start" in der_lookup[0]:
+                    # Find the starting DER modifier
+                    self.der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
+        except Exception as e:
+            print(f"Can't find DER start range. Exception: {e}")
+            
+        return self.der_modifier_start_range
+
     
     def pet_data_dictionary(self, user_id, pet_id) -> dict:
         """Builds a dictionary of the current SQL row if logged in or session
         variables if no user is logged in"""
-        
-        try:
-            self.user_id = user_id
-        except Exception as e:
-            print(f"Exception: {e}, reassigning User ID as 0")
-            self.user_id = 0  
-            
-        try: 
-            self.pet_id = pet_id
-        except Exception as e:
-            print(f"Exception: {e}, reassigning pet ID as 0")
-            self.pet_id = 0  
         
         # If user is logged in and pet ID hasn't been assigned, use SQL query
         if pet_id != 0 and user_id != 0:
@@ -46,10 +138,10 @@ class FindInfo():
             )       
                 
             # Check if pet_data is empty
-            if not self.pet_data:
+            if self.pet_data == None:
                 print("The pet hasn't been added yet.")
             
-            print(self.pet_data)
+            # print(self.pet_data)
             
             
         # Otherwise, pass session variables
@@ -158,7 +250,8 @@ class FindInfo():
                 print("The pet hasn't been added yet.")
             
             # See if the pet is already added 
-            if "pet_id" in self.pet_data[0] or "pet_id" in self.guest_pet_data:
+            if self.pet_data and "pet_id" in self.pet_data[0] \
+                or self.guest_pet_data and "pet_id" in self.guest_pet_data[0]:
                 pet_id = self.pet_data[0]["pet_id"]
                 print(f"ID of pet: {pet_id}")
             else:
@@ -168,66 +261,76 @@ class FindInfo():
             pet_id = 0
         
         return pet_id
+    
+    def find_existing_pet(self, user_id, animal_id) -> bool:
+        """Returns a True if pet is found in the database""" 
+         
             
+        print(f"user_id: {user_id}, pet_id: {animal_id}") 
+
+        try:
+            # See if the pet is already added
+            find_existing_pet = db.execute(
+                "SELECT pet_id, name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
+                user_id=user_id, pet_id=animal_id
+                ) 
             
-    def find_all_user_pets(self):
+            if not find_existing_pet:
+                print("Pet not found.")
+                return False
+            
+            pet_name = find_existing_pet[0]["name"]
+            pet_id = find_existing_pet[0]["pet_id"]
+            print(f"Name: {pet_name}", f"Pet ID: {pet_id} found")
+            return True 
+        
+        except Exception as e:
+            print(f"Pet not found. Exception: {e}")
+            
+            return False
+        
+            
+    def find_all_user_pets(self, user_id) -> dict:
         """Finds all pets under a user id"""
         
         if session["user_id"] != None:
             try:
                 pet_list = db.execute(
                     "SELECT * FROM pets WHERE owner_id = :user",
-                    user=session["user_id"]
+                    user=user_id
                 )
             
+                print(pet_list)
             except Exception as e:
                 flash(f"Couldn't find pet list. Exception: {e}")
         
         return pet_list
             
-    def login_check_for_species(self):
+    def login_check_for_species(self) -> str:
         """Checks if user is logged in, then assigns species"""
-        # Conditional rewrite suggested by CoPilot 
         
         try:
-            print(self.pet_data)
-            species = self.pet_data[0]["species"]
-            print(f"Class species: {species}")
+            if self.pet_data and "species" in self.pet_data[0]:
+                self.species = self.pet_data[0]["species"]
+                print(f"Class species: {self.species}")
         except Exception as e:
             flash(f"Can't find species ID. Exception: {e}")
-        # if "user_id" in session and session["user_id"] != None:
-            # If the user is logged in, verify table variables 
-            # print(f"Species check User ID: {session["user_id"]}")
-            # print(f"Species check Name: {session["pet_name"]}")
-            
-        
-            # species_result = db.execute(
-            #     "SELECT species FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-            # )
-            
-
-            # if species_result:
-            #     species = species_result[0]["species"]
-            #     print(species)
-            # else:
-            #     species = session["species"]
-            #     print(f"Non-db species: {species}") 
                 
         else:
             # If a user isn't logged in, grab species variable
-            species = session["species"]
             
-            # if species == None:
-            #     species = request.args.get("species")
-            # print(f"Non-db species: {species}") 
+            if "species" in session and session["species"] is not None:
+                # Condition suggested by CoPilot
+                self.species = session["species"]
+            
+            print(f"Session species: {self.species}") 
         
         # Return whatever species variable ends up being found 
-        return species   
+        return self.species   
 
 
-    def find_breed_id(self):
+    def find_breed_id(self) -> int:
         """Returns the breed of the pet"""
-    
         
         try:
             species = self.pet_data[0]["species"]
@@ -237,28 +340,7 @@ class FindInfo():
                 breed_id = self.pet_data[0]["feline_breed_id"]
                 
             print(f"Breed ID: {breed_id}")
-            # if self.user_id != 0:
-                # If the user is logged in, verify table variables 
-                
-                # try:
-                #     print(session["user_id"])
-                #     print(session["pet_name"])
-                    
-                #     species = login_check_for_species()
-                    
-                #     breed_result = db.execute(
-                #         "SELECT canine_breed_id, feline_breed_id FROM pets WHERE owner_id = ? AND name = ?",
-                #         session["user_id"], session["pet_name"]
-                #     )
-                # except Exception as e:
-                #     flash("Unable to find a list of your pets. Please try again.")    
-                # else:
-                #     if species == "Canine":
-                #         breed_id = breed_result[0]["canine_breed_id"]
-                #     if species == "Feline":
-                #         breed_id = breed_result[0]["feline_breed_id"]
 
-                #     print(breed_id)
         
         except Exception as e:
             # If a user isn't logged in, grab breed ID variable
@@ -272,8 +354,106 @@ class FindInfo():
         else:
             # Return whatever breed ID variable ends up being found if no errors
             return breed_id
+        
+        
+    def der_factor(self) -> int:
+        """Finds the latest der_factor set, if applicable"""
+        
+        if "user_id" in session and session["user_id"] != None:
+            if self.species == "Canine":
+                try:
+                    self.der_factor_id = self.pet_data[0]["canine_der_factor_id"]
+                    print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+                except Exception as e:
+                    flash(f"Can't find DER Factor ID. Exception: {e}")
+            if self.species == "Feline":
+                try:
+                    self.der_factor_id = self.pet_data[0]["feline_der_factor_id"]
+                    print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+                except Exception as e:
+                    flash(f"Can't find DER Factor ID. Exception: {e}")       
+        else:
+            # If a user isn't logged in, grab species variable
+            self.der_factor_id = session["der_factor_id"]
+                    
+            print(f"Session DER factor ID: {self.der_factor_id}") 
+            
+        print(f"DER factor ID: {self.der_factor_id}")
+        
+        return self.der_factor_id
+        # # Condition suggested by CoPilot
+        
+        #     # If the user is logged in, verify table variables 
+
+        #     self.pet_data
+        #     pet_info = db.execute(
+        #         "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        #     )
+            
+
+        #     if pet_info:
+        #         species = pet_info[0]["species"]
+        #         if species == "Canine":
+        #             der_factor_id = pet_info[0]["canine_der_factor_id"]
+        #         elif species == "Feline":
+        #             der_factor_id = pet_info[0]["feline_der_factor_id"]
+                    
+        #         print(f"species: {species}, der_factor_id: {der_factor_id}")
+        #     else:
+        #         species = session["species"]
+        #         der_factor_id = session["der_factor_id"]
+        #         print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
+                
+        # else:
+        #     # If a user isn't logged in, grab  variable
+        #     der_factor_id = session["der_factor_id"]
+        
+        # # Return whatever DER factor id variable ends up being found 
+        # print(f"DER factor ID: {der_factor_id}")
+        # return der_factor_id
+
+    def find_svg(self) -> str:
+        """Find SVG depending on breed and species"""
+        
+        species = self.login_check_for_species()
+        breed_id = self.find_breed_id()
+        try:
+            if species == "Canine":
+                # If SVG can't be found, use a placeholder
+                self.svg = 'assets/svg/dogs/0_Labrador_Retriever_peeking_dog-4.svg'
+
+                svg_search = db.execute(
+                    "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                    )
+                    
+                if svg_search != None:
+                    self.svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+
+                print(self.svg)
+                    
+            elif species == "Feline":
+                # If SVG can't be found, use a placeholder
+                self.svg = 'assets/svg/cats/American_ShortHair0-04.svg'
+
+                # Search for breed image in database
+                svg_search = db.execute(
+                    "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                    )
+                    
+                if svg_search:
+                    self.svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
 
 
+                print(self.svg)
+        except Exception as e:
+            flash(f"Can't find SVG file. Exception: {e}")
+        else:
+            # If found, return SVG
+            return self.svg
+            
+            
 def find_repro_status():
     """Returns the reproductive status of the pet"""
     if "user_id" in session and session["user_id"] != None:
@@ -483,132 +663,59 @@ def find_food_form():
 
 
 
-def der_factor():
+def der_factor(self):
     """Finds the latest der_factor set, if applicable"""
+    
     if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-
-        
-        pet_info = db.execute(
-            "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-
-        if pet_info:
-            species = pet_info[0]["species"]
-            if species == "Canine":
-                der_factor_id = pet_info[0]["canine_der_factor_id"]
-            elif species == "Feline":
-                der_factor_id = pet_info[0]["feline_der_factor_id"]
-                
-            print(f"species: {species}, der_factor_id: {der_factor_id}")
-        else:
-            species = session["species"]
-            der_factor_id = session["der_factor_id"]
-            print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
-            
+        if self.species == "Canine":
+            try:
+                self.der_factor_id = self.pet_data[0]["canine_der_factor_id"]
+                print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+            except Exception as e:
+                flash(f"Can't find DER Factor ID. Exception: {e}")
+        if self.species == "Feline":
+            try:
+                self.der_factor_id = self.pet_data[0]["feline_der_factor_id"]
+                print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+            except Exception as e:
+                flash(f"Can't find DER Factor ID. Exception: {e}")       
     else:
-        # If a user isn't logged in, grab  variable
-        der_factor_id = session["der_factor_id"]
-    
-    # Return whatever DER factor id variable ends up being found 
-    print(f"DER factor ID: {der_factor_id}")
-    return der_factor_id
-
-
-def find_der_low_end():
-    """Finds DER low end"""
-    
-    # Use helpers.py to verify species and check der_factor
-    species = login_check_for_species()
-    der_factor_id = der_factor()
-    
-    der_modifier_start_range = 0
-    
-    # Use DER factor id to lookup DER information by species
-    if species == "Canine":
-        der_lookup = db.execute(
-            "SELECT life_stage, canine_der_factor_range_start FROM canine_der_factors \
-                WHERE factor_id = :der_factor_id",
-                der_factor_id=der_factor_id)
-        print(der_lookup)
-
-        # Find the start and end range of DER modifiers
-        der_modifier_start_range = der_lookup[0]["canine_der_factor_range_start"]
+        # If a user isn't logged in, grab species variable
+        self.der_factor_id = session["der_factor_id"]
+                
+        print(f"Session DER factor ID: {self.der_factor_id}") 
         
-    elif species == "Feline":
-        der_lookup = db.execute(
-        "SELECT life_stage, feline_der_factor_range_start \
-            FROM feline_der_factors WHERE factor_id = :der_factor_id",
-            der_factor_id=der_factor_id)
-        print("der")
-        print(F"Der lookup: {der_lookup}")
-
-        # Find the starting DER modifier
-        der_modifier_start_range = der_lookup[0]["feline_der_factor_range_start"]
-
-    return der_modifier_start_range
-
-
-def find_der_high_end():
-    """Finds DER high end"""
+    print(f"DER factor ID: {self.der_factor_id}")
     
-    # Use helpers.py to verify species and check der_factor
-    species = login_check_for_species()
-    der_factor_id = der_factor()
+    return self.der_factor_id
+    # # Condition suggested by CoPilot
     
-    der_modifier_end_range = 0
-    # Use DER factor id to lookup DER information by species
-    if species == "Canine":
-        der_lookup = db.execute(
-            "SELECT life_stage, canine_der_factor_range_end \
-                FROM canine_der_factors WHERE factor_id = :der_factor_id",
-                der_factor_id=der_factor_id)
-        print(f"DER lookup: {der_lookup}")
+    #     # If the user is logged in, verify table variables 
 
-        # Find the ending DER modifier
-        der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
+    #     self.pet_data
+    #     pet_info = db.execute(
+    #         "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+    #     )
         
-    elif species == "Feline":
-        der_lookup = db.execute(
-        "SELECT life_stage, feline_der_factor_range_end \
-            FROM feline_der_factors WHERE factor_id = :der_factor_id",
-            der_factor_id=der_factor_id)
-        print("der")
-        print(F"Der lookup: {der_lookup}")
 
-        # Find the start and end range of DER modifiers
-        der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
-    
-    return der_modifier_end_range
+    #     if pet_info:
+    #         species = pet_info[0]["species"]
+    #         if species == "Canine":
+    #             der_factor_id = pet_info[0]["canine_der_factor_id"]
+    #         elif species == "Feline":
+    #             der_factor_id = pet_info[0]["feline_der_factor_id"]
+                
+    #         print(f"species: {species}, der_factor_id: {der_factor_id}")
+    #     else:
+    #         species = session["species"]
+    #         der_factor_id = session["der_factor_id"]
+    #         print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
             
-def find_der_mid_range():
-    """Finds DER mid-range"""
+    # else:
+    #     # If a user isn't logged in, grab  variable
+    #     der_factor_id = session["der_factor_id"]
     
-    # Use helpers.py to verify species and check der_factor
-    species = login_check_for_species()
-    der_factor_id = der_factor()
-    
-    # Use DER factor id to lookup DER information by species
-    if species == "Canine":
-        der_lookup = db.execute(
-            "SELECT life_stage, ((canine_der_factor_range_start + canine_der_factor_range_end) / 2) AS mid_range \
-                FROM canine_der_factors WHERE factor_id = :der_factor_id",
-                der_factor_id=der_factor_id)
-        print(der_lookup)
+    # # Return whatever DER factor id variable ends up being found 
+    # print(f"DER factor ID: {der_factor_id}")
+    # return der_factor_id
 
-
-    elif species == "Feline":
-        der_lookup = db.execute(
-        "SELECT life_stage, ((feline_der_factor_range_start + feline_der_factor_range_end) / 2) AS mid_range \
-            FROM feline_der_factors WHERE factor_id = :der_factor_id",
-            der_factor_id=der_factor_id)
-        print("der")
-        print(F"Der lookup: {der_lookup}")
-
-    # Find the middle range of DER modifiers
-    der_mid_range = der_lookup[0]["mid_range"]
-        
-    print(f"Mid range DER Factor {der_mid_range}")
-    
-    return der_mid_range

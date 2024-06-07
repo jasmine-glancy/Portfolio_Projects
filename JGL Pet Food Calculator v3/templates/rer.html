@@ -50,14 +50,14 @@
         </p>
     </div>
     <div class="button-container">
-        <a href="{{ url_for('confirm_data') }}">
+        <a href="{{ url_for('confirm_data', pet_id=pet_id) }}">
             <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 3: Confirm Pet Info</button>
         </a>
 
         <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
         <div class="divider"></div>
 
-        <a href="{{ url_for('der') }}">
+        <a href="{{ url_for('der', pet_id=pet_id) }}">
             <button type="submit" class="btn btn-secondary btn-lg">Go to Next Part</button>
         </a>
     </div>

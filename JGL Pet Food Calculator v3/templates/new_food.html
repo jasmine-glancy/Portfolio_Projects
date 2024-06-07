@@ -13,7 +13,7 @@
     </div>
 
     <!-- Load in WTF Form --> 
-    <form action="{{ url_for('new_food') }}" method="POST">
+    <form action="{{ url_for('new_food', pet_id=pet_id) }}" method="POST">
         <div class="row">
             Please enter the calorie information of the new food you are interested in switching
             your pet to. Please enter 0 in the second field if you are only interested in transitioning
@@ -60,7 +60,7 @@
         </div>
         
         <div class="button-container">
-            <a href="{{ url_for('confirm_data') }}">
+            <a href="{{ url_for('confirm_data', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 3: Confirm Pet Info</button>
             </a>
 
