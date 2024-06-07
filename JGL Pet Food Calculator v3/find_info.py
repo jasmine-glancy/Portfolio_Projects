@@ -54,7 +54,7 @@ class FindInfo():
         return self.der_modifier_end_range
                 
                 
-    def find_der_mid_range(self):
+    def find_der_mid_range(self) -> float:
         """Finds DER mid-range"""
         
         species = self.login_check_for_species()
@@ -153,6 +153,7 @@ class FindInfo():
         
         return self.pet_data 
     
+    
     def guest_pet_data_dictionary(self, user_id, pet_id) -> dict:
         """Builds a dictionary of session variables if no user is logged in"""
 
@@ -239,6 +240,7 @@ class FindInfo():
                          
         return self.guest_pet_data
 
+
     def find_pet_id(self, user_id, animal_id) -> int:
         """Finds the specific pet ID"""
         
@@ -261,6 +263,7 @@ class FindInfo():
             pet_id = 0
         
         return pet_id
+    
     
     def find_existing_pet(self, user_id, animal_id) -> bool:
         """Returns a True if pet is found in the database""" 
@@ -305,6 +308,7 @@ class FindInfo():
                 flash(f"Couldn't find pet list. Exception: {e}")
         
         return pet_list
+        
             
     def login_check_for_species(self) -> str:
         """Checks if user is logged in, then assigns species"""
@@ -355,7 +359,254 @@ class FindInfo():
             # Return whatever breed ID variable ends up being found if no errors
             return breed_id
         
+    
+    def check_if_pediatric(self) -> str:
+        """Checks if the pet is pediatric"""
         
+        try:
+            if self.pet_data and "is_pediatric" in self.pet_data[0]:
+                self.pediatric_status = self.pet_data[0]["is_pediatric"]
+                print(f"Class pediatric status: {self.pediatric_status}")
+        except Exception as e:
+            flash(f"Can't find pediatric status. Exception: {e}")
+                
+        else:
+            # If a user isn't logged in, grab species variable
+            
+            if "is_pediatric" in session and session["is_pediatric"] is not None:
+                # Condition suggested by CoPilot
+                self.pediatric_status = session["is_pediatric"]
+            
+            print(f"Session pediatric status: {self.pediatric_status}") 
+        
+        # Return whatever pediatric status variable ends up being found 
+        return self.pediatric_status   
+        # if session["user_id"] != None:
+        #     # If user isn logged in, query the database
+                
+        #     try:
+        #         check_peds_status = db.execute(
+        #             "SELECT is_pediatric FROM pets WHERE name = :pet_name AND owner_id = :user_id",
+        #             pet_name=session["pet_name"], user_id=session["user_id"]
+        #         )
+        #     except Exception as e:
+        #         flash(f"Unable to find pediatric status, Exception: {e}")
+        #     else:
+        #         is_pediatric = check_peds_status[0]["is_pediatric"]
+        # else:
+        #     # If the user isn't logged in, grab session variables
+        #     is_pediatric = session["is_pediatric"]
+                
+        # print(f"Is Pediatric? {is_pediatric}")
+        
+        # return is_pediatric
+        
+        
+    def find_repro_status(self) -> str:
+        """Returns the reproductive status of the pet"""
+        
+        try:
+            if self.pet_data and "sex" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.pet_sex = self.pet_data[0]["sex"]
+                print(f"Pet's sex: {self.pet_sex}")
+        except Exception as e:
+            flash(f"Can't find pet's sex. Exception: {e}")
+                
+        else:    
+            if "pet_sex" in session and session["pet_sex"] is not None:
+                self.pet_sex = session["pet_sex"]
+            
+            print(f"Session pet's sex: {self.pet_sex}")     
+        
+        # Return whatever reproductive status variable ends up being found 
+        return self.pet_sex
+                
+        #     if species_result:
+        #         pet_sex = species_result[0]["sex"]
+        #         print(pet_sex)
+        #     else:
+        #         pet_sex = session["pet_sex"]
+        #         print(f"Non-db repro status: {pet_sex}") 
+                
+        # else:
+        #     # If a user isn't logged in, grab session variable
+        #     pet_sex = session["pet_sex"]
+            
+        #     print(f"Non-db repro status: {pet_sex}") 
+        
+
+    def check_if_pregnant(self) -> str:
+        """Checks if the pet is pregnant"""
+    
+        try:
+            if self.pet_data and "is_pregnant" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.is_pregnant = self.pet_data[0]["is_pregnant"]
+                print(f"Pet's pregnancy status: {self.is_pregnant}")
+        except Exception as e:
+            flash(f"Can't find pet's pregnancy status. Exception: {e}")
+                
+        else:    
+            if "is_pregnant" in session and session["pregnancy_status"] is not None:
+                self.is_pregnant = session["pregnancy_status"]
+            
+            print(f"Session pregnancy status: {self.is_pregnant}") 
+    
+        # Return whatever pregnancy variable ends up being found 
+        return self.is_pregnant  
+    
+    # if "user_id" in session and session["user_id"] != None:
+    #     # If the user is logged in, verify table variables 
+    #     print(f"Pregnancy check, User ID: {session["user_id"]}")
+    #     print(f"Pregnancy check, Name: {session["pet_name"]}")
+        
+        
+    #     pregnancy_result = db.execute(
+    #         "SELECT is_pregnant FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+    #     )
+        
+
+    #     if pregnancy_result:
+    #         is_pregnant = pregnancy_result[0]["is_pregnant"]
+    #         print(is_pregnant)
+    #     else:
+    #         is_pregnant = session["pregnancy_status"]
+    #         print(f"Non-db pregnancy status: {is_pregnant}") 
+            
+    # else:
+    #     # If a user isn't logged in, grab session variable
+    #     is_pregnant = session["pregnancy_status"]
+        
+    #     print(f"Non-db pregnancy status: {is_pregnant}") 
+    
+
+
+    def check_if_nursing(self) -> str:
+        """Checks if the pet is nursing"""
+        
+        try:
+            if self.pet_data and "is_nursing" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.is_nursing = self.pet_data[0]["is_nursing"]
+                print(f"Pet's lactation status: {self.is_nursing}")
+        except Exception as e:
+            flash(f"Can't find pet's lactation status. Exception: {e}")
+                
+        else:    
+            if "lactation_status" in session and session["lactation_status"] is not None:
+                self.is_nursing = session["lactation_status"]
+            
+            print(f"Session lactation status: {self.is_nursing}") 
+            
+        # Return whatever nursing status variable ends up being found 
+        return self.is_nursing  
+       
+        # if "user_id" in session and session["user_id"] != None:
+        #     # If the user is logged in, verify table variables 
+        #     print(f"Nursing check, User ID: {session["user_id"]}")
+        #     print(f"Nursing check, Name: {session["pet_name"]}")
+            
+            
+        #     nursing_result = db.execute(
+        #         "SELECT is_nursing FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        #     )
+            
+
+        #     if nursing_result:
+        #         is_nursing = nursing_result[0]["is_nursing"]
+        #         print(is_nursing)
+        #     else:
+        #         is_nursing = session["lactation_status"]
+        #         print(f"Non-db nursing status: {is_nursing}") 
+                
+        # else:
+        #     # If a user isn't logged in, grab session variable
+        #     is_nursing = session["lactation_status"]
+            
+        #     print(f"Non-db nursing status: {is_nursing}") 
+        
+        # # Return whatever nursing status variable ends up being found 
+        # return is_nursing  
+
+
+    def check_litter_size(self) -> int:
+        """Checks the pet's litter size"""
+        
+        try:
+            if self.pet_data and "litter_size" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.litter_size = self.pet_data[0]["litter_size"]
+                print(f"Pet's litter size: {self.litter_size}")
+        except Exception as e:
+            flash(f"Can't find pet's litter size. Exception: {e}")
+                
+        else:    
+            if "litter_size" in session and session["litter_size"] is not None:
+                self.litter_size = session["litter_size"]
+            
+            print(f"Session litter size: {self.litter_size}") 
+            
+        # Return whatever litter size variable ends up being found 
+        return self.litter_size  
+    
+        # if "user_id" in session and session["user_id"] != None:
+        #     # If the user is logged in, verify table variables 
+        #     print(f"Litter size check, User ID: {session["user_id"]}")
+        #     print(f"Litter size check, Name: {session["pet_name"]}")
+            
+            
+        #     litter_result = db.execute(
+        #         "SELECT litter_size FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
+        #     )
+            
+
+        #     if litter_result:
+        #         litter_size = litter_result[0]["litter_size"]
+        #         print(litter_size)
+        #     else:
+        #         litter_size = session["litter_size"]
+        #         print(f"Non-db litter size: {litter_size}") 
+                
+        # else:
+        #     # If a user isn't logged in, grab session variable
+        #     is_pregnant = session["litter_size"]
+            
+        #     print(f"Non-db litter size: {litter_size}") 
+        
+        # # Return whatever litter size variable ends up being found 
+        # return litter_size 
+
+
+    def check_obesity_risk(self):
+        """Checks if a pet's breed has a predisposed risk to obesity"""
+        
+        breed_id = self.find_breed_id()
+        species = self.login_check_for_species()
+        
+        if species == "Canine":
+            # Check if pet breed is predisposed to obesity
+                breed_obesity_data = db.execute(
+                    "SELECT ObeseProneBreed FROM dog_breeds WHERE BreedID = :breed_id",
+                    breed_id=breed_id
+                )
+                
+                if breed_obesity_data:
+                    self.obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                    
+        elif species == "Feline":
+            # Check if pet breed is predisposed to obesity
+                breed_obesity_data = db.execute(
+                    "SELECT ObeseProneBreed FROM cat_breeds WHERE BreedID = :breed_id",
+                    breed_id=breed_id
+                )
+                
+                if breed_obesity_data:
+                    self.obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+                    
+        return self.obese_prone_breed
+
+
     def der_factor(self) -> int:
         """Finds the latest der_factor set, if applicable"""
         
@@ -373,7 +624,7 @@ class FindInfo():
                 except Exception as e:
                     flash(f"Can't find DER Factor ID. Exception: {e}")       
         else:
-            # If a user isn't logged in, grab species variable
+            # If a user isn't logged in, grab DER factor ID variable
             self.der_factor_id = session["der_factor_id"]
                     
             print(f"Session DER factor ID: {self.der_factor_id}") 
@@ -411,6 +662,7 @@ class FindInfo():
         # # Return whatever DER factor id variable ends up being found 
         # print(f"DER factor ID: {der_factor_id}")
         # return der_factor_id
+
 
     def find_svg(self) -> str:
         """Find SVG depending on breed and species"""
@@ -454,240 +706,81 @@ class FindInfo():
             return self.svg
             
             
-def find_repro_status():
-    """Returns the reproductive status of the pet"""
-    if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        print(f"Check sex, User ID: {session["user_id"]}")
-        print(f"Check sex, Name: {session["pet_name"]}")
+    def find_food_form(self) -> str:
+        """Find the form of the pet's current diet e.g dry, canned, pouch"""
         
-        
-        species_result = db.execute(
-            "SELECT sex FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-
-        if species_result:
-            pet_sex = species_result[0]["sex"]
-            print(pet_sex)
-        else:
-            pet_sex = session["pet_sex"]
-            print(f"Non-db repro status: {pet_sex}") 
-            
-    else:
-        # If a user isn't logged in, grab session variable
-        pet_sex = session["pet_sex"]
-        
-        print(f"Non-db repro status: {pet_sex}") 
-    
-    # Return whatever reproductive status variable ends up being found 
-    return pet_sex
-
-
-def check_if_pregnant():
-    """Checks if the pet is pregnant"""
-    if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        print(f"Pregnancy check, User ID: {session["user_id"]}")
-        print(f"Pregnancy check, Name: {session["pet_name"]}")
-        
-        
-        pregnancy_result = db.execute(
-            "SELECT is_pregnant FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-
-        if pregnancy_result:
-            is_pregnant = pregnancy_result[0]["is_pregnant"]
-            print(is_pregnant)
-        else:
-            is_pregnant = session["pregnancy_status"]
-            print(f"Non-db pregnancy status: {is_pregnant}") 
-            
-    else:
-        # If a user isn't logged in, grab session variable
-        is_pregnant = session["pregnancy_status"]
-        
-        print(f"Non-db pregnancy status: {is_pregnant}") 
-    
-    # Return whatever pregnancy variable ends up being found 
-    return is_pregnant  
-
-
-def check_if_nursing():
-    """Checks if the pet is pregnant"""
-    if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        print(f"Nursing check, User ID: {session["user_id"]}")
-        print(f"Nursing check, Name: {session["pet_name"]}")
-        
-        
-        nursing_result = db.execute(
-            "SELECT is_nursing FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-
-        if nursing_result:
-            is_nursing = nursing_result[0]["is_nursing"]
-            print(is_nursing)
-        else:
-            is_nursing = session["lactation_status"]
-            print(f"Non-db nursing status: {is_nursing}") 
-            
-    else:
-        # If a user isn't logged in, grab session variable
-        is_nursing = session["lactation_status"]
-        
-        print(f"Non-db nursing status: {is_nursing}") 
-    
-    # Return whatever nursing status variable ends up being found 
-    return is_nursing  
-
-
-def check_litter_size():
-    """Checks if the pet is pregnant"""
-    if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        print(f"Litter size check, User ID: {session["user_id"]}")
-        print(f"Litter size check, Name: {session["pet_name"]}")
-        
-        
-        litter_result = db.execute(
-            "SELECT litter_size FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        )
-        
-
-        if litter_result:
-            litter_size = litter_result[0]["litter_size"]
-            print(litter_size)
-        else:
-            litter_size = session["litter_size"]
-            print(f"Non-db litter size: {litter_size}") 
-            
-    else:
-        # If a user isn't logged in, grab session variable
-        is_pregnant = session["litter_size"]
-        
-        print(f"Non-db litter size: {litter_size}") 
-    
-    # Return whatever litter size variable ends up being found 
-    return litter_size 
-
-
-def check_if_pediatric():
-    """Checks if the pet is pediatric"""
-    
-    if session["user_id"] != None:
-        # If user isn logged in, query the database
-            
         try:
-            check_peds_status = db.execute(
-                "SELECT is_pediatric FROM pets WHERE name = :pet_name AND owner_id = :user_id",
-                pet_name=session["pet_name"], user_id=session["user_id"]
-            )
+            if self.pet_data and "current_food_form" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.current_food_form = self.pet_data[0]["current_food_form"]
+                print(f"Pet's current food form: {self.current_food_form}")
         except Exception as e:
-            flash(f"Unable to find pediatric status, Exception: {e}")
-        else:
-            is_pediatric = check_peds_status[0]["is_pediatric"]
-    else:
-        # If the user isn't logged in, grab session variables
-        is_pediatric = session["is_pediatric"]
-            
-    print(f"Is Pediatric? {is_pediatric}")
-    
-    return is_pediatric
-
-
-def check_obesity_risk():
-    """Checks if a pet's breed has a predisposed risk to obesity"""
-    
-    # Use helpers.py to check for breed ID
-    breed_id = find_breed_id()
-    
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
-    
-    if species == "Canine":
-        # Check if pet breed is predisposed to obesity
-            breed_obesity_data = db.execute(
-                "SELECT ObeseProneBreed FROM dog_breeds WHERE BreedID = :breed_id",
-                breed_id=breed_id
-            )
-            
-            if breed_obesity_data:
-                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
-                  
-    elif species == "Feline":
-        # Check if pet breed is predisposed to obesity
-            breed_obesity_data = db.execute(
-                "SELECT ObeseProneBreed FROM cat_breeds WHERE BreedID = :breed_id",
-                breed_id=breed_id
-            )
-            
-            if breed_obesity_data:
-                obese_prone_breed = breed_obesity_data[0]["ObeseProneBreed"]
+            flash(f"Can't find pet's current food form. Exception: {e}")
                 
-    return obese_prone_breed
-
-
-def find_food_form():
-    """Find the form of the pet's current diet"""
-    
-    if "user_id" in session and session["user_id"] != None:
-        # If the user is logged in, verify table variables 
-        print(session["user_id"])
-        print(session["pet_name"])
-        
-        
-        food_result = db.execute(
-            "SELECT current_food_form FROM pets WHERE owner_id = ? AND name = ?", 
-            session["user_id"], session["pet_name"]
-        )
-        
-
-        if food_result:
-            current_food_form = food_result[0]["current_food_form"]
-            print(current_food_form)
-        else:
-            current_food_form = session["current_food_form"]
-            print(f"Non-db current_food_form: {current_food_form}") 
+        else:    
+            if "current_food_form" in session and session["current_food_form"] is not None:
+                self.current_food_form = session["current_food_form"]
             
-    else:
-        # If a user isn't logged in, grab food form variable
-        current_food_form = session["current_food_form"]
-        
-        print(f"Non-db current_food_form: {current_food_form}")
+            print(f"Session current food form: {self.current_food_form}") 
+            
+        # Return whatever current food form variable ends up being found 
+        return self.current_food_form  
     
-    # Return whatever form variable ends up being found 
-    return current_food_form 
+        # if "user_id" in session and session["user_id"] != None:
+        #     # If the user is logged in, verify table variables 
+        #     print(session["user_id"])
+        #     print(session["pet_name"])
+            
+            
+        #     food_result = db.execute(
+        #         "SELECT current_food_form FROM pets WHERE owner_id = ? AND name = ?", 
+        #         session["user_id"], session["pet_name"]
+        #     )
+            
 
-
-
-def der_factor(self):
-    """Finds the latest der_factor set, if applicable"""
-    
-    if "user_id" in session and session["user_id"] != None:
-        if self.species == "Canine":
-            try:
-                self.der_factor_id = self.pet_data[0]["canine_der_factor_id"]
-                print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
-            except Exception as e:
-                flash(f"Can't find DER Factor ID. Exception: {e}")
-        if self.species == "Feline":
-            try:
-                self.der_factor_id = self.pet_data[0]["feline_der_factor_id"]
-                print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
-            except Exception as e:
-                flash(f"Can't find DER Factor ID. Exception: {e}")       
-    else:
-        # If a user isn't logged in, grab species variable
-        self.der_factor_id = session["der_factor_id"]
+        #     if food_result:
+        #         current_food_form = food_result[0]["current_food_form"]
+        #         print(current_food_form)
+        #     else:
+        #         current_food_form = session["current_food_form"]
+        #         print(f"Non-db current_food_form: {current_food_form}") 
                 
-        print(f"Session DER factor ID: {self.der_factor_id}") 
+        # else:
+        #     # If a user isn't logged in, grab food form variable
+        #     current_food_form = session["current_food_form"]
+            
+        #     print(f"Non-db current_food_form: {current_food_form}")
         
-    print(f"DER factor ID: {self.der_factor_id}")
+        # # Return whatever form variable ends up being found 
+        # return current_food_form 
+
+
+
+# def der_factor(self):
+#     """Finds the latest der_factor set, if applicable"""
     
-    return self.der_factor_id
+#     if "user_id" in session and session["user_id"] != None:
+#         if self.species == "Canine":
+#             try:
+#                 self.der_factor_id = self.pet_data[0]["canine_der_factor_id"]
+#                 print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+#             except Exception as e:
+#                 flash(f"Can't find DER Factor ID. Exception: {e}")
+#         if self.species == "Feline":
+#             try:
+#                 self.der_factor_id = self.pet_data[0]["feline_der_factor_id"]
+#                 print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
+#             except Exception as e:
+#                 flash(f"Can't find DER Factor ID. Exception: {e}")       
+#     else:
+#         # If a user isn't logged in, grab species variable
+#         self.der_factor_id = session["der_factor_id"]
+                
+#         print(f"Session DER factor ID: {self.der_factor_id}") 
+        
+#     print(f"DER factor ID: {self.der_factor_id}")
+    
+#     return self.der_factor_id
     # # Condition suggested by CoPilot
     
     #     # If the user is logged in, verify table variables 

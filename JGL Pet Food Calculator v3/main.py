@@ -5,11 +5,7 @@ from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
-# TODO: Split helpers.py into multiple files
-from find_info import FindInfo, \
-    find_repro_status, check_if_pregnant, check_litter_size, check_if_pediatric, \
-        check_if_nursing, check_obesity_risk, find_food_form, \
-            der_factor
+from find_info import FindInfo
 from helpers import clear_variable_list
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -926,7 +922,7 @@ def pet_condition(pet_id):
             
             # Use find_info to verify DER factor ID
             der_factor_id = fi.der_factor()
-            check_litter_size()
+            # check_litter_size()
             
                 
             print(f"Weight: {weight}{units}")
@@ -982,9 +978,9 @@ def pet_condition(pet_id):
             print(f"Estimated ideal weight: {est_ideal_weight_kgs} kgs, {est_ideal_weight_lbs} lbs")
 
             # Check for pregnancy status and nursing status
-            pregnancy_status = check_if_pregnant()
-            is_nursing = check_if_nursing()
-            is_pediatric = check_if_pediatric()
+            pregnancy_status = fi.check_if_pregnant()
+            is_nursing = fi.check_if_nursing()
+            is_pediatric = fi.check_if_pediatric()
             
             if species == "Canine":
                 
@@ -1002,7 +998,7 @@ def pet_condition(pet_id):
                     
             
                 # Check if pet breed is predisposed to obesity
-                obese_prone_breed = check_obesity_risk()
+                obese_prone_breed = fi.check_obesity_risk()
                     
                 print(obese_prone_breed)
                 if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
@@ -1050,7 +1046,7 @@ def pet_condition(pet_id):
                         der_factor_id = 3
                     
                 # Check if pet breed is predisposed to obesity
-                obese_prone_breed = check_obesity_risk()
+                obese_prone_breed = fi.check_obesity_risk()
                     
                 print(obese_prone_breed)
                 if obese_prone_breed == "y" and pregnancy_status != "y" and is_nursing != "y" and is_pediatric != "y":
@@ -1113,18 +1109,18 @@ def activity():
             
         # Use find_info to verify DER factor ID, pregnancy status, and lactation status
         der_factor_id = fi.der_factor()
-        pregnancy_status = check_if_pregnant()
-        is_nursing = check_if_nursing()
+        pregnancy_status = fi.check_if_pregnant()
+        is_nursing = fi.check_if_nursing()
         
         # Check if pet breed is predisposed to obesity
-        obese_prone_breed = check_obesity_risk()
+        obese_prone_breed = fi.check_obesity_risk()
         
         
         # Pets that aren't pregnant, aren't nursing, and are obese prone
         not_preg_or_nursing_non_obese = pregnancy_status != "y" and is_nursing != "y" and obese_prone_breed != "y"
         
         # Check if a pet is pediatric
-        is_pediatric = check_if_pediatric()
+        is_pediatric = fi.check_if_pediatric()
                 
         # sources: https://wellbeloved.com/pages/cat-dog-activity-levels
         # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
@@ -1311,16 +1307,17 @@ def new_food():
 def rer(pet_id):
     """Calculates the minimum number of calories a pet needs at rest per day"""
 
+    # Use find_info to find DER start and end range
+    fi = FindInfo(session["user_id"])
     
     # Use login check from helpers.py to verify reproductive status
-    sex = find_repro_status()
+    sex = fi.find_repro_status()
     
     # Import food calculator
     cf = CalculateFood(session["user_id"], pet_id)
     rer = cf.calculcate_rer()
     
-    # Use find_info to find DER start and end range
-    fi = FindInfo(session["user_id"])
+
     # Use DER factor id to lookup DER information by species
     der_modifier_start_range = fi.find_der_low_end()
     der_modifier_end_range = fi.find_der_high_end()
@@ -1374,10 +1371,10 @@ def rer(pet_id):
     print(f"RER: {rer}")
     
     # Check life stage factors
-    obese_prone = check_obesity_risk()
-    is_pediatric = check_if_pediatric()
-    is_nursing = check_if_nursing()
-    is_pregnant = check_if_pregnant()
+    obese_prone = fi.check_obesity_risk()
+    is_pediatric = fi.check_if_pediatric()
+    is_nursing = fi.check_if_nursing()
+    is_pregnant = fi.check_if_pregnant()
     
     if obese_prone == "y" or is_pediatric == "y" \
         or is_nursing == "y" or is_pregnant == "y":
@@ -1444,10 +1441,11 @@ def der(pet_id):
     print(possessive_pronoun, object_pronoun)
     
     
-    # Use login check from find_info to verify species
+    # Use find_info to verify species, sex, and litter size if applicable
     fi = FindInfo(session["user_id"], pet_id) 
     species = fi.login_check_for_species()
-    sex = find_repro_status()
+    sex = fi.find_repro_status()
+    litter_size = fi.check_litter_size()
     
     # If user is logged in, use SQL query
     if session["user_id"] != None:
