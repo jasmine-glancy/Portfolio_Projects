@@ -17,20 +17,68 @@
     <!-- Load in completed reports --> 
     <form action="/finished_reports" method="POST">
         <div class="row">
-            <select name="reports">
-                <option disabled selected>Please Select a Pet</option>
-                {% for pet in pet_list %}
-                    {% if pet.date_of_first_report != None %}
-                            <option value="{{ pet.pet_id }}">{{ pet.name }}</option>
 
-
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>
+                            Pet
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                    </thead>
+                <tbody>
+                    {% for pet in pet_list %}
+                        {% if pet.date_of_first_report != None %}
+                            <tr>
+                                <td>
+                                    <h4>{{ pet.name }}</h4>
+                                    {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
+                                    {{ pet.age_in_months }} month old
+                                {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
+                                    {{ pet.age_in_months }} months old
+                                {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
+                                    {{ pet.age_in_years }} year old
+                                {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
+                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
+                                {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
+                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
+                                {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
+                                    {{ pet.age_in_years }} years old
+                                {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
+                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
+                                {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
+                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
+                                {% endif %}
+                                {% if pet.sex == "female_spayed" %}
+                                    Female (Spayed)
+                                {% elif pet.sex == "female" %}
+                                    Female (Intact)
+                                {% elif pet.sex == "male_neutered" %}
+                                    Male (Neutered)
+                                {% elif pet.sex == "male" %}
+                                    Male (Intact)
+                                {% endif %}
+                                {{ pet.breed }} ({{ pet.species }})
+                                </td>
+                                <td>
+                                <div class="button-container">
+                                    <a href="{{ url_for('completed_report', id=pet.pet_id) }}">
+                                        <button type="button" class="btn btn-secondary btn-sm">Go to Pet's Final Report</button>
+                                    </a> 
+                                
+                                    <!-- TODO: Add modify capability -->
+                                    <a href="#">   
+                                        <button type="submit" class="btn btn-secondary btn-sm">Modify Report</button>
+                                    </div>
+                                </td>
+                            </tr>
                         {% endif %}
-                {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
 
-            </select>
-            <div class="button-container">
-                <button type="submit" class="btn btn-secondary btn-lg">Modify Report</button>
-            </div>
         </div>
     </form>
     

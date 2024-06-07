@@ -11,6 +11,13 @@
 {% block content %}
 
 <div class="container-lg">
+
+    <!-- Outputs error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
     
     <div class="report_wrapper">
         <div class="report_title">
@@ -183,7 +190,7 @@
         
         
         <div class="food_and_exercise">
-            {% if pet_data[0].species == "Feline" and pet_data[0].bcs > 6 %}
+            {% if pet_data[0].species == "Feline" and pet_data[0].bcs > 6 and pet_data[0].pet_age_years > 7 %}
             <div class="feeding">
             {% else %}
             <div class="k9_feeding">

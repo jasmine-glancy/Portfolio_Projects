@@ -1,14 +1,16 @@
 """Welcome to the Pet Food Calculator!"""
 
+from calculate_food import CalculateFood
 from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 # TODO: Split helpers.py into multiple files
-from helpers import login_check_for_species, der_factor, check_if_pregnant, calculcate_rer, find_repro_status, \
-    find_breed_id, find_pet_id, convert_decimal_to_volumetric, find_food_form, pet_data_dictionary, check_litter_size, \
-        check_if_nursing, check_obesity_risk, check_if_pediatric, clear_variable_list, find_der_low_end, find_der_high_end, \
-            find_der_mid_range, calculcate_der
+from find_info import FindInfo, \
+    find_repro_status, check_if_pregnant, check_litter_size, check_if_pediatric, \
+        check_if_nursing, check_obesity_risk, find_food_form, \
+            der_factor, find_der_low_end, find_der_high_end, find_der_mid_range
+from helpers import clear_variable_list
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -161,15 +163,14 @@ def logout():
 def pet_info():
     """Gets the pet's signalment, i.e. name, age, sex/reproductive status, breed, species"""
     
-    id = None
     try:
-        pet_id = request.args.get("id") 
+        pet_id = request.args.get("id")
+        fi = FindInfo(session["user_id"], pet_id) 
         print(f"pet ID: {pet_id}")
-        id = find_pet_id(pet_id) 
+        id = fi.find_pet_id(session["user_id"], pet_id) 
     except Exception as e:
         print(f"Couldn't find ID, Exception: {e}")
     else:
-        
         print(f"user_id: {session['user_id']}, pet_id: {id}") 
 
         
@@ -179,9 +180,6 @@ def pet_info():
         
         species = form.pet_species.data
         pet_name = form.pet_name.data.title()
-        
-        print(type(species))
-        print(type(pet_name))
         
         
         # Show an error message if the user doesn't choose a species
@@ -193,14 +191,13 @@ def pet_info():
         if session["user_id"] != None:
             
 
-            if pet_id is not None:    
-                
+            if pet_id != None:    
                 
                 print(f"user_id: {session['user_id']}, pet_id: {id}")  # Add this line
 
                 # See if the pet is already added
                 find_existing_pet = db.execute(
-                    "SELECT name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
+                    "SELECT pet_id, name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
                     user_id=session["user_id"], pet_id=id
                 )
                 
@@ -213,339 +210,381 @@ def pet_info():
                         )
                     except Exception as e:
                         flash(f"Unable to update data, Exception: {e}")
+                        return render_template("get_signalment.html", form=form)
                     else:
                         session["species"] = species
                         session["pet_name"] = pet_name
+                        session["pet_id"] = find_existing_pet[0]["pet_id"] 
+                        pet_id = find_existing_pet[0]["pet_id"] 
             else:
-                # If no pet is found (i.e. new pet in the database), create new session variable and store pet
-                # Store session variables
-                session["species"] = species
-                session["pet_name"] = pet_name
-                
+                # If no pet is found (i.e. new pet in the database), create new session variables and store pet
+                print("New pet")
                 try:
+                    # Insert new pet data
                     db.execute(
                         "INSERT INTO pets (owner_id, name, species) VALUES (?, ?, ?)",
                         session["user_id"], pet_name, species
                     )
+                    
+                    print("Looking up new pet's ID")                        
+                    # Query the new pet's id 
+                    pet_data = db.execute(
+                        "SELECT pet_id, name FROM pets \
+                            WHERE owner_id = :user_id AND name = :pet_name",
+                            user_id=session["user_id"], pet_name=pet_name
+                        )
+                    
+                    print(pet_data[0]["pet_id"], pet_data[0]["name"])
+                    new_pet_id = pet_data[0]["pet_id"]
+                    
                 except Exception as e:
-                    flash(f"Unable to insert new data, Exception: {e}")
-                
-        # else pass the data to the next function via session variables
-        return redirect(url_for('pet_info_continued', species=species, pet_name=pet_name))
+                    flash(f"Unable to insert and query new signalment data, Exception: {e}")
+                    return render_template("get_signalment.html", form=form)
+                else:
+                    pet_id = new_pet_id
+                    session["pet_id"] = pet_id
+                    
+                     # Update the pet_data dictionary with the new pet's id
+                    pet_data[0]["pet_id"] = pet_id
+                    fi = FindInfo(session["user_id"], pet_id) 
 
+            # Store session variables
+            session["species"] = species
+            session["pet_name"] = pet_name
+                    
+            pet_id = fi.find_pet_id(session["user_id"], pet_id)
+            
+        print(pet_id, species, pet_name)        
+            
+        if pet_id is not None:
+            return redirect(url_for('pet_info_continued', pet_id=pet_id, species=species, pet_name=pet_name))
+        else:
+            flash("Pet ID is not available. Please try again.")
+            return render_template("get_signalment.html", form=form)
+        
     return render_template("get_signalment.html", form=form)
 
 
-@app.route("/get-signalment-pt-2", methods=["GET", "POST"])
-def pet_info_continued():
+@app.route("/get-signalment-pt-2/<int:pet_id>", methods=["GET", "POST"])
+def pet_info_continued(pet_id):
     """Gets the rest of pet's signalment, 
     i.e. name, age, sex/reproductive status, breed, species"""
     
     form = NewSignalment()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
-
+    id = None
+    try:
+        print(f"pet ID: {pet_id}")
+        fi = FindInfo(session["user_id"], pet_id) 
         
-    # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
-    # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
+        id = fi.find_pet_id(session["user_id"], pet_id) 
+        
+        # Use login check from find_info to verify species
+        species = fi.login_check_for_species()
+    except Exception as e:
+        print(f"Couldn't find ID, Exception: {e}")
+    else:
+        
+        print(f"user_id: {session['user_id']}, pet_id: {id}") 
+            
     
-    # Access breed data via database
-    pet_breed = []
-    if species == "Canine":
-        canine_breed_list = db.execute(
-            "SELECT Breed FROM dog_breeds ORDER BY Breed"
-        )
+        # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
+        # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
         
-        if canine_breed_list != None:
-            pet_breed += canine_breed_list
+        # Access breed data via database
+        pet_breed = []
+        if species == "Canine":
+            canine_breed_list = db.execute(
+                "SELECT Breed FROM dog_breeds ORDER BY Breed"
+            )
             
-    if species == "Feline":
-        feline_breed_list = db.execute(
-            "SELECT Breed FROM cat_breeds ORDER BY Breed"
-        )
-        if feline_breed_list != None:
-            pet_breed += feline_breed_list
+            if canine_breed_list != None:
+                pet_breed += canine_breed_list
+                
+        if species == "Feline":
+            feline_breed_list = db.execute(
+                "SELECT Breed FROM cat_breeds ORDER BY Breed"
+            )
+            if feline_breed_list != None:
+                pet_breed += feline_breed_list
+            
         
-    
-    if request.method == "POST":
-        pet_sex = form.pet_sex.data
-        pet_age_years = form.pet_age.data
-        pet_age_months = form.pet_age_months.data 
-        pet_breed = request.form.get("pet_breed")
+        if request.method == "POST":
+            pet_sex = form.pet_sex.data
+            pet_age_years = form.pet_age.data
+            pet_age_months = form.pet_age_months.data 
+            pet_breed = request.form.get("pet_breed")
 
 
-        # Show an error message if the user doesn't choose a breed or sex
-        if pet_breed == None and pet_sex == "default":
-            flash("Please choose a breed and your pet's reproductive status from the dropdown menus.")
-            return redirect(url_for('pet_info_continued'))
-        elif pet_breed == None and pet_sex != "default":
-            flash("Please choose a breed from the dropdown menus.")
-            return redirect(url_for('pet_info_continued'))
-        elif pet_breed != None and pet_sex == "default":
-            flash("Please choose your pet's reproductive status from the dropdown menus.")
-            return redirect(url_for('pet_info_continued'))    
-        elif pet_age_years < 0 or pet_age_months < 0:
-            flash("Please enter 0 or a number greater than zero.")
-            return redirect(url_for('pet_info_continued'))    
-        else:
-            print(pet_age_years, pet_age_months)
-            if pet_age_months > 12:
-                # If more than 12 months is input, add number to years
-                
-                pet_age_years += pet_age_months / 12
-                
-                # Get the integer part of pet_age_years
-                pet_age_years_int = int(pet_age_years)  
-                
-                # Get the decimal part of pet_age_years
-                pet_age_years_decimal = pet_age_years - pet_age_years_int  
+            # Show an error message if the user doesn't choose a breed or sex
+            if pet_breed == None and pet_sex == "default":
+                flash("Please choose a breed and your pet's reproductive status from the dropdown menus.")
+                return redirect(url_for('pet_info_continued'))
+            elif pet_breed == None and pet_sex != "default":
+                flash("Please choose a breed from the dropdown menus.")
+                return redirect(url_for('pet_info_continued'))
+            elif pet_breed != None and pet_sex == "default":
+                flash("Please choose your pet's reproductive status from the dropdown menus.")
+                return redirect(url_for('pet_info_continued'))    
+            elif pet_age_years < 0 or pet_age_months < 0:
+                flash("Please enter 0 or a number greater than zero.")
+                return redirect(url_for('pet_info_continued'))    
+            else:
+                print(pet_age_years, pet_age_months)
+                if pet_age_months > 12:
+                    # If more than 12 months is input, add number to years
+                    
+                    pet_age_years += pet_age_months / 12
+                    
+                    # Get the integer part of pet_age_years
+                    pet_age_years_int = int(pet_age_years)  
+                    
+                    # Get the decimal part of pet_age_years
+                    pet_age_years_decimal = pet_age_years - pet_age_years_int  
 
-                # Convert the decimal part of pet_age_years back to months
-                pet_age_months = round(pet_age_years_decimal * 12)
+                    # Convert the decimal part of pet_age_years back to months
+                    pet_age_months = round(pet_age_years_decimal * 12)
 
-                # Update pet_age_years to only include the integer part
-                pet_age_years = pet_age_years_int
+                    # Update pet_age_years to only include the integer part
+                    pet_age_years = pet_age_years_int
+                    
+                print(pet_age_years, pet_age_months)
+                    
+                # Create new session variables
+                session["pet_sex"] = pet_sex
+                session["pet_age_years"] = pet_age_years
+                session["pet_age_months"] = pet_age_months
+                session["pet_breed"] = pet_breed
+                # print(pet_breed)
                 
-            print(pet_age_years, pet_age_months)
+                # print(pet_age_years)
+                # print(pet_age_months)
+                # print(pet_breed)
+                # print(pet_sex)
+                # print(session["pet_name"])
+                # print(session["user_id"])
                 
-            # Create new session variables
-            session["pet_sex"] = pet_sex
-            session["pet_age_years"] = pet_age_years
-            session["pet_age_months"] = pet_age_months
-            session["pet_breed"] = pet_breed
-            # print(pet_breed)
-            
-            # print(pet_age_years)
-            # print(pet_age_months)
-            # print(pet_breed)
-            # print(pet_sex)
-            # print(session["pet_name"])
-            # print(session["user_id"])
-            
-            # Convert months to years for easier logic reading
-            partial_years = float(pet_age_months / 12)
-            pet_age = pet_age_years + partial_years    
-            
-            print(pet_age)   
-            
-            # Set flags to see if a pet is between pediatric and sexually mature ages
-            is_pediatric = "n"
-            not_pediatric_not_mature = False
-            sexually_mature = False
-            # Search for pet breed code in breed database
-            if species == "Canine":
-                breed_id_result = db.execute(
-                    "SELECT BreedID FROM dog_breeds WHERE Breed = ?", pet_breed
-                )
+                # Convert months to years for easier logic reading
+                partial_years = float(pet_age_months / 12)
+                pet_age = pet_age_years + partial_years    
                 
-                breed_id = breed_id_result[0]["BreedID"]
-            
-                print(f"breed_id: {breed_id}")
+                print(pet_age)   
                 
-                # Find breed size category
-                breed_size_results = db.execute(
-                    "SELECT SizeCategory FROM dog_breeds WHERE BreedID = ?;", breed_id
-                )
+                # Set flags to see if a pet is between pediatric and sexually mature ages
+                is_pediatric = "n"
+                not_pediatric_not_mature = False
+                sexually_mature = False
+                # Search for pet breed code in breed database
+                if species == "Canine":
+                    breed_id_result = db.execute(
+                        "SELECT BreedID FROM dog_breeds WHERE Breed = ?", pet_breed
+                    )
+                    
+                    breed_id = breed_id_result[0]["BreedID"]
                 
-                breed_size = breed_size_results[0]["SizeCategory"]
-                
-                print(breed_size)
-                
-                if breed_size == "X-Small" or breed_size == "Small" or breed_size == "Medium":
-                    if pet_age < 0.33:
-                        # Puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
-                        print("DER Modifier * 3.0")
+                    print(f"breed_id: {breed_id}")
+                    
+                    # Find breed size category
+                    breed_size_results = db.execute(
+                        "SELECT SizeCategory FROM dog_breeds WHERE BreedID = ?;", breed_id
+                    )
+                    
+                    breed_size = breed_size_results[0]["SizeCategory"]
+                    
+                    print(breed_size)
+                    
+                    if breed_size == "X-Small" or breed_size == "Small" or breed_size == "Medium":
+                        if pet_age < 0.33:
+                            # Puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
+                            print("DER Modifier * 3.0")
+                            der_factor_id = 13
+                            is_pediatric = "y"
+                        elif pet_age >= 0.33 and pet_age <= 0.66:
+                            # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 2.5
+                            print("DER Modifier * 2.5")
+                            der_factor_id = 15
+                            is_pediatric = "y"
+                        elif pet_age > 0.66 and pet_age <= 1:
+                            # Toy/small/medium breed puppies between 8 and 12 months of age have a DER modifier of * 1.8-2.0
+                            print("DER Modifier * 1.8-2.0")
+                            der_factor_id = 18
+                            is_pediatric = "y"
+                        elif pet_age > 1 and pet_age < 2:
+                            # Toy/small/medium breed dogs that aren't pediatric but aren't sexually matue
+                            not_pediatric_not_mature = True
+                        else:
+                            # Pets over 2 years old
+                            sexually_mature = True
+                                
+                    elif breed_size == "Large":
+                        if pet_age < 0.33:
+                            # Large breed puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
+                            print("DER Modifier * 3.0")
+                            der_factor_id = 13
+                            is_pediatric = "y"
+                        elif pet_age > 0.33 and pet_age <= 0.91:
+                            # Large breed puppies between 4 and 11 months old have a DER modifier of * 2.5
+                            print("DER Modifier * 2.5")
+                            der_factor_id = 16
+                            is_pediatric = "y"
+                        elif pet_age > 0.91 and pet_age <= 1.5:
+                            # Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
+                            print("DER Modifier * 1.8-2.0")
+                            der_factor_id = 18
+                            is_pediatric = "y"
+                        elif pet_age > 1.5 and pet_age < 2:
+                            # Large breed dogs that aren't pediatric but aren't sexually matue
+                            not_pediatric_not_mature = True
+                        else:
+                            # Pets over 2 years old
+                            sexually_mature = True
+                            
+                    elif breed_size == "X-Large":
+                        if pet_age < 0.33:
+                            # X-Large breed puppies under 6 months old have a DER modifier of * 3.0 factor_id 13
+                            der_factor_id = 13
+                            print("DER Modifier * 3.0")
+                            is_pediatric = "y"
+                        if pet_age > 0.5 and pet_age <= 1:
+                            # X-Large breed puppies between 6 and 12 months old have a DER modifier of * 2.5
+                            print("DER Modifier * 2.5")
+                            der_factor_id = 17
+                            is_pediatric = "y"
+                        elif pet_age > 1 and pet_age <= 1.5:
+                            # X-Large breed puppies between 12 and 18 months old have a DER modifier of * 1.8-2.0
+                            print("DER Modifier * 1.8-2.0")
+                            der_factor_id = 20
+                            is_pediatric = "y"
+                        elif pet_age > 1.5 and pet_age < 2:
+                            # X-Large breed dogs that aren't pediatric but aren't sexually matue
+                            not_pediatric_not_mature = True
+                        else:
+                            # Pets over 2 years old
+                            sexually_mature = True
+                            
+                            
+                    # List for condensed conditionals suggested by CoPilot
+                    if not_pediatric_not_mature or sexually_mature:
+                        if pet_sex in ["female_spayed", "male_neutered"]:
+                            # Non-pediatric, sexually immature and older dogs that are neutered or spayed
+                            print("DER Modifier * 1.4-1.6")
+                            der_factor_id = 1
+                            
+                        elif pet_sex in ["male", "female"]:
+                            # Non-pediatric, sexually immature or intact male dogs
+                            print("DER Modifier * 1.6-1.8")
+                            der_factor_id = 2
+                            
+                            
+                            
+                    print(breed_size)
+                    
+                    # Add pet to the database if the user is logged in
+                    if session["user_id"] != None:
+                        print(session["user_id"])
+                        print(session["pet_name"])
+                        print(breed_id, der_factor_id, pet_age_years, pet_age_months, pet_breed, pet_sex)
+
+                        try:
+                            db.execute(
+                                "UPDATE pets SET canine_breed_id = :breed_id, canine_der_factor_id = :der_factor_id, \
+                                    age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex, is_pediatric = :pediatric_status \
+                                        WHERE name = :pet_name AND owner_id = :user_id",
+                                    breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, \
+                                        sex=pet_sex, pediatric_status=is_pediatric, pet_name=session["pet_name"], user_id=session["user_id"]
+                                )
+
+                            
+                        except Exception as e:
+                            flash(f"Missing pet name or user ID in session. Exception: {e}")
+                            return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species, pet_id=pet_id))
+
+                            
+                if species == "Feline":
+                    breed_id_result = db.execute(
+                        "SELECT BreedID FROM cat_breeds WHERE Breed = ?", pet_breed
+                    )    
+                    
+                    breed_id = breed_id_result[0]["BreedID"]
+                    print(breed_id)
+                    
+
+                    # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
+                    # and https://www.veterinary-practice.com/article/feeding-for-optimal-growth
+                    if pet_age <= 0.33 or pet_age > 0.5 and pet_age <= 0.83:
+                        # Kittens under 4 months old or between 7 and 10 months old have a DER modifier of * 2.0
+                        print("DER Modifier * 2.0")
                         der_factor_id = 13
                         is_pediatric = "y"
-                    elif pet_age >= 0.33 and pet_age <= 0.66:
-                        # Toy/small/medium breed puppies between 4 and 8 months of age have a DER modifier of * 2.5
+                    elif pet_age > 0.33 and pet_age <= 0.5:
+                        #Kittens between 5 and 6 months old have a DER modifier of * 2.5
                         print("DER Modifier * 2.5")
+                        der_factor_id = 14
+                        is_pediatric = "y"
+                    elif pet_age > 0.83 and pet_age <= 1:
+                        # Kittens between 10 and 12 months old have a DER modifier of * 1.8-2.0
+                        print("DER Modifier * 1.8-2.0")
                         der_factor_id = 15
                         is_pediatric = "y"
-                    elif pet_age > 0.66 and pet_age <= 1:
-                        # Toy/small/medium breed puppies between 8 and 12 months of age have a DER modifier of * 1.8-2.0
-                        print("DER Modifier * 1.8-2.0")
-                        der_factor_id = 18
-                        is_pediatric = "y"
                     elif pet_age > 1 and pet_age < 2:
-                        # Toy/small/medium breed dogs that aren't pediatric but aren't sexually matue
+                        # Kittens that aren't pediatric but aren't sexually matue
                         not_pediatric_not_mature = True
-                    else:
+                    elif pet_age >= 2 and pet_age < 7:
                         # Pets over 2 years old
                         sexually_mature = True
+                    elif pet_age >= 7 and pet_age <= 11:
+                        # Cats between 7 and 11 years of age have a DER modifier of * 1.1-1.4
+                        print("DER Modifier * 1.1-1.4")
+                        der_factor_id = 4
+                    elif pet_age >= 11:
+                        # Cats older than 11 years have a DER modifier of * 1.1-1.6
+                        print("DER Modifier * 1.1-1.6")
+                        der_factor_id = 5
+                        
+                    if not_pediatric_not_mature or sexually_mature:
+                        if pet_sex in ["female_spayed", "male_neutered"]:
+                            # Non-pediatric, sexually immature and older cats that are neutered or spayed
+                            print("DER Modifier * 1.2-1.4")
+                            der_factor_id = 1
                             
-                elif breed_size == "Large":
-                    if pet_age < 0.33:
-                        # Large breed puppies under 4 months old have a DER modifier of * 3.0 factor_id 13
-                        print("DER Modifier * 3.0")
-                        der_factor_id = 13
-                        is_pediatric = "y"
-                    elif pet_age > 0.33 and pet_age <= 0.91:
-                        # Large breed puppies between 4 and 11 months old have a DER modifier of * 2.5
-                        print("DER Modifier * 2.5")
-                        der_factor_id = 16
-                        is_pediatric = "y"
-                    elif pet_age > 0.91 and pet_age <= 1.5:
-                        # Large breed puppies between 11 and 18 months old have a DER modifier of * 1.8-2.0
-                        print("DER Modifier * 1.8-2.0")
-                        der_factor_id = 18
-                        is_pediatric = "y"
-                    elif pet_age > 1.5 and pet_age < 2:
-                        # Large breed dogs that aren't pediatric but aren't sexually matue
-                        not_pediatric_not_mature = True
-                    else:
-                        # Pets over 2 years old
-                        sexually_mature = True
-                        
-                elif breed_size == "X-Large":
-                    if pet_age < 0.33:
-                        # X-Large breed puppies under 6 months old have a DER modifier of * 3.0 factor_id 13
-                        der_factor_id = 13
-                        print("DER Modifier * 3.0")
-                        is_pediatric = "y"
-                    if pet_age > 0.5 and pet_age <= 1:
-                        # X-Large breed puppies between 6 and 12 months old have a DER modifier of * 2.5
-                        print("DER Modifier * 2.5")
-                        der_factor_id = 17
-                        is_pediatric = "y"
-                    elif pet_age > 1 and pet_age <= 1.5:
-                        # X-Large breed puppies between 12 and 18 months old have a DER modifier of * 1.8-2.0
-                        print("DER Modifier * 1.8-2.0")
-                        der_factor_id = 20
-                        is_pediatric = "y"
-                    elif pet_age > 1.5 and pet_age < 2:
-                        # X-Large breed dogs that aren't pediatric but aren't sexually matue
-                        not_pediatric_not_mature = True
-                    else:
-                        # Pets over 2 years old
-                        sexually_mature = True
-                        
-                        
-                # List for condensed conditionals suggested by CoPilot
-                if not_pediatric_not_mature or sexually_mature:
-                    if pet_sex in ["female_spayed", "male_neutered"]:
-                        # Non-pediatric, sexually immature and older dogs that are neutered or spayed
-                        print("DER Modifier * 1.4-1.6")
-                        der_factor_id = 1
-                        
-                    elif pet_sex in ["male", "female"]:
-                        # Non-pediatric, sexually immature or intact male dogs
-                        print("DER Modifier * 1.6-1.8")
-                        der_factor_id = 2
-                        
-                        
-                        
-                print(breed_size)
-                
-                # Add pet to the database if the user is logged in
-                if session["user_id"] != None:
-                    print(session["user_id"])
-                    print(session["pet_name"])
-                    print(breed_id, der_factor_id, pet_age_years, pet_age_months, pet_breed, pet_sex)
+                        elif pet_sex in ["male", "female"]:
+                            # Non-pediatric, sexually immature or intact male cats
+                            print("DER Modifier * 1.4-1.6")
+                            der_factor_id = 2
 
-                    try:
-                        db.execute(
-                            "UPDATE pets SET canine_breed_id = :breed_id, canine_der_factor_id = :der_factor_id, \
-                                age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex, is_pediatric = :pediatric_status \
-                                    WHERE name = :pet_name AND owner_id = :user_id",
-                                breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, \
-                                    sex=pet_sex, pediatric_status=is_pediatric, pet_name=session["pet_name"], user_id=session["user_id"]
-                            )
-                        
-                        
-                    except Exception as e:
-                        flash(f"Missing pet name or user ID in session. Exception: {e}")
-                        return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species))
 
-                        
-            if species == "Feline":
-                breed_id_result = db.execute(
-                    "SELECT BreedID FROM cat_breeds WHERE Breed = ?", pet_breed
-                )    
-                
-                breed_id = breed_id_result[0]["BreedID"]
-                print(breed_id)
-                
-
-                # DER factors suggested by https://todaysveterinarynurse.com/wp-content/uploads/sites/3/2018/07/TVN-2018-03_Puppy_Kitten_Nutrition.pdf
-                # and https://www.veterinary-practice.com/article/feeding-for-optimal-growth
-                if pet_age <= 0.33 or pet_age > 0.5 and pet_age <= 0.83:
-                    # Kittens under 4 months old or between 7 and 10 months old have a DER modifier of * 2.0
-                    print("DER Modifier * 2.0")
-                    der_factor_id = 13
-                    is_pediatric = "y"
-                elif pet_age > 0.33 and pet_age <= 0.5:
-                    #Kittens between 5 and 6 months old have a DER modifier of * 2.5
-                    print("DER Modifier * 2.5")
-                    der_factor_id = 14
-                    is_pediatric = "y"
-                elif pet_age > 0.83 and pet_age <= 1:
-                    # Kittens between 10 and 12 months old have a DER modifier of * 1.8-2.0
-                    print("DER Modifier * 1.8-2.0")
-                    der_factor_id = 15
-                    is_pediatric = "y"
-                elif pet_age > 1 and pet_age < 2:
-                    # Kittens that aren't pediatric but aren't sexually matue
-                    not_pediatric_not_mature = True
-                elif pet_age >= 2 and pet_age < 7:
-                    # Pets over 2 years old
-                    sexually_mature = True
-                elif pet_age >= 7 and pet_age <= 11:
-                    # Cats between 7 and 11 years of age have a DER modifier of * 1.1-1.4
-                    print("DER Modifier * 1.1-1.4")
-                    der_factor_id = 4
-                elif pet_age >= 11:
-                    # Cats older than 11 years have a DER modifier of * 1.1-1.6
-                    print("DER Modifier * 1.1-1.6")
-                    der_factor_id = 5
                     
-                if not_pediatric_not_mature or sexually_mature:
-                    if pet_sex in ["female_spayed", "male_neutered"]:
-                        # Non-pediatric, sexually immature and older cats that are neutered or spayed
-                        print("DER Modifier * 1.2-1.4")
-                        der_factor_id = 1
+                    # Add pet to the database if the user is logged in
+                    if session["user_id"] != None:
+                        print (der_factor_id)
                         
-                    elif pet_sex in ["male", "female"]:
-                        # Non-pediatric, sexually immature or intact male cats
-                        print("DER Modifier * 1.4-1.6")
-                        der_factor_id = 2
-
-
-                
-                # Add pet to the database if the user is logged in
-                if session["user_id"] != None:
-                    print (der_factor_id)
-                    
-                    try:
-                        db.execute(
-                            "UPDATE pets SET feline_breed_id = :breed_id, feline_der_factor_id = :der_factor_id, \
-                                age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex, is_pediatric = :pediatric_status \
-                                    WHERE name = :pet_name AND owner_id = :user_id",
-                                breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, \
-                                    sex=pet_sex, pediatric_status=is_pediatric, pet_name=session["pet_name"], user_id=session["user_id"]
-                            )
+                        try:
+                            db.execute(
+                                "UPDATE pets SET feline_breed_id = :breed_id, feline_der_factor_id = :der_factor_id, \
+                                    age_in_years = :y, age_in_months = :m, breed = :breed, sex = :sex, is_pediatric = :pediatric_status \
+                                        WHERE name = :pet_name AND owner_id = :user_id",
+                                    breed_id=breed_id, der_factor_id=der_factor_id, y=pet_age_years, m=pet_age_months, breed=pet_breed, \
+                                        sex=pet_sex, pediatric_status=is_pediatric, pet_name=session["pet_name"], user_id=session["user_id"]
+                                )
+                            
+                        except Exception as e:
+                            flash(f"Unable to update part 2 of signalment data, Exception: {e}")
+                            return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species, pet_id=pet_id))
                         
-                    except Exception as e:
-                        flash(f"Unable to update part 2 of signalment data, Exception: {e}")
-                        return redirect(url_for("pet_info_continued", form=form, pet_breed=pet_breed, species=species))
+                # Store new info as session variables
+                session["der_factor_id"] = der_factor_id
+                session["breed_id"] = breed_id
+                session["is_pediatric"] = is_pediatric
                     
-            # Store new info as session variables
-            session["der_factor_id"] = der_factor_id
-            session["breed_id"] = breed_id
-            session["is_pediatric"] = is_pediatric
                 
-            
-            if pet_age >= 2 and pet_sex == "female":
-                # If the pet is a mature intact female, redirect to pregnancy questions
-                return redirect(url_for('repro_status', species=species))
-            else:
-                # redirect to pet body condition score questions
-                return redirect(url_for('pet_condition', species=species))
-
-
-
-    return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species)
+                if pet_age >= 2 and pet_sex == "female":
+                    # If the pet is a mature intact female, redirect to pregnancy questions
+                    return redirect(url_for('repro_status', species=species))
+                else:
+                    # redirect to pet body condition score questions
+                    return redirect(url_for('pet_condition', species=species))
+        return render_template("get_signalment_part_2.html", form=form, pet_breed=pet_breed, species=species, pet_id=pet_id)
+    return render_template("get_signalment_part_2.html", form=form, pet_id=pet_id)
 
 
 @app.route("/pregnancy_status", methods=["GET", "POST"])
@@ -553,8 +592,9 @@ def repro_status():
     """Gets information about the pet's pregnancy status"""
     repro = ReproStatus()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()   
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
      
     if request.method == "POST":
         pregnancy_status = repro.pregnancy_status.data
@@ -616,8 +656,9 @@ def gestation_duration():
     
     repro = ReproStatus()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         number_weeks_pregnant = repro.weeks_gestation.data
@@ -670,8 +711,9 @@ def litter_size():
     
     repro = ReproStatus()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         litter_size = repro.litter_size.data
@@ -741,8 +783,9 @@ def lactation_status():
     
     repro = ReproStatus()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         lactation_status = repro.nursing_status.data
@@ -780,7 +823,9 @@ def lactation_duration():
     
     repro = ReproStatus()
     
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         duration_of_nursing = int(repro.weeks_nursing.data)
@@ -833,8 +878,9 @@ def pet_condition():
     
     form = GetWeight() 
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         bcs = int(form.pet_bcs.data)
@@ -1028,8 +1074,9 @@ def activity():
     
     work = WorkForm()
     
-    # Use login check from helpers.py to verify species
-    species = login_check_for_species()
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     
     if request.method == "POST":
         light_work_minutes = work.light_work_minutes.data
@@ -1244,9 +1291,13 @@ def new_food():
 def rer():
     """Calculates the minimum number of calories a pet needs at rest per day"""
 
+    
     # Use login check from helpers.py to verify reproductive status
     sex = find_repro_status()
-    rer = calculcate_rer()
+    
+    # Import food calculator
+    cf = CalculateFood()
+    rer = cf.calculcate_rer()
     
     # Use DER factor id to lookup DER information by species
     der_modifier_start_range = find_der_low_end()
@@ -1309,12 +1360,14 @@ def rer():
     if obese_prone == "y" or is_pediatric == "y" \
         or is_nursing == "y" or is_pregnant == "y":
         # If pet is an obese prone breed, set max treat kcal/day at 8% of RER
-        treat_kcals = rer * 0.08
+        treat_kcals = int(rer * 0.08)
     else:
         # Calculate treat kcals per day (10% of RER)
-        treat_kcals = rer * 0.1
+        treat_kcals = int(rer * 0.1)
         
     print(f"Treat kcal:{treat_kcals}")
+    
+    session["rec_treat_kcal_per_day"] = treat_kcals
     
     # If user is logged in, add current food information to the database
     if session["user_id"] != None:
@@ -1332,8 +1385,8 @@ def rer():
         except Exception as e:
             flash(f"Unable to update data, Exception: {e}")
     
-    der_low_end = float(calculcate_der()["DER_low_end"])
-    der_high_end = float(calculcate_der()["DER_high_end"])
+    der_low_end = int(float(cf.calculcate_der()["DER_low_end"]))
+    der_high_end = int(float(cf.calculcate_der()["DER_high_end"]))
     
     print (f"Low end: {der_low_end} type: {type(der_low_end)} High end: {der_high_end} type: {type(der_high_end)} ")
     if request.method == "POST":    
@@ -1359,13 +1412,19 @@ def rer():
 def der():
     """Calculates the daily energy rate and total food amount of the current diet to feed"""
     
+    # Import food calculator
+    cf = CalculateFood()
+    
     # Call session variable for pronouns
     object_pronoun = session["object_pronoun"]
     possessive_pronoun = session["possessive_pronoun"]
 
     print(possessive_pronoun, object_pronoun)
-    # Use helpers.py to verify species and check repro status
-    species = login_check_for_species()
+    
+    
+    # Use login check from find_info to verify species
+    fi = FindInfo(session["user_id"], pet_id) 
+    species = fi.login_check_for_species()
     sex = find_repro_status()
     
     # If user is logged in, use SQL query
@@ -1426,10 +1485,13 @@ def der():
     
 
 
-    der = calculcate_der()["DER"]
-    der_low_end = calculcate_der()["DER_low_end"]
-    der_high_end = calculcate_der()["DER_high_end"]
-    der_modifier = calculcate_der()["DER_modifier"]
+    der = cf.calculcate_der()["DER"]
+    der_low_end = cf.calculcate_der()["DER_low_end"]
+    der_high_end = cf.calculcate_der()["DER_high_end"]
+    der_modifier = cf.calculcate_der()["DER_modifier"]
+    
+    # Convert all to int for easier reading
+    der, der_low_end, der_high_end = int(float(der)), int(float(der_low_end)), int(float(der_high_end))
 
     print(f"Low End: {der_low_end} High {der_high_end}")
     # Calculate the required calories per day
@@ -1444,7 +1506,7 @@ def der():
     print(daily_whole_cans_or_cups)
     print(type(daily_whole_cans_or_cups))
         
-    daily_partial_volumetric = convert_decimal_to_volumetric(daily_partial_amount)
+    daily_partial_volumetric = cf.convert_decimal_to_volumetric(daily_partial_amount)
 
     if daily_partial_volumetric == "1":
         # If partial volume is more than 0.86 cups, convert whole cup/can volume amount to integer
@@ -1517,7 +1579,7 @@ def der():
         print(type(meal_whole_cans_or_cups))
         
         # Calculate total volumetric amounts per meal
-        meal_partial_volumetric = convert_decimal_to_volumetric(meal_partial_amount)
+        meal_partial_volumetric = cf.convert_decimal_to_volumetric(meal_partial_amount)
 
         print(f"meal_partial_volumetric: {meal_partial_volumetric}")
         if meal_partial_volumetric == "1":
@@ -1621,110 +1683,153 @@ def completed_report():
     """Return's pet's final completed report"""
 
     # TODO: Enable user to get to this page from "Completed Reports"
-    
-    pet_data = pet_data_dictionary()
-    
-    rer = "{:.2f}".format(pet_data[0]["rer"])
-    der = "{:.2f}".format(pet_data[0]["der"])
-    
-    print(der)
-    object_pronoun = ""
-    subject_pronoun = ""
-    possessive_pronoun = ""
-    if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
-        object_pronoun = "her"
-        subject_pronoun = "she"
-    elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
-        object_pronoun = "him"
-        possessive_pronoun = "his"
-        subject_pronoun = "he"
-        
-    print(object_pronoun)
-    
-    # Find breed ID
-    breed_id = find_breed_id()
-    print(breed_id)
-    
-    # Find life stage, notes, and SVGs
-    if pet_data[0]["species"] == "Canine":
-        life_stage_search = db.execute(
-            "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
-            pet_data[0]["canine_der_factor_id"]
-        )
-        
-        svg_search = db.execute(
-            "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
-            breed_id=breed_id
-        )
-        
-        if svg_search[0] != None:
-            # TODO: If SVG can't be found, use a placeholder
-            svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
-            print(svg)
-            
-    elif pet_data[0]["species"] == "Feline":
-        life_stage_search = db.execute(
-            "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
-            pet_data[0]["feline_der_factor_id"]
-        )
-        
-        # Search for breed image in database
-        svg_search = db.execute(
-            "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
-            breed_id=breed_id
-        )
-        
-        if svg_search[0] != None:
-            # TODO: If SVG can't be found, use a placeholder
-            if pet_data[0]["species"] == "Feline":
-                svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
-                print(svg)
-                
-    if life_stage_search[0] != None:
-        life_stage = life_stage_search[0]["life_stage"]
-        notes = life_stage_search[0]["notes"]
-        
 
-    if pet_data[0]["meals_per_day"]:
-        meals_per_day = pet_data[0]["meals_per_day"]
     
+    id = None
+    try:
+        pet_id = request.args.get("id")
+        fi = FindInfo(session["user_id"], pet_id) 
+        print(f"pet ID: {pet_id}")
+        id = fi.find_pet_id(session["user_id"], pet_id) 
+        
+    except Exception as e:
+        print(f"Couldn't find ID, Exception: {e}")
+    else:
+            
+        print(f"user_id: {session['user_id']}, pet_id: {id}")     
+
+        
+        if session["user_id"] != None:
+        
+            # If a user is logged in, pass user ID 
+            pet_data = fi.pet_data_dictionary(session["user_id"], id)
+            
+            values = list(session.values())
+            all_same = all(value == values[0] for value in values)
+            for key, value in session.items():
+                print(key, value)
+            print(f"session length: {len(session.items())} all_same length: {len(session.items())}")
+                
+        else:
+            # Check if all session variables are the same, syntax suggested by CoPilot
+
+            
+            if all_same == False and len(session.items()) > 2:
+                # If not all session variables are the same
+                print("Values not the same, clearing...")
+                
+                # Clear values 
+                clear_variable_list()
+                
+                # TODO: Re-build new session variables
+            
+            pet_data = db.execute(
+                "SELECT * FROM pets WHERE owner_id = :user_id AND pet_id = :id",
+                user_id=session["user_id"], id=id
+            ) 
+        
+        rer = "{:.2f}".format(pet_data[0]["rer"])
+        der = pet_data[0]["der"]
+        
+        print(der)
+        object_pronoun = ""
+        subject_pronoun = ""
+        possessive_pronoun = ""
+        if pet_data[0]["sex"] == "female" or pet_data[0]["sex"] == "female_spayed":
+            object_pronoun = "her"
+            subject_pronoun = "she"
+        elif pet_data[0]["sex"] == "male" or pet_data[0]["sex"] == "male_neutered":
+            object_pronoun = "him"
+            possessive_pronoun = "his"
+            subject_pronoun = "he"
+            
+        print(object_pronoun)
+        
+        # Find breed ID
+        breed_id = fi.find_breed_id()
+        print(breed_id)
+        
+        # Find life stage, notes, and SVGs
+        if pet_data[0]["species"] == "Canine":
+            if id:
+
+                life_stage_search = db.execute(
+                    "SELECT life_stage, notes FROM canine_der_factors WHERE factor_id = ?",
+                    pet_data[0]["canine_der_factor_id"]
+                )
+                
+                svg_search = db.execute(
+                    "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                )
+                
+                if svg_search != None:
+                    # TODO: If SVG can't be found, use a placeholder
+                    svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+                    print(svg)
+                
+        elif pet_data[0]["species"] == "Feline":
+            if id:
+                life_stage_search = db.execute(
+                    "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
+                    pet_data[0]["feline_der_factor_id"]
+                )
+                
+                # Search for breed image in database
+                svg_search = db.execute(
+                    "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                )
+                
+                if svg_search:
+                    # TODO: If SVG can't be found, use a placeholder
+                    if pet_data[0]["species"] == "Feline":
+                        svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
+                        print(svg)
+                    
+        if life_stage_search:
+            life_stage = life_stage_search[0]["life_stage"]
+            notes = life_stage_search[0]["notes"]
+            
+
+        if pet_data:
+            meals_per_day = pet_data[0]["meals_per_day"]
+        
+        cf = CalculateFood()
+        
+        # Find DER range   
+        der_low_end = float(cf.calculcate_der()["DER_low_end"])
+        der_high_end = float(cf.calculcate_der()["DER_high_end"])
+        
+        # Convert to int for easier reading
+        der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
-    # Find DER range   
-    der_low_end = float(calculcate_der()["DER_low_end"])
-    der_high_end = float(calculcate_der()["DER_high_end"])
-    
-    # Convert to int for easier reading
-    der_low_end, der_high_end = int(der_low_end), int(der_high_end)
-    
-    return render_template("complete_report.html",
-                           pet_data=pet_data,
-                           rer=rer,
-                           der=der,
-                           der_low_end=der_low_end,
-                           der_high_end=der_high_end,
-                           svg=svg,
-                           meals_per_day=meals_per_day,
-                           life_stage=life_stage,
-                           notes=notes,
-                           object_pronoun=object_pronoun,
-                           subject_pronoun=subject_pronoun,
-                           possessive_pronoun=possessive_pronoun)
+        return render_template("complete_report.html",
+                            pet_data=pet_data,
+                            rer=rer,
+                            der=der,
+                            der_low_end=der_low_end,
+                            der_high_end=der_high_end,
+                            svg=svg,
+                            meals_per_day=meals_per_day,
+                            life_stage=life_stage,
+                            notes=notes,
+                            object_pronoun=object_pronoun,
+                            subject_pronoun=subject_pronoun,
+                            possessive_pronoun=possessive_pronoun)
 
 
 @app.route("/finished_reports", methods=["GET", "POST"])
 def finished_reports():
     """Provides a dropdown list of completed reports"""
+
+    # Use user_id and find_info to verify species
+    try:
+        fi = FindInfo(session["user_id"])
+        pet_list = fi.find_all_user_pets()
+    except Exception as e:
+        flash(f"")
     
-    if session["user_id"] != None:
-        try:
-            pet_list = db.execute(
-                "SELECT pet_id, name FROM pets WHERE owner_id = :user",
-                user=session["user_id"]
-            )
-        
-        except Exception as e:
-            flash(f"Couldn't find pet list. Exception: {e}")
-            
     # If user doesn't choose from the dropdown, provide error
     if request.method == "POST":
         pet_to_edit = request.form.get("reports")
@@ -1759,3 +1864,15 @@ def edit_info():
         print(pet_id)
     
     return render_template("edit_report.html", pet_data=pet_data, pet_id=pet_id)
+
+
+@app.route("/find_pet", methods=["GET", "POST"])
+def find_pet():
+    """Brings up a drop-down menu if pet id can't be found"""
+    
+    if session["user_id"] != None:
+        pet_list = find_all_user_pets()
+        
+        return render_template("find_pet.html", pet_list=pet_list)
+        
+        
