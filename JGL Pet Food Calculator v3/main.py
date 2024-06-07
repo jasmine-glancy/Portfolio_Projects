@@ -1835,7 +1835,8 @@ def completed_report():
                             notes=notes,
                             object_pronoun=object_pronoun,
                             subject_pronoun=subject_pronoun,
-                            possessive_pronoun=possessive_pronoun)
+                            possessive_pronoun=possessive_pronoun,
+                            pet_id=id)
 
 
 @app.route("/finished_reports", methods=["GET", "POST"])
