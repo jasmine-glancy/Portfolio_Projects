@@ -250,7 +250,8 @@ def pet_info():
             # Store session variables
             session["species"] = species
             session["pet_name"] = pet_name
-                    
+             
+            fi = FindInfo(session["user_id"], pet_id)       
             pet_id = fi.find_pet_id(session["user_id"], pet_id)
             
         print(pet_id, species, pet_name)        
@@ -1765,7 +1766,7 @@ def completed_report():
     breed_id = fi.find_breed_id()
     print(breed_id)
         
-    svg = fi.find_svg()
+    svg = fi.find_svg(session["user_id"], id)
         
     # Find life stage, notes, and SVGs
     if pet_data[0]["species"] == "Canine":
@@ -1843,6 +1844,7 @@ def completed_report():
 def finished_reports():
     """Provides a dropdown list of completed reports"""
 
+    # TODO: Add login required
     # Use user_id and find_info to verify species
     try:
         fi = FindInfo(session["user_id"])
@@ -1850,6 +1852,13 @@ def finished_reports():
     except Exception as e:
         flash(f"Unable to find pet list. Exception: {e}")
         return render_template("finished_reports.html")
+    
+    try:
+        svg = fi.find_svg(session["user_id"])
+        print(svg)
+    except Exception as e:
+        flash(f"Unable to find SVG. Exception: {e}")
+        return render_template("finished_reports.html")    
     
     # If user doesn't choose from the dropdown, provide error
     if request.method == "POST":
@@ -1863,12 +1872,13 @@ def finished_reports():
         
         return redirect(url_for('edit_info', pet_id=pet_to_edit))
 
-    return render_template("finished_reports.html", pet_list=pet_list)
+    return render_template("finished_reports.html", pet_list=pet_list, svg=svg)
 
 @app.route("/edit_info/<int:pet_id>", methods=["GET", "POST"])
 def edit_info(pet_id):
     """Allows a user to edit a pet's info and generate a new report"""
     
+    # TODO: Add login required
     pet_id = request.args.get("pet_id")
     
     print(pet_id)
@@ -1890,10 +1900,24 @@ def edit_info(pet_id):
 @app.route("/find_pet", methods=["GET", "POST"])
 def find_pet():
     """Brings up a drop-down menu if pet id can't be found"""
-    
+
+    # TODO: Add login required    
+    # TODO: Bring up a list of all potential matches if a pet ID can't be found
+    # Match name, species, breed
     if session["user_id"] != None:
         pet_list = find_all_user_pets()
         
         return render_template("find_pet.html", pet_list=pet_list)
         
-        
+
+@app.route("/wip_reports", methods=["GET", "POST"])
+def wip_reports():
+    """Brings up a list of in-progress reports for the user to edit"""
+
+    # TODO: Add login required
+    
+    fi = FindInfo(session["user_id"])
+    
+    wip_reports = fi.find_wip_reports(session["user_id"])
+    
+    return render_template("wip_reports.html", wip_reports=wip_reports)

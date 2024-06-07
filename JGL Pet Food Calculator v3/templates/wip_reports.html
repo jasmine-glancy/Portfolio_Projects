@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Incomplete Reports{% endblock %}
+0
+{% block content %}
+
+<div class="container-lg">
+    <h1>Incomplete Reports</h1>
+
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Load in completed reports --> 
+    <form action="/wip_reports" method="POST">
+        <div class="row">
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                    </thead>
+                <tbody>
+                    {% for pet in wip_reports %}
+                        {% if pet.date_of_first_report == None %}
+                            <tr>
+                                <td>
+                                    <h4>{{ pet.name }}</h4>
+                                    <br>
+                                    {% if pet.age_in_years != None and pet.age_in_months != None%}
+                                        {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
+                                            {{ pet.age_in_months }} month old
+                                        {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
+                                            {{ pet.age_in_months }} months old
+                                        {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
+                                            {{ pet.age_in_years }} year old
+                                        {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
+                                            {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
+                                        {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
+                                            {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
+                                        {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
+                                            {{ pet.age_in_years }} years old
+                                        {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
+                                            {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
+                                        {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
+                                            {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if pet.sex != None %}
+                                        {% if pet.sex == "female_spayed" %}
+                                            Female (Spayed)
+                                        {% elif pet.sex == "female" %}
+                                            Female (Intact)
+                                        {% elif pet.sex == "male_neutered" %}
+                                            Male (Neutered)
+                                        {% elif pet.sex == "male" %}
+                                            Male (Intact)
+                                        {% endif %}
+                                    {% endif %}
+                                
+                                {% if pet.breed != None %}
+                                    {{ pet.breed }} 
+                                {% endif %}
+                                
+                                {% if pet.species != None %}
+                                    ({{ pet.species }})
+                                {% endif %}
+                                </td>
+                                <td>
+                                <div class="button-container">
+                                    <a href="{{ url_for('pet_info', pet_id=pet.pet_id) }}">
+                                        <button type="button" class="btn btn-secondary btn-sm">
+                                            Edit {{ pet.name }}'s Name or Species
+                                        </button>
+                                    </a>
+                                
+                                    <a href="{{ url_for('pet_info_continued', pet_id=pet.pet_id) }}">
+                                        <button type="button" class="btn btn-secondary btn-sm">
+                                            Edit {{ pet.name }}'s Species, Age, or Sex
+                                        </button>
+                                    </a>
+
+                                    {% if pet.sex == "female" %}
+                                        <a href="{{ url_for('repro_status', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Pregnancy Status
+                                            </button>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if pet.is_pregnant == "y" %}
+                                        <a href="{{ url_for('gestation_duration', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Pregnancy Duration
+                                            </button>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if pet.is_nursing == "y" %}
+                                        <a href="{{ url_for('lactation_status', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Nursing Status
+                                            </button>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if pet.litter_size != None and pet.litter_size > 0 %}
+                                        <a href="{{ url_for('litter_size', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Litter Size
+                                            </button>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if pet.weeks_nursing != None and pet.species == "Feline" %}
+
+                                        <a href="{{ url_for('lactation_duration', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Lactation Length
+                                            </button>
+                                        </a>
+
+                                    {% endif %}
+
+                                    <a href="{{ url_for('pet_condition', pet_id=pet.pet_id) }}">
+                                        <button type="button" class="btn btn-secondary btn-sm">
+                                            Edit {{ pet.name }}'s Weight or Body Condition Score
+                                        </button>
+                                    </a>
+
+                                    {% if pet.species == "Canine" %}
+                                        <a href="{{ url_for('activity', pet_id=pet.pet_id) }}">
+                                            <button type="button" class="btn btn-secondary btn-sm">
+                                                Edit {{ pet.name }}'s Activity Duration
+                                            </button>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </form>
+    
+
+</div>
+{% endblock %}

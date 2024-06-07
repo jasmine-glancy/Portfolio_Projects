@@ -20,7 +20,11 @@ class FindInfo():
             print(f"Exception: {e}, reassigning pet ID as 0")
             self.pet_id = 0  
         
-        self.pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
+        if user_id == 0:
+            # If the user has a "guest" ID, query guest dictionary
+            self.pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
+        else:
+            self.guest_pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
 
 
     def find_der_high_end(self) -> float:
@@ -254,28 +258,28 @@ class FindInfo():
             # See if the pet is already added 
             if self.pet_data and "pet_id" in self.pet_data[0] \
                 or self.guest_pet_data and "pet_id" in self.guest_pet_data[0]:
-                pet_id = self.pet_data[0]["pet_id"]
-                print(f"ID of pet: {pet_id}")
+                self.pet_id = self.pet_data[0]["pet_id"]
+                print(f"ID of pet: {self.pet_id}")
             else:
                 print("Pet ID not found in pet_data.")
-                pet_id = 0
+                self.pet_id = 0
         else:
-            pet_id = 0
+            self.pet_id = 0
         
-        return pet_id
+        return self.pet_id
     
     
-    def find_existing_pet(self, user_id, animal_id) -> bool:
+    def find_existing_pet(self, user_id, pet_id) -> bool:
         """Returns a True if pet is found in the database""" 
-         
             
-        print(f"user_id: {user_id}, pet_id: {animal_id}") 
+        
+        print(f"user_id: {user_id}, pet_id: {pet_id}") 
 
         try:
             # See if the pet is already added
             find_existing_pet = db.execute(
                 "SELECT pet_id, name FROM pets WHERE owner_id = :user_id AND pet_id = :pet_id",
-                user_id=user_id, pet_id=animal_id
+                user_id=user_id, pet_id=pet_id
                 ) 
             
             if not find_existing_pet:
@@ -292,11 +296,29 @@ class FindInfo():
             
             return False
         
+    
+    def find_wip_reports(self, user_id) -> dict:
+        """Builds a list of in-progress reports"""
+        
+        if user_id != None or user_id != 0:
+            # If user ID isn't empty or 0 (the "guest" user ID), query database
+            try:
+                wip_reports = db.execute(
+                    "SELECT * FROM pets WHERE owner_id = :user AND date_of_first_report IS NULL",
+                    user=user_id
+                )
+                
+                print(wip_reports)
+            except Exception as e:
+                print(f"Can't find list of unfinished reports. Exception: {e}")
             
+        return wip_reports
+                
     def find_all_user_pets(self, user_id) -> dict:
         """Finds all pets under a user id"""
         
-        if session["user_id"] != None:
+        if user_id != None or user_id != 0:
+            # If user ID isn't empty or 0 (the "guest" user ID), query database
             try:
                 pet_list = db.execute(
                     "SELECT * FROM pets WHERE owner_id = :user",
@@ -664,46 +686,55 @@ class FindInfo():
         # return der_factor_id
 
 
-    def find_svg(self) -> str:
+    def find_svg(self, user_id, pet_id=None) -> str:
         """Find SVG depending on breed and species"""
         
         species = self.login_check_for_species()
         breed_id = self.find_breed_id()
-        try:
-            if species == "Canine":
-                # If SVG can't be found, use a placeholder
-                self.svg = 'assets/svg/dogs/0_Labrador_Retriever_peeking_dog-4.svg'
+        
+        if pet_id != 0 or pet_id != None:
+            self.find_all_svgs = db.execute(
+                "SELECT * FROM pets WHERE owner_id = :user AND pet_id = :pet_id",
+                user=user_id, pet_id=pet_id
+            )
+        # TODO: Find a way to query guest SVG?
+        
+        for pet in self.find_all_svgs:
+            try:
+                if species == "Canine":
+                    # If SVG can't be found, use a placeholder
+                    self.svg = 'assets/svg/dogs/0_Labrador_Retriever_peeking_dog-4.svg'
 
-                svg_search = db.execute(
-                    "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
-                    breed_id=breed_id
-                    )
-                    
-                if svg_search != None:
-                    self.svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+                    svg_search = db.execute(
+                        "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
+                        breed_id=breed_id
+                        )
+                        
+                    if svg_search != None:
+                        self.svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
 
-                print(self.svg)
-                    
-            elif species == "Feline":
-                # If SVG can't be found, use a placeholder
-                self.svg = 'assets/svg/cats/American_ShortHair0-04.svg'
+                    print(self.svg)
+                        
+                elif species == "Feline":
+                    # If SVG can't be found, use a placeholder
+                    self.svg = 'assets/svg/cats/American_ShortHair0-04.svg'
 
-                # Search for breed image in database
-                svg_search = db.execute(
-                    "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
-                    breed_id=breed_id
-                    )
-                    
-                if svg_search:
-                    self.svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
+                    # Search for breed image in database
+                    svg_search = db.execute(
+                        "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
+                        breed_id=breed_id
+                        )
+                        
+                    if svg_search:
+                        self.svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
 
 
-                print(self.svg)
-        except Exception as e:
-            flash(f"Can't find SVG file. Exception: {e}")
-        else:
-            # If found, return SVG
-            return self.svg
+                    print(self.svg)
+            except Exception as e:
+                flash(f"Can't find SVG file. Exception: {e}")
+        
+        # If found, return SVG
+        return self.svg
             
             
     def find_food_form(self) -> str:

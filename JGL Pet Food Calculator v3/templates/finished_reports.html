@@ -26,6 +26,8 @@
                         </th>
                         <th>
                         </th>
+                        <th>
+                        </th>
                     </tr>
                     </thead>
                 <tbody>
@@ -33,6 +35,8 @@
                         {% if pet.date_of_first_report != None %}
                             <tr>
                                 <td>
+                                    <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
+
                                     <h4>{{ pet.name }}</h4>
                                     {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
                                     {{ pet.age_in_months }} month old
