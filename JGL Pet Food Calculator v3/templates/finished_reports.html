@@ -31,11 +31,13 @@
                     </tr>
                     </thead>
                 <tbody>
-                    {% for pet in pet_list %}
+                    {% for pet, svg in pet_list|zip(svgs) %}
                         {% if pet.date_of_first_report != None %}
                             <tr>
+                                <td class="fr_svg">
+                                    <img src="{{ url_for('static', filename=svg) }}" class="final_pet_pic">
+                                </td>
                                 <td>
-                                    <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
 
                                     <h4>{{ pet.name }}</h4>
                                     {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}

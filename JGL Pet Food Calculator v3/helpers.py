@@ -1,6 +1,9 @@
 """Contains additional checks and decorators (i.e. is user logged in, login decorator)"""
 
-from flask import session
+from flask import Flask, session
+
+# Configure application
+app = Flask(__name__)
 
 
 def clear_variable_list():
@@ -10,3 +13,7 @@ def clear_variable_list():
         if variable != "user_id":
             session.pop(variable, None)
    
+
+def zip_lists(a, b):
+    return zip(a, b)
+

@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from find_info import FindInfo
-from helpers import clear_variable_list
+from helpers import clear_variable_list, zip_lists
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -25,6 +25,9 @@ Bootstrap5(app)
 # Load environmental variables
 
 app.config['SECRET_KEY'] = os.environ.get('KEY')
+
+# Allows Jinja to use the Zip function, suggested by CoPilot
+app.jinja_env.filters['zip'] = zip_lists
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
@@ -622,7 +625,7 @@ def repro_status(pet_id):
             
             if species == "Canine":
                 # If pet is pregnant and canine, ask how many weeks along she is
-                return redirect(url_for('gestation_duration', species=species))
+                return redirect(url_for('gestation_duration', species=species, pet_id=pet_id))
             else: 
                 # If pet is pregnant and feline, DER factor is * 1.6-2.0
                 der_factor_id = 7
@@ -1031,7 +1034,7 @@ def pet_condition(pet_id):
                 session["der_factor_id"] = der_factor_id  
                 
                 # Gets a dog's activity level if applicable 
-                return redirect(url_for('activity'))  
+                return redirect(url_for('activity', pet_id=pet_id))  
             
             elif species == "Feline":
                 
@@ -1085,8 +1088,8 @@ def pet_condition(pet_id):
     return render_template("get_weight_and_bcs.html", form=form, species=species, pet_id=pet_id)
 
 
-@app.route("/activity", methods=["GET", "POST"])
-def activity():
+@app.route("/activity/<int:pet_id>", methods=["GET", "POST"])
+def activity(pet_id):
     """Gets a pet's activity status/amount"""
     
     work = WorkForm()
@@ -1179,21 +1182,22 @@ def activity():
         # Update DER factor ID variable
         session["der_factor_id"] = der_factor_id  
         
-        return redirect(url_for('confirm_data', species=species))
+        return redirect(url_for('confirm_data', species=species, pet_id=pet_id))
     
-    return render_template("get_work_level.html", work=work)
+    return render_template("get_work_level.html", work=work, pet_id=pet_id)
 
 
-@app.route("/confirm_data", methods=["GET", "POST"])
-def confirm_data():
+@app.route("/confirm_data/<int:pet_id>", methods=["GET", "POST"])
+def confirm_data(pet_id):
     """Confirms pet's info before taking users to the food calculator"""
     
-    # Find data from from helpers.py 
-    pet_data = pet_data_dictionary()
+    # Find data from from find info.py
+    fi = FindInfo(session["user_id"], pet_id) 
+    pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
     print(pet_data)
     user_id = session["user_id"]
         
-    return render_template("confirm_pet_info.html", pet_data=pet_data, user_id=user_id)
+    return render_template("confirm_pet_info.html", pet_data=pet_data, user_id=user_id, pet_id=pet_id)
     
     
 @app.route("/current_food", methods=["GET", "POST"])
@@ -1201,7 +1205,9 @@ def current_food():
     """Asks the user for information on their current food"""
     
     current_food = FoodForm()
-    
+    pet_id = request.args.get('pet_id', type=int)
+
+    print(pet_id)
     if request.method == "POST":
         current_food_kcal = current_food.current_food_kcal.data
         current_food_form = current_food.current_food_form.data
@@ -1212,10 +1218,10 @@ def current_food():
         try:
             if meals_per_day < 1:
                 flash("Please enter a number equal to or greater than 1.")
-                return render_template("current_food.html", current_food=current_food)
+                return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
         except TypeError as e:
             flash("Please enter a number equal to or greater than 1.")
-            return render_template("current_food.html", current_food=current_food)
+            return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
         
         print(current_food_kcal)
         print(meals_per_day)
@@ -1224,13 +1230,13 @@ def current_food():
 
         if current_food_form == "default" and wants_transition != "default":
             flash("Please choose from the current food form dropdown.")
-            return render_template("current_food.html", current_food=current_food)
+            return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
         elif wants_transition == "default" and current_food_form != "default":
             flash("Please choose whether you want to transition your pet to another diet.")
-            return render_template("current_food.html", current_food=current_food)
+            return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
         elif current_food_form == "default" and wants_transition == "default":
             flash("Please from the current food form dropdown and whether you want to transition your pet to another diet.")
-            return render_template("current_food.html", current_food=current_food)
+            return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
         else:
             # If user is logged in, add current food information to the database
             if session["user_id"] != None:
@@ -1260,7 +1266,7 @@ def current_food():
             # If user doesn't want a transition, calculate RER
             return redirect(url_for('rer'))
         
-    return render_template("current_food.html", current_food=current_food)
+    return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
     
     
 @app.route("/new_food", methods=["GET", "POST"])
@@ -1318,10 +1324,16 @@ def rer(pet_id):
     cf = CalculateFood(session["user_id"], pet_id)
     rer = cf.calculcate_rer()
     
+    pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
 
     # Use DER factor id to lookup DER information by species
-    der_modifier_start_range = fi.find_der_low_end()
-    der_modifier_end_range = fi.find_der_high_end()
+    if pet_data[0]["species"] == "Canine":
+        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
+        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
+    elif pet_data[0]["species"] == "Feline":
+        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
+        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
+        
     
     object_pronoun = ""
     possessive_pronoun = ""
@@ -1766,10 +1778,15 @@ def completed_report():
     breed_id = fi.find_breed_id()
     print(breed_id)
         
-    svg = fi.find_svg(session["user_id"], id)
-        
+    # svg = fi.find_svg(session["user_id"], pet_data[0]["pet_id"], pet_data[0]["species"])
+    
+
     # Find life stage, notes, and SVGs
     if pet_data[0]["species"] == "Canine":
+        
+        # Finds dog SVG
+        svg = fi.find_svg(session["user_id"], pet_data[0]["pet_id"], pet_data[0]["species"], pet_data[0]["canine_breed_id"])
+
         if id:
 
             life_stage_search = db.execute(
@@ -1788,6 +1805,10 @@ def completed_report():
                 #     print(svg)
                 
     elif pet_data[0]["species"] == "Feline":
+        
+        # Finds cat SVG
+        svg = fi.find_svg(session["user_id"], pet_data[0]["pet_id"], pet_data[0]["species"], pet_data[0]["feline_breed_id"])
+
         if id:
             life_stage_search = db.execute(
                 "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
@@ -1818,8 +1839,12 @@ def completed_report():
     # cf = CalculateFood(session["user_id"], pet_id)
         
     # Find DER range   
-    der_low_end = float(fi.find_der_low_end())
-    der_high_end = float(fi.find_der_high_end())
+    if pet_data[0]["species"] == "Canine":
+        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
+        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
+    elif pet_data[0]["species"] == "Feline":
+        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
+        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
         
     # Convert to int for easier reading
     der_low_end, der_high_end = int(der_low_end), int(der_high_end)
@@ -1854,8 +1879,17 @@ def finished_reports():
         return render_template("finished_reports.html")
     
     try:
-        svg = fi.find_svg(session["user_id"])
-        print(svg)
+        svgs = []
+        for pet in pet_list:
+            if pet["species"] == "Canine":
+                svg = fi.find_svg(pet["owner_id"], pet["pet_id"], pet["species"], pet["canine_breed_id"])
+            elif pet["species"] == "Feline":
+                svg = fi.find_svg(pet["owner_id"], pet["pet_id"], pet["species"], pet["feline_breed_id"])
+            
+            # Suggested by CoPilot
+            svgs.append(svg)
+            
+        print(svgs)
     except Exception as e:
         flash(f"Unable to find SVG. Exception: {e}")
         return render_template("finished_reports.html")    
@@ -1872,7 +1906,8 @@ def finished_reports():
         
         return redirect(url_for('edit_info', pet_id=pet_to_edit))
 
-    return render_template("finished_reports.html", pet_list=pet_list, svg=svg)
+    return render_template("finished_reports.html", pet_list=pet_list, svgs=svgs)
+
 
 @app.route("/edit_info/<int:pet_id>", methods=["GET", "POST"])
 def edit_info(pet_id):

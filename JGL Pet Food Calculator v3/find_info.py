@@ -27,12 +27,9 @@ class FindInfo():
             self.guest_pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
 
 
-    def find_der_high_end(self) -> float:
+    def find_der_high_end(self, species=None, der_factor_id=None) -> float:
         """Finds DER high end"""
         
-        # Use DER factor id to lookup DER information by species
-        species = self.login_check_for_species()
-        der_factor_id = self.der_factor()
         
         if species == "Canine":
             der_lookup = db.execute(
@@ -41,28 +38,27 @@ class FindInfo():
                     der_factor_id=der_factor_id)
             print(f"DER lookup: {der_lookup}")
 
-            # Find the ending DER modifier
-            self.der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
+            if der_lookup:
+                # Find the ending DER modifier
+                self.der_modifier_end_range = der_lookup[0]["canine_der_factor_range_end"]
             
         elif species == "Feline":
             der_lookup = db.execute(
             "SELECT life_stage, feline_der_factor_range_end \
                 FROM feline_der_factors WHERE factor_id = :der_factor_id",
                 der_factor_id=der_factor_id)
-            print("der")
             print(F"Der lookup: {der_lookup}")
 
-            # Find the start and end range of DER modifiers
-            self.der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
+            if der_lookup:
+                # Find the start and end range of DER modifiers
+                self.der_modifier_end_range = der_lookup[0]["feline_der_factor_range_end"]
         
         return self.der_modifier_end_range
                 
                 
-    def find_der_mid_range(self) -> float:
+    def find_der_mid_range(self, species=None, der_factor_id=None) -> float:
         """Finds DER mid-range"""
-        
-        species = self.login_check_for_species()
-        der_factor_id = self.der_factor()
+
         
         # Use DER factor id to lookup DER information by species
         if species == "Canine":
@@ -89,19 +85,10 @@ class FindInfo():
         return self.der_mid_range
 
 
-    def find_der_low_end(self) -> float:
+    def find_der_low_end(self, species=None, der_factor_id=None) -> float:
         """Finds DER low end"""
         
-        # Use helpers.py to verify species and check der_factor
-        # species = login_check_for_species()
-        # der_factor_id = der_factor()
-        
-        
         try:
-            # Use DER factor id to lookup DER information by species
-            
-            species = self.login_check_for_species()
-            der_factor_id  = self.der_factor()
             
             if species == "Canine":
                 der_lookup = db.execute(
@@ -403,25 +390,6 @@ class FindInfo():
         
         # Return whatever pediatric status variable ends up being found 
         return self.pediatric_status   
-        # if session["user_id"] != None:
-        #     # If user isn logged in, query the database
-                
-        #     try:
-        #         check_peds_status = db.execute(
-        #             "SELECT is_pediatric FROM pets WHERE name = :pet_name AND owner_id = :user_id",
-        #             pet_name=session["pet_name"], user_id=session["user_id"]
-        #         )
-        #     except Exception as e:
-        #         flash(f"Unable to find pediatric status, Exception: {e}")
-        #     else:
-        #         is_pediatric = check_peds_status[0]["is_pediatric"]
-        # else:
-        #     # If the user isn't logged in, grab session variables
-        #     is_pediatric = session["is_pediatric"]
-                
-        # print(f"Is Pediatric? {is_pediatric}")
-        
-        # return is_pediatric
         
         
     def find_repro_status(self) -> str:
@@ -444,19 +412,6 @@ class FindInfo():
         # Return whatever reproductive status variable ends up being found 
         return self.pet_sex
                 
-        #     if species_result:
-        #         pet_sex = species_result[0]["sex"]
-        #         print(pet_sex)
-        #     else:
-        #         pet_sex = session["pet_sex"]
-        #         print(f"Non-db repro status: {pet_sex}") 
-                
-        # else:
-        #     # If a user isn't logged in, grab session variable
-        #     pet_sex = session["pet_sex"]
-            
-        #     print(f"Non-db repro status: {pet_sex}") 
-        
 
     def check_if_pregnant(self) -> str:
         """Checks if the pet is pregnant"""
@@ -477,31 +432,6 @@ class FindInfo():
     
         # Return whatever pregnancy variable ends up being found 
         return self.is_pregnant  
-    
-    # if "user_id" in session and session["user_id"] != None:
-    #     # If the user is logged in, verify table variables 
-    #     print(f"Pregnancy check, User ID: {session["user_id"]}")
-    #     print(f"Pregnancy check, Name: {session["pet_name"]}")
-        
-        
-    #     pregnancy_result = db.execute(
-    #         "SELECT is_pregnant FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-    #     )
-        
-
-    #     if pregnancy_result:
-    #         is_pregnant = pregnancy_result[0]["is_pregnant"]
-    #         print(is_pregnant)
-    #     else:
-    #         is_pregnant = session["pregnancy_status"]
-    #         print(f"Non-db pregnancy status: {is_pregnant}") 
-            
-    # else:
-    #     # If a user isn't logged in, grab session variable
-    #     is_pregnant = session["pregnancy_status"]
-        
-    #     print(f"Non-db pregnancy status: {is_pregnant}") 
-    
 
 
     def check_if_nursing(self) -> str:
@@ -523,33 +453,6 @@ class FindInfo():
             
         # Return whatever nursing status variable ends up being found 
         return self.is_nursing  
-       
-        # if "user_id" in session and session["user_id"] != None:
-        #     # If the user is logged in, verify table variables 
-        #     print(f"Nursing check, User ID: {session["user_id"]}")
-        #     print(f"Nursing check, Name: {session["pet_name"]}")
-            
-            
-        #     nursing_result = db.execute(
-        #         "SELECT is_nursing FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        #     )
-            
-
-        #     if nursing_result:
-        #         is_nursing = nursing_result[0]["is_nursing"]
-        #         print(is_nursing)
-        #     else:
-        #         is_nursing = session["lactation_status"]
-        #         print(f"Non-db nursing status: {is_nursing}") 
-                
-        # else:
-        #     # If a user isn't logged in, grab session variable
-        #     is_nursing = session["lactation_status"]
-            
-        #     print(f"Non-db nursing status: {is_nursing}") 
-        
-        # # Return whatever nursing status variable ends up being found 
-        # return is_nursing  
 
 
     def check_litter_size(self) -> int:
@@ -572,33 +475,6 @@ class FindInfo():
         # Return whatever litter size variable ends up being found 
         return self.litter_size  
     
-        # if "user_id" in session and session["user_id"] != None:
-        #     # If the user is logged in, verify table variables 
-        #     print(f"Litter size check, User ID: {session["user_id"]}")
-        #     print(f"Litter size check, Name: {session["pet_name"]}")
-            
-            
-        #     litter_result = db.execute(
-        #         "SELECT litter_size FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        #     )
-            
-
-        #     if litter_result:
-        #         litter_size = litter_result[0]["litter_size"]
-        #         print(litter_size)
-        #     else:
-        #         litter_size = session["litter_size"]
-        #         print(f"Non-db litter size: {litter_size}") 
-                
-        # else:
-        #     # If a user isn't logged in, grab session variable
-        #     is_pregnant = session["litter_size"]
-            
-        #     print(f"Non-db litter size: {litter_size}") 
-        
-        # # Return whatever litter size variable ends up being found 
-        # return litter_size 
-
 
     def check_obesity_risk(self):
         """Checks if a pet's breed has a predisposed risk to obesity"""
@@ -654,44 +530,11 @@ class FindInfo():
         print(f"DER factor ID: {self.der_factor_id}")
         
         return self.der_factor_id
-        # # Condition suggested by CoPilot
-        
-        #     # If the user is logged in, verify table variables 
-
-        #     self.pet_data
-        #     pet_info = db.execute(
-        #         "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-        #     )
-            
-
-        #     if pet_info:
-        #         species = pet_info[0]["species"]
-        #         if species == "Canine":
-        #             der_factor_id = pet_info[0]["canine_der_factor_id"]
-        #         elif species == "Feline":
-        #             der_factor_id = pet_info[0]["feline_der_factor_id"]
-                    
-        #         print(f"species: {species}, der_factor_id: {der_factor_id}")
-        #     else:
-        #         species = session["species"]
-        #         der_factor_id = session["der_factor_id"]
-        #         print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
-                
-        # else:
-        #     # If a user isn't logged in, grab  variable
-        #     der_factor_id = session["der_factor_id"]
-        
-        # # Return whatever DER factor id variable ends up being found 
-        # print(f"DER factor ID: {der_factor_id}")
-        # return der_factor_id
 
 
-    def find_svg(self, user_id, pet_id=None) -> str:
+    def find_svg(self, user_id, pet_id=None, species=None, breed_id=None) -> str:
         """Find SVG depending on breed and species"""
-        
-        species = self.login_check_for_species()
-        breed_id = self.find_breed_id()
-        
+                
         if pet_id != 0 or pet_id != None:
             self.find_all_svgs = db.execute(
                 "SELECT * FROM pets WHERE owner_id = :user AND pet_id = :pet_id",
@@ -699,40 +542,39 @@ class FindInfo():
             )
         # TODO: Find a way to query guest SVG?
         
-        for pet in self.find_all_svgs:
-            try:
-                if species == "Canine":
+        
+        try:
+            if species == "Canine":
+
+                svg_search = db.execute(
+                    "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                    )
+                        
+                if svg_search:
+                    self.svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+                else:
                     # If SVG can't be found, use a placeholder
                     self.svg = 'assets/svg/dogs/0_Labrador_Retriever_peeking_dog-4.svg'
-
-                    svg_search = db.execute(
-                        "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
-                        breed_id=breed_id
-                        )
                         
-                    if svg_search != None:
-                        self.svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
+            elif species == "Feline":
 
-                    print(self.svg)
+                # Search for breed image in database
+                svg_search = db.execute(
+                    "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
+                    breed_id=breed_id
+                    )
                         
-                elif species == "Feline":
+                if svg_search:
+                    self.svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
+                else:
                     # If SVG can't be found, use a placeholder
                     self.svg = 'assets/svg/cats/American_ShortHair0-04.svg'
-
-                    # Search for breed image in database
-                    svg_search = db.execute(
-                        "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
-                        breed_id=breed_id
-                        )
-                        
-                    if svg_search:
-                        self.svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
-
-
-                    print(self.svg)
-            except Exception as e:
+                
+        except Exception as e:
                 flash(f"Can't find SVG file. Exception: {e}")
         
+        # print(self.svg)
         # If found, return SVG
         return self.svg
             
@@ -757,89 +599,3 @@ class FindInfo():
         # Return whatever current food form variable ends up being found 
         return self.current_food_form  
     
-        # if "user_id" in session and session["user_id"] != None:
-        #     # If the user is logged in, verify table variables 
-        #     print(session["user_id"])
-        #     print(session["pet_name"])
-            
-            
-        #     food_result = db.execute(
-        #         "SELECT current_food_form FROM pets WHERE owner_id = ? AND name = ?", 
-        #         session["user_id"], session["pet_name"]
-        #     )
-            
-
-        #     if food_result:
-        #         current_food_form = food_result[0]["current_food_form"]
-        #         print(current_food_form)
-        #     else:
-        #         current_food_form = session["current_food_form"]
-        #         print(f"Non-db current_food_form: {current_food_form}") 
-                
-        # else:
-        #     # If a user isn't logged in, grab food form variable
-        #     current_food_form = session["current_food_form"]
-            
-        #     print(f"Non-db current_food_form: {current_food_form}")
-        
-        # # Return whatever form variable ends up being found 
-        # return current_food_form 
-
-
-
-# def der_factor(self):
-#     """Finds the latest der_factor set, if applicable"""
-    
-#     if "user_id" in session and session["user_id"] != None:
-#         if self.species == "Canine":
-#             try:
-#                 self.der_factor_id = self.pet_data[0]["canine_der_factor_id"]
-#                 print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
-#             except Exception as e:
-#                 flash(f"Can't find DER Factor ID. Exception: {e}")
-#         if self.species == "Feline":
-#             try:
-#                 self.der_factor_id = self.pet_data[0]["feline_der_factor_id"]
-#                 print(f"Class species: {self.species}", f"DER factor ID: {self.der_factor_id}")
-#             except Exception as e:
-#                 flash(f"Can't find DER Factor ID. Exception: {e}")       
-#     else:
-#         # If a user isn't logged in, grab species variable
-#         self.der_factor_id = session["der_factor_id"]
-                
-#         print(f"Session DER factor ID: {self.der_factor_id}") 
-        
-#     print(f"DER factor ID: {self.der_factor_id}")
-    
-#     return self.der_factor_id
-    # # Condition suggested by CoPilot
-    
-    #     # If the user is logged in, verify table variables 
-
-    #     self.pet_data
-    #     pet_info = db.execute(
-    #         "SELECT species, canine_der_factor_id, feline_der_factor_id FROM pets WHERE owner_id = ? AND name = ?", session["user_id"], session["pet_name"]
-    #     )
-        
-
-    #     if pet_info:
-    #         species = pet_info[0]["species"]
-    #         if species == "Canine":
-    #             der_factor_id = pet_info[0]["canine_der_factor_id"]
-    #         elif species == "Feline":
-    #             der_factor_id = pet_info[0]["feline_der_factor_id"]
-                
-    #         print(f"species: {species}, der_factor_id: {der_factor_id}")
-    #     else:
-    #         species = session["species"]
-    #         der_factor_id = session["der_factor_id"]
-    #         print(f"Non-db species: {species}, der_factor_id: {der_factor_id}") 
-            
-    # else:
-    #     # If a user isn't logged in, grab  variable
-    #     der_factor_id = session["der_factor_id"]
-    
-    # # Return whatever DER factor id variable ends up being found 
-    # print(f"DER factor ID: {der_factor_id}")
-    # return der_factor_id
-
