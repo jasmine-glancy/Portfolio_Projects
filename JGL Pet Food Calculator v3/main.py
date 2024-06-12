@@ -6,7 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_bootstrap import Bootstrap5
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from find_info import FindInfo
-from helpers import clear_variable_list, zip_lists
+from helpers import clear_variable_list
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -26,8 +26,6 @@ Bootstrap5(app)
 
 app.config['SECRET_KEY'] = os.environ.get('KEY')
 
-# Allows Jinja to use the Zip function, suggested by CoPilot
-app.jinja_env.filters['zip'] = zip_lists
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
@@ -1145,12 +1143,14 @@ def activity(pet_id):
             
             if not_preg_or_nursing_non_obese and is_pediatric == "n":
                 der_factor_id = 21
-        elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0:
+        elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0 or \
+            heavy_work_hours > 0 and heavy_work_hours < 4:
             # Moderate activity: 1-2 hours of low impact activity
             activity_level = "Moderate"
             
             if not_preg_or_nursing_non_obese and is_pediatric == "n":
                 der_factor_id = 22
+                
         elif heavy_work_hours >= 1 and heavy_work_hours <= 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
             activity_level = "Moderate"
@@ -1502,7 +1502,7 @@ def der(pet_id):
         der = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER"]
         der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_low_end"]))
         der_high_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_high_end"]))
-        der_modifier = cf.calculcate_der()["DER_modifier"]
+        der_modifier = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_modifier"]
     elif pet_data[0]["species"] == "Feline":
         der = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER"]
         der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_low_end"]))
@@ -1702,9 +1702,6 @@ def der(pet_id):
 @app.route("/completed_report", methods=["GET", "POST"])
 def completed_report():
     """Return's pet's final completed report"""
-
-    # TODO: Enable user to get to this page from "Completed Reports"
-
     
     try:
         pet_id = request.args.get("pet_id", type=int)
@@ -1766,8 +1763,6 @@ def completed_report():
     breed_id = fi.find_breed_id()
     print(breed_id)
         
-    # svg = fi.find_svg(session["user_id"], pet_data[0]["pet_id"], pet_data[0]["species"])
-    
 
     # Find life stage, notes, and SVGs
     if pet_data[0]["species"] == "Canine":
@@ -1782,16 +1777,6 @@ def completed_report():
                 pet_data[0]["canine_der_factor_id"]
             )
                 
-                # svg_search = db.execute(
-                #     "SELECT svg FROM dog_breeds WHERE BreedId = :breed_id",
-                #     breed_id=breed_id
-                # )
-                
-                # if svg_search != None:
-                #     # TODO: If SVG can't be found, use a placeholder
-                #     svg = 'assets/svg/dogs/' + svg_search[0]["svg"] 
-                #     print(svg)
-                
     elif pet_data[0]["species"] == "Feline":
         
         # Finds cat SVG
@@ -1802,19 +1787,6 @@ def completed_report():
                 "SELECT life_stage, notes FROM feline_der_factors WHERE factor_id = ?",
                 pet_data[0]["feline_der_factor_id"]
             )
-                
-                # # Search for breed image in database
-                # svg_search = db.execute(
-                #     "SELECT svg FROM cat_breeds WHERE BreedId = :breed_id",
-                #     breed_id=breed_id
-                # )
-                
-                # if svg_search:
-                #     # TODO: If SVG can't be found, use a placeholder
-                #     if pet_data[0]["species"] == "Feline":
-                #         svg = 'assets/svg/cats/' + svg_search[0]["svg"] 
-                #         print(svg)
-    
     print(svg)                
     if life_stage_search:
         life_stage = life_stage_search[0]["life_stage"]
@@ -1824,16 +1796,37 @@ def completed_report():
     if pet_data:
         meals_per_day = pet_data[0]["meals_per_day"]
         
-    # cf = CalculateFood(session["user_id"], pet_id)
-        
+
     # Find DER range   
     if pet_data[0]["species"] == "Canine":
+        
+        # Find expected breed size
+        breed_search = db.execute(
+            "SELECT SizeCategory FROM dog_breeds WHERE BreedID = :breed_id",
+            breed_id=pet_data[0]["canine_breed_id"]
+        )
+        
+        
+        if breed_search:
+            breed_size_category = breed_search[0]["SizeCategory"].lower()
+        
         der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
         der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
     elif pet_data[0]["species"] == "Feline":
+        
+        # Find expected breed size
+        breed_search = db.execute(
+            "SELECT SizeCategory FROM cat_breeds WHERE BreedID = :breed_id",
+            breed_id=pet_data[0]["feline_breed_id"]
+        )
+        
+        
+        if breed_search:
+            breed_size_category = breed_search[0]["SizeCategory"].lower()
+            
         der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
         der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"]))
-        
+    print(f"Breed size category: {breed_size_category}")
     # Convert to int for easier reading
     der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
@@ -1850,7 +1843,8 @@ def completed_report():
                             object_pronoun=object_pronoun,
                             subject_pronoun=subject_pronoun,
                             possessive_pronoun=possessive_pronoun,
-                            pet_id=id)
+                            pet_id=id,
+                            breed_size_category=breed_size_category)
 
 
 @app.route("/finished_reports", methods=["GET", "POST"])
@@ -1865,44 +1859,17 @@ def finished_reports():
     except Exception as e:
         flash(f"Unable to find pet list. Exception: {e}")
         return render_template("finished_reports.html")
-    
-    try:
-        svgs = []
-        for pet in pet_list:
-            if pet["species"] == "Canine":
-                svg = fi.find_svg(pet["owner_id"], pet["pet_id"], pet["species"], pet["canine_breed_id"])
-            elif pet["species"] == "Feline":
-                svg = fi.find_svg(pet["owner_id"], pet["pet_id"], pet["species"], pet["feline_breed_id"])
-            
-            # Suggested by CoPilot
-            svgs.append(svg)
-            
-        print(svgs)
-    except Exception as e:
-        flash(f"Unable to find SVG. Exception: {e}")
-        return render_template("finished_reports.html")    
-    
-    # If user doesn't choose from the dropdown, provide error
-    if request.method == "POST":
-        pet_to_edit = request.form.get("reports")
-        
-        print(pet_to_edit)
-        
-        if pet_to_edit == None:
-            flash("Please choose a pet to edit their report.")
-            return redirect(url_for('finished_reports'))
-        
-        return redirect(url_for('edit_info', pet_id=pet_to_edit))
 
-    return render_template("finished_reports.html", pet_list=pet_list, svgs=svgs)
+    return render_template("finished_reports.html", pet_list=pet_list)
 
 
-@app.route("/edit_info/<int:pet_id>", methods=["GET", "POST"])
-def edit_info(pet_id):
+@app.route("/edit_info", methods=["GET", "POST"])
+def edit_info():
     """Allows a user to edit a pet's info and generate a new report"""
     
     # TODO: Add login required
-    pet_id = request.args.get("pet_id")
+    
+    pet_id = request.args.get("pet_id", type=int)
     
     print(pet_id)
     try:

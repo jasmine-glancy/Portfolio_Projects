@@ -48,7 +48,7 @@
         <a href="{{ url_for('pet_info') }}"><button type="button" class="btn btn-secondary btn-lg">Use As A Guest</button></a>
     {% else %}
         <a href="{{ url_for('new_pet_calc') }}"><button type="button" class="btn btn-secondary btn-lg">Calculate For A New Pet</button></a>
-        <a href="{{ url_for('recalculate_pet', pet_id=pet_id) }}"><button type="button" class="btn btn-secondary btn-lg">Recalculate For An Existing Pet</button></a>
+        <a href="{{ url_for('recalculate_pet') }}"><button type="button" class="btn btn-secondary btn-lg">Recalculate For An Existing Pet</button></a>
         <a href="{{ url_for('logout') }}"><button type="button" class="btn btn-secondary btn-lg">Log Out</button></a>
         
     {% endif %}

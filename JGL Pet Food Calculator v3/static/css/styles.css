@@ -52,6 +52,8 @@ h1 {
     h4 {
         display: inline-block;
         justify-content: flex-end;
+        padding-right: 10px;
+        padding-left: 10px;
     }
 
 .login {
@@ -78,6 +80,11 @@ h1 {
         color: #fff;
     }
 
+    .final_report_table {
+        width: 950px;
+        margin-left: auto;
+        margin-right: auto;
+    }
     hr {
         margin-top: 0px;
         margin-bottom: 0px;
@@ -87,6 +94,44 @@ h1 {
         color: var(--darker_lime);
     }
 
+    .table_info {
+        height: 200px;
+    }
+
+    .pet_table_info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        
+    }
+    
+    .signalment_info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .name_and_paws {
+        display: flex;
+        flex-direction: row;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .age_sex_breed {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button_table_info {
+        height: 100%;
+    }
+
+    .spacer {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
 /* Links */
 a {
@@ -147,6 +192,12 @@ a:hover {
         display: inline-block;
     }
 
+    .spacer {
+        display: flex;
+        flex-direction: column;
+        height: 25vw;
+        width: auto;
+    }
 /* Progress bar */
 .progress {
     --bs-progress-bg: var(--pale_white_green);
@@ -350,6 +401,10 @@ a:hover {
     .smaller_padding {
         margin-top: 10px;
     }
+    
+    .quarter_padding {
+        margin-top: 25px;
+    }
 
     .mid_padding {
         margin-top: 40px;
@@ -446,13 +501,6 @@ a:hover {
         margin-left: 20px;
     }
 
-    /* Pet SVG table cell  */
-    .fr_svg {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
         /* Pet SVG */
         .final_pet_pic {
             display: block;
@@ -497,8 +545,23 @@ a:hover {
     }
 
 
-    
+/* Images */
+.fr_bowl {
+    width: 75px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
+    .fr_paw {
+        width: 25px;
+        display: inline-block;
+    }
+
+    .bowl {
+        width: 75px;
+        display: inline-block;
+        padding: 10px;
+    }
 #fr {
     width: 220px;  
     margin-left: 5px;
@@ -556,11 +619,12 @@ a:hover {
     margin-top: 5px;
     padding: 0;
 }
-    .wider_treats {
+    .wider_treats, .treats {
         margin-left: 60px;
+        width: 85%;
     }
 
-    .preg_treats, .treats {
+    .preg_treats {
         margin-left: 325px;
     }
 

@@ -220,13 +220,19 @@
                     {% else %}
                         ({{ life_stage|trim }})
                     {% endif %}
+
                 </div>
             {% endif %}
-
         
         {% if pet_data[0].is_pregnant == "y" %}
             {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
                 <div class="large_padding"></div>
+            {% endif %}
+        {% elif pet_data[0].is_pediatric == "y" %}
+            {% if pet_data[0].species == "Feline" %}
+                <div class="xlarge_padding"></div>
+            {% elif pet_data[0].species == "Canine" %}
+                <div class="quarter_padding"></div>
             {% endif %}
         {% endif %}
 
@@ -234,9 +240,18 @@
 
             <div class="feeding">
                 {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing != "y" %}
-                    <div class="large_padding"></div>
-                {% elif pet_data[0].species == "Canine" and pet_data[0].bcs > 6 %}
-                    <div class="mid_padding"></div>
+                    {% if pet_data[0].is_pediatric != "y" %}    
+                        <div class="large_padding"></div>
+                    {% else %}
+                        <div class="quarter_padding"></div>
+                    {% endif %}
+                {% elif pet_data[0].species == "Canine" %}
+                    {% if pet_data[0].bcs > 6 %}
+                        <div class="mid_padding"></div>
+                    {% elif pet_data[0].is_pediatric == "y" %} 
+                        <div class="smaller_padding"></div>
+                    {% endif %}
+
                 {% elif pet_data[0].is_pregnant == "y" %}
                     <div class="neg_padding"></div>
                 {% elif pet_data[0].is_nursing == "y" %}
@@ -296,6 +311,59 @@
                     If {{ pet_data[0].name }} prefers drinking running water, there are water fountains 
                     you can get buy.
 
+                    {% if pet_data[0].is_pediatric == "y" %}
+                        <div class="smaller_padding"></div>
+                        {{ pet_data[0].name }}'s needs are dynamic as a growing kitten, so it is essential 
+                        to regularly weigh {{ object_pronoun }} and check 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %}
+                        updated body condition score. {{ pet_data[0].name }} should be weighed every
+                        {% if pet_data[0].age_in_months >= 1 or pet_data[0].age_in_months < 6 %}
+                            <!-- Kittens between 1 and 6 months --> 
+                            month
+                        {% elif pet_data[0].age_in_months >= 6 and pet_data[0].age_in_months <= 12 %}
+                            <!-- Kittens between 6 months and adulthood -->
+                            3 months
+                        {% endif %}
+                        to ensure {{ subject_pronoun }} is growing at a healthy rate. Please contact 
+                        {{ pet_data[0].name }}'s veterinarian if {{ subject_pronoun }} isn't gaining weight, 
+                        seems weak, or seems to hit "speed bumps" while playing (i.e. {{ pet_data[0].name }}
+                        is energetic and then is suddenly very tired in the middle of play). 
+
+                        <div class="smaller_padding"></div>
+                        In order to set {{ pet_data[0].name }} up for optimal growth, {{ subject_pronoun }} 
+                        should be on a complete and balanced diet formulated that is for kitten growth and 
+                        meets the <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                        title="View World Small Animal Veterinary Association Guidelines"
+                        class="fp_link">WSAVA guidelines</a>. 
+                        
+                        {% if pet_data[0].meals_per_day < 3 %}
+                            <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
+                            It is recommended to feed {{ pet_data[0].name }} 
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %}
+                            daily amount over 3-4 small meals, as providing {{ object_pronoun }} food 
+                            free-choice can increase                         
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %} 
+                            risk of obesity.
+                        {% endif %} 
+                        
+                        When choosing what form of food to feed {{ pet_data[0].name }}, 
+                        it is important to note that dry diets are more calorically dense (meaning less 
+                        is needed to achieve the daily caloric requirement) and canned food diets can be 
+                        tastier due to the moisture content.
+                    {% endif %}
+
                     {% if pet_data[0].age_in_years > 7 %}
                         <!-- Provide cat water recommendations -->
                         At {{ pet_data[0].name }}'s age, it is important to keep a closer eye on 
@@ -322,6 +390,57 @@
                             leaving wet or semi-moist food out for longer can cause it to decrease in quality. Additionally,
                             leaving it out longer can allow pests and bacteria to contaminate {{ pet_data[0].name }}'s food.
                         {% endif %}
+                    {% endif %}
+                {% elif pet_data[0].species == "Canine" %}
+                    {% if pet_data[0].is_pediatric == "y" %}
+                        <div class="smaller_padding"></div>
+                        {{ pet_data[0].name }} is a {{ breed_size_category }} breed dog.
+                        {{ pet_data[0].name }}'s needs are dynamic as a growing puppy, 
+                        so it is essential to regularly weigh {{ object_pronoun }} and 
+                        check 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %}
+                        updated body condition score. {{ pet_data[0].name }} should be
+                        weighed every 
+                        {% if pet_data[0].age_in_months >= 1 and pet_data[0].age_in_months < 6 %}
+                            <!-- Dogs between 1 and 6 months old -->
+                            2-4 weeks until {{ subject_pronoun }} is 6 months old
+                        {% elif pet_data[0].age_in_months >= 6 %}
+                            <!-- Dogs 6 months old until adult -->
+                            month
+                        {% endif %}
+                        to ensure {{ subject_pronoun }} is growing at a healthy rate. Please contact
+                        {{ pet_data[0].name }}'s veterinarian if {{ subject_pronoun }} isn't
+                        gaining weight, seems weak, or seems to hit "speed bumps" while playing 
+                        (i.e. seems energetic and then suddenly very tired in the middle of play). 
+
+                        <div class="smaller_padding"></div>
+                        In order to set {{ pet_data[0].name }} up for optimal growth, {{ subject_pronoun }} 
+                        should be on a complete and balanced diet formulated that is for puppy growth and 
+                        meets the <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                        title="View World Small Animal Veterinary Association Guidelines"
+                        class="fp_link">WSAVA guidelines</a>. 
+                        
+                        {% if pet_data[0].meals_per_day < 2 %}
+                            <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
+                            It is recommended to feed {{ pet_data[0].name }} 
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %}
+                            daily amount over 2-3 meals, as providing {{ object_pronoun }} food 
+                            free-choice can increase                         
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %} 
+                            risk of obesity.
+                        {% endif %} 
                     {% endif %}
                 {% endif %}
             </div>
@@ -567,7 +686,7 @@
                             her kittens' dynamic needs. 
                         {% elif pet_data[0].is_pregnant == "y" %}
                             <!-- If pet is a pregnant cat, provide recommendations -->
-                            
+                            <div class="smaller_padding"></div>
                             In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
                             should be fed a highly digestible, high quality kitten food from a brand that meets the 
                             <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
@@ -843,20 +962,22 @@
             {% endif %}
         {% endif %}
 
-    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or 
+    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or
     pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
         {% if pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" %}
-            {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating < 6 %}
-                <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
-                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                    {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                    day from treats. This is 8% of
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                        {{ possessive_pronoun }} 
-                    {% else %}
-                        {{ object_pronoun }} 
-                    {% endif %} RER.
-                </div>
+            {% if pet_data[0].is_pregnant == "y" %}
+                {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating < 6 %}
+                    <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
+                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                        day from treats. This is 8% of
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} RER.
+                    </div>
+                {% endif %}
             {% elif pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating >= 6 %}
                 <div class="wider_treats">
                     <!-- recommend treat amounts, |round|int suggested by CoPilot -->
@@ -869,20 +990,7 @@
                     {% endif %} RER.
                 </div>
             {% endif %}
-
-        {% elif pet_data[0].is_pregnant == "y" %}
-
-            <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
-                <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                day from treats. This is 8% of
-                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                    {{ possessive_pronoun }} 
-                {% else %}
-                    {{ object_pronoun }} 
-                {% endif %} RER.
-            </div>
-        {% else %}
+        {% elif pet_data[0].is_pediatric == "y" %}
             <div class="treats"> 
                 <!-- recommend treat amounts, |round|int suggested by CoPilot -->
                 {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
@@ -892,6 +1000,17 @@
                 {% else %}
                     {{ object_pronoun }} 
                 {% endif %} RER.
+
+                {% if pet_data[0].species == "Canine" %}
+                    When choosing a chewable toy for {{ pet_data[0].name }}, it is 
+                    important to seek out materials that won't harm {{ object_pronoun }}. 
+                    Avoid any abrasive materials like rope or tennis balls, as they can 
+                    cause wearing on the teeth. Materials that are too hard should also be 
+                    avoided, as they can cause the teeth to break. If you are able to dent 
+                    the chew with your finger nail, it is a good indicator that the chew is 
+                    soft enough to be against the teeth. Chews should always be offered while 
+                    {{ pet_data[0].name }} is supervised just in case the chew breaks or splinters.
+                {% endif %}
             </div>
         {% endif %}
     {% else %}     

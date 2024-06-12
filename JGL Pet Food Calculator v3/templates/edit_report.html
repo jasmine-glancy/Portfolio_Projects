@@ -106,16 +106,16 @@
                         {{ pet_data[0].age_in_months }} months old
                     {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 0 %}
                         {{ pet_data[0].age_in_years }} year old
-                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
-                        {{ pet_data[0].age_in_years }} years old
                     {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months == 1 %}
-                        {{ pet_data[0].age_in_years }} year old {{ pet_data[0].age_in_months }} month old
-                    {% elif pet_data[0].age_in_years >= 1 and pet_dat0a[0].age_in_months > 1 %}
-                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
-                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
-                        {{ pet_data[0].age_in_years }} years old {{ pet_data[0].age_in_months }} months old
+                        {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} month old
                     {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
                         {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
+                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
+                        {{ pet_data[0].age_in_years }} years old
+                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 1 %}
+                        {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} month old
+                    {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
+                        {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} months old
                     {% endif %}
                     <a href="{{ url_for('pet_info_continued', pet_id=pet_id) }}">
                         <button type="button" class="btn btn-secondary btn-sm">Edit</button>
@@ -243,9 +243,9 @@
 
     <div class="row">
         <h2>
-            <img src="{{ url_for('static', filename='assets/img/pet_food_bowl.png') }}" alt="A bowl with a pawprint" class="bowl">
+            <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
             Feeding Information
-            <img src="{{ url_for('static', filename='assets/img/pet_food_bowl.png') }}" alt="A bowl with a pawprint" class="bowl">
+            <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
         </h2>
     </div>
 
