@@ -249,7 +249,6 @@ class FindInfo():
                 print(f"ID of pet: {self.pet_id}")
             else:
                 print("Pet ID not found in pet_data.")
-                self.pet_id = 0
         else:
             self.pet_id = 0
         

@@ -49,6 +49,7 @@
         {% endif %}
             
         </div>
+
         <div class="final_report">
         <div class="data">
             <!-- Return pet's signalment -->
@@ -156,6 +157,11 @@
             kcal per day. The following formula was used: 
         </div>
   
+        {% if pet_data[0].is_pregnant == "y" %}
+            {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
+                <div class="large_padding"></div>
+            {% endif %}
+        {% endif %}
         
             <!-- Return the formula used to calculate DER -->
             {% if pet_data[0].species == "Feline" %} 
@@ -166,14 +172,27 @@
                         DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }} kittens)
                     </div>
                 {% else %}
-                <div class="final_formula_fel">
-                    DER = {{ pet_data[0].name }}'s RER x DER Modifier
-                    <br>
-                    DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
-                </div>
+                    <div class="final_formula_fel">
+                        DER = {{ pet_data[0].name }}'s RER x DER Modifier
+                        <br>
+                        DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+                    </div>
+                    {% if pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 %}
+                        <div class="mid_padding"></div>
+                    {% endif %}
                 {% endif %}
             {% else %}
                 <div class="final_formula">
+                    {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating > 6 %}
+                        <div class="mid_padding"></div>
+                    {% elif pet_data[0].species == "Canine" %}
+                        {% if pet_data[0].bcs > 6 and pet_data[0].bcs < 8 %}
+                            <div class="mid_padding"></div>
+                        {% else %}
+                            <div class="no_padding"></div>
+                        {% endif %}
+                    {% endif %}
+
                     DER = {{ pet_data[0].name }}'s RER x DER Modifier
                     <br>
                     DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
@@ -188,12 +207,24 @@
             {% endif %}
 
         
-        
+        {% if pet_data[0].is_pregnant == "y" %}
+            {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
+                <div class="large_padding"></div>
+            {% endif %}
+        {% endif %}
+
         <div class="food_and_exercise">
-            {% if pet_data[0].species == "Feline" and pet_data[0].bcs > 6 and pet_data[0].age_in_years > 7 %}
+
             <div class="feeding">
-            {% else %}
-            <div class="k9_feeding">
+                {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing != "y" %}
+                    <div class="large_padding"></div>
+                {% elif pet_data[0].species == "Canine" and pet_data[0].bcs > 6 %}
+                    <div class="mid_padding"></div>
+                {% elif pet_data[0].is_pregnant == "y" %}
+                    <div class="neg_padding"></div>
+                {% elif pet_data[0].is_nursing == "y" %}
+                    <div class="smaller_padding"></div>
+                {% endif %}
                 <!-- Return amount to feed per day and per meal  --> 
                 {{ pet_data[0].name }} should be getting around
                 {% if pet_data[0].meals_per_day != 1 %}
@@ -222,16 +253,60 @@
 
                     {% if pet_data[0].current_food_form != "can" %}
                         <!-- Recommend canned food diets for nursing mothers not already on them -->
-                        Additionally, it may be beneficial to place her on a canned or mixed canned/dry
+                        Additionally, it may be beneficial to place her on a canned or mixed canned and dry
                         food diet while she is nursing. 
-                        <br>
+                        <div class="smaller_padding"></div>
                         Please keep in mind canned foods are less 
                         calorically dense (meaning they have less calories per unit) than dry foods,
                         so {{ pet_data[0].name }} may need to eat more cans more frequently to hit her daily caloric
                         requirements.
                     {% endif %}
                 {% endif %}
-            {% endif %}
+                {% if pet_data[0].species == "Feline" %}
+                    Be sure to place 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} 
+                    food bowl away from
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} 
+                    water bowl, as many cats instinctively prefer to eat away from their water source. 
+                    If {{ pet_data[0].name }} prefers drinking running water, there are water fountains 
+                    you can get buy.
+
+                    {% if pet_data[0].age_in_years > 7 %}
+                        <!-- Provide cat water recommendations -->
+                        At {{ pet_data[0].name }}'s age, it is important to keep a closer eye on 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} 
+                        appetite. 
+                        
+                        {% if pet_data[0].meals_per_day < 2 %}
+                            <!-- If the senior cat isn't already getting frequent meals, make additional recommendations -->
+                            This can be best done by providing {{ pet_data[0].name }}'s food over two 
+                            or more meals per day instead of free-feeding. 
+                        {% endif %}
+
+                        {% if pet_data[0].current_food_form == "dry" %}
+                            <!-- If the senior cat is on dry food, make additional recommendations -->
+                            Additionally, consider buying smaller bags of pet food, as bags that are open 
+                            for more than 30 days can oxidize and become stale or rancid depending on storage.
+                        {% elif pet_data[0].current_food_form != "dry" %}
+                            <!-- If the senior cat is on canned or semi-moist foods, make additional recommendations -->
+                            Consider only leaving {{ pet_data[0].name }}'s food out for 30 minutes at most, as 
+                            leaving wet or semi-moist food out for longer can cause it to decrease in quality. Additionally,
+                            leaving it out longer can allow pests and bacteria to contaminate {{ pet_data[0].name }}'s food.
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
             </div>
             {% if pet_data[0].species == "Canine" %}
 
@@ -242,7 +317,7 @@
                             <!-- If a dog is 6 weeks pregnant, recommend specifics 
                             https://vcahospitals.com/know-your-pet/feeding-the-pregnant-dog
                             https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7169170/-->
-                                
+                            <div class="smaller_padding"></div>
                             {{ pet_data[0].name }} is in the last trimester of pregnancy. During this time,
                             it is expected to see {{ pet_data[0].name }}'s weight increase approximately 15-25% from
                             her weight at breeding
@@ -256,6 +331,9 @@
                             by the time of whelping. To ensure she gets adequate nutrition, it is recommended to feed
                             a high-quality, highly digestible food formulated for puppy growth or lactation over several
                             meals per day (or made freely available). 
+
+                            <div class="smaller_padding"></div>
+                            
                             These kinds of diets are calorically dense, meaning
                             {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her puppies' 
                             dynamic needs. It is best to choose from a brand that meets the 
@@ -264,6 +342,7 @@
                             class="fp_link">WSAVA guidelines</a>. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
                             as these diets do not have the currect calcium to phosphorus ratio.
                         {% else %}
+                            <div class="smaller_padding"></div>
                             <!-- If a dog is less than 5 weeks pregnant, recommend specifics 
                             https://www.akc.org/expert-advice/dog-breeding/the-care-and-feeding-of-the-breeding-bitch-part-two/-->
                             
@@ -282,6 +361,7 @@
                             {% endif %}
                         {% endif %}
                     {% elif pet_data[0].is_nursing == "y" %}
+                        <div class="smaller_padding"></div>
                         <!-- If dog is nursing, provide recommendations -->
                         Some weight loss is expected, as {{ pet_data[0].name }}'s current nutritional
                         needs have been significantly increased. It is recommended to keep a close eye on
@@ -342,14 +422,7 @@
                                 you may consider using a 
                                 <a href="https://www.google.com/search?client=firefox-b-1-d&sca_esv=71b2db2a9157258c&sca_upv=1&sxsrf=ADLYWII6E84-I1JPxopgLG-pz_SEAOVW7g:1717592995262&q=timed+cat+and+dog+feeder&tbm=shop&source=lnms&prmd=sivnmbtz&ved=1t:200715&ictx=111&biw=1920&bih=955&dpr=1"
                                 title="Google shopping for automatic pet feeders">
-                                    timed/automatic feeder</a> for {{ pet_data[0].name }}. For further weight loss options, please discuss how to help 
-                                {{ pet_data[0].name }} lose weight with 
-                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                    {{ possessive_pronoun }} 
-                                {% else %}
-                                    {{ object_pronoun }} 
-                                {% endif %}
-                                veterinarian. 
+                                    timed/automatic feeder</a> for {{ pet_data[0].name }}. 
                             </p>
                         
                         {% endif %}
@@ -358,235 +431,442 @@
 
                 
                 <!-- TODO: import treat calculator results -->
-
-                <div class="card" id="final_report">
-                    <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
-                    alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
-                    id="fr"
-                    align="left">
-                    <div class="card-body">
-                      <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
-                      <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
-                        and encourage slower eating! Please note, it can be difficult to make sure 
-                        your pet is eating their daily portion if mutliple animals have access to 
-                        these toys at one time.
-                      </p>
+                
+                {% if pet_data[0].is_pregnant == "y" %}
+                    <div class="card" id="preg_final_report">
+                        <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
+                        alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
+                        id="fr"
+                        align="left">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            and encourage slower eating! Please note, it can be difficult to make sure 
+                            your pet is eating their daily portion if mutliple animals have access to 
+                            these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
+                        class="card-link"
+                        title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
+                        class="card-link"
+                        title="Chewy search for dog puzzle toys">
+                            More puzzle toys for dogs on Chewy
+                        </a>
+                        </div>
                     </div>
-                    <div class="card-body-fr">
-                      <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
-                      class="card-link"
-                      title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
-                        Find this puzzle feeder on Chewy
-                      </a>
-                      <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
-                      class="card-link"
-                      title="Chewy search for dog puzzle toys">
-                        More puzzle toys for dogs on Chewy
-                      </a>
+                {% elif pet_data[0].bcs > 6 %}
+                    <div class="card" id="final_report_obese">
+                        <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
+                        alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
+                        id="fr"
+                        align="left">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            and encourage slower eating! Please note, it can be difficult to make sure 
+                            your pet is eating their daily portion if mutliple animals have access to 
+                            these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
+                        class="card-link"
+                        title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
+                        class="card-link"
+                        title="Chewy search for dog puzzle toys">
+                            More puzzle toys for dogs on Chewy
+                        </a>
+                        </div>
                     </div>
-                  </div>
+                {% else %}
+                    <div class="card" id="final_report">
+                        <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
+                        alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
+                        id="fr"
+                        align="left">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            and encourage slower eating! Please note, it can be difficult to make sure 
+                            your pet is eating their daily portion if mutliple animals have access to 
+                            these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
+                        class="card-link"
+                        title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
+                        class="card-link"
+                        title="Chewy search for dog puzzle toys">
+                            More puzzle toys for dogs on Chewy
+                        </a>
+                        </div>
+                    </div>
+                {% endif %}
 
                     
 
             {% elif pet_data[0].species == "Feline" %}
-            <div class="feline_recs">
-                <div class="reproduction_recs">
-                    {% if pet_data[0].is_nursing == "y" %}
-                        <!-- If pet is a nursing feline, provide feeding guidelines -->
-                        In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
-                        should be fed a highly digestible, high quality kitten formula from a brand 
-                        that meets the 
+                <div class="feline_recs">
+                    <div class="reproduction_recs">
+                        {% if pet_data[0].is_nursing == "y" %}
+                            <div class="smaller_padding"></div>
 
-                        <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
-                            WSAVA guidelines</a>.
+                            <!-- If pet is a nursing feline, provide feeding guidelines -->
+                            In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
+                            should be fed a highly digestible, high quality kitten formula from a brand 
+                            that meets the 
 
-                        {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
-                            <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
-                            It is recommended to feed {{ pet_data[0].name }} several 
-                            times a day. It is not recommended to provide free-choice feeding
-                            for {{ pet_data[0].name }}, as it allows her to make more milk than
-                            she needs.
+                            <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                                WSAVA guidelines</a>.
 
-                        {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
-                            <!-- If within the first 3-4 weeks of nursing -->
-                            It is recommended to feed {{ pet_data[0].name }} several 
-                            times a day or provide food freely for the first 3 to 4 
-                            weeks after giving birth.
+                            {% if pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size <= 2 %}
+                                <!-- If within the first 3-4 weeks of nursing with 1-2 kittens -->
+                                It is recommended to feed {{ pet_data[0].name }} several 
+                                times a day. It is not recommended to provide free-choice feeding
+                                for {{ pet_data[0].name }}, as it allows her to make more milk than
+                                she needs.
+
+                            {% elif pet_data[0].weeks_nursing <= 4 and pet_data[0].litter_size > 2 %}
+                                <!-- If within the first 3-4 weeks of nursing -->
+                                It is recommended to feed {{ pet_data[0].name }} several 
+                                times a day or provide food freely for the first 3 to 4 
+                                weeks after giving birth.
+                            {% endif %}
+
+                            Kitten food and diets formulated for nursing are calorically dense, meaning
+                            {{ pet_data[0].name }} will be able to eat less to feel satiated and to support 
+                            her kittens' dynamic needs. 
+                        {% elif pet_data[0].is_pregnant == "y" %}
+                            <!-- If pet is a pregnant cat, provide recommendations -->
+                            
+                            In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
+                            should be fed a highly digestible, high quality kitten food from a brand that meets the 
+                            <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                            title="View World Small Animal Veterinary Association Guidelines"
+                            class="fp_link">WSAVA guidelines</a>. These kinds of diets are calorically dense, 
+                            meaning {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her 
+                            kittens' dynamic needs. To encourage adequate food intake, it is recommended to
+                            feed {{ pet_data[0].name }} several small meals per day. {{ pet_data[0].name }}'s 
+                            feeding amounts should be recalculated after the kittens are born.
+
+                            <div class="smaller_padding"></div>
+                            It is not recommended to provide any supplements to {{ pet_data[0].name }} without 
+                            first discussing them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
+                            title="American Feed Control Officials Homepage"
+                            class="fp_link">Association of American Feed Control Officials (AAFCO)</a> statement 
+                            that the diets are formualted for lactation/growth are complete and balanced, so 
+                            further supplementation could make {{ pet_data[0].name }} prone to nutrient imbalances. 
                         {% endif %}
-
-                        Kitten food and diets formulated for nursing are calorically dense, meaning
-                        {{ pet_data[0].name }} will be able to eat less to feel satiated and to support 
-                        her kittens' dynamic needs. 
-                    {% elif pet_data[0].is_pregnant == "y" %}
-                        <!-- If pet is a pregnant cat, provide recommendations -->
-                        
-                        In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
-                        should be fed a highly digestible, high quality kitten food from a brand that meets the 
-                        <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
-                        title="View World Small Animal Veterinary Association Guidelines"
-                        class="fp_link">WSAVA guidelines</a>. These kinds of diets are calorically dense, 
-                        meaning {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her 
-                        kittens' dynamic needs. To encourage adequate food intake, it is recommended to
-                        feed {{ pet_data[0].name }} several small meals per day. {{ pet_data[0].name }}'s 
-                        feeding amounts should be recalculated after the kittens are born.
-
-                        It is not recommended to provide any supplements to {{ pet_data[0].name }} without 
-                        first discussing them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
-                        title="American Feed Control Officials Homepage"
-                        class="fp_link">Association of American Feed Control Officials (AAFCO)</a> statement 
-                        that the diets are formualted for lactation/growth are complete and balanced, so 
-                        further supplementation could make {{ pet_data[0].name }} prone to nutrient imbalances. 
-                    {% endif %}
-                </div>
-                <div class="exercise" id="feline_exercise">
-                    {% if pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
-                        <!-- Recommend enrichment and exercise resources for all cats -->  
-                        All pets can benefit from physical and mental excersize! Enticing your cat
-                        to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
-                        with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
-                        occasionally to cater to 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %}
-                        foraging instincts. 
-                    {% endif %}
-                    
-                    <!-- If cat is overweight or obese, provide additional exercise technique recs -->
-                    {% if pet_data[0].bcs > 6 %}
-                   
-                        To encourage additional exercise, you can move your {{ pet_data[0].name }}'s food bowl to an elevated
-                        surface (on a cat tree, upstairs, et cetra). You can also move your cat's
-                        litterbox to a different floor of your house if possible. 
-                        Feeding {{ pet_data[0].name }}
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} 
-                        daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                        may help promote weight loss. If you are unable to provide more frequently than two meals a 
-                        day, you can consider a few options. First, you can offer food before you leave the house in 
-                        the morning, then again as soon as you get home in the evening, and then right before bed. Or 
-                        you may consider using a timed/automatic feeder for {{ pet_data[0].name }}. For further weight 
-                        loss options, please discuss how to help 
-                        {{ pet_data[0].name }} lose weight with 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %}
-                        veterinarian. 
-                        
-                        <p>
-                            <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
-                            Based off of 
+                    </div>
+                    <div class="exercise" id="feline_exercise">
+                        {% if pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
+                            <!-- Recommend enrichment and exercise resources for all cats -->  
+                            All pets can benefit from physical and mental excersize! Enticing your cat
+                            to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
+                            with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
+                            occasionally to cater to 
                             {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                                 {{ possessive_pronoun }} 
                             {% else %}
-                                {{ object_pronoun }}
+                                {{ object_pronoun }} 
                             {% endif %}
-                            current body condition score, it is not recommended to help {{ pet_data[0].name }} 
-                            lose weight by reducing 
+                            foraging instincts. 
+                        {% endif %}
+                        
+                        <!-- If cat is overweight or obese, provide additional exercise technique recs -->
+                        {% if pet_data[0].bcs > 6 %}
+                    
+                            To encourage additional exercise, you can move your {{ pet_data[0].name }}'s food bowl to an elevated
+                            surface (on a cat tree, upstairs, et cetra). You can also move your cat's
+                            litterbox to a different floor of your house if possible. 
+
+                            <div class="smaller_padding"></div>
+
+                            Feeding {{ pet_data[0].name }}
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %} 
+                            daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                            may help promote weight loss. If you are unable to provide more frequently than two meals a 
+                            day, you can consider a few options. First, you can offer food before you leave the house in 
+                            the morning, then again as soon as you get home in the evening, and then right before bed. Or 
+                            you may consider using a timed/automatic feeder for {{ pet_data[0].name }}. 
+                            
+                            {% if pet_data[0].age_in_years < 7 %}
+                                For further weight 
+                                loss options, please discuss how to help 
+                                {{ pet_data[0].name }} lose weight with 
+                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                    {{ possessive_pronoun }} 
+                                {% else %}
+                                    {{ object_pronoun }} 
+                                {% endif %}
+                                veterinarian. 
+                            
+                                <p>
+                                    <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+                                    Based off of 
+                                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                        {{ possessive_pronoun }} 
+                                    {% else %}
+                                        {{ object_pronoun }}
+                                    {% endif %}
+                                    current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                                    lose weight by reducing 
+                                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                        {{ possessive_pronoun }} 
+                                    {% else %}
+                                        {{ object_pronoun }}
+                                    {% endif %} 
+                                    current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                                    is not on a food specifically formulated for cats to help with weight loss. {{ pet_data[0].name }} 
+                                    has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                                    percentage is around 15-20%. 
+                                    
+                                </p>
+                            {% endif %}
+                        {% endif %}
+                    </div>       
+
+                </div>
+            
+                {% if pet_data[0].is_pregnant == "y" or pet_data[0].species == "Feline" and 
+                pet_data[0].bcs > 6 and pet_data[0].age_in_years >= 7 %}
+                    <!-- Fix formatting for pregnant cats-->
+                    <div class="card" id="preg_fel_final_report">
+                        <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+                        alt="three puzzle feeders for cats that are shaped like mice."
+                        id="fr">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            for indoor cats! Please note, it can be difficult to make sure your pet is 
+                            eating enough if mutliple animals have access to these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" 
+                        class="card-link"
+                        title="Doc & Phoebe puzzle feeder mice for cats on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" 
+                        class="card-link"
+                        title="Chewy search for more puzzle toys for cats">
+                            More puzzle toys for cats on Chewy
+                        </a>
+                        </div>
+                    </div>
+                {% elif pet_data[0].species == "Feline" and pet_data[0].bcs > 6 and 
+                pet_data[0].age_in_years < 7 %}
+                    <div class="card" id="final_report_young_obese">
+                        <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+                        alt="three puzzle feeders for cats that are shaped like mice."
+                        id="fr">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            for indoor cats! Please note, it can be difficult to make sure your pet is 
+                            eating enough if mutliple animals have access to these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" 
+                        class="card-link"
+                        title="Doc & Phoebe puzzle feeder mice for cats on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" 
+                        class="card-link"
+                        title="Chewy search for more puzzle toys for cats">
+                            More puzzle toys for cats on Chewy
+                        </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card" id="final_report">
+                        <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
+                        alt="three puzzle feeders for cats that are shaped like mice."
+                        id="fr">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            for indoor cats! Please note, it can be difficult to make sure your pet is 
+                            eating enough if mutliple animals have access to these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" 
+                        class="card-link"
+                        title="Doc & Phoebe puzzle feeder mice for cats on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" 
+                        class="card-link"
+                        title="Chewy search for more puzzle toys for cats">
+                            More puzzle toys for cats on Chewy
+                        </a>
+                        </div>
+                    </div>
+                {% endif %}
+                
+            {% endif %}
+        </div>
+        {% if pet_data[0].bcs > 6 %}
+            {% if pet_data[0].species == "Feline" or pet_data[0].species == "Canine" %}
+                {% if pet_data[0].species == "Feline" and pet_data[0].age_in_years >= 7 %}
+                    <div class="reduction">
+                        <!-- Provide disclaimer on food reduction in older cats with a BCS of 7 or higher -->
+                        Based off of 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %}
+                        current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                        lose weight by reducing 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} 
+                        current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                        is not on a food specifically formulated for pets to help with weight loss. {{ pet_data[0].name }} 
+                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                        percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                        to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                        Speak with {{ pet_data[0].name }}'s veterinarian about what can be done to balance 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} 
+                        quality of life with 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} current weight.
+                    </div>
+                {% elif pet_data[0].species == "Feline" and pet_data[0].age_in_years < 7 %}
+                    <div class="reduction">
+                        {{ pet_data[0].name }}'s ideal body weight is estimated
+                        to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                        For further weight loss options, please discuss how to help {{ pet_data[0].name }} lose 
+                        weight with 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                            {% endif %}
+                        veterinarian. 
+                    </div>
+                {% elif pet_data[0].species == "Canine" %}
+                    <div class="reduction">
+                        <div class="mid_padding"></div>
+                        <!-- Provide disclaimer on food reduction in older cats with a BCS of 7 or higher -->
+                        Based off of 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %}
+                        current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                        lose weight by reducing 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} 
+                        current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                        is not on a food specifically formulated for pets to help with weight loss. {{ pet_data[0].name }} 
+                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                        percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                        to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                        {% if pet_data[0].age_in_years > 7 %}
+                            Speak with {{ pet_data[0].name }}'s veterinarian about what can be done to balance 
                             {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }}
                             {% endif %} 
-                            current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-                            is not on a food specifically formulated for cats to help with weight loss. {{ pet_data[0].name }} 
-                            has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-                            percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
-                            to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
-                        </p>
-                    {% endif %}
-                </div>       
-                <div class="treats">
-                    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y"
-                    or pet_data[0].is_nursing == "y" %}
-                        <!-- recommend treat amounts for obese animals and pediatric animals,
-                             |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                        day from treats. This is 8% of
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
+                            quality of life with 
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }}
+                            {% endif %} current weight.
                         {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} RER.
-                    {% else %}
-                        <br>
-                        <!-- recommend treat amounts for everyone else, |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                        day from treats. This is 10% of 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} RER.
-
-                        <!-- TODO: import treat calculator results -->
-                    {% endif %}
-                </div>
-            </div>
-
-                <div class="card" id="final_report">
-                    <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
-                    alt="three puzzle feeders for cats that are shaped like mice."
-                    id="fr">
-                    <div class="card-body">
-                    <h5 class="card-title-fr">Doc & Phoebe Puzzle Toy with Trainer</h5>
-                    <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
-                        for indoor cats! Please note, it can be difficult to make sure your pet is 
-                        eating enough if mutliple animals have access to these toys at one time.
-                    </p>
+                            For further weight loss options, please discuss how to help 
+                            {{ pet_data[0].name }} lose weight with 
+                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                                {{ possessive_pronoun }} 
+                            {% else %}
+                                {{ object_pronoun }} 
+                            {% endif %}
+                            veterinarian. 
+                        {% endif %}
                     </div>
-                    <div class="card-body-fr">
-                    <a href="https://www.chewy.com/doc-phoebes-cat-co-indoor-hunting-cat/dp/179102?utm_source=google-product&utm_medium=cpc&utm_campaign=20207612288&utm_content=&gad_source=1&gclid=Cj0KCQjw6uWyBhD1ARIsAIMcADrhfsHst5Srr0AnUVs6Bc3CzpI2jwrvF2cly1TTKajwJrhZ0B0euHUaAp91EALw_wcB" 
-                    class="card-link"
-                    title="Doc & Phoebe puzzle feeder mice for cats on Chewy.com">
-                        Find this puzzle feeder on Chewy
-                    </a>
-                    <a href="https://www.chewy.com/s?query=puzzle+toy&rh=c%3A326" 
-                    class="card-link"
-                    title="Chewy search for more puzzle toys for cats">
-                        More puzzle toys for cats on Chewy
-                    </a>
-                    </div>
-                </div>
-                
+                {% endif %}
+
             {% endif %}
-        </div>
-        {% if pet_data[0].bcs > 6%}
-        <div class="reduction">
-            <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
-            Based off of 
-            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                {{ possessive_pronoun }} 
-            {% else %}
-                {{ object_pronoun }}
-            {% endif %}
-            current body condition score, it is not recommended to help {{ pet_data[0].name }} 
-            lose weight by reducing 
-            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                {{ possessive_pronoun }} 
-            {% else %}
-                {{ object_pronoun }}
-            {% endif %} 
-            current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-            is not on a food specifically formulated for dogs to help with weight loss. {{ pet_data[0].name }} 
-            has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-            percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
-            to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
-        </div>
-    {% endif %}
+        {% endif %}
 
     {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or 
     pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
-        {% if pet_data[0].bcs > 6 %}
-            <div class="wider_treats">
+        {% if pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" %}
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating < 6 %}
+                <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 8% of
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
+                </div>
+            {% elif pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating >= 6 %}
+                <div class="wider_treats">
+                    <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                    day from treats. This is 8% of
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} RER.
+                </div>
+            {% endif %}
+
+        {% elif pet_data[0].is_pregnant == "y" %}
+
+            <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
+                <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+                day from treats. This is 8% of
+                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {{ possessive_pronoun }} 
+                {% else %}
+                    {{ object_pronoun }} 
+                {% endif %} RER.
+            </div>
         {% else %}
-            <div class="treats">  
+            <div class="treats"> 
                 <!-- recommend treat amounts, |round|int suggested by CoPilot -->
                 {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                 day from treats. This is 8% of

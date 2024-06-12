@@ -181,7 +181,7 @@ def pet_info():
     form = NewSignalment()
     
     if request.method == "POST":
-        
+        id = fi.find_pet_id(session["user_id"], request.form.get("pet_id")) 
         species = form.pet_species.data
         pet_name = form.pet_name.data.title()
         
@@ -199,13 +199,16 @@ def pet_info():
 
                 # See if the pet is already added
                 find_existing_pet = fi.find_existing_pet(session["user_id"], id)
+                print(find_existing_pet)
                 
+                # TODO: Add dropdown 
                 if find_existing_pet:
                     # If existing pet is found, update the data
                     print("Existing pet found")
                     try:
                         db.execute(
-                            "UPDATE pets SET name = :updated_name, species = :updated_species WHERE pet_id = :pet_id AND owner_id = :user_id",
+                            "UPDATE pets SET name = :updated_name, species = :updated_species \
+                                WHERE pet_id = :pet_id AND owner_id = :user_id",
                             updated_name=pet_name, updated_species=species, pet_id=id, user_id=session["user_id"]
                         )
                     except Exception as e:
@@ -228,7 +231,8 @@ def pet_info():
                             session["user_id"], pet_name, species
                         )
                         
-                        print("Looking up new pet's ID")                        
+                        print("Looking up new pet's ID")      
+                                          
                         # Query the new pet's id 
                         pet_data = db.execute(
                             "SELECT pet_id, name FROM pets \

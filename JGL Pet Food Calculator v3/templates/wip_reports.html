@@ -75,73 +75,92 @@
                                 {% endif %}
                                 </td>
                                 <td>
-                                <div class="button-container">
-                                    <a href="{{ url_for('pet_info', pet_id=pet.pet_id) }}">
-                                        <button type="button" class="btn btn-secondary btn-sm">
-                                            Edit {{ pet.name }}'s Name or Species
-                                        </button>
-                                    </a>
-                                
-                                    <a href="{{ url_for('pet_info_continued', pet_id=pet.pet_id) }}">
-                                        <button type="button" class="btn btn-secondary btn-sm">
-                                            Edit {{ pet.name }}'s Species, Age, or Sex
-                                        </button>
-                                    </a>
-
-                                    {% if pet.sex == "female" %}
-                                        <a href="{{ url_for('repro_status', pet_id=pet.pet_id) }}">
+                                    <div class="button-container">
+                                        <a href="{{ url_for('pet_info', pet_id=pet.pet_id) }}">
                                             <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Pregnancy Status
+                                                Edit {{ pet.name }}'s Name or Species
                                             </button>
                                         </a>
-                                    {% endif %}
-
-                                    {% if pet.is_pregnant == "y" %}
-                                        <a href="{{ url_for('gestation_duration', pet_id=pet.pet_id) }}">
+                                    
+                                        <a href="{{ url_for('pet_info_continued', pet_id=pet.pet_id) }}">
                                             <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Pregnancy Duration
-                                            </button>
-                                        </a>
-                                    {% endif %}
-
-                                    {% if pet.is_nursing == "y" %}
-                                        <a href="{{ url_for('lactation_status', pet_id=pet.pet_id) }}">
-                                            <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Nursing Status
-                                            </button>
-                                        </a>
-                                    {% endif %}
-
-                                    {% if pet.litter_size != None and pet.litter_size > 0 %}
-                                        <a href="{{ url_for('litter_size', pet_id=pet.pet_id) }}">
-                                            <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Litter Size
-                                            </button>
-                                        </a>
-                                    {% endif %}
-
-                                    {% if pet.weeks_nursing != None and pet.species == "Feline" %}
-
-                                        <a href="{{ url_for('lactation_duration', pet_id=pet.pet_id) }}">
-                                            <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Lactation Length
+                                                Edit {{ pet.name }}'s Species, Age, or Sex
                                             </button>
                                         </a>
 
-                                    {% endif %}
+                                        {% if pet.sex == "female" %}
+                                            <a href="{{ url_for('repro_status', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Pregnancy Status
+                                                </button>
+                                            </a>
+                                        {% endif %}
 
-                                    <a href="{{ url_for('pet_condition', pet_id=pet.pet_id) }}">
-                                        <button type="button" class="btn btn-secondary btn-sm">
-                                            Edit {{ pet.name }}'s Weight or Body Condition Score
-                                        </button>
-                                    </a>
+                                        {% if pet.is_pregnant == "y" %}
+                                            <a href="{{ url_for('gestation_duration', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Pregnancy Duration
+                                                </button>
+                                            </a>
+                                        {% endif %}
 
-                                    {% if pet.species == "Canine" %}
-                                        <a href="{{ url_for('activity', pet_id=pet.pet_id) }}">
+                                        {% if pet.is_nursing == "y" %}
+                                            <a href="{{ url_for('lactation_status', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Nursing Status
+                                                </button>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if pet.litter_size != None and pet.litter_size > 0 %}
+                                            <a href="{{ url_for('litter_size', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Litter Size
+                                                </button>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if pet.weeks_nursing != None and pet.species == "Feline" %}
+
+                                            <a href="{{ url_for('lactation_duration', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Lactation Length
+                                                </button>
+                                            </a>
+
+                                        {% endif %}
+
+                                        <a href="{{ url_for('pet_condition', pet_id=pet.pet_id) }}">
                                             <button type="button" class="btn btn-secondary btn-sm">
-                                                Edit {{ pet.name }}'s Activity Duration
+                                                Edit {{ pet.name }}'s Weight or Body Condition Score
                                             </button>
                                         </a>
+
+                                        {% if pet.species == "Canine" %}
+                                            <a href="{{ url_for('activity', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Activity Duration
+                                                </button>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if pet.current_food_kcal != None %}
+                                        <hr />
+                                        <div class="button-container">
+                                            <a href="{{ url_for('current_food', pet_id=pet.pet_id) }}">
+                                                <button type="button" class="btn btn-secondary btn-sm">
+                                                    Edit {{ pet.name }}'s Current Food Information
+                                                </button>
+                                            </a>
+
+                                            {% if pet.transitioning_food_one_kcal != None %}
+                                                <a href="{{ url_for('new_food', pet_id=pet.pet_id) }}">
+                                                    <button type="button" class="btn btn-secondary btn-sm">
+                                                        Edit {{ pet.name }}'s New Food Information
+                                                    </button>
+                                                </a>
+                                            {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>
