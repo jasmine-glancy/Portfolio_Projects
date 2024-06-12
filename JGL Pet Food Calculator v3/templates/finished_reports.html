@@ -68,9 +68,12 @@
                                                 Male (Intact)
                                             {% endif %}
                                             {{ pet.breed }} ({{ pet.species }})
-                                            <br>
-                                            <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="fr_bowl">
-                                    
+                                            <br>                                    
+                                            {% if pet.species == "Feline" %}
+                                                <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="fr_bowl">
+                                            {% elif pet.species == "Canine" %}
+                                                <img src="{{ url_for('static', filename='assets/svg/dog_food_bowl.svg') }}" alt="A bowl with a bone" class="fr_bowl">
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </td>

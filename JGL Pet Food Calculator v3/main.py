@@ -1106,7 +1106,8 @@ def activity(pet_id):
         heavy_work_minutes = work.heavy_work_minutes.data
         heavy_work_hours = work.heavy_work_hours.data
         
-        
+        print(f'heavy_work_hours: {heavy_work_hours}, light_work_hours: {light_work_hours}')
+
         # Convert time for easier logic tracking
         light_work_hours += (light_work_minutes / 60)
         heavy_work_hours += (heavy_work_minutes / 60)
@@ -1122,8 +1123,9 @@ def activity(pet_id):
         obese_prone_breed = fi.check_obesity_risk()
         
         
-        # Pets that aren't pregnant, aren't nursing, and are obese prone
+        # Pets that aren't pregnant, aren't nursing, and are obese prone, condition suggested by CoPilot
         not_preg_or_nursing_non_obese = pregnancy_status != "y" and is_nursing != "y" and obese_prone_breed != "y"
+        not_preg_or_nursing = pregnancy_status != "y" and is_nursing != "y"
         
         # Check if a pet is pediatric
         is_pediatric = fi.check_if_pediatric()
@@ -1144,24 +1146,27 @@ def activity(pet_id):
             if not_preg_or_nursing_non_obese and is_pediatric == "n":
                 der_factor_id = 21
         elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0 or \
-            heavy_work_hours > 0 and heavy_work_hours < 4:
+            heavy_work_hours > 0 and heavy_work_hours < 3:
             # Moderate activity: 1-2 hours of low impact activity
             activity_level = "Moderate"
             
-            if not_preg_or_nursing_non_obese and is_pediatric == "n":
+            if not_preg_or_nursing and is_pediatric == "n":
+                # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
                 der_factor_id = 22
                 
-        elif heavy_work_hours >= 1 and heavy_work_hours <= 3 and light_work_hours == 0:
+        elif heavy_work_hours >= 1 and heavy_work_hours < 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
             activity_level = "Moderate"
             
-            if not_preg_or_nursing_non_obese and is_pediatric == "n":
+            if not_preg_or_nursing and is_pediatric == "n":
+                # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
                 der_factor_id = 22
-        elif heavy_work_hours > 3 and light_work_hours == 0:
+        elif heavy_work_hours >= 3 and light_work_hours >= 1:
             # Working and performance: 3+ hours (i.e. working dog)
             activity_level = "Heavy"
             
-            if not_preg_or_nursing_non_obese and is_pediatric == "n":
+            if not_preg_or_nursing and is_pediatric == "n":
+                # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
                 der_factor_id = 23
                     
         print(activity_level)
@@ -1810,8 +1815,10 @@ def completed_report():
         if breed_search:
             breed_size_category = breed_search[0]["SizeCategory"].lower()
         
-        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
-        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]))
+        der_low_end = float(fi.find_der_low_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]) * pet_data[0]["rer"])
+        der_high_end = float(fi.find_der_high_end(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"]) * pet_data[0]["rer"])
+        
+        print(der_low_end, der_high_end)
     elif pet_data[0]["species"] == "Feline":
         
         # Find expected breed size
@@ -1852,6 +1859,8 @@ def finished_reports():
     """Provides a dropdown list of completed reports"""
 
     # TODO: Add login required
+    
+    # TODO: Paginate results
     # Use user_id and find_info to verify species
     try:
         fi = FindInfo(session["user_id"])

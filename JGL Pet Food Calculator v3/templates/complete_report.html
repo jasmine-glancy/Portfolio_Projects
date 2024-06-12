@@ -194,7 +194,10 @@
 
                     {% if pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 %}
                         <div class="mid_padding"></div>
+                    {% elif pet_data[0].age_in_years >= 7 and pet_data[0].bcs <= 6  %}
+                        <div class="large_padding"></div>
                     {% endif %}
+                    
                 {% endif %}
 
                 
@@ -232,7 +235,12 @@
             {% if pet_data[0].species == "Feline" %}
                 <div class="xlarge_padding"></div>
             {% elif pet_data[0].species == "Canine" %}
-                <div class="quarter_padding"></div>
+                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    <div class="xlarge_padding"></div>
+                {% else %}
+                    <div class="quarter_padding"></div>
+                {% endif %}
+
             {% endif %}
         {% endif %}
 
@@ -242,6 +250,8 @@
                 {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing != "y" %}
                     {% if pet_data[0].is_pediatric != "y" %}    
                         <div class="large_padding"></div>
+                    {% elif pet_data[0].age_in_years >= 7 %}
+                        <div class="xlarge_padding"></div>
                     {% else %}
                         <div class="quarter_padding"></div>
                     {% endif %}
@@ -250,6 +260,8 @@
                         <div class="mid_padding"></div>
                     {% elif pet_data[0].is_pediatric == "y" %} 
                         <div class="smaller_padding"></div>
+                    {% elif pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                        <div class="xlarge_padding"></div>
                     {% endif %}
 
                 {% elif pet_data[0].is_pregnant == "y" %}
@@ -365,6 +377,7 @@
                     {% endif %}
 
                     {% if pet_data[0].age_in_years > 7 %}
+                        <div class="smaller_padding"></div>
                         <!-- Provide cat water recommendations -->
                         At {{ pet_data[0].name }}'s age, it is important to keep a closer eye on 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
@@ -521,7 +534,7 @@
                 
 
                 
-                {% if pet_data[0].activity_level != "Moderate Activity" and pet_data[0].activity_level != "Heavy Activity" 
+                {% if pet_data[0].activity_level != "Moderate" and pet_data[0].activity_level != "Heavy" 
                 and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
                     <!-- If dog is not already getting moderate to heavy exercise, and is not pregnant or nursing --> 
                     <div class="exercise">
@@ -534,6 +547,45 @@
                     </div>
                     <br>
                     {% endif %}
+
+                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    <div class="exercise">
+                        <!-- If dog is active, provide additional recommendations-->
+                        <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
+                        While {{ pet_data[0].name }} is active, it's important to provide plenty of fresh, clean 
+                        water. Offering frequent drinks in lieu of large gulps of water can help reduce the chance 
+                        of bloating, abdominal discomfort, and regurgitation. While there are electrolyte drinks 
+                        for dogs, they are not recommended as dogs don't sweat away their electrolytes. Additionally,
+                        some sports drinks for dogs may cause stomach upset.
+
+                        <div class="smaller_padding"></div>
+
+                        It is important to let {{ pet_data[0].name }} rest between 2-3 hours after a meal before allowing 
+                        {{ object_pronoun }} to exercise or engage in heavy play. You may also consider discussing 
+                        {{ pet_data[0].name }}'s activity level with 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} veterinarian to see if {{ subject_pronoun }} may benefit from a diet 
+                        that is formulated for performance per the <a href="https://www.aafco.org/" 
+                        title="American Feed Control Officials Homepage"
+                        class="fp_link">Association of 
+                        American Feed Control Officials (AAFCO)</a> guidelines. 
+
+                        <div class="smaller_padding"></div>
+                        
+                        Some performance based diets have a higher fat to protein ratio, while
+                        others have a higher carbohydrate to fat ratio. Additionally, they are more
+                        calorically dense, meaning {{ pet_data[0].name }} will need to eat less of the
+                        diet to hit                         
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} daily caloric needs. 
+                    </div>
+                {% endif %}
 
                 <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
                 {% if pet_data[0].bcs > 6 and pet_data[0].is_pediatric != "y" or pet_data[0].is_pregnant != "y"
@@ -597,6 +649,33 @@
                     </div>
                 {% elif pet_data[0].bcs > 6 %}
                     <div class="card" id="final_report_obese">
+                        <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
+                        alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
+                        id="fr"
+                        align="left">
+                        <div class="card-body">
+                        <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
+                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
+                            and encourage slower eating! Please note, it can be difficult to make sure 
+                            your pet is eating their daily portion if mutliple animals have access to 
+                            these toys at one time.
+                        </p>
+                        </div>
+                        <div class="card-body-fr">
+                        <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
+                        class="card-link"
+                        title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
+                            Find this puzzle feeder on Chewy
+                        </a>
+                        <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
+                        class="card-link"
+                        title="Chewy search for dog puzzle toys">
+                            More puzzle toys for dogs on Chewy
+                        </a>
+                        </div>
+                    </div>
+                {% elif pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    <div class="card" id="final_report_active">
                         <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
                         alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
                         id="fr"
@@ -1013,6 +1092,18 @@
                 {% endif %}
             </div>
         {% endif %}
+    {% elif pet_data[0].age_in_years >= 7 %}
+        <div class="senior_treats">        
+            <div class="smaller_padding"></div>       
+            <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+            {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
+            day from treats. This is 10% of 
+            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }} 
+            {% endif %} RER.
+        </div>
     {% else %}     
         <div class="treats">               
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->

@@ -362,6 +362,8 @@ a:hover {
         margin-left: auto;
         margin-right: auto;
         min-height: fit-content;
+        width: 480px;
+        word-wrap: break-word;
     }
 
     .final_formula_nursing {
@@ -418,6 +420,9 @@ a:hover {
         margin-top: 100px;
     }
 
+    .dxl_padding {
+        margin-top: 250px;
+    }
 .food_and_exercise {
     display: flex;
     flex-direction: column;
@@ -512,7 +517,7 @@ a:hover {
 
 /* Puzzle feeder images */
 #final_report, #final_report_cat, #preg_fel_final_report, #preg_final_report, 
- #final_report_obese, #final_report_young_obese {
+ #final_report_obese, #final_report_young_obese, #final_report_active {
     display: inline;
     position: absolute;
     margin-right: 46vw;
@@ -542,6 +547,10 @@ a:hover {
 
     #final_report {
         margin-top: 50px;
+    }
+
+    #final_report_active {
+        margin-top: 125px;
     }
 
 
@@ -624,7 +633,7 @@ a:hover {
         width: 85%;
     }
 
-    .preg_treats {
+    .preg_treats, .senior_treats {
         margin-left: 325px;
     }
 

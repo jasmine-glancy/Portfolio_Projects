@@ -243,9 +243,18 @@
 
     <div class="row">
         <h2>
-            <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
+            {% if pet_data[0].species == "Feline" %}
+                <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
+            {% elif pet_data[0].species == "Canine" %}
+                <img src="{{ url_for('static', filename='assets/svg/dog_food_bowl.svg') }}" alt="A bowl with a bone" class="bowl">
+            {% endif %}
+
             Feeding Information
-            <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
+            {% if pet_data[0].species == "Feline" %}
+                <img src="{{ url_for('static', filename='assets/svg/food_bowl.svg') }}" alt="A bowl with a pawprint" class="bowl">
+            {% elif pet_data[0].species == "Canine" %}
+                <img src="{{ url_for('static', filename='assets/svg/dog_food_bowl.svg') }}" alt="A bowl with a bone" class="bowl">
+            {% endif %}
         </h2>
     </div>
 
