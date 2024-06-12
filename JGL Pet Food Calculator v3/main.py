@@ -1268,7 +1268,7 @@ def current_food():
                 return redirect(url_for('new_food'))
             
             # If user doesn't want a transition, calculate RER
-            return redirect(url_for('rer'))
+            return redirect(url_for('rer', pet_id=pet_id))
         
     return render_template("current_food.html", current_food=current_food, pet_id=pet_id)
     
@@ -1309,7 +1309,7 @@ def new_food():
 
            
         # If user doesn't want a transition, calculate RER
-        return redirect(url_for('rer'))
+        return redirect(url_for('rer', pet_id=pet_id))
            
     return render_template("new_food.html", new_foods=new_foods)
 
@@ -1357,36 +1357,9 @@ def rer(pet_id):
     session["possessive_pronoun"] = possessive_pronoun
     
     # Find pet's current weight so the user can know what formula was used to find their pet's RER
-    if session["user_id"] != None:
-        # If user is logged in, find current rer info
-
-        try:            
-            weight_data = db.execute(
-                "SELECT weight, units, converted_weight, converted_weight_units \
-                    FROM pets WHERE name = ? AND owner_id = ?",
-                session["pet_name"], session["user_id"]
-            )
-            print(weight_data)          
-        except Exception as e:
-            flash(f"Unable to find data, Exception: {e}")
-            return redirect(url_for("rer"))
-        else:
-            if weight_data:
-                weight = weight_data[0]["weight"]
-                units = weight_data[0]["units"]
-                converted_weight = weight_data[0]["converted_weight"]
-                converted_weight_units = weight_data[0]["converted_weight_units"]
-    else:        
-        # If a user isn't logged in, grab session variables
-        weight = session["weight"]
-        units = session["units"]
-        converted_weight = session["converted_weight"]
-        converted_weight_units = session["converted_weight_units"]
+    pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
     
-    
-    print(f"weight: {weight} units: {units}")
-    print(f"RER: {rer}")
-    
+    print(pet_data)
     # Check life stage factors
     obese_prone = fi.check_obesity_risk()
     is_pediatric = fi.check_if_pediatric()
@@ -1421,9 +1394,15 @@ def rer(pet_id):
         except Exception as e:
             flash(f"Unable to update data, Exception: {e}")
     
-    der_low_end = int(float(cf.calculcate_der()["DER_low_end"]))
-    der_high_end = int(float(cf.calculcate_der()["DER_high_end"]))
+    if pet_data[0]["species"] == "Canine":
     
+        der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_low_end"]))
+        der_high_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_high_end"]))
+    
+    elif pet_data[0]["species"] == "Feline":
+        der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_low_end"]))
+        der_high_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_high_end"]))
+        
     print (f"Low end: {der_low_end} type: {type(der_low_end)} High end: {der_high_end} type: {type(der_high_end)} ")
     if request.method == "POST":    
         return redirect(url_for('der'))
@@ -1433,15 +1412,14 @@ def rer(pet_id):
                            name=session["pet_name"],
                            object_pronoun=object_pronoun,
                            possessive_pronoun=possessive_pronoun,
-                           weight=weight,
-                           converted_weight=converted_weight,
-                           units=units,
+                           weight=pet_data[0]["weight"],
+                           converted_weight=pet_data[0]["converted_weight"],
+                           units=pet_data[0]["units"],
                            sex=sex,
                            der_low_end=der_low_end,
                            der_high_end=der_high_end,
-                           converted_weight_units=converted_weight_units,
-                           start_range=der_modifier_start_range,
-                           end_range=der_modifier_end_range)
+                           converted_weight_units=pet_data[0]["converted_weight_units"],
+                           pet_id=pet_id)
     
     
 @app.route("/der/<int:pet_id>", methods=["GET", "POST"])
@@ -1514,18 +1492,23 @@ def der(pet_id):
         print(name, sex, rer, meals_per_day, current_food_kcal, is_nursing, litter_size)
                 
     # Use find_info to verify DER factor ID and food form
-    current_food_form = find_food_form()
+    current_food_form = fi.find_food_form()
     der_factor_id = fi.der_factor()
     
     print(der_factor_id)
     print(rer, der_factor_id, meals_per_day, current_food_kcal, current_food_form)
     
+    if pet_data[0]["species"] == "Canine":
+        der = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER"]
+        der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_low_end"]))
+        der_high_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["canine_der_factor_id"])["DER_high_end"]))
+        der_modifier = cf.calculcate_der()["DER_modifier"]
+    elif pet_data[0]["species"] == "Feline":
+        der = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER"]
+        der_low_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_low_end"]))
+        der_high_end = int(float(cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_high_end"]))
+        der_modifier = cf.calculcate_der(pet_data[0]["species"], pet_data[0]["feline_der_factor_id"])["DER_modifier"]
 
-
-    der = cf.calculcate_der()["DER"]
-    der_low_end = cf.calculcate_der()["DER_low_end"]
-    der_high_end = cf.calculcate_der()["DER_high_end"]
-    der_modifier = cf.calculcate_der()["DER_modifier"]
     
     # Convert all to int for easier reading
     der, der_low_end, der_high_end = int(float(der)), int(float(der_low_end)), int(float(der_high_end))
@@ -1697,6 +1680,7 @@ def der(pet_id):
 
     
     return render_template("der.html",
+                           pet_id=pet_id,
                            rer=rer,
                            der=der,
                            name=name,

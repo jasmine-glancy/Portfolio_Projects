@@ -170,17 +170,34 @@
                         DER = {{ pet_data[0].name }}'s {{ notes }}
                         <br>
                         DER = {{ rer }} + ({{ pet_data[0].der_modifier }} * {{ pet_data[0].litter_size }} kittens)
+                        
+                        <!-- Return any notes regarding life stage -->
+                        {% if notes != None %}
+                            ({{ life_stage|trim }}, {{ notes }})
+                        {% else %}
+                            ({{ life_stage|trim }})
+                        {% endif %}
                     </div>
                 {% else %}
                     <div class="final_formula_fel">
                         DER = {{ pet_data[0].name }}'s RER x DER Modifier
                         <br>
                         DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
+                        
+                        <!-- Return any notes regarding life stage -->
+                        {% if notes != None %}
+                            ({{ life_stage|trim }}, {{ notes }})
+                        {% else %}
+                            ({{ life_stage|trim }})
+                        {% endif %}
                     </div>
+
                     {% if pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 %}
                         <div class="mid_padding"></div>
                     {% endif %}
                 {% endif %}
+
+                
             {% else %}
                 <div class="final_formula">
                     {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating > 6 %}
