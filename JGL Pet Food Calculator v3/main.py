@@ -1855,6 +1855,10 @@ def completed_report():
     # Convert to int for easier reading
     der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
+    cf = CalculateFood(session["user_id"], id)
+    transitioning_food_amts_rec = cf.transition_food_calculator(pet_data[0]["der"])
+        
+    print(transitioning_food_amts_rec)
     print(type(pet_data[0]["bcs"]))
     return render_template("complete_report.html",
                             pet_data=pet_data,
@@ -1870,7 +1874,8 @@ def completed_report():
                             subject_pronoun=subject_pronoun,
                             possessive_pronoun=possessive_pronoun,
                             pet_id=id,
-                            breed_size_category=breed_size_category)
+                            breed_size_category=breed_size_category,
+                            transitioning_food_amts_rec=transitioning_food_amts_rec)
 
 
 @app.route("/finished_reports", methods=["GET", "POST"])
