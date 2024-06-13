@@ -78,7 +78,7 @@ class FindInfo():
             print(F"Der lookup: {der_lookup}")
 
         # Find the middle range of DER modifiers
-        self.der_mid_range = der_lookup[0]["mid_range"]
+        self.der_mid_range = round(der_lookup[0]["mid_range"], 2)
             
         print(f"Mid range DER Factor {self.der_mid_range}")
         

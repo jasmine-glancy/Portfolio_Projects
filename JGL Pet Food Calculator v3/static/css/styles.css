@@ -437,10 +437,20 @@ a:hover {
     margin-top: 0px;
 }
 
+    .reduction, .small_reduction {
+        margin-left: 60px;
+    }
+
     .reduction {
         margin-top: 10px;
         width: 90%;
-        margin-left: 60px;
+    }
+
+    .small_reduction {
+        margin-top: 5px;
+        width: 63%;
+        margin-left: 330px;
+        margin-right: 30px;
     }
 
 .feeding {

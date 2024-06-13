@@ -143,10 +143,15 @@ class FoodForm(FlaskForm):
     meals_per_day = FloatField(
         "How many meals per day* does your pet get?: ",
         validators=[DataRequired()])
+    sensitive_stomach = SelectField(u"Does your pet have a sensitive stomach?: ",
+                                  choices=[("default", "Please make a selection"),
+                                            ("y", "Yes"),
+                                            ("n", "No")],
+                                  render_kw={"default": {"disabled": ""}})
     new_food_one_kcal = FloatField(
         "How many calories are in each cup (or can/pouch)* of the first new food you want your pet to be on: ",
         validators=[DataRequired()])
-    new_food_one_form = SelectField(u"What form of this diet do you wish to feed?: ",
+    new_food_one_form = SelectField(u"What form of the first new food do you wish to feed?: ",
                                   choices=[("default", "Please make a selection"),
                                             ("can", "Canned"),
                                             ("dry", "Dry"),
@@ -155,8 +160,9 @@ class FoodForm(FlaskForm):
     new_food_two_kcal = FloatField(
         "How many calories are in each cup (or can/pouch)* of the second new food you want your pet to be on: ",
         validators=[DataRequired()])
-    new_food_two_form = SelectField(u"What form of this diet do you wish to feed?: ",
+    new_food_two_form = SelectField(u"What form of the second new food do you wish to feed?: ",
                                   choices=[("default", "Please make a selection"),
+                                            ("n/a", "No Second Diet"),
                                             ("can", "Canned"),
                                             ("dry", "Dry"),
                                             ("pouch", "Semi-Moist Pouches")],

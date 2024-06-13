@@ -324,16 +324,16 @@ def pet_info_continued(pet_id):
             # Show an error message if the user doesn't choose a breed or sex
             if pet_breed == None and pet_sex == "default":
                 flash("Please choose a breed and your pet's reproductive status from the dropdown menus.")
-                return redirect(url_for('pet_info_continued'))
+                return redirect(url_for('pet_info_continued', pet_id=pet_id))
             elif pet_breed == None and pet_sex != "default":
                 flash("Please choose a breed from the dropdown menus.")
-                return redirect(url_for('pet_info_continued'))
+                return redirect(url_for('pet_info_continued', pet_id=pet_id))
             elif pet_breed != None and pet_sex == "default":
                 flash("Please choose your pet's reproductive status from the dropdown menus.")
-                return redirect(url_for('pet_info_continued'))    
+                return redirect(url_for('pet_info_continued', pet_id=pet_id))    
             elif pet_age_years < 0 or pet_age_months < 0:
                 flash("Please enter 0 or a number greater than zero.")
-                return redirect(url_for('pet_info_continued'))    
+                return redirect(url_for('pet_info_continued', pet_id=pet_id))    
             else:
                 print(pet_age_years, pet_age_months)
                 if pet_age_months > 12:
@@ -1270,7 +1270,7 @@ def current_food():
             if wants_transition == "y":
                 # If the user wants to transition their pet to a new food, redirect them
                     # to the next form
-                return redirect(url_for('new_food'))
+                return redirect(url_for('new_food', pet_id=pet_id))
             
             # If user doesn't want a transition, calculate RER
             return redirect(url_for('rer', pet_id=pet_id))
@@ -1283,40 +1283,58 @@ def new_food():
     """Asks the user for calorie information on up to 2 new foods"""
     
     new_foods = FoodForm()
+    pet_id = request.args.get('pet_id', type=int)
     
     if request.method == "POST":
         first_food_kcal = new_foods.new_food_one_kcal.data
         first_food_form = new_foods.new_food_one_form.data
         second_food_kcal = new_foods.new_food_two_kcal.data
         second_food_form = new_foods.new_food_two_form.data
+        sensitive_stomach = new_foods.sensitive_stomach.data
         
-        # If user is logged in, add current food information to the database
-        if session["user_id"] != None:
-            try:
-                print(session["pet_name"])
-                print(session["user_id"])
-                    
-                db.execute(
-                    "UPDATE pets SET transitioning_food_one_kcal = :kcal_one, \
-                        transitioning_food_one_form = :first_food_form, transitioning_food_two_kcal = :kcal_two, \
-                            transitioning_food_two_form = :second_food_form WHERE name = :pet_name AND owner_id = :user_id",
-                    kcal_one=first_food_kcal, first_food_form=first_food_form, kcal_two=second_food_kcal, second_food_form=second_food_form, pet_name=session["pet_name"], user_id=session["user_id"]
-                )
-                    
-            except Exception as e:
-                    flash(f"Unable to update transition food data, Exception: {e}")
-            
-        # Otherwise, create new session variables
-        session["first_new_food_kcal"] = first_food_kcal
-        session["first_new_food_form"] = first_food_form
-        session["second_new_food_kcal"] = second_food_kcal 
-        session["second_new_food_form"] = second_food_form
+        print(sensitive_stomach, first_food_kcal, first_food_form, second_food_kcal, second_food_form)
+        if first_food_form == "default":
+            flash("Please choose new food form from the dropdown.")
+            return redirect(url_for('new_food', pet_id=pet_id))
+        elif second_food_form == "default":
+            flash("Please choose \"No Second Diet\" if a second new food is not needed.")
+            return redirect(url_for('new_food', pet_id=pet_id))
+        elif sensitive_stomach == "default":
+            flash("Please select an option from the sensitive stomach dropdown.")
+            return redirect(url_for('new_food', pet_id=pet_id))
+        else:
 
+            # If user is logged in, add current food information to the database
+            if session["user_id"] != None:
+                try:
+                    print(session["pet_name"])
+                    print(session["user_id"])
+                        
+                    db.execute(
+                        "UPDATE pets SET transitioning_food_one_kcal = :kcal_one, \
+                            transitioning_food_one_form = :first_food_form, transitioning_food_two_kcal = :kcal_two, \
+                                transitioning_food_two_form = :second_food_form, sensitive_stomach = :sensitive_stomach \
+                                    WHERE name = :pet_name AND owner_id = :user_id",
+                        kcal_one=first_food_kcal, first_food_form=first_food_form, 
+                        kcal_two=second_food_kcal, second_food_form=second_food_form, 
+                        sensitive_stomach=sensitive_stomach, pet_name=session["pet_name"], user_id=session["user_id"]
+                    )
+                        
+                except Exception as e:
+                        flash(f"Unable to update transition food data, Exception: {e}")
+                
+            # Otherwise, create new session variables
+            session["first_new_food_kcal"] = first_food_kcal
+            session["first_new_food_form"] = first_food_form
+            session["second_new_food_kcal"] = second_food_kcal 
+            session["second_new_food_form"] = second_food_form
+            session["sensitive_stomach"] = sensitive_stomach
+
+            
+            # If input is successful, calculate RER
+            return redirect(url_for('rer', pet_id=pet_id))
            
-        # If user doesn't want a transition, calculate RER
-        return redirect(url_for('rer', pet_id=pet_id))
-           
-    return render_template("new_food.html", new_foods=new_foods)
+    return render_template("new_food.html", new_foods=new_foods, pet_id=pet_id)
 
 
 @app.route("/rer/<int:pet_id>", methods=["GET", "POST"])
@@ -1837,6 +1855,7 @@ def completed_report():
     # Convert to int for easier reading
     der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
+    print(type(pet_data[0]["bcs"]))
     return render_template("complete_report.html",
                             pet_data=pet_data,
                             rer=rer,

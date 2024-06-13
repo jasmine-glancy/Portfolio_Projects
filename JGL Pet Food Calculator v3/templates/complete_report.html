@@ -194,7 +194,7 @@
 
                     {% if pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 %}
                         <div class="mid_padding"></div>
-                    {% elif pet_data[0].age_in_years >= 7 and pet_data[0].bcs <= 6  %}
+                    {% elif pet_data[0].age_in_years >= 7 or pet_data[0].bcs <= 6  %}
                         <div class="large_padding"></div>
                     {% endif %}
                     
@@ -397,12 +397,15 @@
                             <!-- If the senior cat is on dry food, make additional recommendations -->
                             Additionally, consider buying smaller bags of pet food, as bags that are open 
                             for more than 30 days can oxidize and become stale or rancid depending on storage.
-                        {% elif pet_data[0].current_food_form != "dry" %}
-                            <!-- If the senior cat is on canned or semi-moist foods, make additional recommendations -->
-                            Consider only leaving {{ pet_data[0].name }}'s food out for 30 minutes at most, as 
-                            leaving wet or semi-moist food out for longer can cause it to decrease in quality. Additionally,
-                            leaving it out longer can allow pests and bacteria to contaminate {{ pet_data[0].name }}'s food.
+                    
                         {% endif %}
+                    {% endif %}
+                    {% if pet_data[0].current_food_form != "dry" %}
+                        <div class="smaller_padding"></div>
+                        <!-- If the senior cat is on canned or semi-moist foods, make additional recommendations -->
+                        Consider only leaving {{ pet_data[0].name }}'s food out for 30 minutes at most, as 
+                        leaving wet or semi-moist food out for longer can cause it to decrease in quality. Additionally,
+                        leaving it out longer can allow pests and bacteria to contaminate {{ pet_data[0].name }}'s food.
                     {% endif %}
                 {% elif pet_data[0].species == "Canine" %}
                     {% if pet_data[0].is_pediatric == "y" %}
@@ -588,32 +591,29 @@
                 {% endif %}
 
                 <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
-                {% if pet_data[0].bcs > 6 and pet_data[0].is_pediatric != "y" or pet_data[0].is_pregnant != "y"
-                or pet_data[0].is_nursing != "y" %}
+                {% if pet_data[0].bcs > 6 and pet_data[0].is_pediatric != "y" and pet_data[0].is_pregnant != "y"
+                and pet_data[0].is_nursing != "y" %}
                     <div class="exercise">
-                        {% if pet_data[0].bcs > 6 %}
-                                If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
-                                puzzle feeders or using a mini-muffin tin to encourage {{ pet_data[0].name }} to
-                                eat more slowly.
+                        If {{ pet_data[0].name }} struggles with speed eating, consider trying commercial
+                        puzzle feeders or using a mini-muffin tin to encourage {{ pet_data[0].name }} to
+                        eat more slowly.
                             
 
-                                Feeding {{ pet_data[0].name }}
-                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                    {{ possessive_pronoun }} 
-                                {% else %}
-                                    {{ object_pronoun }} 
-                                {% endif %} 
-                                daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                                may help promote weight loss. If you are unable to provide more frequently than two meals a 
-                                day, you can consider a few options. First, you can offer food before you leave the house in 
-                                the morning, then again as soon as you get home in the evening, and then right before bed. Or 
-                                you may consider using a 
-                                <a href="https://www.google.com/search?client=firefox-b-1-d&sca_esv=71b2db2a9157258c&sca_upv=1&sxsrf=ADLYWII6E84-I1JPxopgLG-pz_SEAOVW7g:1717592995262&q=timed+cat+and+dog+feeder&tbm=shop&source=lnms&prmd=sivnmbtz&ved=1t:200715&ictx=111&biw=1920&bih=955&dpr=1"
-                                title="Google shopping for automatic pet feeders">
-                                    timed/automatic feeder</a> for {{ pet_data[0].name }}. 
-                            </p>
-                        
-                        {% endif %}
+                        Feeding {{ pet_data[0].name }}
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} 
+                        daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                        may help promote weight loss. If you are unable to provide more frequently than two meals a 
+                        day, you can consider a few options. First, you can offer food before you leave the house in 
+                        the morning, then again as soon as you get home in the evening, and then right before bed. Or 
+                        you may consider using a 
+                        <a href="https://www.google.com/search?client=firefox-b-1-d&sca_esv=71b2db2a9157258c&sca_upv=1&sxsrf=ADLYWII6E84-I1JPxopgLG-pz_SEAOVW7g:1717592995262&q=timed+cat+and+dog+feeder&tbm=shop&source=lnms&prmd=sivnmbtz&ved=1t:200715&ictx=111&biw=1920&bih=955&dpr=1"
+                        title="Google shopping for automatic pet feeders">
+                        timed/automatic feeder</a> for {{ pet_data[0].name }}. 
+                    
                     </div>
                 {% endif %}
 
@@ -961,9 +961,9 @@
                         {% endif %} 
                         current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
                         is not on a food specifically formulated for pets to help with weight loss. {{ pet_data[0].name }} 
-                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-                        percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
-                        to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat percentage 
+                        is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated to be around 
+                        {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                         Speak with {{ pet_data[0].name }}'s veterinarian about what can be done to balance 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
@@ -1008,7 +1008,9 @@
                             {{ object_pronoun }}
                         {% endif %} 
                         current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-                        is not on a food specifically formulated for pets to help with weight loss. {{ pet_data[0].name }} 
+                        is not on a food specifically formulated for pets to help with weight loss. 
+                            
+                        {{ pet_data[0].name }} 
                         has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
                         percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
                         to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
@@ -1025,26 +1027,46 @@
                             {% else %}
                                 {{ object_pronoun }}
                             {% endif %} current weight.
-                        {% else %}
-                            For further weight loss options, please discuss how to help 
-                            {{ pet_data[0].name }} lose weight with 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                {{ possessive_pronoun }} 
-                            {% else %}
-                                {{ object_pronoun }} 
-                            {% endif %}
-                            veterinarian. 
                         {% endif %}
                     </div>
                 {% endif %}
-
+            {% endif %}
+        {% elif pet_data[0].bcs == 6 %}
+            {% if pet_data[0].species == "Feline"%}
+                <div class="small_reduction">
+                    {{ pet_data[0].name }} has approximately {{ pet_data[0].body_fat_percentage }}% body
+                    fat. An ideal body fat percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                    to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                    At {{ pet_data[0].name }}'s current body condition, it is recommended to feed {{ pet_data[0].name }}
+                    based on 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %} ideal weight.
+                    <div class="smaller_padding"></div>
+                </div>
+            {% elif pet_data[0].species == "Canine" %}
+                <div class="small_reduction">
+                    {{ pet_data[0].name }} has approximately {{ pet_data[0].body_fat_percentage }}% body
+                    fat. An ideal body fat percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
+                    to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
+                    At {{ pet_data[0].name }}'s current body condition, it is recommended to feed {{ pet_data[0].name }}
+                    based on 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }}
+                    {% endif %} ideal weight.
+                    <div class="smaller_padding"></div>
+                </div>
             {% endif %}
         {% endif %}
 
-    {% if pet_data[0].bcs > 6 or pet_data[0].is_pediatric == "y" or
+    {% if pet_data[0].bcs >= 6 or pet_data[0].is_pediatric == "y" or
     pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
-        {% if pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" %}
-            {% if pet_data[0].is_pregnant == "y" %}
+        {% if pet_data[0].bcs >= 6 or pet_data[0].is_pregnant == "y" %}
+            {% if pet_data[0].bcs == 6 or pet_data[0].is_pregnant == "y" %}
                 {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating < 6 %}
                     <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
                         <!-- recommend treat amounts, |round|int suggested by CoPilot -->
@@ -1092,7 +1114,7 @@
                 {% endif %}
             </div>
         {% endif %}
-    {% elif pet_data[0].age_in_years >= 7 %}
+    {% elif pet_data[0].age_in_years >= 7 or pet_data[0].bcs < 6 %}
         <div class="senior_treats">        
             <div class="smaller_padding"></div>       
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->

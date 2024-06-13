@@ -12,14 +12,29 @@
         <div class="progress-bar" style="width: 87.5%">87.5%</div>
     </div>
 
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
+    
     <!-- Load in WTF Form --> 
     <form action="{{ url_for('new_food', pet_id=pet_id) }}" method="POST">
         <div class="row">
             Please enter the calorie information of the new food you are interested in switching
-            your pet to. Please enter 0 in the second field if you are only interested in transitioning
-            your pet to only one food.
+            your pet to. Please enter 0 in the second calorie field and "no second food" in the final
+            dropdown if you are only interested in transitioning your pet to only one food.
         </div>
 
+        <div class="row">
+            <div class="col" title="Sensitive Stomach Label">
+                {{ new_foods.sensitive_stomach.label }}
+            </div>
+            <div class="col" title="Sensitive Stomach Dropdown">
+                {{ new_foods.sensitive_stomach }}
+            </div>
+        </div>
         <div class="row">
             <div class="col" title="First New Food Calories Label">
                 {{ new_foods.new_food_one_kcal.label }}
@@ -30,10 +45,10 @@
         </div>
         <div class="row">
             <div class="col" title="First New Food Form">
-                {{ current_food.new_food_one_form.label }}
+                {{ new_foods.new_food_one_form.label }}
             </div>
             <div class="col" title="First New Food Form Dropdown">
-                {{ current_food.new_food_one_form }}
+                {{ new_foods.new_food_one_form }}
             </div>
         </div>
         <div class="row">
@@ -46,10 +61,10 @@
         </div>
         <div class="row">
             <div class="col" title="Second New Food Form">
-                {{ current_food.new_food_two_form.label }}
+                {{ new_foods.new_food_two_form.label }}
             </div>
             <div class="col" title="Second New Food Form Dropdown">
-                {{ current_food.new_food_two_form }}
+                {{ new_foods.new_food_two_form }}
             </div>
         </div>
 
