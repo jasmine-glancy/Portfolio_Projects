@@ -998,7 +998,7 @@ def pet_condition(pet_id):
                     elif bcs == 6:
                         # Change DER factor to weight loss
                         der_factor_id = 4 
-                    elif bcs > 7:
+                    elif bcs > 6:
                         # Change DER factor to obese prone
                         der_factor_id = 3
                     
@@ -1047,7 +1047,7 @@ def pet_condition(pet_id):
                     elif bcs == 6:
                         # Change DER factor to weight loss
                         der_factor_id = 6 
-                    elif bcs > 7:
+                    elif bcs > 6:
                         # Change DER factor id to obese prone 
                         der_factor_id = 3
                     

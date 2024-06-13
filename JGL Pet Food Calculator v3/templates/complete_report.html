@@ -197,10 +197,7 @@
                     {% elif pet_data[0].age_in_years >= 7 or pet_data[0].bcs <= 6  %}
                         <div class="large_padding"></div>
                     {% endif %}
-                    
-                {% endif %}
-
-                
+                {% endif %}           
             {% else %}
                 <div class="final_formula">
                     {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating > 6 %}
@@ -242,6 +239,8 @@
                 {% endif %}
 
             {% endif %}
+        {% elif pet_data[0].bcs > 6 and pet_data[0].species == "Feline" %}
+            <div class="large_padding"></div>
         {% endif %}
 
         <div class="food_and_exercise">

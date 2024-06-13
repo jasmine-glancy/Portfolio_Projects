@@ -32,7 +32,6 @@ class CalculateFood():
     def calculcate_rer(self):
         """Calculates the minimum number of calories a pet needs at rest per day"""
             
-            
         print(self.pet_data[0]["weight"], self.pet_data[0]["units"])
             
         # Convert lbs weighs to kgs
@@ -52,34 +51,6 @@ class CalculateFood():
 
     def calculcate_der(self, species=None, der_factor_id=None):
         """Calculates daily caloric needs based on life stage"""
-        
-        # # Check species and nursing status
-        # species = login_check_for_species()
-        # is_nursing = check_if_nursing()
-        # litter_size = check_litter_size()
-        
-        # # find pet's RER
-        # # If user is logged in, use SQL query
-        # if session["user_id"] != None:
-        #     try:
-        #         print(session["pet_name"])
-        #         print(session["user_id"])
-                    
-        #         pet_data = db.execute(
-        #             "SELECT rer FROM pets WHERE owner_id = :user_id AND name = :pet_name",
-        #             user_id=session["user_id"], pet_name=session["pet_name"]
-        #         )       
-                
-        #         print(pet_data)
-                
-        #         if pet_data:  
-        #             rer = int(pet_data[0]["rer"])
-        #     except Exception as e:
-        #         flash(f"Unable to find pet data for RER calculation, Exception: {e}")    
-        # else:
-        #     # If a user isn't logged in, grab session variables
-        #     rer = session["rer"]     
-        
         
         # Use DER factor id to lookup DER information by species
         self.der_modifier_start_range = self.fi.find_der_low_end(species, der_factor_id)
@@ -134,3 +105,22 @@ class CalculateFood():
             self.partial_volumetric = "1"
             
         return self.partial_volumetric
+    
+    def transition_food_calculator(self, der):
+        """Calculate how much of each food is needed if a pet is going to transition to a new food"""
+        
+        if self.pet_data[0]["sensitive_stomach"] == "y":
+            # If pet has a sensitive stomach, transition over 10-14 days
+            trans_min_len, trans_max_len = 10, 14
+            trans_percents = {1: 5, 2: 15, 3: 25, 4: 30, 5: 40, 6: 45,
+                              7: 50, 8: 55, 9: 60, 10: 65, 11: 75, 12: 85,
+                              13: 95, 14: 100}
+        else:
+            # Otherwise, transition over 5-7 days
+            trans_min_len, trans_max_len = 5, 7
+            trans_percents = { 1: 25, 2: 37.5, 3: 50, 4: 62.5, 
+                              5: 75, 6: 75, 7: 100}
+        
+        if self.pet_data[0]["transitioning_food_two_kcal"] == None:
+            # If the user doesn't want to transition to more than one diet
+            

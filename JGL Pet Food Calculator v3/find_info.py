@@ -159,7 +159,8 @@ class FindInfo():
                         "current_food_amt_rec": None, "current_food_kcal": None, "current_food_form": None,
                         "meals_per_day": None, "current_food_amt_per_meal": None, "is_pregnant": None,
                         "weeks_gestating": None, "is_nursing": None, "litter_size": None, "weeks_nursing": None,
-                        "rec_treat_kcal_per_day": None, "transitioning_food_one_kcal": None, "transitioning_food_one_form": None,
+                        "rec_treat_kcal_per_day": None, "sensitive_stomach": None, 
+                        "transitioning_food_one_kcal": None, "transitioning_food_one_form": None,
                         "transitioning_food_two_kcal": None, "transitioning_food_two_form": None}]
         
             if session["pet_id"] != None:
@@ -220,6 +221,8 @@ class FindInfo():
                 self.guest_pet_data[0]["current_food_amt_per_meal"] = session["current_food_amt_per_meal"]            
             elif session["rec_treat_kcal_per_day"] != None:
                 self.guest_pet_data[0]["rec_treat_kcal_per_day"] = session["rec_treat_kcal_per_day"]
+            elif session["sensitive_stomach"] != None:
+                self.guest_pet_data[0]["sensitive_stomach"] = session["sensitive_stomach"]
             elif session["first_new_food_kcal"] != None:
                 self.guest_pet_data[0]["transitioning_food_one_kcal"] = session["first_new_food_kcal"] 
             elif session["first_new_food_form"] != None:
