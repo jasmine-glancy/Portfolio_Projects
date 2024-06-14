@@ -56,6 +56,13 @@ h1 {
         padding-left: 10px;
     }
 
+    .fr_name {
+        top: 20px;
+        display:inline-block;
+        width: 45%;
+        word-wrap: break-word;
+    }
+
 .login {
     margin: 2px;
 }
@@ -77,7 +84,7 @@ h1 {
         font-weight: 500;
         --bs-table-bg: #84b893;
         /* TODO: Change thead font colors */
-        color: #fff;
+        color: var(--deep_blue_green);
     }
 
     .final_report_table {
@@ -131,6 +138,20 @@ h1 {
     .spacer {
         margin-top: 10px;
         margin-bottom: 10px;
+    }
+
+    .transition {
+        font-size: 25px;
+        text-align: center;
+        border-bottom: 1px solid var(--deep_blue_green);
+        border: 1px solid var(--pale_sky_blue);
+        --bs-table-bg: var(--pale_white_green);
+        --bs-table-striped-color: var(--light_sky);
+        --bs-table-striped-bg: var(--pale_sky_blue);
+        margin-top: 2vw;
+        margin-bottom: 0vw;
+        margin-left: auto;
+        margin-right: auto;
     }
 
 /* Links */
@@ -392,12 +413,18 @@ a:hover {
     margin-top: 50px;
 }
 
+
     .neg_padding {
         margin-top: -25px;
     }
 
     .no_padding {
         margin-top: 0px;
+    }
+
+    .tiny_padding {
+        display: block;
+        padding-top: 10px;
     }
 
     .smaller_padding {
@@ -552,7 +579,7 @@ a:hover {
     }
 
     #preg_fel_final_report {
-        margin-top: 100px;
+        margin-top: 125px;
     }
 
     #final_report {
@@ -601,12 +628,16 @@ a:hover {
  }
 
 
-.reproduction_recs, .supplements {
+.reproduction_recs, .wider_reproduction_recs, .supplements {
     margin-top: 10px;
     margin: 0; 
     padding: 0; 
     margin-bottom: 10px;
 }
+
+    .supplements, .wider_reproduction_recs {
+        margin-left: 60px;
+    }
 
 .fp_link {
     position: relative;
@@ -617,6 +648,7 @@ a:hover {
     position: relative;
     margin-top: 10px;
     margin-bottom: 15px;
+    margin-left: 60px;
     margin: 0;
     padding: 0;
 }
@@ -643,7 +675,7 @@ a:hover {
         width: 85%;
     }
 
-    .preg_treats, .senior_treats {
+    .limit_treats, .senior_treats {
         margin-left: 325px;
     }
 

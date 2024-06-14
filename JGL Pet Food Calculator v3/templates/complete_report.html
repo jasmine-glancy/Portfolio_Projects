@@ -157,14 +157,12 @@
             kcal per day. The following formula was used: 
         </div>
   
-        {% if pet_data[0].is_pregnant == "y" %}
-            {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
-                <div class="large_padding"></div>
-            {% endif %}
-        {% endif %}
         
             <!-- Return the formula used to calculate DER -->
             {% if pet_data[0].species == "Feline" %} 
+                {% if pet_data[0].is_pregnant == "y" %}
+                    <div class="large_padding"></div>
+                {% endif %}
                 {% if pet_data[0].is_nursing == "y" %}
                     <div class="final_formula_nursing">
                         DER = {{ pet_data[0].name }}'s {{ notes }}
@@ -180,6 +178,9 @@
                     </div>
                 {% else %}
                     <div class="final_formula_fel">
+                        {% if pet_data[0].is_pregnant == "y" or pet_data[0].bcs < 6 %}
+                            <div class="quarter_padding"></div>
+                        {% endif %}
                         DER = {{ pet_data[0].name }}'s RER x DER Modifier
                         <br>
                         DER = {{ rer }} x {{ pet_data[0].der_modifier }} 
@@ -192,6 +193,7 @@
                         {% endif %}
                     </div>
 
+                <!-- TODO: Add headings -->
                     {% if pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 %}
                         <div class="mid_padding"></div>
                     {% elif pet_data[0].age_in_years >= 7 or pet_data[0].bcs <= 6  %}
@@ -203,7 +205,12 @@
                     {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating > 6 %}
                         <div class="mid_padding"></div>
                     {% elif pet_data[0].species == "Canine" %}
-                        {% if pet_data[0].bcs > 6 and pet_data[0].bcs < 8 %}
+                        {% if pet_data[0].is_pregnant == "y" %}
+                            {% if pet_data[0].weeks_gestating <= 6 %}
+                                <div class="mid_padding"></div>
+                            {% endif %}
+                            <div class="smaller_padding"></div>
+                        {% elif pet_data[0].bcs >= 6 %}
                             <div class="mid_padding"></div>
                         {% else %}
                             <div class="no_padding"></div>
@@ -225,8 +232,12 @@
             {% endif %}
         
         {% if pet_data[0].is_pregnant == "y" %}
-            {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
-                <div class="large_padding"></div>
+            {% if pet_data[0].species == "Feline" %}
+                {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating <= 6 %}
+                    <div class="large_padding"></div>
+                {% endif %}
+            {% elif pet_data[0].species == "Canine" %}
+                <div class="smaller_padding"></div>
             {% endif %}
         {% elif pet_data[0].is_pediatric == "y" %}
             {% if pet_data[0].species == "Feline" %}
@@ -246,29 +257,30 @@
         <div class="food_and_exercise">
 
             <div class="feeding">
+                
                 {% if pet_data[0].species == "Feline" and pet_data[0].is_nursing != "y" %}
                     {% if pet_data[0].is_pediatric != "y" %}    
                         <div class="large_padding"></div>
                     {% elif pet_data[0].age_in_years >= 7 %}
                         <div class="xlarge_padding"></div>
                     {% else %}
-                        <div class="quarter_padding"></div>
+                        <div class="smaller_padding"></div>
                     {% endif %}
                 {% elif pet_data[0].species == "Canine" %}
                     {% if pet_data[0].bcs > 6 %}
                         <div class="mid_padding"></div>
-                    {% elif pet_data[0].is_pediatric == "y" %} 
+                    {% elif pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y" %} 
                         <div class="smaller_padding"></div>
-                    {% elif pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    {% elif pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
                         <div class="xlarge_padding"></div>
                     {% endif %}
 
-                {% elif pet_data[0].is_pregnant == "y" %}
-                    <div class="neg_padding"></div>
                 {% elif pet_data[0].is_nursing == "y" %}
                     <div class="smaller_padding"></div>
                 {% endif %}
                 <!-- Return amount to feed per day and per meal  --> 
+                <h2>Food and Water</h2>
+                <div class="smaller_padding"></div>
                 {{ pet_data[0].name }} should be getting around
                 {% if pet_data[0].meals_per_day != 1 %}
                     {{ pet_data[0].current_food_amt_rec }} (or approximately 
@@ -304,7 +316,35 @@
                         so {{ pet_data[0].name }} may need to eat more cans more frequently to hit her daily caloric
                         requirements.
                     {% endif %}
+
                 {% endif %}
+                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    
+                    <!-- If dog is active, provide additional recommendations-->
+                    <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
+                    While {{ pet_data[0].name }} is active, it's important to provide plenty of fresh, clean 
+                    water. Offering frequent drinks in lieu of large gulps of water can help reduce the chance 
+                    of bloating, abdominal discomfort, and regurgitation. While there are electrolyte drinks 
+                    for dogs, they are not recommended as dogs don't sweat away their electrolytes. Additionally,
+                    some sports drinks for dogs may cause stomach upset.
+
+                    <div class="no_padding"></div>
+                    <h2>Activity</h2>
+                    <div class="smaller_padding"></div>
+                    It is important to let {{ pet_data[0].name }} rest between 2-3 hours after a meal before allowing 
+                    {{ object_pronoun }} to exercise or engage in heavy play. You may also consider discussing 
+                    {{ pet_data[0].name }}'s activity level with 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %} veterinarian to see if {{ subject_pronoun }} may benefit from a diet 
+                    that is formulated for performance per the <a href="https://www.aafco.org/" 
+                    title="American Feed Control Officials Homepage"
+                    class="fp_link">Association of 
+                    American Feed Control Officials (AAFCO)</a> guidelines. 
+                {% endif %}
+
                 {% if pet_data[0].species == "Feline" %}
                     Be sure to place 
                     {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
@@ -323,6 +363,7 @@
                     you can get buy.
 
                     {% if pet_data[0].is_pediatric == "y" %}
+                        <h2>Rechecking Weight</h2>
                         <div class="smaller_padding"></div>
                         {{ pet_data[0].name }}'s needs are dynamic as a growing kitten, so it is essential 
                         to regularly weigh {{ object_pronoun }} and check 
@@ -460,14 +501,35 @@
                 {% endif %}
             </div>
             {% if pet_data[0].species == "Canine" %}
-
+                {% if pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    <div class="exercise">
+                        <!-- If dog is active, provide additional recommendations-->
+                        <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
+                        
+                        <div class="smaller_padding"></div>
+                        <h2>Performance Diets</h2>
+                        <div class="smaller_padding"></div>
+                        Some performance based diets have a higher fat to protein ratio, while
+                        others have a higher carbohydrate to fat ratio. Additionally, they are more
+                        calorically dense, meaning {{ pet_data[0].name }} will need to eat less of the
+                        diet to hit                         
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} daily caloric needs. 
+                    </div>
+                {% endif %}
                 <div class="reproduction_recs">
-                    {% if pet_data[0].is_pregnant == "y" %}
+                    {% if pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Light"
+                    or pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Sedentary" %}
                         <!-- If dog is pregnant, provide gestation specific recommendations -->
                         {% if pet_data[0].weeks_gestating >= 6 %}
                             <!-- If a dog is 6 weeks pregnant, recommend specifics 
                             https://vcahospitals.com/know-your-pet/feeding-the-pregnant-dog
                             https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7169170/-->
+                            <div class="smaller_padding"></div>
+                            <h2>Weight Gain & Nutrition While Pregnant</h2>
                             <div class="smaller_padding"></div>
                             {{ pet_data[0].name }} is in the last trimester of pregnancy. During this time,
                             it is expected to see {{ pet_data[0].name }}'s weight increase approximately 15-25% from
@@ -493,6 +555,8 @@
                             class="fp_link">WSAVA guidelines</a>. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
                             as these diets do not have the currect calcium to phosphorus ratio.
                         {% else %}
+                            <div class="smaller_padding"></div>
+                            <h2>Weight & Nutrition While Pregnant</h2>
                             <div class="smaller_padding"></div>
                             <!-- If a dog is less than 5 weeks pregnant, recommend specifics 
                             https://www.akc.org/expert-advice/dog-breeding/the-care-and-feeding-of-the-breeding-bitch-part-two/-->
@@ -520,26 +584,14 @@
                         receiving the nutrients she needs.
                     {% endif %}
                 </div>
-                    
-                {% if pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
-                    <!-- Supplement disclaimer -->
-                    <div class="supplements">
-                        It is not recommended to provide any supplements to {{ pet_data[0].name }} without first discussing
-                        them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
-                            title="American Feed Control Officials Homepage"
-                            class="fp_link">Association of 
-                            American Feed Control Officials (AAFCO)</a> statement that the diets are formualted for 
-                        lactation/growth are complete and balanced, so further supplementation could make 
-                        {{ pet_data[0].name }} prone to nutrient imbalances.
-                    </div>
-                {% endif %}
                 
 
-                
                 {% if pet_data[0].activity_level != "Moderate" and pet_data[0].activity_level != "Heavy" 
                 and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
                     <!-- If dog is not already getting moderate to heavy exercise, and is not pregnant or nursing --> 
                     <div class="exercise">
+                        <h2>Exercise</h2>
+                        <div class="smaller_padding"></div>
                         All pets can benefit from physical and mental excersize! Similar to cats, dogs can 
                         find enjoyment in a flirt pole (a dog toy attached to a string). It is not recommended
                         to play with dogs with a laser pointer, as it can lead to anxiety and obsessive behaviors.
@@ -550,44 +602,7 @@
                     <br>
                     {% endif %}
 
-                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
-                    <div class="exercise">
-                        <!-- If dog is active, provide additional recommendations-->
-                        <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
-                        While {{ pet_data[0].name }} is active, it's important to provide plenty of fresh, clean 
-                        water. Offering frequent drinks in lieu of large gulps of water can help reduce the chance 
-                        of bloating, abdominal discomfort, and regurgitation. While there are electrolyte drinks 
-                        for dogs, they are not recommended as dogs don't sweat away their electrolytes. Additionally,
-                        some sports drinks for dogs may cause stomach upset.
 
-                        <div class="smaller_padding"></div>
-
-                        It is important to let {{ pet_data[0].name }} rest between 2-3 hours after a meal before allowing 
-                        {{ object_pronoun }} to exercise or engage in heavy play. You may also consider discussing 
-                        {{ pet_data[0].name }}'s activity level with 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} veterinarian to see if {{ subject_pronoun }} may benefit from a diet 
-                        that is formulated for performance per the <a href="https://www.aafco.org/" 
-                        title="American Feed Control Officials Homepage"
-                        class="fp_link">Association of 
-                        American Feed Control Officials (AAFCO)</a> guidelines. 
-
-                        <div class="smaller_padding"></div>
-                        
-                        Some performance based diets have a higher fat to protein ratio, while
-                        others have a higher carbohydrate to fat ratio. Additionally, they are more
-                        calorically dense, meaning {{ pet_data[0].name }} will need to eat less of the
-                        diet to hit                         
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} daily caloric needs. 
-                    </div>
-                {% endif %}
 
                 <!-- If dog is overweight or obese, provide additional exercise/feeding technique recs -->
                 {% if pet_data[0].bcs > 6 and pet_data[0].is_pediatric != "y" and pet_data[0].is_pregnant != "y"
@@ -619,34 +634,8 @@
                 
                 <!-- TODO: import treat calculator results -->
                 
-                {% if pet_data[0].is_pregnant == "y" %}
-                    <div class="card" id="preg_final_report">
-                        <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
-                        alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
-                        id="fr"
-                        align="left">
-                        <div class="card-body">
-                        <h5 class="card-title-fr">Brightkins Puzzle Toy for Dogs</h5>
-                        <p class="card-text-fr">Puzzle toys are a great way to provide enrichment
-                            and encourage slower eating! Please note, it can be difficult to make sure 
-                            your pet is eating their daily portion if mutliple animals have access to 
-                            these toys at one time.
-                        </p>
-                        </div>
-                        <div class="card-body-fr">
-                        <a href="https://www.chewy.com/brightkins-dj-doggo-puzzle-feeder-dog/dp/930046" 
-                        class="card-link"
-                        title="Brightkins DJ Doggo puzzle feeder for dogs on Chewy.com">
-                            Find this puzzle feeder on Chewy
-                        </a>
-                        <a href="https://www.chewy.com/s?query=puzzle%20toys%20for%20dogs" 
-                        class="card-link"
-                        title="Chewy search for dog puzzle toys">
-                            More puzzle toys for dogs on Chewy
-                        </a>
-                        </div>
-                    </div>
-                {% elif pet_data[0].bcs > 6 %}
+            
+                {% if pet_data[0].bcs > 6 %}
                     <div class="card" id="final_report_obese">
                         <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
                         alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
@@ -673,7 +662,7 @@
                         </a>
                         </div>
                     </div>
-                {% elif pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                {% elif pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
                     <div class="card" id="final_report_active">
                         <img src="{{ url_for('static', filename='assets/img/k9_puzzle_feeder.png') }}" 
                         alt="A plastic puzzle feeder for dogs with many compartments to hide treats"
@@ -736,7 +725,8 @@
                     <div class="reproduction_recs">
                         {% if pet_data[0].is_nursing == "y" %}
                             <div class="smaller_padding"></div>
-
+                            <h2>Food Choice</h2>
+                            <div class="smaller_padding"></div>   
                             <!-- If pet is a nursing feline, provide feeding guidelines -->
                             In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
                             should be fed a highly digestible, high quality kitten formula from a brand 
@@ -765,6 +755,8 @@
                         {% elif pet_data[0].is_pregnant == "y" %}
                             <!-- If pet is a pregnant cat, provide recommendations -->
                             <div class="smaller_padding"></div>
+                            <h2>Food Choice and Frequency</h2>
+                            <div class="smaller_padding"></div>
                             In order to meet the higher energy demands of pregnancy, {{ pet_data[0].name }} 
                             should be fed a highly digestible, high quality kitten food from a brand that meets the 
                             <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
@@ -776,6 +768,8 @@
                             feeding amounts should be recalculated after the kittens are born.
 
                             <div class="smaller_padding"></div>
+                            <h2>Supplements</h2>
+                            <div class="smaller_padding"></div>
                             It is not recommended to provide any supplements to {{ pet_data[0].name }} without 
                             first discussing them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
                             title="American Feed Control Officials Homepage"
@@ -786,6 +780,8 @@
                     </div>
                     <div class="exercise" id="feline_exercise">
                         {% if pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
+                            <h2>Exercise</h2>
+                            <div class="smaller_padding"></div>
                             <!-- Recommend enrichment and exercise resources for all cats -->  
                             All pets can benefit from physical and mental excersize! Enticing your cat
                             to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
@@ -805,60 +801,12 @@
                             To encourage additional exercise, you can move your {{ pet_data[0].name }}'s food bowl to an elevated
                             surface (on a cat tree, upstairs, et cetra). You can also move your cat's
                             litterbox to a different floor of your house if possible. 
-
-                            <div class="smaller_padding"></div>
-
-                            Feeding {{ pet_data[0].name }}
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                {{ possessive_pronoun }} 
-                            {% else %}
-                                {{ object_pronoun }} 
-                            {% endif %} 
-                            daily ration over multiple small meals a day can help promote satiety (feeling full) and 
-                            may help promote weight loss. If you are unable to provide more frequently than two meals a 
-                            day, you can consider a few options. First, you can offer food before you leave the house in 
-                            the morning, then again as soon as you get home in the evening, and then right before bed. Or 
-                            you may consider using a timed/automatic feeder for {{ pet_data[0].name }}. 
-                            
-                            {% if pet_data[0].age_in_years < 7 %}
-                                For further weight 
-                                loss options, please discuss how to help 
-                                {{ pet_data[0].name }} lose weight with 
-                                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                    {{ possessive_pronoun }} 
-                                {% else %}
-                                    {{ object_pronoun }} 
-                                {% endif %}
-                                veterinarian. 
-                            
-                                <p>
-                                    <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
-                                    Based off of 
-                                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                        {{ possessive_pronoun }} 
-                                    {% else %}
-                                        {{ object_pronoun }}
-                                    {% endif %}
-                                    current body condition score, it is not recommended to help {{ pet_data[0].name }} 
-                                    lose weight by reducing 
-                                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                        {{ possessive_pronoun }} 
-                                    {% else %}
-                                        {{ object_pronoun }}
-                                    {% endif %} 
-                                    current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
-                                    is not on a food specifically formulated for cats to help with weight loss. {{ pet_data[0].name }} 
-                                    has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
-                                    percentage is around 15-20%. 
-                                    
-                                </p>
-                            {% endif %}
                         {% endif %}
                     </div>       
 
                 </div>
             
-                {% if pet_data[0].is_pregnant == "y" or pet_data[0].species == "Feline" and 
+                {% if pet_data[0].is_pregnant == "y" or 
                 pet_data[0].bcs > 6 and pet_data[0].age_in_years >= 7 %}
                     <!-- Fix formatting for pregnant cats-->
                     <div class="card" id="preg_fel_final_report">
@@ -885,8 +833,7 @@
                         </a>
                         </div>
                     </div>
-                {% elif pet_data[0].species == "Feline" and pet_data[0].bcs > 6 and 
-                pet_data[0].age_in_years < 7 %}
+                {% elif pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 or pet_data[0].bcs < 6 %}
                     <div class="card" id="final_report_young_obese">
                         <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
                         alt="three puzzle feeders for cats that are shaped like mice."
@@ -940,11 +887,71 @@
                 
             {% endif %}
         </div>
+        {% if pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
+            <!-- Supplement disclaimer -->
+            <div class="supplements">
+                <div class="smaller_padding"></div>
+                <h2>Supplements</h2>
+                <div class="smaller_padding"></div>
+                It is not recommended to provide any supplements to {{ pet_data[0].name }} without first discussing
+                them with her veterinarian.Diets that include an <a href="https://www.aafco.org/" 
+                    title="American Feed Control Officials Homepage"
+                    class="fp_link">Association of 
+                    American Feed Control Officials (AAFCO)</a> statement that the diets 
+                {% if pet_data[0].weeks_gestating >= 6 %}
+                    are formualted for lactation/growth 
+                {% else %}
+                    are formulated to be complete
+                {% endif %}
+                are complete and balanced, so further supplementation could make 
+                {{ pet_data[0].name }} prone to nutrient imbalances.
+            </div>
+        {% endif %}
+
+        <div class="wider_reproduction_recs">
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Moderate"
+            or pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Heavy" %}
+                <!-- If dog is pregnant, provide gestation specific recommendations -->
+                {% if pet_data[0].weeks_gestating >= 6 %}
+                    <!-- If a dog is 6 weeks pregnant, recommend specifics 
+                    https://vcahospitals.com/know-your-pet/feeding-the-pregnant-dog
+                    https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7169170/-->
+                    <div class="smaller_padding"></div>
+                    <h2>Weight Gain & Nutrition While Pregnant</h2>
+                    <div class="smaller_padding"></div>
+                    {{ pet_data[0].name }} is in the last trimester of pregnancy. During this time,
+                    it is expected to see {{ pet_data[0].name }}'s weight increase approximately 15-25% from
+                    her weight at breeding
+                    {% if pet_data[0].weeks_gestating == 6 %}
+                        <!-- If dog has been pregnant for 6 weeks, give a range estimate for weights at partuition -->
+                        (to around {{ pet_data[0].weight + (pet_data[0].weight * 0.15)|round }} - {{ pet_data[0].weight + (pet_data[0].weight * 0.25)|round }}
+                        {{ pet_data[0].units }}/
+                        {{ pet_data[0].converted_weight + (pet_data[0].converted_weight  * 0.15)|round }} -
+                        {{ pet_data[0].converted_weight +(pet_data[0].converted_weight  * 0.25)|round }} {{ pet_data[0].converted_weight_units }})
+                    {% endif %}
+                    by the time of whelping. To ensure she gets adequate nutrition, it is recommended to feed
+                    a high-quality, highly digestible food formulated for puppy growth or lactation over several
+                    meals per day (or made freely available). 
+
+                    <div class="smaller_padding"></div>
+                    
+                    These kinds of diets are calorically dense, meaning
+                    {{ pet_data[0].name }} will be able to eat less to feel satiated and to support her puppies' 
+                    dynamic needs. It is best to choose from a brand that meets the 
+                    <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                    title="View World Small Animal Veterinary Association Guidelines"
+                    class="fp_link">WSAVA guidelines</a>. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
+                    as these diets do not have the currect calcium to phosphorus ratio.
+                {% endif %}
+            {% endif %}
+        </div>
         {% if pet_data[0].bcs > 6 %}
-            {% if pet_data[0].species == "Feline" or pet_data[0].species == "Canine" %}
-                {% if pet_data[0].species == "Feline" and pet_data[0].age_in_years >= 7 %}
+            {% if pet_data[0].species == "Feline"%}
+                {% if pet_data[0].age_in_years >= 7 %}
                     <div class="reduction">
                         <!-- Provide disclaimer on food reduction in older cats with a BCS of 7 or higher -->
+                        <h2>Body Fat Percentage</h2>
+                        <div class="smaller_padding"></div>
                         Based off of 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
                             {{ possessive_pronoun }} 
@@ -976,8 +983,57 @@
                             {{ object_pronoun }}
                         {% endif %} current weight.
                     </div>
-                {% elif pet_data[0].species == "Feline" and pet_data[0].age_in_years < 7 %}
+                {% elif pet_data[0].age_in_years < 7 %}
                     <div class="reduction">
+                        <div class="xlarge_padding"></div>
+                        <h2>Feeding Frequency</h2>
+                        <div class="smaller_padding"></div>
+                        Feeding {{ pet_data[0].name }}
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} 
+                        daily ration over multiple small meals a day can help promote satiety (feeling full) and 
+                        may help promote weight loss. If you are unable to provide more frequently than two meals a 
+                        day, you can consider a few options. First, you can offer food before you leave the house in 
+                        the morning, then again as soon as you get home in the evening, and then right before bed. Or 
+                        you may consider using a timed/automatic feeder for {{ pet_data[0].name }}. 
+                        
+                        For further weight loss options, please discuss how to help 
+                        {{ pet_data[0].name }} lose weight with 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %}
+                        veterinarian. 
+                        
+                        <div class="smaller_padding"></div>
+                        <h2>Body Fat Percentage</h2>
+                        <div class="smaller_padding"></div>
+
+                        <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
+                        Based off of 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %}
+                        current body condition score, it is not recommended to help {{ pet_data[0].name }} 
+                        lose weight by reducing 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }}
+                        {% endif %} 
+                        current food portion. Doing so may lead to nutritional deficiencies if {{ pet_data[0].name }}
+                        is not on a food specifically formulated for cats to help with weight loss. {{ pet_data[0].name }} 
+                        has approximately {{ pet_data[0].body_fat_percentage }}% body fat. An ideal body fat 
+                        percentage is around 15-20%. 
+                                
+                        <h2>Ideal Body Weight</h2>
+                        <div class="smaller_padding"></div>
                         {{ pet_data[0].name }}'s ideal body weight is estimated
                         to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                         For further weight loss options, please discuss how to help {{ pet_data[0].name }} lose 
@@ -992,6 +1048,8 @@
                 {% elif pet_data[0].species == "Canine" %}
                     <div class="reduction">
                         <div class="mid_padding"></div>
+                        <h2>Body Fat Percentage</h2>
+                        <div class="smaller_padding"></div>
                         <!-- Provide disclaimer on food reduction in older cats with a BCS of 7 or higher -->
                         Based off of 
                         {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
@@ -1033,6 +1091,8 @@
         {% elif pet_data[0].bcs == 6 %}
             {% if pet_data[0].species == "Feline"%}
                 <div class="small_reduction">
+                    <h2>Body Fat Percentage</h2>
+                    <div class="smaller_padding"></div>
                     {{ pet_data[0].name }} has approximately {{ pet_data[0].body_fat_percentage }}% body
                     fat. An ideal body fat percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
                     to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
@@ -1047,6 +1107,8 @@
                 </div>
             {% elif pet_data[0].species == "Canine" %}
                 <div class="small_reduction">
+                    <h2>Body Fat Percentage</h2>
+                    <div class="smaller_padding"></div>
                     {{ pet_data[0].name }} has approximately {{ pet_data[0].body_fat_percentage }}% body
                     fat. An ideal body fat percentage is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated
                     to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
@@ -1065,22 +1127,11 @@
     {% if pet_data[0].bcs >= 6 or pet_data[0].is_pediatric == "y" or
     pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
         {% if pet_data[0].bcs >= 6 or pet_data[0].is_pregnant == "y" %}
-            {% if pet_data[0].bcs == 6 or pet_data[0].is_pregnant == "y" %}
-                {% if pet_data[0].weeks_gestating == None or pet_data[0].weeks_gestating < 6 %}
-                    <div class="preg_treats">  <!-- Formatting for pregnancy treats -->
-                        <!-- recommend treat amounts, |round|int suggested by CoPilot -->
-                        {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
-                        day from treats. This is 8% of
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                            {{ possessive_pronoun }} 
-                        {% else %}
-                            {{ object_pronoun }} 
-                        {% endif %} RER.
-                    </div>
-                {% endif %}
-            {% elif pet_data[0].bcs > 6 or pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating >= 6 %}
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].weeks_gestating == None or pet_data[0].bcs >= 6 or pet_data[0].weeks_gestating >= 6 %}
                 <div class="wider_treats">
                     <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                    <h2>Treats</h2>
+                    <div class="smaller_padding"></div>
                     {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                     day from treats. This is 8% of
                     {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
@@ -1093,6 +1144,8 @@
         {% elif pet_data[0].is_pediatric == "y" %}
             <div class="treats"> 
                 <!-- recommend treat amounts, |round|int suggested by CoPilot -->
+                <h2>Treats</h2>
+                <div class="smaller_padding"></div>
                 {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                 day from treats. This is 8% of
                 {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
@@ -1115,7 +1168,10 @@
         {% endif %}
     {% elif pet_data[0].age_in_years >= 7 or pet_data[0].bcs < 6 %}
         <div class="senior_treats">        
-            <div class="smaller_padding"></div>       
+            <div class="smaller_padding"></div> 
+            <h2>Treats</h2>
+            <div class="smaller_padding"></div>      
+
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->
             {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
             day from treats. This is 10% of 
@@ -1126,7 +1182,10 @@
             {% endif %} RER.
         </div>
     {% else %}     
-        <div class="treats">               
+        <div class="treats">     
+            <h2>Treats</h2>
+            <div class="smaller_padding"></div>   
+
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->
             {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
             day from treats. This is 10% of 
@@ -1146,6 +1205,62 @@
             </div>
         {% endif %}
         
+        
+    <!-- If the user wants a food transition, show the dictionary -->
+    {% if transitioning_food_amts_rec %}
+        <div class="row">
+            <h2>
+                <img src="{{ url_for('static', filename='assets/svg/pet_food_bag.svg') }}" alt="A bag of food with a pawprint" class="bowl">
+                <p class="fr_name">
+                    Transitioning {{ pet_data[0].name }} to a New Food
+                </p>
+                <img src="{{ url_for('static', filename='assets/svg/pet_food_bag.svg') }}" alt="A bag of food with a pawprint" class="bowl">
+            </h2>
+        </div>
+        <table class="transition">
+            <thead>
+                <tr>
+                    <th>
+                        Day
+                    </th>
+                    <th>
+                        Old Food Percent
+                    </th>
+                    <th>
+                        Old Food Recommended
+                    </th>
+                    <th>
+                        New Food Percent
+                    </th>
+                    <th>
+                        New Food Recommended
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day, data in transitioning_food_amts_rec.items() %}
+                    <tr>
+                        <td>
+                            {{ day }}
+                        </td>
+                        <th>
+                            {{ data["Old Food Percent"] }}
+                        </th>
+                        <th>
+                            {{ data["Old Food Recommended"] }}
+                        </th>
+                        <th>
+                            {{ data["New Food Percent"] }}
+                        </th>
+                        <th>
+                            {{ data["New Food Recommended"] }}
+                        </th>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    {% endif %}
         <!-- Go back --> 
         <div class="button-container-fp">
             <a href="{{ url_for('der', pet_id=pet_id) }}">

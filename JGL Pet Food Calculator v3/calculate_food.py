@@ -8,7 +8,7 @@ from find_info import FindInfo
 # Configure CS50 Library to use SQLite database (for login checks)
 db = SQL("sqlite:///pet_food_calculator.db")
 
-
+# TODO: Move RER and DER to a different file
 class CalculateFood():
     def __init__(self, user_id, pet_id=None):
         """Query the pet's info for calculation"""
@@ -147,7 +147,8 @@ class CalculateFood():
             # Loop over each day in transition period and calculate based on DER and percent of food feed
             for day in trans_percents:
                 day_label = f"Day {day}"
-                
+                old_food_percent = int(trans_percents[day] * 100)
+                new_food_percent = int(trans_percents[day] * 100)  
                 old_food_total = (old_food_amt * trans_percents[day]) / self.pet_data[0]["meals_per_day"]
                 old_food_whole_cans_or_cups = str(old_food_total).split(".")[0]
                 old_food_partial_amount = str(old_food_total).split(".")[1]
@@ -241,10 +242,10 @@ class CalculateFood():
                 elif new_food_amt_rec.endswith(" and 0"):
                     new_food_amt_rec = new_food_amt_rec.replace(" and 0", "")
                  
-                old_food_percent = 1 - trans_percents[day]
-                new_food_percent = trans_percents[day]       
-                transitioning_food_amts_rec[day_label] = {f"Old Food {int(old_food_percent * 100)}%": old_food_amt_rec, 
-                                                        f"New Food {int(new_food_percent * 100)}%": new_food_amt_rec}
-        
+
+                print(old_food_percent, new_food_percent)
+                transitioning_food_amts_rec[day_label] = {f"Old Food {old_food_percent}%": old_food_amt_rec, 
+                                                      f"New Food {new_food_percent}%": new_food_amt_rec}
+    
         return transitioning_food_amts_rec
             
