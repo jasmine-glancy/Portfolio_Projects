@@ -53,14 +53,6 @@
         <div class="row">
             * If your pet has free access to food at all times of the day, please input "1".
         </div>
-        <div class="row">
-            <div class="col" title="Food Transition Label">
-                {{ current_food.food_transition.label }}
-            </div>
-            <div class="col" title="Food Transition Dropdown">
-                {{ current_food.food_transition }}
-            </div>
-        </div>
 
         <div class="button-container">
             <a href="{{ url_for('confirm_data', pet_id=pet_id) }}">

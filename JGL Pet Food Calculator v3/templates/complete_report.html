@@ -67,7 +67,7 @@
             {% elif pet_data[0].age_in_years == 1 and pet_data[0].age_in_months > 1 %}
                 {{ pet_data[0].age_in_years }} year {{ pet_data[0].age_in_months }} months old
             {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 0 %}
-                {{ pet_data[0].age_in_years }} years old
+                {{ pet_data[0].age_in_years }} year old
             {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months == 1 %}
                 {{ pet_data[0].age_in_years }} years {{ pet_data[0].age_in_months }} month old
             {% elif pet_data[0].age_in_years > 1 and pet_data[0].age_in_months > 1 %}
@@ -141,7 +141,12 @@
 
             <!-- Give RER and DER information -->
             {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
-            {{ rer }} kcal based off of her current weight of {{ pet_data[0].weight }} 
+            {{ rer }} kcal based off of 
+            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {{ possessive_pronoun }} 
+            {% else %}
+                {{ object_pronoun }} 
+            {% endif %} current weight of {{ pet_data[0].weight }} 
             {{ pet_data[0].units }}. ({{ pet_data[0].converted_weight }} 
             {{ pet_data[0].converted_weight_units }}). As a reminder, this is the 
             minimum amount {{ pet_data[0].name }} needs at rest (i.e. if 
@@ -206,9 +211,6 @@
                         <div class="mid_padding"></div>
                     {% elif pet_data[0].species == "Canine" %}
                         {% if pet_data[0].is_pregnant == "y" %}
-                            {% if pet_data[0].weeks_gestating <= 6 %}
-                                <div class="mid_padding"></div>
-                            {% endif %}
                             <div class="smaller_padding"></div>
                         {% elif pet_data[0].bcs >= 6 %}
                             <div class="mid_padding"></div>
@@ -263,6 +265,8 @@
                         <div class="large_padding"></div>
                     {% elif pet_data[0].age_in_years >= 7 %}
                         <div class="xlarge_padding"></div>
+                    {% elif pet_data[0].is_pediatric == "y" %}
+                        <div class="mid_padding"></div>
                     {% else %}
                         <div class="smaller_padding"></div>
                     {% endif %}
@@ -363,6 +367,7 @@
                     you can get buy.
 
                     {% if pet_data[0].is_pediatric == "y" %}
+                        <div class="smaller_padding"></div>
                         <h2>Rechecking Weight</h2>
                         <div class="smaller_padding"></div>
                         {{ pet_data[0].name }}'s needs are dynamic as a growing kitten, so it is essential 
@@ -386,6 +391,8 @@
                         is energetic and then is suddenly very tired in the middle of play). 
 
                         <div class="smaller_padding"></div>
+                        <h2>Food Choice</h2>
+                        <div class="smaller_padding"></div>  
                         In order to set {{ pet_data[0].name }} up for optimal growth, {{ subject_pronoun }} 
                         should be on a complete and balanced diet formulated that is for kitten growth and 
                         meets the <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
@@ -450,6 +457,8 @@
                 {% elif pet_data[0].species == "Canine" %}
                     {% if pet_data[0].is_pediatric == "y" %}
                         <div class="smaller_padding"></div>
+                        <h2>Rechecking Weight</h2>
+                        <div class="smaller_padding"></div>  
                         {{ pet_data[0].name }} is a {{ breed_size_category }} breed dog.
                         {{ pet_data[0].name }}'s needs are dynamic as a growing puppy, 
                         so it is essential to regularly weigh {{ object_pronoun }} and 
@@ -473,30 +482,6 @@
                         gaining weight, seems weak, or seems to hit "speed bumps" while playing 
                         (i.e. seems energetic and then suddenly very tired in the middle of play). 
 
-                        <div class="smaller_padding"></div>
-                        In order to set {{ pet_data[0].name }} up for optimal growth, {{ subject_pronoun }} 
-                        should be on a complete and balanced diet formulated that is for puppy growth and 
-                        meets the <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
-                        title="View World Small Animal Veterinary Association Guidelines"
-                        class="fp_link">WSAVA guidelines</a>. 
-                        
-                        {% if pet_data[0].meals_per_day < 2 %}
-                            <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
-                            It is recommended to feed {{ pet_data[0].name }} 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                {{ possessive_pronoun }} 
-                            {% else %}
-                                {{ object_pronoun }} 
-                            {% endif %}
-                            daily amount over 2-3 meals, as providing {{ object_pronoun }} food 
-                            free-choice can increase                         
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
-                                {{ possessive_pronoun }} 
-                            {% else %}
-                                {{ object_pronoun }} 
-                            {% endif %} 
-                            risk of obesity.
-                        {% endif %} 
                     {% endif %}
                 {% endif %}
             </div>
@@ -554,6 +539,14 @@
                             title="View World Small Animal Veterinary Association Guidelines"
                             class="fp_link">WSAVA guidelines</a>. It is not recommended to feed {{ pet_data[0].name }} a large breed puppy food, 
                             as these diets do not have the currect calcium to phosphorus ratio.
+
+                            {% if pet_data[0].weeks_gestating == 9 %}
+                                <div class="no_padding"></div>
+                                <h2>Recalculate Amounts</h2>
+                                <div class="smaller_padding"></div>
+                                It is recommended to revisit this calculator in one week to recalculate 
+                                {{ pet_data[0].name }}'s feeding amounts after she whelps.
+                            {% endif %}
                         {% else %}
                             <div class="smaller_padding"></div>
                             <h2>Weight & Nutrition While Pregnant</h2>
@@ -567,15 +560,20 @@
                             her appetite. It is crucial to monitor her weight and body condition score frequently 
                             during this time, as her needs are dynamic. Please consult your veterinarian if 
                             {{ pet_data[0].name }} loses weight during this time.
+
+                            
                             {% if pet_data[0].weeks_gestating == 5 %}
+                                <div class="no_padding"></div>
+                                <h2>Recalculate Amounts</h2>
+                                <div class="smaller_padding"></div>
                                 It is recommended to revisit this calculator in one week to recalculate 
                                 {{ pet_data[0].name }}'s feeding amounts for the third trimester.
-                            {% elif pet_data[0].weeks_gestating == 9 %}
-                                It is recommended to revisit this calculator in one week to recalculate 
-                                {{ pet_data[0].name }}'s feeding amounts after she whelps.
+
                             {% endif %}
                         {% endif %}
                     {% elif pet_data[0].is_nursing == "y" %}
+                        <div class="smaller_padding"></div>
+                        <h2>Weight Loss While Nursing</h2>
                         <div class="smaller_padding"></div>
                         <!-- If dog is nursing, provide recommendations -->
                         Some weight loss is expected, as {{ pet_data[0].name }}'s current nutritional
@@ -587,7 +585,7 @@
                 
 
                 {% if pet_data[0].activity_level != "Moderate" and pet_data[0].activity_level != "Heavy" 
-                and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
+                and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" and pet_data[0].is_pediatric != "y" %}
                     <!-- If dog is not already getting moderate to heavy exercise, and is not pregnant or nursing --> 
                     <div class="exercise">
                         <h2>Exercise</h2>
@@ -599,7 +597,6 @@
                         go up and down them for exercise by moving where you feed {{ object_pronoun }}. 
                         
                     </div>
-                    <br>
                     {% endif %}
 
 
@@ -729,7 +726,7 @@
                             <div class="smaller_padding"></div>   
                             <!-- If pet is a nursing feline, provide feeding guidelines -->
                             In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
-                            should be fed a highly digestible, high quality kitten formula from a brand 
+                            should be fed a highly digestible, high quality kitten food from a brand 
                             that meets the 
 
                             <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
@@ -766,20 +763,10 @@
                             kittens' dynamic needs. To encourage adequate food intake, it is recommended to
                             feed {{ pet_data[0].name }} several small meals per day. {{ pet_data[0].name }}'s 
                             feeding amounts should be recalculated after the kittens are born.
-
-                            <div class="smaller_padding"></div>
-                            <h2>Supplements</h2>
-                            <div class="smaller_padding"></div>
-                            It is not recommended to provide any supplements to {{ pet_data[0].name }} without 
-                            first discussing them with her veterinarian. Most diets that include an <a href="https://www.aafco.org/" 
-                            title="American Feed Control Officials Homepage"
-                            class="fp_link">Association of American Feed Control Officials (AAFCO)</a> statement 
-                            that the diets are formualted for lactation/growth are complete and balanced, so 
-                            further supplementation could make {{ pet_data[0].name }} prone to nutrient imbalances. 
                         {% endif %}
                     </div>
                     <div class="exercise" id="feline_exercise">
-                        {% if pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" %}
+                        {% if pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" and pet_data[0].is_pediatric != "y" %}
                             <h2>Exercise</h2>
                             <div class="smaller_padding"></div>
                             <!-- Recommend enrichment and exercise resources for all cats -->  
@@ -833,7 +820,7 @@
                         </a>
                         </div>
                     </div>
-                {% elif pet_data[0].bcs > 6 and pet_data[0].age_in_years < 7 or pet_data[0].bcs < 6 %}
+                {% elif pet_data[0].bcs > 6 and pet_data[0].is_pediatric == "n" and pet_data[0].age_in_years < 7 or pet_data[0].bcs < 6 %}
                     <div class="card" id="final_report_young_obese">
                         <img src="{{ url_for('static', filename='assets/img/fel_puzzle_toy.png') }}" 
                         alt="three puzzle feeders for cats that are shaped like mice."
@@ -887,23 +874,112 @@
                 
             {% endif %}
         </div>
+        
+        
+        {% if pet_data[0].is_pediatric == "y" %}
+            {% if pet_data[0].species == "Feline" %}
+                <div class="kitten_exercise">
+                    <h2>Exercise</h2>
+                    <div class="smaller_padding"></div>
+                    <!-- Recommend enrichment and exercise resources for all cats -->  
+                    All pets can benefit from physical and mental excersize! Enticing your cat
+                    to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
+                    with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
+                    occasionally to cater to 
+                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {{ possessive_pronoun }} 
+                    {% else %}
+                        {{ object_pronoun }} 
+                    {% endif %}
+                    foraging instincts. 
+                </div>
+            {% elif pet_data[0].species == "Canine" %}
+                <div class="puppy_food_choice">
+                    <div class="smaller_padding"></div>
+                    <h2>Food Choice</h2>
+                    <div class="smaller_padding"></div>  
+                    In order to set {{ pet_data[0].name }} up for optimal growth, {{ subject_pronoun }} 
+                    should be on a complete and balanced diet formulated that is for puppy growth and 
+                    meets the <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" 
+                    title="View World Small Animal Veterinary Association Guidelines"
+                    class="fp_link">WSAVA guidelines</a>. 
+                    
+                    {% if pet_data[0].meals_per_day < 2 %}
+                        <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
+                        It is recommended to feed {{ pet_data[0].name }} 
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %}
+                        daily amount over 2-3 meals, as providing {{ object_pronoun }} food 
+                        free-choice can increase                         
+                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {{ possessive_pronoun }} 
+                        {% else %}
+                            {{ object_pronoun }} 
+                        {% endif %} 
+                        risk of obesity.
+                    {% endif %} 
+
+                    When choosing what form of food to feed {{ pet_data[0].name }}, 
+                    it is important to note that dry diets are more calorically dense (meaning less 
+                    is needed to achieve the daily caloric requirement) and canned food diets can be 
+                    tastier due to the moisture content.
+                </div>
+                <div class="puppy_exercise">
+                    <h2>Exercise</h2>
+                    <div class="smaller_padding"></div>
+                    All pets can benefit from physical and mental excersize! Similar to cats, dogs can 
+                    find enjoyment in a flirt pole (a dog toy attached to a string). It is not recommended
+                    to play with dogs with a laser pointer, as it can lead to anxiety and obsessive behaviors.
+                    Alternatively, if your house has stairs, you can encourage {{ pet_data[0].name }} to 
+                    go up and down them for exercise by moving where you feed {{ object_pronoun }}. 
+                    
+                </div>
+            {% endif %}
+        {% endif%}
+
+        {% if pet_data[0].is_nursing == "y" and pet_data[0].species == "Canine" %}
+            <div class="wider_reproduction_recs">
+                <div class="smaller_padding"></div>
+                <h2>Food Choice</h2>
+                <div class="smaller_padding"></div>
+                In order to meet the higher energy demands of nursing, {{ pet_data[0].name }} 
+                should be fed a highly digestible, high quality puppy food from a brand 
+                that meets the 
+
+                <a href="https://wsava.org/global-guidelines/global-nutrition-guidelines/" title="View World Small Animal Veterinary Association Guidelines">
+                    WSAVA guidelines</a>.
+
+                {% if pet_data[0].meals_per_day < 3 %}
+                    <!-- If not already receiving multiple meals per day -->
+                    It is recommended to feed {{ pet_data[0].name }} several 
+                    times a day or provide food freely while she is nursing until the puppies are weaned.
+                {% endif %}
+
+                Puppy food and diets formulated for nursing are calorically dense, meaning
+                {{ pet_data[0].name }} will be able to eat less to feel satiated and to support 
+                her puppies' dynamic needs. 
+            </div>
+        {% endif %}
         {% if pet_data[0].is_pregnant == "y" or pet_data[0].is_nursing == "y" %}
+
             <!-- Supplement disclaimer -->
             <div class="supplements">
-                <div class="smaller_padding"></div>
+                {% if pet_data[0].species == "Feline"%}
+                    <div class="xlarge_padding"></div>
+                {% else %}
+                    <div class="smaller_padding"></div>
+                {% endif %}
                 <h2>Supplements</h2>
                 <div class="smaller_padding"></div>
                 It is not recommended to provide any supplements to {{ pet_data[0].name }} without first discussing
-                them with her veterinarian.Diets that include an <a href="https://www.aafco.org/" 
+                them with her veterinarian. Diets that include an <a href="https://www.aafco.org/" 
                     title="American Feed Control Officials Homepage"
                     class="fp_link">Association of 
-                    American Feed Control Officials (AAFCO)</a> statement that the diets 
-                {% if pet_data[0].weeks_gestating >= 6 %}
-                    are formualted for lactation/growth 
-                {% else %}
-                    are formulated to be complete
-                {% endif %}
-                are complete and balanced, so further supplementation could make 
+                    American Feed Control Officials (AAFCO)</a> statement that the diets are formualted for 
+                lactation/growth are complete and balanced, so further supplementation could make 
                 {{ pet_data[0].name }} prone to nutrient imbalances.
             </div>
         {% endif %}
@@ -1155,6 +1231,9 @@
                 {% endif %} RER.
 
                 {% if pet_data[0].species == "Canine" %}
+                    <div class="smaller_padding"></div>
+                    <h2>Chew Toy Considerations</h2>
+                    <div class="smaller_padding"></div>
                     When choosing a chewable toy for {{ pet_data[0].name }}, it is 
                     important to seek out materials that won't harm {{ object_pronoun }}. 
                     Avoid any abrasive materials like rope or tennis balls, as they can 
@@ -1205,93 +1284,14 @@
             </div>
         {% endif %}
         
-        
-    <!-- If the user wants a food transition, show the dictionary -->
-    {% if transitioning_food_amts_rec %}
-        <div class="row">
-            <h2>
-                <img src="{{ url_for('static', filename='assets/svg/pet_food_bag.svg') }}" alt="A bag of food with a pawprint" class="bowl">
-                <p class="fr_name">
-                    Transitioning {{ pet_data[0].name }} to a New Food
-                </p>
-                <img src="{{ url_for('static', filename='assets/svg/pet_food_bag.svg') }}" alt="A bag of food with a pawprint" class="bowl">
-            </h2>
-        </div>
-        <table class="transition">
-            <thead>
-                <tr>
-                    <th>
-                        Day
-                    </th>
-                    <th>
-                        Old Food Percent
-                    </th>
-                    <th>
-                        Old Food Recommended
-                    </th>
-                    <th>
-                        New Food Percent
-                    </th>
-                    <th>
-                        New Food Recommended
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for day, data in transitioning_food_amts_rec.items() %}
-                    <tr>
-                        <td>
-                            {{ day }}
-                        </td>
-                        <th>
-                            {{ data["Old Food Percent"] }}
-                        </th>
-                        <th>
-                            {{ data["Old Food Recommended"] }}
-                        </th>
-                        <th>
-                            {{ data["New Food Percent"] }}
-                        </th>
-                        <th>
-                            {{ data["New Food Recommended"] }}
-                        </th>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-    {% endif %}
         <!-- Go back --> 
         <div class="button-container-fp">
             <a href="{{ url_for('der', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go to Part 6: Pet's DER</button>
             </a>
-
-            <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
-            <div class="divider"></div>
-            
-            <!-- TODO: "Print Report" button and "Email Report" button functional --> 
-            <button type="button" class="btn btn-secondary btn-lg">Print This Report</button>
-            <button type="button" class="btn btn-secondary btn-lg">Email This Report</button>
         </div>
-        <button class="scroll_to_top">
-            <i class="up"></i>
-        </button>
     </div>
 
 </div>
 
 {% endblock %}
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const btn = document.getElementById("scroll_to_top");
-
-        btn.addEventListener("click", () => {
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth",
-            });
-        });
-    });
-</script>

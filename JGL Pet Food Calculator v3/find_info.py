@@ -20,11 +20,7 @@ class FindInfo():
             print(f"Exception: {e}, reassigning pet ID as 0")
             self.pet_id = 0  
         
-        if user_id == 0:
-            # If the user has a "guest" ID, query guest dictionary
-            self.pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
-        else:
-            self.guest_pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
+        self.pet_data = self.pet_data_dictionary(self.user_id, self.pet_id)
 
 
     def find_der_high_end(self, species=None, der_factor_id=None) -> float:
@@ -134,126 +130,31 @@ class FindInfo():
             
             # print(self.pet_data)
             
-            
-        # Otherwise, pass session variables
-        else:        
-            # Check Session variables for emptiness and update the dictionary if found
-            
-            pet_data = self.guest_pet_data_dictionary(self, user_id)    
-            self.pet_data = pet_data
         
         return self.pet_data 
     
-    
-    def guest_pet_data_dictionary(self, user_id, pet_id) -> dict:
-        """Builds a dictionary of session variables if no user is logged in"""
 
-        if user_id == 0 or pet_id == 0:
-            # Check Session variables for emptiness and update the dictionary if found
-            self.guest_pet_data = [{"pet_id": None, "name": None, "age_in_years": None,
-                        "age_in_months": None, "is_pediatric": None, "species": None,
-                        "breed": None, "sex": None, "bcs": None, "weight": None, 
-                        "units": None, "converted_weight": None, "converted_weight_units": None,
-                        "ideal_weight_kgs": None, "ideal_weight_lbs": None, "activity_level": None,
-                        "rer": None, "der": None, "der_factor_id": None, "der_modifier": None,
-                        "current_food_amt_rec": None, "current_food_kcal": None, "current_food_form": None,
-                        "meals_per_day": None, "current_food_amt_per_meal": None, "is_pregnant": None,
-                        "weeks_gestating": None, "is_nursing": None, "litter_size": None, "weeks_nursing": None,
-                        "rec_treat_kcal_per_day": None, "sensitive_stomach": None, 
-                        "transitioning_food_one_kcal": None, "transitioning_food_one_form": None,
-                        "transitioning_food_two_kcal": None, "transitioning_food_two_form": None}]
-        
-            if session["pet_id"] != None:
-                self.guest_pet_data[0]["pet_id"] = session["pet_id"]
-            elif session["pet_name"] != None:
-                self.guest_pet_data[0]["name"] = session["pet_name"]
-            elif session["pet_age_years"] != None:
-                self.guest_pet_data[0]["age_in_years"] = session["pet_age_years"]
-            elif session["pet_age_months"] != None:
-                self.guest_pet_data[0]["age_in_months"] = session["pet_age_months"]
-            elif session["is_pediatric"] != None:
-                self.guest_pet_data[0]["is_pediatric"] = session["is_pediatric"]
-            elif session["species"] != None:
-                self.guest_pet_data[0]["species"] = session["species"]
-            elif session["pet_breed"] != None:
-                self.guest_pet_data[0]["breed"] = session["pet_breed"]
-            elif session["pet_sex"] != None:
-                self.guest_pet_data[0]["sex"] = session["pet_sex"]
-            elif session["bcs"] != None:
-                self.guest_pet_data[0]["bcs"] = session["bcs"]            
-            elif session["weight"] != None:
-                self.guest_pet_data[0]["weight"] = session["weight"]       
-            elif session["units"] != None:
-                self.guest_pet_data[0]["units"] = session["units"]
-            elif session["converted_weight"] != None:
-                self.guest_pet_data[0]["converted_weight"] = session["converted_weight"]       
-            elif session["converted_weight_units"] != None:
-                self.guest_pet_data[0]["converted_weight_units"] = session["converted_weight_units"]          
-            elif session["activity_level"] != None:
-                self.guest_pet_data[0]["activity_level"] = session["activity_level"]
-            elif session["pregnancy_status"] != None:
-                self.guest_pet_data[0]["is_pregnant"] = session["pregnancy_status"]
-            elif session["number_weeks_pregnant"] != None:
-                self.guest_pet_data[0]["weeks_gestating"] = session["number_weeks_pregnant"]
-            elif session["lactation_status"] != None:
-                self.guest_pet_data[0]["is_nursing"] = session["lactation_status"]
-            elif session["litter_size"] != None:
-                self.guest_pet_data[0]["litter_size"] = session["litter_size"]
-            elif session["duration_of_nursing"] != None:
-                self.guest_pet_data[0]["weeks_nursing"] = session["duration_of_nursing"]
-            elif session["rer"] != None:
-                self.guest_pet_data[0]["rer"] = session["rer"]
-            elif session["der"] != None:
-                self.guest_pet_data[0]["der"] = session["der"]
-            elif session["der_factor_id"] != None:
-                self.guest_pet_data[0]["der_factor_id"] = session["der_factor_id"]
-            elif session["der_modifier"] != None:
-                self.guest_pet_data[0]["der_modifier"] = session["der_modifier"]
-            elif session["daily_amount_to_feed_cur_food"] != None:
-                self.guest_pet_data[0]["current_food_amt_rec"] = session["daily_amount_to_feed_cur_food"] 
-            elif session["current_food_form"] != None:
-                self.guest_pet_data[0]["current_food_form"] = session["current_food_form"]                
-            elif session["current_food_kcal"] != None:
-                self.guest_pet_data[0]["current_food_kcal"] = session["current_food_kcal"] 
-            elif session["meals_per_day"] != None:
-                self.guest_pet_data[0]["meals_per_day"] = session["meals_per_day"]        
-            elif session["current_food_amt_per_meal"] != None:
-                self.guest_pet_data[0]["current_food_amt_per_meal"] = session["current_food_amt_per_meal"]            
-            elif session["rec_treat_kcal_per_day"] != None:
-                self.guest_pet_data[0]["rec_treat_kcal_per_day"] = session["rec_treat_kcal_per_day"]
-            elif session["sensitive_stomach"] != None:
-                self.guest_pet_data[0]["sensitive_stomach"] = session["sensitive_stomach"]
-            elif session["first_new_food_kcal"] != None:
-                self.guest_pet_data[0]["transitioning_food_one_kcal"] = session["first_new_food_kcal"] 
-            elif session["first_new_food_form"] != None:
-                self.guest_pet_data[0]["transitioning_food_one_form"] = session["first_new_food_form"]                
-            elif session["second_new_food_kcal"] != None:
-                self.guest_pet_data[0]["transitioning_food_two_kcal"] = session["second_new_food_kcal"] 
-            elif session["second_new_food_form"] != None:
-                self.guest_pet_data[0]["transitioning_food_two_form"] = session["second_new_food_form"]    
-                         
-        return self.guest_pet_data
-
-
-    def find_pet_id(self, user_id, animal_id) -> int:
+    def find_pet_id(self, user_id, name, species) -> int:
         """Finds the specific pet ID"""
         
-        print(f"ID arg: {animal_id}")
+        pet_query = db.execute(
+            "SELECT pet_id FROM pets \
+                WHERE owner_id = :user AND name = :name AND species = :species",
+                user=user_id, name=name, species=species
+        )
         
-        if user_id != 0:
+        if pet_query:
             # Check if pet_data is empty
             if not self.pet_data:
                 print("The pet hasn't been added yet.")
             
             # See if the pet is already added 
-            if self.pet_data and "pet_id" in self.pet_data[0] \
-                or self.guest_pet_data and "pet_id" in self.guest_pet_data[0]:
+            if self.pet_data and "pet_id" in self.pet_data[0]:
                 self.pet_id = self.pet_data[0]["pet_id"]
                 print(f"ID of pet: {self.pet_id}")
             else:
                 print("Pet ID not found in pet_data.")
-        else:
-            self.pet_id = 0
+                self.pet_id = pet_query[0]["pet_id"]
         
         return self.pet_id
     
@@ -331,14 +232,6 @@ class FindInfo():
         except Exception as e:
             flash(f"Can't find species ID. Exception: {e}")
                 
-        else:
-            # If a user isn't logged in, grab species variable
-            
-            if "species" in session and session["species"] is not None:
-                # Condition suggested by CoPilot
-                self.species = session["species"]
-            
-            print(f"Session species: {self.species}") 
         
         # Return whatever species variable ends up being found 
         return self.species   
@@ -542,8 +435,6 @@ class FindInfo():
                 "SELECT * FROM pets WHERE owner_id = :user AND pet_id = :pet_id",
                 user=user_id, pet_id=pet_id
             )
-        # TODO: Find a way to query guest SVG?
-        
         
         try:
             if species == "Canine":
@@ -601,3 +492,20 @@ class FindInfo():
         # Return whatever current food form variable ends up being found 
         return self.current_food_form  
     
+    def find_pronouns(self, sex):
+        """Returns pronouns"""
+        object_pronoun = ""
+        possessive_pronoun = ""
+        if sex == "female" or sex == "female_spayed":
+            # Subject pronoun is she
+            object_pronoun = "her"
+            subject_pronoun = "she"
+        elif sex == "male" or sex == "male_neutered":
+            # Subject pronoun is he
+            object_pronoun = "him"
+            possessive_pronoun = "his"
+            subject_pronoun = "he"
+            
+        return {"object_pronoun": object_pronoun, 
+                "possessive_pronoun": possessive_pronoun,
+                "subject_pronoun": subject_pronoun}

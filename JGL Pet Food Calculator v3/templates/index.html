@@ -38,14 +38,10 @@
 
     {% if not session["user_id"] %}
         <!-- Hide this information and these buttons once the user logs in -->
-        <p>
-            Please choose from the options below to access the Pet Food Calculator.
-            Please note, if you choose not to log in, your results will not be saved.
-        </p>
 
         <a href="{{ url_for('login') }}"><button type="button" class="btn btn-secondary btn-lg">Log In</button></a>
         <a href="{{ url_for('register' )}}"><button type="button" class="btn btn-secondary btn-lg">Register</button></a>
-        <a href="{{ url_for('pet_info') }}"><button type="button" class="btn btn-secondary btn-lg">Use As A Guest</button></a>
+        
     {% else %}
         <a href="{{ url_for('new_pet_calc') }}"><button type="button" class="btn btn-secondary btn-lg">Calculate For A New Pet</button></a>
         <a href="{{ url_for('recalculate_pet') }}"><button type="button" class="btn btn-secondary btn-lg">Recalculate For An Existing Pet</button></a>

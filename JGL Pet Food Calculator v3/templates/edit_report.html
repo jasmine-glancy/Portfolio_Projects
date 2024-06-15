@@ -276,22 +276,6 @@
                 <th>
                     Recommended Feeding Amounts
                 </th>
-                {% if pet_data[0].transitioning_food_one_kcal != None %}
-                    <th>
-                        New Food 1 Caloric Density
-                    </th>    
-                    <th>
-                        New Food 1 Recommended Feeding Amounts
-                    </th>
-                {% endif %}
-                {% if pet_data[0].transitioning_food_two_kcal != None %}
-                    <th>
-                        New Food 2 Caloric Density
-                    </th>    
-                    <th>
-                        New Food 2 Recommended Feeding Amounts
-                    </th>
-                {% endif %}
             </tr>
         </thead>
         <tbody>
@@ -311,22 +295,6 @@
                 <td>
                     {{ pet_data[0].current_food_amt_rec }} ({{ pet_data[0].current_food_amt_per_meal }} per meal)
                 </td>
-                {% if pet_data[0].transitioning_food_one_kcal != None %}
-                    <th>
-                        {{ pet_data[0].transitioning_food_one_kcal }}/{{ pet_data[0].transitioning_food_one_form }}
-                    </th>    
-                    <th>
-                        {{ pet_data[0].transitioning_food_one_per_meal }}
-                    </th>
-                {% endif %}
-                {% if pet_data[0].transitioning_food_two_kcal != None %}
-                    <th>
-                        {{ pet_data[0].transitioning_food_two_kcal }}/{{ pet_data[0].transitioning_food_two_form }}
-                    </th>    
-                    <th>
-                        {{ pet_data[0].transitioning_food_two_per_meal }}
-                    </th>
-                {% endif %}
             </tr>
         </tbody>
     </table>
