@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Part 6: Pet's DER{% endblock %}
+{% block title %}Part 8: Pet's DER{% endblock %}
 0
 {% block content %}
 
 <div class="container-lg">
-    <h1>Part 6: Pet's DER</h1>
+    <h1>Part 8: Pet's DER</h1>
 
     <!-- Progress bar -->
     <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" style="width: 100%">100%</div>
+        <div class="progress-bar" style="width: 88%">88%</div>
     </div>
 
     <!-- Load in calcuated DER --> 
@@ -21,7 +21,13 @@
         {% else %}
             {{ der }} 
         {% endif %}
-        kcalories per day. This is {{ daily_amount_to_feed }}
+        kcal per day. The DER is amount of calories that 
+        {{ name }} needs based on                         
+        {% if sex == "male" or sex == "male_neutered" %}
+            {{ possessive_pronoun }} 
+        {% else %}
+            {{ object_pronoun }} 
+        {% endif %} current life stage. This is {{ daily_amount_to_feed }}
 
         {% if meals_per_day > 1 %}
             or about {{ total_amount_per_meal }} per meal over 
@@ -64,7 +70,7 @@
     </div>
     <div class="button-container">
         <a href="{{ url_for('rer', pet_id=pet_id) }}">
-            <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 4: Pet's RER</button>
+            <button type="button" class="btn btn-secondary btn-lg">Go Back To Part 7: Pet's RER</button>
         </a>
 
         <!-- Divider solution suggested by Michael Allen on Stack Overflow -->

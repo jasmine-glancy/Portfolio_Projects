@@ -2,16 +2,16 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Part 2.5: Activity Level{% endblock %}
+{% block title %}Part 4: Activity Level{% endblock %}
 
 {% block content %}
 
 <div class="container-lg">
-    <h1>Part 2.5: Activity Level</h1>
+    <h1>Part 4: Activity Level</h1>
 
     <!-- Progress bar -->
     <div class="progress" role="progressbar" aria-label="bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" style="width: 40%">40%</div>
+        <div class="progress-bar" style="width: 44%">44%</div>
       </div>
 
     
@@ -73,13 +73,13 @@
     
         <div class="button-container">
             <a href="{{ url_for('pet_condition', pet_id=pet_id) }}">
-                <button type="button" class="btn btn-secondary btn-lg">Go to Part 2: Weight and Body Condition</button>
+                <button type="button" class="btn btn-secondary btn-lg">Go to Part 3: Weight and Body Condition</button>
             </a>
 
             <!-- Divider solution suggested by Michael Allen on Stack Overflow-->
             <div class="divider"></div>
 
-            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 3: Confirm Pet Information</button>
+            <button type="submit" class="btn btn-secondary btn-lg">Go to Part 5: Confirm Pet Information</button>
         </div>
     </form>
 </div>

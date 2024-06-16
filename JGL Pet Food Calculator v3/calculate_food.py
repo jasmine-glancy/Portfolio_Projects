@@ -8,7 +8,7 @@ from find_info import FindInfo
 # Configure CS50 Library to use SQLite database (for login checks)
 db = SQL("sqlite:///pet_food_calculator.db")
 
-# TODO: Move RER and DER to a different file
+# TODO: Move RER and DER to a different file v2
 class CalculateFood():
     def __init__(self, user_id, pet_id=None):
         """Query the pet's info for calculation"""

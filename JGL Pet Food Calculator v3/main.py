@@ -30,9 +30,7 @@ app.config['SECRET_KEY'] = os.environ.get('KEY')
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
 
-# Image credit to Laurie O'Keefe in partner with PetMD, consulting veterinarian Jennifer Coates, DVM
 
-# TODO: Add login required to applicable routes
 @app.route("/")
 def home():
     """Includes welcome and disclaimers along with login/register buttons"""
@@ -282,9 +280,6 @@ def pet_info_continued(pet_id):
         flash(f"Couldn't find ID, Exception: {e}")
         return redirect(url_for('pet_info_continued', pet_id=pet_id)) 
     else:
-        
-            
-    
         # AKC Breeds by Size csv courtesy of MeganSorenson of Github 
         # # # https://github.com/MeganSorenson/American-Kennel-Club-Breeds-by-Size-Dataset/blob/main/AmericanKennelClubBreedsBySize.xlsx
         
@@ -1552,13 +1547,23 @@ def der(pet_id):
         print(session["pet_name"])
         print(session["user_id"])
                                    
-        db.execute(
-            "UPDATE pets SET der = :der, der_modifier = :der_modifier, current_food_amt_rec = :daily_amount_to_feed, \
-                date_of_first_report = CURRENT_TIMESTAMP, most_recent_report_date = CURRENT_TIMESTAMP, \
-                current_food_amt_per_meal = :total_amount_per_meal WHERE pet_id = :pet_id AND owner_id = :user_id",
-            der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, total_amount_per_meal=total_amount_per_meal, \
-                pet_id=pet_id, user_id=session["user_id"]
-        )
+        # If the pet has a completed report, don't update date_of_first_report
+        if pet_data[0]["date_of_first_report"]:
+            db.execute(
+                "UPDATE pets SET der = :der, der_modifier = :der_modifier, current_food_amt_rec = :daily_amount_to_feed, \
+                    most_recent_report_date = CURRENT_TIMESTAMP, current_food_amt_per_meal = :total_amount_per_meal \
+                        WHERE pet_id = :pet_id AND owner_id = :user_id",
+                der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, total_amount_per_meal=total_amount_per_meal, \
+                    pet_id=pet_id, user_id=session["user_id"]
+            )
+        else:
+            db.execute(
+                "UPDATE pets SET der = :der, der_modifier = :der_modifier, current_food_amt_rec = :daily_amount_to_feed, \
+                    date_of_first_report = CURRENT_TIMESTAMP, most_recent_report_date = CURRENT_TIMESTAMP, \
+                    current_food_amt_per_meal = :total_amount_per_meal WHERE pet_id = :pet_id AND owner_id = :user_id",
+                der=der, der_modifier=der_modifier, daily_amount_to_feed=daily_amount_to_feed, total_amount_per_meal=total_amount_per_meal, \
+                    pet_id=pet_id, user_id=session["user_id"]
+            )
         
 
     except Exception as e:
@@ -1652,7 +1657,7 @@ def completed_report():
     if pet_data:
         meals_per_day = pet_data[0]["meals_per_day"]
         
-
+    
     # Find DER range   
     if pet_data[0]["species"] == "Canine":
         

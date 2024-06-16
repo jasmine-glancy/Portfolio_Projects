@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    {% if name %}
-        {{ name }}'s Final Report
+    {% if pet_data[0].name %}
+        {{ pet_data[0].name }}'s Final Report
     {% else %}
         Pet's Final Report
     {% endif %}
@@ -113,11 +113,11 @@
                 {{ pet_data[0].name }} is currently pregnant.
             {% endif %}
             {% if pet_data[0].is_pregnant == "n" %}
-                {{ pet_data[0].name }} is not currently 
+                {{ pet_data[0].name }} is not currently pregnant
             {% endif %}
             {% if pet_data[0].is_nursing == "y" %}
                 <!-- If pet is a nursing female -->
-                pregnant, but she is actively nursing a litter of
+                but she is actively nursing a litter of
                 {% if pet_data[0].litter_size != None and pet_data[0].litter_size != 1 %}
                     {{ pet_data[0].litter_size }}
                     <!-- Return litter size and species -->

@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import request, session, flash
+from flask import session, flash
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
@@ -371,7 +371,7 @@ class FindInfo():
         return self.litter_size  
     
 
-    def check_obesity_risk(self):
+    def check_obesity_risk(self) -> str:
         """Checks if a pet's breed has a predisposed risk to obesity"""
         
         breed_id = self.find_breed_id()
@@ -492,7 +492,7 @@ class FindInfo():
         # Return whatever current food form variable ends up being found 
         return self.current_food_form  
     
-    def find_pronouns(self, sex):
+    def find_pronouns(self, sex) -> str:
         """Returns pronouns"""
         object_pronoun = ""
         possessive_pronoun = ""
