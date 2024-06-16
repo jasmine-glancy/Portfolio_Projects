@@ -4,7 +4,7 @@
 
 #### Description:
 
-Welcome to the Pet Food Calculator! This is a Flask web application that allows you to input your pet's information and get recommended feeding amounts. In addition, it will even instruct you how much to feed if you are transitioning your dog or cat to a different diet!
+Welcome to the Pet Food Calculator! This is a Flask web application that allows you to input your pet's information and get recommended feeding amounts. It will also provide specific recommendations based on your pet's life stage!
 
 When changing your pet from one food to another, it is important to do a slow transition over 5-14 days (the actual time depends on how sensitive your pet's stomach is, though generally, the transition period is 5-7 days).
 
@@ -442,3 +442,6 @@ This was a project I had a lot of fun with, and I could work on it forever! This
   - The user will be able to choose from a list of similar options to what they input if applicable
   - The information for how much of a certain human food the pet should get per day would be inserted into the final report
 - Refactoring for speed and to reduce redundancy
+- AI body condition scorer
+  - Allow the user to upload several pictures of their pet (bird's eye, from the side, from the front) to attempt to determine the pet's body condition score
+  - AI would view the pet's photos and return recommended body condition scores with the option to allow the user to override the recommendations
