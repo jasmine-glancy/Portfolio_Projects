@@ -1,6 +1,6 @@
 # PET FOOD CALCULATOR
 
-#### Video Demo: <URL HERE>
+#### Video Demo: <[Pet Food Calculator](https://youtu.be/GNHv3KKURjY)>
 
 #### Description:
 
