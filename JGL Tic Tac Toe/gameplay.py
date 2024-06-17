@@ -49,6 +49,16 @@ class JglTicTacToe():
 
         # TODO: Write a new function to check whether a player has won or not 
             # TODO: Check for all the rows, columns, and the two diagonals
-            
-        # TODO: Show the board every time a new move is made by someone
+                
+    def jgl_get_combinations_and_positions(self, jgl_position, jgl_winning_combos):
+        """Get winning combinations and positions on the game board"""
+        
+        # TODO: Keep track of player positions and computer positions
+        jgl_combos_with_positions = []
+        for combo in self.jgl_winning_combos:
+            if jgl_position in combo:
+                jgl_combos_with_positions.append(combo)
+        return jgl_combos_with_positions
+    
+        # TODO: Keep track of possible winning combos for computer logic
         
