@@ -16,9 +16,9 @@ class JglUserInterface():
         
     def jgl_load_logo(self):
         """Adds the app logo"""
-        jgl_canvas = tk.Canvas(width=750, height=370, bg="#FFF5D6", highlightthickness=0)
+        jgl_canvas = tk.Canvas(width=950, height=525, bg="#FFF5D6", highlightthickness=0)
         self.jgl_logo = tk.PhotoImage(file="D:/Work/Portfolio Projects/JGL Image Watermarking Desktop App/icon.png")
-        jgl_canvas.create_image(375, 150, image=self.jgl_logo)
+        jgl_canvas.create_image(475, 225, image=self.jgl_logo)
         jgl_canvas.grid(column=0, row=0, columnspan=4)
         
     def jgl_ask_user_for_image(self):
@@ -26,7 +26,7 @@ class JglUserInterface():
         
         # Image path label
         jgl_image_label = tk.Label()
-        jgl_image_label.config(text="Image Location (i.e. /pictures/pathway.png): ", 
+        jgl_image_label.config(text="Image name (i.e. file.png): ", 
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 12, "bold"))
@@ -46,48 +46,123 @@ class JglUserInterface():
                                fg="#968C6D",
                                font=("Helvetica", 16, "bold"),
                                pady=10)
-        jgl_watermark_label.grid(column=0, row=2)
+        jgl_watermark_label.grid(column=0, row=2, columnspan=4)
         
-        # Font type label
-        jgl_font_label = tk.Label()
-        jgl_font_label.config(text="Please choose a font type (i.e. Helvetica): ", 
+        # Font watermark label
+        jgl_watermark_text_label = tk.Label()
+        jgl_watermark_text_label.config(text="Please enter the text of your watermark: ", 
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 12, "bold"))
-        jgl_font_label.grid(column=0, row=3)
+        jgl_watermark_text_label.grid(column=0, row=3)
         
-        # Font type input
-        jgl_font_entry = tk.Entry(width=35, bg="#FFF8EB")
-        jgl_font_entry.grid(column=1, row=3, columnspan=2)
+        # Font watermark input
+        jgl_watermark_text = tk.Entry(width=98, bg="#FFF8EB")
+        jgl_watermark_text.grid(column=1, row=3, columnspan=3)
         
-        # Font size label
-        jgl_size_label = tk.Label()
-        jgl_size_label.config(text="Please enter font size (i.e. 12): ", 
+        # Font X-coordinate label
+        jgl_font_xcord_label = tk.Label()
+        jgl_font_xcord_label.config(text="Please enter the x-coordinate of the text: ", 
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 12, "bold"))
-        jgl_size_label.grid(column=0, row=4)
+        jgl_font_xcord_label.grid(column=0, row=4)
         
-        # Font size input
-        jgl_size_entry = tk.Entry(width=35, bg="#FFF8EB")
-        jgl_size_entry.grid(column=1, row=4, columnspan=2)
+        # Font X-coordinate input
+        jgl_font_xcord_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_font_xcord_entry.grid(column=1, row=4)
+        
+        # Font Y-coordinate label
+        jgl_font_ycord_label = tk.Label()
+        jgl_font_ycord_label.config(text="Please enter the y-coordinate of the text: ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               padx=25)
+        jgl_font_ycord_label.grid(column=2, row=4)
+        
+        # Font Y-coordinate input
+        jgl_font_ycord_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_font_ycord_entry.grid(column=3, row=4, padx=25)
+        
+        # Font fill red value label
+        jgl_font_fill_r_label = tk.Label()
+        jgl_font_fill_r_label.config(text="Please enter red font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"))
+        jgl_font_fill_r_label.grid(column=0, row=5)
+        
+        # Font fill red value input
+        jgl_font_fill_r_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_font_fill_r_entry.grid(column=1, row=5)
+        
+        # Font fill green value label
+        jgl_font_fill_g_label = tk.Label()
+        jgl_font_fill_g_label.config(text="Please enter green font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               padx=25)
+        jgl_font_fill_g_label.grid(column=2, row=5)
+        
+        # Font fill green value input
+        jgl_font_fill_g_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_font_fill_g_entry.grid(column=3, row=5, padx=25)
+        
+        # Font fill blue value label
+        jgl_font_fill_b_label = tk.Label()
+        jgl_font_fill_b_label.config(text="Please enter blue font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               padx=25)
+        jgl_font_fill_b_label.grid(column=0, row=6)
+        
+        # Font fill blue value input
+        jgl_font_fill_b_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_font_fill_b_entry.grid(column=1, row=6)
         
         # Font style label
         jgl_style_label = tk.Label()
-        jgl_style_label.config(text="Please enter font style (i.e. bold, normal, italic): ", 
+        jgl_style_label.config(text="Please enter font size (i.e. 10): ", 
                                bg="#FFF5D6", 
                                fg="#968C6D",
-                               font=("Helvetica", 12, "bold"))
-        jgl_style_label.grid(column=0, row=5)
+                               font=("Helvetica", 11, "bold"))
+        jgl_style_label.grid(column=2, row=6)
         
         # Font style input
-        jgl_style_entry = tk.Entry(width=35, bg="#FFF8EB")
-        jgl_style_entry.grid(column=1, row=5, columnspan=2)
+        jgl_style_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_style_entry.grid(column=3, row=6, padx=25)
+        
+        # Font anchor label
+        jgl_anchor_label = tk.Label()
+        jgl_anchor_label.config(text="Please enter font anchor (i.e. lt for vertical, la for horizontal): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 11, "bold"))
+        jgl_anchor_label.grid(column=0, row=7)
+        
+        # Font anchor input
+        jgl_anchor_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_anchor_entry.grid(column=1, row=7, padx=25)
+        
+        # Font alignment label
+        jgl_anchor_label = tk.Label()
+        jgl_anchor_label.config(text="Please enter font alignment (i.e. center, left, right): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 11, "bold"))
+        jgl_anchor_label.grid(column=2, row=7)
+        
+        # Font alignment input
+        jgl_anchor_entry = tk.Entry(width=10, bg="#FFF8EB")
+        jgl_anchor_entry.grid(column=3, row=7, padx=25)
         
         # Add Button
         jg_upload_button = tk.Button(text="Watermark", width=35, highlightthickness=0, 
                                      bg="#968C6D", fg="#FFF8EB", pady=10, padx=10)
-        jg_upload_button.grid(column=0, row=6, columnspan=4, pady=25)
+        jg_upload_button.grid(column=0, row=8, columnspan=4, pady=25)
 
         
     
