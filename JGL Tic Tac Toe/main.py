@@ -27,16 +27,23 @@ jgl_player_1 = JglPlayer1(jgl_game, jgl_empty_boxes)
 jgl_player_2 = JglPlayer2(jgl_game, jgl_player_1, jgl_winning_combos, jgl_empty_boxes)
 jgl_player_2.jgl_computer_symbol()
 
-while jgl_game.jgl_is_board_filled != False:
+# Winner found
+winner_found = jgl_game.jgl_check_for_wins()
+while jgl_game.jgl_is_board_filled != False or winner_found == False:
+    
+    
     # Mark the boxes
     jgl_player_1.jgl_box_mark(jgl_empty_boxes)
+    jgl_game.jgl_check_for_wins()
 
-    # Print board again
+    # Print board and update winning combinations
     jgl_game.jgl_print_board()
+    jgl_game.jgl_check_for_wins()
 
     # Computer picks a mark
     jgl_player_2.jgl_computer_choice(jgl_winning_combos, jgl_empty_boxes)
     jgl_game.jgl_print_board()
+    jgl_game.jgl_check_for_wins()
 # TODO: If the current player won the game, then print a winning message and break the infinite loop.
 
 

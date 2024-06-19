@@ -36,7 +36,7 @@ class JglPlayer1():
         
         if self.jgl_user_mark < 0 or self.jgl_user_mark > 8:
             print("Please enter a number between 0 and 8.")
-            return self.jgl_box_mark()
+            return self.jgl_box_mark(jgl_empty_boxes)
         
         # If the spot is already filled, give an error
         if self.jgl_game.jgl_game_board[self.jgl_user_mark] != "___":
