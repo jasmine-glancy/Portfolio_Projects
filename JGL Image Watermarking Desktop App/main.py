@@ -9,10 +9,9 @@ from ui import JglUserInterface
 
 jgl_ui = JglUserInterface()
 
+
 #------------ Step 3: Watermark Image & Saving it ----------------
 
-
-# TODO: 2. Use image.open() for the opening of the mage and image.show() for the photo view to open
 
 # TODO: 3. plt.imshow() is used to open the image in the IDE
 

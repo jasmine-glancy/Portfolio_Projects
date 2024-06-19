@@ -1,8 +1,11 @@
 """Creates the user interface for the desktop app"""
 
+
 # Import libraries for GUI (TKinter)
 import tkinter as tk
+from PIL import Image
 
+    
 class JglUserInterface():
     def __init__(self):
         self.jgl_window = tk.Tk()
@@ -12,6 +15,7 @@ class JglUserInterface():
         self.jgl_load_logo()
         self.jgl_ask_user_for_image()
         self.jgl_ask_for_watermark()
+        self.jgl_add_watermark()
         self.jgl_window.mainloop()
         
     def jgl_load_logo(self):
@@ -33,8 +37,9 @@ class JglUserInterface():
         jgl_image_label.grid(column=0, row=1)
         
         # Image path input
-        jgl_image_path_entry = tk.Entry(width=35, bg="#FFF8EB")
-        jgl_image_path_entry.grid(column=1, row=1, columnspan=2)
+        self.jgl_image_path_entry = tk.Entry(width=35, bg="#FFF8EB")
+        self.jgl_image_path_entry.grid(column=1, row=1, columnspan=2)
+        
         
     def jgl_ask_for_watermark(self):
         """Ask for user's watermark preferences"""
@@ -159,12 +164,50 @@ class JglUserInterface():
         jgl_anchor_entry = tk.Entry(width=10, bg="#FFF8EB")
         jgl_anchor_entry.grid(column=3, row=7, padx=25)
         
-        # Add Button
-        jg_upload_button = tk.Button(text="Watermark", width=35, highlightthickness=0, 
-                                     bg="#968C6D", fg="#FFF8EB", pady=10, padx=10)
-        jg_upload_button.grid(column=0, row=8, columnspan=4, pady=25)
-
+    def jgl_add_watermark(self):
+        """Takes info and marks it on the image the user inputs"""
         
+        # Watermark Button
+        jg_watermark_button = tk.Button(text="Watermark", width=35, highlightthickness=0, 
+                                     bg="#968C6D", fg="#FFF8EB", pady=10, padx=10,
+                                     command=self.jgl_watermark)
+        jg_watermark_button.grid(column=0, row=8, columnspan=4, pady=25)
+
+    def jgl_watermark(self):
+        """Watermarks the image"""
+        jgl_image_to_mark = self.jgl_image_path_entry.get()
+        print("Tapped!")
+        print(jgl_image_to_mark)   
+        
+        #------------  Watermark Image & Saving it ----------------
+
+        try:
+            # 2. Use image.open() for the opening of the image 
+            with Image.open(jgl_image_to_mark) as jgl_img:
+                # Opens the photo viewer
+                jgl_img.show()
+        except FileNotFoundError as jgl_not_found:
+            print(f"File not found, exception: {jgl_not_found}")
+        except Exception as e:
+            print(f"Can't open file, exception: {e}")
+
+        # TODO: 3. plt.imshow() is used to open the image in the IDE
+
+        # TODO: 4. Make a copy of an image for the creation of the watermark image with the same dimensions as the older one
+
+        # TODO: 5. Make the image editable using ImageDraw
+
+        # TODO: 6. Use ImageFont to specify font and font size
+
+        # TODO: 7. Create a draw method of ImageDraw module and pass the image as a parameter in the function
+
+        # TODO: 8. Create a Font using ImageFont module function truetypel() as it neads two parameters
+            # i.e. ("font type", size)
+            
+        # TODO: 9. Then use text() function of draw object and pass the 4 parameters
+            # the 4 parameters should be (point of starting for text, "sample text", Color, ImageFont object)
+            
+        # TODO: 10. plt.Imshow(watermark_image) for the output
     
 #-------------- Step 2: Setting up widgets -------------------- 
 # TODO: Use the canvas widget to create a background. 
