@@ -4,10 +4,8 @@ import random
 
 class JglTexts():
     def __init__(self) -> None:
-        pass
-    
-    def jgl_text_bank(self) -> dict:
         """Loads in text bank from Hipster Ipsum"""
+        
         self.possible_texts = {1: "I'm baby synth fixie 3 wolf moon green juice kinfolk pour-over crucifix vinyl jianbing craft beer celiac kickstarter church-key four loko direct trade. Sartorial beard unicorn lumbersexual kitsch dreamcatcher. Asymmetrical truffaut DIY, yes plz kogi 3 wolf moon twee neutral milk hotel next level.",
                                2: "Beard fingerstache organic, neutral milk hotel hot chicken DSA sustainable snackwave sus mustache squid crucifix jianbing shabby chic. Succulents pork belly solarpunk snackwave seitan la croix cred praxis church-key mumblecore sus. Vinyl Brooklyn banjo hot chicken beard lomo, narwhal ethical. Retro tonx etsy, next level kombucha microdosing ugh ennui.",
                                3: "Yes plz quinoa flexitarian distillery hot chicken blog ramps meggings schlitz praxis VHS lumbersexual craft beer. Shabby chic hashtag hammock neutra sriracha photo booth. Occupy vape plaid street art bespoke photo booth. Fanny pack forage prism, cornhole williamsburg irony sartorial mustache celiac venmo photo booth you probably haven't heard of them put a bird on it kogi praxis. ",       
@@ -19,9 +17,8 @@ class JglTexts():
                                9: "Twee poutine ramps, street art messenger bag air plant quinoa biodiesel literally occupy 90's tofu live-edge. DSA whatever iPhone prism. Meh cliche PBR&B 3 wolf moon Brooklyn kombucha edison bulb deep v. Pour-over fixie bushwick microdosing, listicle kombucha bodega boys selvage marfa palo santo. Cliche yes plz bicycle rights, church-key pork belly fanny pack jean shorts tote bag raw denim cray taxidermy pok pok.",
                                10: "Craft beer live-edge vexillologist, keffiyeh artisan farm-to-table vibecession venmo thundercats jawn vape post-ironic put a bird on it banh mi. Subway tile blackbird spyplane distillery, irony farm-to-table street art hammock hell of. Solarpunk chia hexagon mlkshk truffaut. Kinfolk messenger bag retro keffiyeh, umami lo-fi farm-to-table grailed mixtape gastropub butcher prism."
                                }
-        return self.possible_texts
     
     def jgl_random_text(self) -> str:
         """Chooses a random string from possible text bank"""
         self.jgl_text = random.choice(self.possible_texts)
-        return self.jgl_text
+        return self.jgl_text.lower()

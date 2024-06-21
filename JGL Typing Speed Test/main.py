@@ -13,5 +13,3 @@ jgl_ui = JglTypingUI()
 # Choose a random text from the text bank
 jgl_random_text = jgl_texts.jgl_random_text()
 print(jgl_random_text)
-
-# TODO: Allow typos, but count them and display them at the end
