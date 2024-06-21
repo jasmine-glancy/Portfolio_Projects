@@ -12,7 +12,7 @@ from tkinter.constants import CENTER
 # (https://thepythoncode.com/article/how-to-make-typing-speed-tester-in-python-using-tkinter)
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
-JGL_FONT_CHOICE = ("Helvetica Monospaced", 25, "normal")
+JGL_FONT_CHOICE = ("Helvetica Monospaced", 20, "bold")
 
 class JglTypingUI():
     def __init__(self) -> None:
@@ -21,22 +21,23 @@ class JglTypingUI():
         self.jgl_window.geometry("700x500")
         self.jgl_load_colors()
         self.jgl_start_button()
-        self.jgl_window.config(padx=20, pady=20, background=self.jgl_light_pink)
+        self.jgl_window.config(padx=20, pady=20, background=self.jgl_pink)
         self.jgl_window.mainloop()
         
     def jgl_load_colors(self) -> str:
-        """Loads in colors from https://coolors.co/palette/cdb4db-ffc8dd-ffafcc-bde0fe-a2d2ff"""
-        self.jgl_baby_blue = "#BDE0FE"
-        self.jgl_robin_egg_blue = "#A2D2FF"
-        self.jgl_light_pink = "#FFC8DD"
-        self.jgl_darker_pink = "#FFAFCC"
-        self.jgl_purple = "#CDB4DB"
+        """Loads in colors from https://coolors.co/palette/231942-5e548e-9f86c0-be95c4-e0b1cb"""
+        self.jgl_pink = "#E0B1CB"
+        self.jgl_darker_pink = "#BE95C4"
+        self.jgl_light_purple = "#9F86C0"
+        self.jgl_purple = "#5E548E"
+        self.jgl_deep_purple = "#231942"
         
     def jgl_start_button(self) -> None:
         """Starts the test when clicked"""
         
         jgl_start_button = tk.Button(text="Start Test!", width=35, highlightthickness=0, 
-                                     bg=self.jgl_purple, fg=self.jgl_baby_blue, pady=10, padx=10)
+                                     bg=self.jgl_deep_purple, fg=self.jgl_darker_pink, pady=10, padx=10,
+                                     font=JGL_FONT_CHOICE)
         
         jgl_start_button.place(relx=0.5, rely=0.5, anchor=CENTER)
         # TODO: Program start button to go away when it is clicked
