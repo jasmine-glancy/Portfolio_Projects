@@ -1,12 +1,11 @@
 
-"""A typing speed test that tells how long it has taken the user to 
+"""A typing speed test UI that tells how long it has taken the user to 
 successfully write out a string of texts"""
 
 import ctypes
 from text_bank import JglTexts
-import time
 import tkinter as tk
-from tkinter.constants import CENTER, E, N, W
+from tkinter.constants import CENTER, E, W
 
 
 # Suggested by ThePythonCode.Com for a sharper window
@@ -43,7 +42,7 @@ class JglTypingUI():
         self.jgl_explain.config(text="Type the letter closest to the bottom of the screen to progress!", 
                                bg=self.jgl_pink, 
                                fg=self.jgl_purple,
-                               font=("Helvetica Monospaced", 14, "bold"))
+                               font=("Helvetica Monospaced", 14, "normal"))
         self.jgl_explain.place(relx=0.5, rely=0.3, anchor=CENTER)
         
         self.jgl_starting_button = tk.Button(text="Start Test!", width=35, highlightthickness=0, 
@@ -52,6 +51,13 @@ class JglTypingUI():
         
         self.jgl_starting_button.place(relx=0.5, rely=0.5, anchor=CENTER)
         
+        self.jgl_text_credit = tk.Label()
+        self.jgl_text_credit.config(text="Hipster Ipsum credited to hipsum.co", 
+                               bg=self.jgl_pink, 
+                               fg=self.jgl_darker_pink,
+                               font=("Helvetica Monospaced", 14, "normal"))
+        self.jgl_text_credit.place(relx=0.5, rely=0.7, anchor=CENTER)
+        
         
     def jgl_start_game(self) -> None:
         """Loads the test"""
@@ -59,7 +65,7 @@ class JglTypingUI():
         print("Tapped!")
         
         # Starts the game
-        game_on = True
+        self.jgl_game_on = True
         
         # TODO: Create and load Key Press function
         # self.jgl_window.bind('<Key>', jglKeyPress)
@@ -70,14 +76,22 @@ class JglTypingUI():
         # Makes the start button and explanation go away when game is started
         self.jgl_starting_button.destroy()
         self.jgl_explain.destroy()
+        self.jgl_text_credit.destroy()
         
-        # TODO: Show time left on the timer
+        # ----------------- Load in the timer ------------------- #
+        
+        # Initiate the timer 
+        self.jgl_seconds_left = 60
+        
+        # Show time left on the timer
         self.jgl_time_left = tk.Label()
-        self.jgl_time_left.config(text="seconds left", 
+        self.jgl_time_left.config(text=f"{self.jgl_seconds_left} seconds left", 
                                bg=self.jgl_pink, 
                                fg=self.jgl_darker_pink,
                                font=JGL_FONT_CHOICE)
         self.jgl_time_left.place(relx=0.5, rely=0.4, anchor=CENTER)
+        
+        self.jgl_counter()
 
         # -------------- Load in the chosen string ---------------- #
         
@@ -89,7 +103,7 @@ class JglTypingUI():
         jgl_text_split = 0
         
         
-        # Left Text
+        # Left Text (text already typed)
         self.jgl_left_text = tk.Label()
         self.jgl_left_text.config(text=jgl_random_text[0:jgl_text_split], 
                                bg=self.jgl_pink, 
@@ -98,13 +112,14 @@ class JglTypingUI():
         self.jgl_left_text.place(relx=0.5, rely=0.5, anchor=E)
         
        
-        # Right Text
+        # Right Text (text to type)
         self.jgl_right_text = tk.Label()
         self.jgl_right_text.config(text=jgl_random_text[jgl_text_split:], 
                                bg=self.jgl_pink, 
                                fg=self.jgl_light_purple,
                                font=JGL_FONT_CHOICE)
         self.jgl_right_text.place(relx=0.5, rely=0.5, anchor=W)
+        
         
         # Load in the current letter to type at the bottom of the screen
         self.jgl_current_letter = tk.Label()
@@ -114,13 +129,6 @@ class JglTypingUI():
                                font=JGL_FONT_CHOICE)
         self.jgl_current_letter.place(relx=0.5, rely=0.6, anchor=CENTER)
             # TODO: Letter has to be typed in order to continue
-        
-        # TODO: Load in the chosen string 5 words at a time
-            # TODO: On the left are the letters/words that already have been written, 
-                # and on the right are the letters that will be written. 
-                # User should type the letter which is currently on the grey letters so that letter moves over.
-            # The first part of the string should be a different color than the second
-            # Put ... before and after section
  
 
         # TODO: After the time has passed, switch screen to finished_screen
@@ -132,7 +140,15 @@ class JglTypingUI():
         # TODO: Include a button to restart the test
         # TODO: Show typo count
         
+    def jgl_counter(self) -> int:
+        """Counts down from 60"""
         
+        self.jgl_time_left.config(text=f"{self.jgl_seconds_left} seconds left")
+        
+        self.jgl_seconds_left -= 1
+        
+        if self.jgl_game_on:
+            self.jgl_window.after(1000, self.jgl_counter)
             
 
 
