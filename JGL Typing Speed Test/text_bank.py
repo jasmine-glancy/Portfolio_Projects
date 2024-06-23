@@ -26,4 +26,4 @@ class JglTexts():
         except Exception as e:
             print(e)
             return self.jgl_random_text()
-        return self.jgl_text.lower()
+        return self.jgl_text

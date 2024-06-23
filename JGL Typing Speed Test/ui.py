@@ -68,7 +68,7 @@ class JglTypingUI():
         self.jgl_game_on = True
         
         # TODO: Create and load Key Press function
-        # self.jgl_window.bind('<Key>', jglKeyPress)
+        self.jgl_window.bind('<Key>', self.jgl_key_press)
         
         # Create a dictionary of possible texts 
         jgl_texts = JglTexts()
@@ -99,7 +99,7 @@ class JglTypingUI():
         jgl_random_text = jgl_texts.jgl_random_text()
         print(jgl_random_text)
         
-        # Set the split point
+        # Set the split point, recommended by ThePyThonCode.com
         jgl_text_split = 0
         
         
@@ -148,9 +148,23 @@ class JglTypingUI():
         self.jgl_seconds_left -= 1
         
         if self.jgl_game_on:
+            # After recommended by ThePyThonCode.com
             self.jgl_window.after(1000, self.jgl_counter)
             
-
-
+    def jgl_key_press(self, event=None) -> None:
+        """Makes sure the user has to type the current letter shown"""
+        
+        try:
+            # Conditions recommended by ThePythonCode.com
+            if event.char == self.jgl_right_text.cget('text')[0]:
+                
+                # Deletes from the right side
+                self.jgl_right_text.config(text=self.jgl_right_text.cget('text')[1:])
+                self.jgl_left_text.config(text=self.jgl_left_text.cget('text') + event.char)
+                
+                # Get the next letter to type
+                self.jgl_current_letter.config(text=self.jgl_right_text.cget('text')[0])
+        except tk.TclError:
+            pass
 
     
