@@ -61,14 +61,9 @@ class JglTypingUI():
         
     def jgl_start_game(self) -> None:
         """Loads the test"""
-
-        print("Tapped!")
         
         # Starts the game
         self.jgl_game_on = True
-        
-        # TODO: Create and load Key Press function
-        self.jgl_window.bind('<Key>', self.jgl_key_press)
         
         # Create a dictionary of possible texts 
         jgl_texts = JglTexts()
@@ -91,7 +86,6 @@ class JglTypingUI():
                                font=JGL_FONT_CHOICE)
         self.jgl_time_left.place(relx=0.5, rely=0.4, anchor=CENTER)
         
-        self.jgl_counter()
 
         # -------------- Load in the chosen string ---------------- #
         
@@ -128,28 +122,71 @@ class JglTypingUI():
                                fg=self.jgl_light_purple,
                                font=JGL_FONT_CHOICE)
         self.jgl_current_letter.place(relx=0.5, rely=0.6, anchor=CENTER)
-            # TODO: Letter has to be typed in order to continue
- 
+        
+        # Initiate typo count
+        self.jgl_typo_count = 0
+        
+        # Current letter has to be typed in order to continue
+        self.jgl_window.bind('<Key>', self.jgl_key_press)
 
-        # TODO: After the time has passed, switch screen to finished_screen
-            
+        # After 60 seconds have passed, switch screen to finished_screen
+        self.jgl_window.after(60000, self.jgl_finished_screen)
+        self.jgl_counter()
+        
     def jgl_finished_screen(self) -> None:
         """Loads the final screen of the game with an option to restart"""
         
-        # TODO: Show what the WPM is
-        # TODO: Include a button to restart the test
-        # TODO: Show typo count
+        # Stops the game
+        self.jgl_game_on = False
         
-    def jgl_counter(self) -> int:
+        # Show what the WPM is
+        self.jgl_wpm = len(self.jgl_left_text.cget('text').split(' '))
+        
+        self.jgl_wpm_label = tk.Label()
+        self.jgl_wpm_label.config(text=f"Your words per minute: {self.jgl_wpm}", 
+                               bg=self.jgl_pink, 
+                               fg=self.jgl_light_purple,
+                               font=JGL_FONT_CHOICE)
+        self.jgl_wpm_label.place(relx=0.5, rely=0.3, anchor=CENTER)
+        
+        # Hide the items on the previous screen
+        self.jgl_left_text.destroy()
+        self.jgl_right_text.destroy()
+        self.jgl_current_letter.destroy()
+        self.jgl_time_left.destroy()
+        
+        
+        # Show typo count
+        self.jgl_typo_result = tk.Label()
+        self.jgl_typo_result.config(bg=self.jgl_pink, 
+                                    fg=self.jgl_darker_pink,
+                                    font=JGL_FONT_CHOICE)
+        self.jgl_typo_result.place(relx=0.5, rely=0.5, anchor=CENTER)
+        if self.jgl_typo_count == 1:
+            self.jgl_typo_result.config(text=f"You had {self.jgl_typo_count} typo")
+        else:
+            self.jgl_typo_result.config(text=f"You had {self.jgl_typo_count} typos")
+            
+        # Include a button to restart the test
+        self.jgl_restart_button = tk.Button(text="Try Again!", width=35, highlightthickness=0, 
+                                     bg=self.jgl_deep_purple, fg=self.jgl_darker_pink, pady=10, padx=10,
+                                     font=JGL_FONT_CHOICE, command=self.jgl_clear_board)
+        
+        self.jgl_restart_button.place(relx=0.5, rely=0.7, anchor=CENTER)
+        
+    def jgl_counter(self) -> None:
         """Counts down from 60"""
         
-        self.jgl_time_left.config(text=f"{self.jgl_seconds_left} seconds left")
-        
-        self.jgl_seconds_left -= 1
-        
-        if self.jgl_game_on:
-            # After recommended by ThePyThonCode.com
-            self.jgl_window.after(1000, self.jgl_counter)
+        try:
+            self.jgl_time_left.config(text=f"{self.jgl_seconds_left} seconds left")
+            
+            self.jgl_seconds_left -= 1
+            
+            if self.jgl_game_on:
+                # After recommended by ThePyThonCode.com
+                self.jgl_window.after(1000, self.jgl_counter)
+        except tk.TclError:
+            pass
             
     def jgl_key_press(self, event=None) -> None:
         """Makes sure the user has to type the current letter shown"""
@@ -157,14 +194,23 @@ class JglTypingUI():
         try:
             # Conditions recommended by ThePythonCode.com
             if event.char == self.jgl_right_text.cget('text')[0]:
-                
                 # Deletes from the right side
                 self.jgl_right_text.config(text=self.jgl_right_text.cget('text')[1:])
                 self.jgl_left_text.config(text=self.jgl_left_text.cget('text') + event.char)
                 
                 # Get the next letter to type
                 self.jgl_current_letter.config(text=self.jgl_right_text.cget('text')[0])
+            else:
+                # If the letter typed isn't the current letter, add to typo count
+                self.jgl_typo_count += 1
+                
         except tk.TclError:
             pass
 
+    def jgl_clear_board(self) -> None:
+        """Clears the board to start a new game"""
     
+        self.jgl_wpm_label.destroy()
+        self.jgl_typo_result.destroy()
+        self.jgl_restart_button.destroy()
+        self.jgl_start_game()
