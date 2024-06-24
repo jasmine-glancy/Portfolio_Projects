@@ -2,24 +2,30 @@
 
 
 # Import libraries for GUI (TKinter)
+import ctypes
 import matplotlib.pyplot as plt
 import tkinter as tk
+from tkinter.constants import CENTER
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from PIL import Image, ImageDraw, ImageFont
 
 JGL_IMAGE_FOLDER = "../pictures/coding"
 
+# Suggested by ThePythonCode.Com for a sharper window
+# (https://thepythoncode.com/article/how-to-make-typing-speed-tester-in-python-using-tkinter)
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
+
 class JglUserInterface():
     def __init__(self) -> None:
         self.jgl_window = tk.Tk()
         self.jgl_window.title("Image Watermarker")
-        self.jgl_window.minsize(width=755, height=375)
+        self.jgl_window.minsize(width=950, height=850)
+        self.jgl_window.geometry("950x850")
         self.jgl_window.config(padx=20, pady=20, background="#FFF5D6")
         self.jgl_load_logo()
         self.jgl_ask_user_for_image()
         self.jgl_ask_for_watermark()
-        self.jgl_add_watermark()
-        self.jgl_verify_watermark_info()
         self.jgl_window.mainloop()
         
     def jgl_load_logo(self) -> None:
@@ -27,7 +33,7 @@ class JglUserInterface():
         jgl_canvas = tk.Canvas(width=950, height=525, bg="#FFF5D6", highlightthickness=0)
         self.jgl_logo = tk.PhotoImage(file="D:/Work/Portfolio Projects/JGL Image Watermarking Desktop App/icon.png")
         jgl_canvas.create_image(475, 225, image=self.jgl_logo)
-        jgl_canvas.grid(column=0, row=0, columnspan=4)
+        jgl_canvas.place(relx=0.5, rely=0.34, anchor=CENTER)
         
     def jgl_ask_user_for_image(self) -> None:
         """Asks user for the path to the image"""
@@ -38,7 +44,7 @@ class JglUserInterface():
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 12, "bold"))
-        jgl_image_label.grid(column=0, row=1)
+        jgl_image_label.place(relx=0.2, rely=0.7, anchor=CENTER)
         
         # Browsing button and notifier
         self.jgl_browsing = tk.StringVar()
@@ -50,7 +56,7 @@ class JglUserInterface():
                                          fg="#FFF5D6",
                                          width=53)
         self.jgl_browsing.set("Open File Explorer")
-        jgl_find_file_button.grid(column=1, row=1, columnspan=3)
+        jgl_find_file_button.place(relx=0.65, rely=0.7, anchor=CENTER)
         
     def jgl_ask_for_watermark(self) -> None:
         """Ask for user's watermark preferences"""
@@ -62,7 +68,7 @@ class JglUserInterface():
                                fg="#968C6D",
                                font=("Helvetica", 16, "bold"),
                                pady=10)
-        jgl_watermark_label.grid(column=0, row=2, columnspan=4)
+        jgl_watermark_label.place(relx=0.5, rely=0.77, anchor=CENTER)
         
         # Font watermark label
         jgl_watermark_text_label = tk.Label()
@@ -70,49 +76,11 @@ class JglUserInterface():
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 12, "bold"))
-        jgl_watermark_text_label.grid(column=0, row=3)
+        jgl_watermark_text_label.place(relx=0.19, rely=.82, anchor=CENTER)
         
         # Font watermark input
-        self.jgl_watermark_text = tk.Entry(width=98, bg="#FFF8EB")
-        self.jgl_watermark_text.grid(column=1, row=3, columnspan=3)
-        
-        # Font fill red value label
-        jgl_font_fill_r_label = tk.Label()
-        jgl_font_fill_r_label.config(text="Please enter red font fill value (between 0 and 255): ", 
-                               bg="#FFF5D6", 
-                               fg="#968C6D",
-                               font=("Helvetica", 12, "bold"))
-        jgl_font_fill_r_label.grid(column=0, row=5)
-        
-        # Font fill red value input
-        self.jgl_font_fill_r_entry = tk.Entry(width=10, bg="#FFF8EB")
-        self.jgl_font_fill_r_entry.grid(column=1, row=5)
-        
-        # Font fill green value label
-        jgl_font_fill_g_label = tk.Label()
-        jgl_font_fill_g_label.config(text="Please enter green font fill value (between 0 and 255): ", 
-                               bg="#FFF5D6", 
-                               fg="#968C6D",
-                               font=("Helvetica", 12, "bold"),
-                               padx=25)
-        jgl_font_fill_g_label.grid(column=2, row=5)
-        
-        # Font fill green value input
-        self.jgl_font_fill_g_entry = tk.Entry(width=10, bg="#FFF8EB")
-        self.jgl_font_fill_g_entry.grid(column=3, row=5, padx=25)
-        
-        # Font fill blue value label
-        jgl_font_fill_b_label = tk.Label()
-        jgl_font_fill_b_label.config(text="Please enter blue font fill value (between 0 and 255): ", 
-                               bg="#FFF5D6", 
-                               fg="#968C6D",
-                               font=("Helvetica", 12, "bold"),
-                               padx=25)
-        jgl_font_fill_b_label.grid(column=0, row=6)
-        
-        # Font fill blue value input
-        self.jgl_font_fill_b_entry = tk.Entry(width=10, bg="#FFF8EB")
-        self.jgl_font_fill_b_entry.grid(column=1, row=6)
+        self.jgl_watermark_text = tk.Entry(width=25, bg="#FFF8EB")
+        self.jgl_watermark_text.place(relx=0.45, rely=.82, anchor=CENTER)
         
         # Font size label
         jgl_size_label = tk.Label()
@@ -120,27 +88,66 @@ class JglUserInterface():
                                bg="#FFF5D6", 
                                fg="#968C6D",
                                font=("Helvetica", 11, "bold"))
-        jgl_size_label.grid(column=2, row=6)
+        jgl_size_label.place(relx=0.68, rely=.82, anchor=CENTER)
         
         # Font size input
-        self.jgl_size_entry = tk.Entry(width=10, bg="#FFF8EB")
-        self.jgl_size_entry.grid(column=3, row=6, padx=25)
-    
+        self.jgl_size_entry = tk.Entry(width=25, bg="#FFF8EB")
+        self.jgl_size_entry.place(relx=0.89, rely=.82, anchor=CENTER)
         
-    def jgl_add_watermark(self) -> None:
-        """Takes info and marks it on the image the user inputs"""
+        # Font fill red value label
+        jgl_font_fill_r_label = tk.Label()
+        jgl_font_fill_r_label.config(text="Please enter red font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               wraplength=225)
+        jgl_font_fill_r_label.place(relx=0.139, rely=.87, anchor=CENTER)
+        
+        # Font fill red value input
+        self.jgl_font_fill_r_entry = tk.Entry(width=10, bg="#FFF8EB")
+        self.jgl_font_fill_r_entry.place(relx=0.3, rely=.867, anchor=CENTER)
+        
+        # Font fill green value label
+        jgl_font_fill_g_label = tk.Label()
+        jgl_font_fill_g_label.config(text="Please enter green font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               wraplength=225)
+        jgl_font_fill_g_label.place(relx=0.46, rely=.87, anchor=CENTER)
+        
+        # Font fill green value input
+        self.jgl_font_fill_g_entry = tk.Entry(width=10, bg="#FFF8EB")
+        self.jgl_font_fill_g_entry.place(relx=0.621, rely=.867, anchor=CENTER)
+        
+        # Font fill blue value label
+        jgl_font_fill_b_label = tk.Label()
+        jgl_font_fill_b_label.config(text="Please enter blue font fill value (between 0 and 255): ", 
+                               bg="#FFF5D6", 
+                               fg="#968C6D",
+                               font=("Helvetica", 12, "bold"),
+                               wraplength=225)
+        jgl_font_fill_b_label.place(relx=0.78, rely=.87, anchor=CENTER)
+        
+        # Font fill blue value input
+        self.jgl_font_fill_b_entry = tk.Entry(width=10, bg="#FFF8EB")
+        self.jgl_font_fill_b_entry.place(relx=0.941, rely=.867, anchor=CENTER)
+        
         
         # Watermark Button
         jg_watermark_button = tk.Button(text="Watermark", width=35, highlightthickness=0, 
-                                     bg="#968C6D", fg="#FFF8EB", pady=10, padx=10,
-                                     command=self.jgl_verify_watermark_info)
-        jg_watermark_button.grid(column=0, row=8, columnspan=4, pady=25)
-
-    def jgl_verify_watermark_info(self) -> None:
+                                        bg="#968C6D", fg="#FFF8EB", pady=10, padx=10,
+                                        command=self.jgl_add_watermark)
+        jg_watermark_button.place(relx=0.5, rely=0.96, anchor=CENTER)
+    
+        
+    def jgl_add_watermark(self) -> None:
         """Watermarks the image"""
         
+        print("Tapped!") 
+        
         # Gets the data input from the form
-        jgl_watermark_text = self.jgl_watermark_text.get()
+        self.jgl_text = self.jgl_watermark_text.get()
         
         
         try:
@@ -150,16 +157,21 @@ class JglUserInterface():
             
         try:
             # Use ImageFont to specify font and font size
-            jgl_font = ImageFont.truetype("arial.ttf", jgl_font_size)
+            self.jgl_font = ImageFont.truetype("arial.ttf", jgl_font_size)
             
         except Exception as e:
             print(f"Can't choose font, exception: {e}")
-            
+        
         try:
-            self.jgl_color_choice = (int(self.jgl_font_fill_r_entry.get()), int(self.jgl_font_fill_g_entry.get()), int(self.jgl_font_fill_b_entry.get()))
+            jgl_r = int(self.jgl_font_fill_r_entry.get())
+            jgl_g = int(self.jgl_font_fill_g_entry.get())
+            jgl_b = int(self.jgl_font_fill_b_entry.get())
+            
+            print(jgl_r, jgl_g, jgl_b) 
+            self.jgl_color_choice = (jgl_r, jgl_g, jgl_b)
+            print(self.jgl_color_choice)
         except Exception as e:
             print(f"Can't choose color, exception: {e}")
-            
         try:
             transparent = Image.new('RGBA', self.jgl_original_image.size, (0,0,0,0))
             transparent.paste(self.jgl_original_image, (0, 0))
@@ -169,24 +181,20 @@ class JglUserInterface():
             # Use text() function of draw object
 
             self.jgl_drawing.text(self.position,
-                            jgl_watermark_text,
+                            self.jgl_text,
                             fill=self.jgl_color_choice,
-                            font=jgl_font)
+                            font=self.jgl_font)
             
             # Save watermarked photo
             finished_img = transparent.convert("RGB")
             jgl_watermarked_image = Image.alpha_composite(self.jgl_original_image, self.jgl_img_copy)
+            
+            plt.imshow(jgl_watermarked_image)
         except Exception as e:
             print(f"Can't watermark image, exception: {e}")
         else:
             # Shows the output
             plt.imshow(finished_img)
-            
-        
-            
-            print("Tapped!")
-            print(jgl_watermark_text)   
-        
             
     def jgl_open_file(self):
         """Opens file selector"""  
@@ -215,6 +223,8 @@ class JglUserInterface():
                 self.jgl_img_resize = self.jgl_img_copy.resize((round(self.jgl_original_image.size[0]*0.25), 
                                                     (round(self.jgl_original_image.size[1]*0.25))))
                 self.jgl_img_copy_mask = self.jgl_img_copy.convert("RGBA")
+                
+                self.jgl_browsing.set("Image Found!")
                     
             except FileNotFoundError as jgl_not_found:
                 print(f"File not found, exception: {jgl_not_found}")
@@ -222,7 +232,6 @@ class JglUserInterface():
                 print(f"Can't open file, exception: {e}")
             else:
                 # If the image can be opened, proceed to the watermarking process
-                
                 
                 # Set position to lower right corner, suggested by Paul D Bourret on Udemy
                 self.position = (self.jgl_original_image.size[0] - self.jgl_img_resize.size[0], self.jgl_original_image.size[1] - self.jgl_img_resize.size[1])
