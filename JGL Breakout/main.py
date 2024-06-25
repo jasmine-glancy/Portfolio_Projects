@@ -1,13 +1,33 @@
 """A program that emulates the original game Breakout, 
 published by Atari, Inc. and released on May 13, 1976!"""
 
+from paddle import jglPaddle
+from turtle import Screen
+import time
+from walls import jglWalls
 
-# TODO: Create the screen
+# Create the screen
+jgl_screen = Screen()
+jgl_screen.setup(width=950, height=750)
+jgl_screen.bgcolor("gray10")
+jgl_screen.title("Breakout by JGL")
+
+# Turn off automatic screen updates 
+jgl_screen.tracer(0)
 
 # TODO: Build walls
+jgl_walls = jglWalls()
     # TODO: Make walls pretty
     # TODO: Randomly generated vs creating uniformly?
+
 # TODO: Create the paddle
+jgl_paddle = jglPaddle((0, -300))
+
+jgl_game_on = True
+
+while jgl_game_on:
+    jgl_screen.update()
+    time.sleep(1)
     # TODO: Paddle is controlled by the mouse moving left to right
 # TODO: Create the ball
     # TODO: User must click the right mouse button to launch the ball 
@@ -37,3 +57,6 @@ published by Atari, Inc. and released on May 13, 1976!"""
     
 # TODO: Detect collision with the wall
     # TODO: When the brick is hit, it dissolves
+    
+# TODO: Show high score screen
+jgl_screen.exitonclick()

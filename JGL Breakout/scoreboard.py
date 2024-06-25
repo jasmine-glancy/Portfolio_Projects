@@ -9,3 +9,5 @@
     # TODO: Increase the score
     
     # TODO: Load in lives 
+    
+    # TODO: Create database for high scores
