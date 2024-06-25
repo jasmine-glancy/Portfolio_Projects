@@ -1,9 +1,6 @@
 """Creates walls to break for the game Breakout"""
 
 from turtle import Turtle
-import random
-
-# TODO: Create a bank of x and y positions
 
 # Create Walls class with Turtle
 class jglBrick(Turtle):
@@ -15,26 +12,6 @@ class jglBrick(Turtle):
         self.shapesize(stretch_wid=1, stretch_len=3)
         self.color(jgl_color)
         self.goto(x=jgl_x_cor, y=jgl_y_cor)
-           
-    # TODO: init should load the blocks with the colors and positions
-    # TODO: Randomly generate vs stagnant positions?
-
-    def jgl_colors(self) -> str:
-        """Randomly generates a color for coloring the blocks"""
-        
-        # TODO: Create a bank of colors
-        jgl_colors = ["red",
-                      "orange",
-                      "OrangeRed",
-                      "yellow",
-                      "YellowGreen",
-                      "SpringGreen",
-                      "green",
-                      "blue",
-                      "DarkSlateBlue",
-                      "purple4"]
-        
-        return random.choice(jgl_colors)
 
     # TODO: Create bust function that destroys the blocks
     
