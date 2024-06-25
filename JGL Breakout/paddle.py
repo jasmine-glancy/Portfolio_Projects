@@ -8,7 +8,8 @@ class jglPaddle(Turtle):
     """Creates the paddle and allows it to move"""
     
     def __init__(self, position):
-        """Creates the paddle and moves it to its position"""
+        """Creates the paddle and moves it to 
+        its initial position"""
 
         super().__init__()
         self.penup()
@@ -16,6 +17,11 @@ class jglPaddle(Turtle):
         self.shape("square")
         self.color("white")
         self.shapesize(stretch_len=5, stretch_wid=1)
-    # TODO: Create function to move paddle left
-
-    # TODO: Create function to move paddle right
+        
+    def jgl_move_paddle_left(self):
+        jgl_new_x_pos = self.xcor() - MOVE_STEPS
+        self.goto(jgl_new_x_pos, self.ycor())
+        
+    def jgl_move_paddle_right(self):
+        jgl_new_x_pos = self.xcor() + MOVE_STEPS
+        self.goto(jgl_new_x_pos, self.ycor())

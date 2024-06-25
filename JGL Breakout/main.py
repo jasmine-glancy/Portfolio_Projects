@@ -21,11 +21,15 @@ jgl_walls = jglWalls()
 # Create the paddle
 jgl_paddle = jglPaddle((0, -300))
 
+jgl_screen.listen()
+jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_left, "a")
+jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_right, "d")
+
 jgl_game_on = True
 
 while jgl_game_on:
     jgl_screen.update()
-    time.sleep(1)
+    time.sleep(0.01)
     # TODO: Paddle is controlled by the mouse moving left to right
 # TODO: Create the ball
     # TODO: User must click the right mouse button to launch the ball 
