@@ -35,15 +35,20 @@ class jglWalls(Turtle):
         self.jgl_create_all_rows()
         
     def jgl_create_row(self, jgl_y_cor, jgl_color):
+        """Creates a new row of bricks"""
         for i in range(-325, 375, 65):
-            # Builds a new brick in each position of the late
+            # Builds a new brick in each row
             jgl_brick = jglBrick(i, jgl_y_cor, jgl_color)  
             self.jgl_bricks.append(jgl_brick)
         
     def jgl_create_all_rows(self):
+        """Creates all rows, code suggested by CoPilot"""
+        
         jgl_row_height = 35
         jgl_number_of_rows = (self.jgl_y_end - self.jgl_y_start) // jgl_row_height
         for i in range(jgl_number_of_rows):
             jgl_y_cor = self.jgl_y_start + i * jgl_row_height
+            
+            # Assigns color by row number
             jgl_color = self.jgl_colors[i % len(self.jgl_colors)]
             self.jgl_create_row(jgl_y_cor, jgl_color)
