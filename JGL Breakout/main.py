@@ -9,18 +9,16 @@ from walls import jglWalls
 # Create the screen
 jgl_screen = Screen()
 jgl_screen.setup(width=950, height=750)
-jgl_screen.bgcolor("gray10")
+jgl_screen.bgcolor("black")
 jgl_screen.title("Breakout by JGL")
 
 # Turn off automatic screen updates 
 jgl_screen.tracer(0)
 
-# TODO: Build walls
+# Build walls
 jgl_walls = jglWalls()
-    # TODO: Make walls pretty
-    # TODO: Randomly generated vs creating uniformly?
 
-# TODO: Create the paddle
+# Create the paddle
 jgl_paddle = jglPaddle((0, -300))
 
 jgl_game_on = True
