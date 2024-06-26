@@ -5,7 +5,7 @@ from scoreboard import jglScoreboard
 
 class jglBall(Turtle):
 
-    def __init__(self, jgl_position, jgl_walls, jgl_game_on, scoreboard) -> None:
+    def __init__(self, jgl_position, jgl_walls, jgl_game_on, scoreboard, jgl_paddle) -> None:
         """Creates the ball"""
         
         super().__init__()
@@ -20,6 +20,7 @@ class jglBall(Turtle):
         self.jgl_move_speed = 0.1
         self.jgl_walls = jgl_walls
         self.jgl_game_on = jgl_game_on
+        self.jgl_paddle = jgl_paddle
         
         self.scoreboard = scoreboard
         
@@ -110,6 +111,7 @@ class jglBall(Turtle):
         if self.jgl_ball.ycor() < -350:
             self.scoreboard.jgl_remove_life()
             self.jgl_reset_position()
+            self.jgl_paddle.jgl_reset_paddle_position()
             return
     
     def jgl_check_collision_with_bricks(self):

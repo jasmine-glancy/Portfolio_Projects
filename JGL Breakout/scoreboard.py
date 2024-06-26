@@ -36,9 +36,5 @@ class jglScoreboard(Turtle):
         self.jgl_lives -= 1
         self.clear()
         self.jgl_update_scoreboard()
-        
-        
-            
-    # TODO: Load in lives 
     
     # TODO: Create database for high scores

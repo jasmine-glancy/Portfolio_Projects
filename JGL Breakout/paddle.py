@@ -25,3 +25,6 @@ class jglPaddle(Turtle):
     def jgl_move_paddle_right(self) -> None:
         jgl_new_x_pos = self.xcor() + MOVE_STEPS
         self.goto(jgl_new_x_pos, self.ycor())
+        
+    def jgl_reset_paddle_position(self) -> None:
+        self.goto((0, -300))

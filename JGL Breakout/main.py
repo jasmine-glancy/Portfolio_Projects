@@ -30,7 +30,7 @@ jgl_game_on = True
 jgl_score = jglScoreboard(jgl_game_on)
 
 # Create the ball
-jgl_ball = jglBall((0, -100), jgl_walls, jgl_game_on, jgl_score)
+jgl_ball = jglBall((0, -100), jgl_walls, jgl_game_on, jgl_score, jgl_paddle)
 
 
 jgl_screen.listen()
