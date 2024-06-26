@@ -22,6 +22,8 @@ class jglBall(Turtle):
         self.jgl_game_on = jgl_game_on
         self.jgl_paddle = jgl_paddle
         
+        # Ensures the ball moves with the paddle until launched
+        self.jgl_moving_with_paddle = True
         self.scoreboard = scoreboard
         
     def jgl_move(self):
@@ -30,6 +32,12 @@ class jglBall(Turtle):
         jgl_new_x = self.jgl_ball.xcor() - self.jgl_x_move
         jgl_new_y = self.jgl_ball.ycor() - self.jgl_y_move
         self.jgl_ball.goto(jgl_new_x, jgl_new_y)
+    
+    def jgl_move_with_paddle(self, jgl_paddle):
+        """Positions the ball on top of the paddle"""
+        
+        if self.jgl_moving_with_paddle:
+            self.jgl_ball.goto(jgl_paddle.xcor(), jgl_paddle.ycor() + 20)
      
     def jgl_bounce(self, jgl_x_bounce, jgl_y_bounce):
         """Bounces the ball based on its direction""" 
@@ -142,3 +150,9 @@ class jglBall(Turtle):
                 elif self.jgl_ball.ycor() > self.jgl_walls.jgl_upper_wall:
                     self.jgl_bounce(jgl_x_bounce=False, jgl_y_bounce=True)
                 break
+            
+    def jgl_launch_ball(self, jgl_x, jgl_y):
+        """Launches the ball when the user clicks the screen"""
+        
+        self.jgl_moving_with_paddle = False
+        self.jgl_move()

@@ -30,19 +30,29 @@ jgl_game_on = True
 jgl_score = jglScoreboard(jgl_game_on)
 
 # Create the ball
-jgl_ball = jglBall((0, -100), jgl_walls, jgl_game_on, jgl_score, jgl_paddle)
+jgl_ball = jglBall((0, -280), jgl_walls, jgl_game_on, jgl_score, jgl_paddle)
 
-
+# Event listeners to check for user input
 jgl_screen.listen()
+
+# Movement is controlled by the "A" and "D" keys
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_left, "a")
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_right, "d")
 
+# Launches the ball on click
+jgl_screen.onclick(jgl_ball.jgl_launch_ball)
 
 
 while jgl_game_on:
+    
+    # Checks if the ball has been launched yet to determine movement
+    if jgl_ball.jgl_moving_with_paddle:
+        jgl_ball.jgl_move_with_paddle(jgl_paddle)
+    else:
+        jgl_ball.jgl_move()
+        
     time.sleep(jgl_ball.jgl_move_speed)
     jgl_screen.update()
-    jgl_ball.jgl_move()
     
     # Check if collision with walls
     jgl_ball.jgl_check_collision_with_walls()
