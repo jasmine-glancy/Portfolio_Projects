@@ -1,6 +1,7 @@
 """A program that emulates the original game Breakout, 
 published by Atari, Inc. and released on May 13, 1976!"""
 
+from ball import jglBall
 from paddle import jglPaddle
 from turtle import Screen
 import time
@@ -19,7 +20,10 @@ jgl_screen.tracer(0)
 jgl_walls = jglWalls()
 
 # Create the paddle
-jgl_paddle = jglPaddle((0, -300))
+jgl_paddle = jglPaddle()
+
+# Create the ball
+jgl_ball = jglBall((0, -100))
 
 jgl_screen.listen()
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_left, "a")
@@ -28,26 +32,17 @@ jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_right, "d")
 jgl_game_on = True
 
 while jgl_game_on:
+    time.sleep(jgl_ball.jgl_move_speed)
     jgl_screen.update()
-    time.sleep(0.01)
-    # TODO: Paddle is controlled by the mouse moving left to right
-# TODO: Create the ball
-    # TODO: User must click the right mouse button to launch the ball 
-        # toward the wall
-    # TODO: The ball is launched at an angle depending on how it hits the
-        # paddle
+    jgl_ball.jgl_move()
+    
+    # Check if collision with walls
+    jgl_ball.jgl_check_collision_with_walls()
+    
+    # Detect collision with the paddle
+    jgl_ball.jgl_check_collision_with_paddle(jgl_paddle)
 
 # TODO: Load in scoreboard
-
-# TODO: Allow user input from the mouse or keyboard?
-    # TODO: Allow user to launch the ball from the paddle
-    # TODO: Enable paddle to move left
-    # TODO: Enable paddle to move right
-
-# TODO: Start game in progress flag
-
-# TODO: Check if ball collides with the left or right walls
-    # TODO: If so, bounce the ball at an angle
     
 # TODO: Detect collision with the paddle
     # TODO: Ball bounces at an angle depending on where it was hit

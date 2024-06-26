@@ -19,7 +19,7 @@ class jglWalls(Turtle):
     """Creats walls with the bricks, suggested by 
     https://www.geeksforgeeks.org/create-breakout-game-using-python/"""
     
-    def __init__(self):
+    def __init__(self) -> None:
         self.jgl_y_start = 10
         self.jgl_y_end = 350
         self.jgl_bricks = []
@@ -34,14 +34,14 @@ class jglWalls(Turtle):
                       "purple4"]
         self.jgl_create_all_rows()
         
-    def jgl_create_row(self, jgl_y_cor, jgl_color):
+    def jgl_create_row(self, jgl_y_cor, jgl_color) -> None:
         """Creates a new row of bricks"""
         for i in range(-325, 375, 65):
             # Builds a new brick in each row
             jgl_brick = jglBrick(i, jgl_y_cor, jgl_color)  
             self.jgl_bricks.append(jgl_brick)
         
-    def jgl_create_all_rows(self):
+    def jgl_create_all_rows(self) -> None:
         """Creates all rows, code suggested by CoPilot"""
         
         jgl_row_height = 35
