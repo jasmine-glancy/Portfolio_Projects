@@ -5,6 +5,7 @@ from ball import jglBall
 from paddle import jglPaddle
 from turtle import Screen
 import time
+from scoreboard import jglScoreboard
 from walls import jglWalls
 
 # Create the screen
@@ -22,14 +23,21 @@ jgl_walls = jglWalls()
 # Create the paddle
 jgl_paddle = jglPaddle()
 
+# Set game flag
+jgl_game_on = True
+
+# Load in scoreboard
+jgl_score = jglScoreboard(jgl_game_on)
+
 # Create the ball
-jgl_ball = jglBall((0, -100), jgl_walls)
+jgl_ball = jglBall((0, -100), jgl_walls, jgl_game_on, jgl_score)
+
 
 jgl_screen.listen()
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_left, "a")
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_right, "d")
 
-jgl_game_on = True
+
 
 while jgl_game_on:
     time.sleep(jgl_ball.jgl_move_speed)
@@ -45,18 +53,9 @@ while jgl_game_on:
     # Detect collision with bricks
     jgl_ball.jgl_check_collision_with_bricks()
 
-# TODO: Load in scoreboard
-    
-# TODO: Detect collision with the paddle
-    # TODO: Ball bounces at an angle depending on where it was hit
-    
-# TODO: Detect when paddle misses
-    # TODO: Lose a life
-    # TODO: Reset the ball's position
-    # TODO: After 3 lives lost, trigger game over
-    
-# TODO: Detect collision with the wall
-    # TODO: When the brick is hit, it dissolves
+    if jgl_score.jgl_lives == 0:
+        print("Game over!")
+        jgl_game_on = False
     
 # TODO: Show high score screen
 jgl_screen.exitonclick()

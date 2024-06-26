@@ -43,8 +43,8 @@ class jglWalls(Turtle):
             # Define the borders of the bricks
             self.jgl_left_wall = jgl_brick.xcor() - 30
             self.jgl_right_wall = jgl_brick.xcor() + 30
-            self.jgl_upper_wall = jgl_brick.ycor() + 15
-            self.jgl_lower_wall = jgl_brick.ycor() - 15
+            self.jgl_upper_wall = jgl_brick.ycor() + 30
+            self.jgl_lower_wall = jgl_brick.ycor() - 30
 
         
     def jgl_create_all_rows(self) -> None:

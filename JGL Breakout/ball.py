@@ -1,11 +1,11 @@
 """A Turtle ball for the game Breakout!"""
 
 from turtle import Turtle
-from walls import jglBrick, jglWalls
+from scoreboard import jglScoreboard
 
 class jglBall(Turtle):
 
-    def __init__(self, jgl_position, jgl_walls) -> None:
+    def __init__(self, jgl_position, jgl_walls, jgl_game_on, scoreboard) -> None:
         """Creates the ball"""
         
         super().__init__()
@@ -19,6 +19,9 @@ class jglBall(Turtle):
         self.jgl_x_move = 10
         self.jgl_move_speed = 0.1
         self.jgl_walls = jgl_walls
+        self.jgl_game_on = jgl_game_on
+        
+        self.scoreboard = scoreboard
         
     def jgl_move(self):
         """Allows the ball to move"""
@@ -34,7 +37,7 @@ class jglBall(Turtle):
            # Reverses the ball's horizontal movement direction 
 
             self.jgl_x_move *= -1
-            self.jgl_move_speed *= 0.9
+            self.jgl_move_speed *= 0.95
         
         if jgl_y_bounce: 
             # Reverses the ball's vertical movement direction
@@ -42,12 +45,12 @@ class jglBall(Turtle):
             self.jgl_y_move *= -1
 
 
-    def reset_position(self):
+    def jgl_reset_position(self):
         """Resets the ball's position after a life is lost"""
         
-        self.goto(0, -100)
+        self.jgl_ball.goto(0, -100)
         self.jgl_move_speed = 0.1
-        self.jgl_bounce_x()
+        self.jgl_bounce(jgl_x_bounce=True, jgl_y_bounce=False)
 
     def jgl_check_collision_with_paddle(self, jgl_paddle):
         """Checks if the ball has collided with the paddle"""
@@ -102,6 +105,12 @@ class jglBall(Turtle):
         # Detect collision with the left or right walls
         if self.jgl_ball.xcor() > 450 or self.jgl_ball.xcor() < -450:
             self.jgl_bounce(jgl_x_bounce=True, jgl_y_bounce=False)
+            
+        # Check if collision with the bottom
+        if self.jgl_ball.ycor() < -350:
+            self.scoreboard.jgl_remove_life()
+            self.jgl_reset_position()
+            return
     
     def jgl_check_collision_with_bricks(self):
         """Checks collision with the bricks"""
@@ -113,6 +122,7 @@ class jglBall(Turtle):
                 brick.clear()
                 brick.hideturtle()
                 self.jgl_walls.jgl_bricks.remove(brick)
+                self.scoreboard.jgl_increase_score()
                     
                 # Detects collision from the left
                 if self.jgl_ball.xcor() < self.jgl_walls.jgl_left_wall:
@@ -129,3 +139,4 @@ class jglBall(Turtle):
                 # Detects collision from the top
                 elif self.jgl_ball.ycor() > self.jgl_walls.jgl_upper_wall:
                     self.jgl_bounce(jgl_x_bounce=False, jgl_y_bounce=True)
+                break
