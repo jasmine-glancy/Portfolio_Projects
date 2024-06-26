@@ -23,7 +23,7 @@ jgl_walls = jglWalls()
 jgl_paddle = jglPaddle()
 
 # Create the ball
-jgl_ball = jglBall((0, -100))
+jgl_ball = jglBall((0, -100), jgl_walls)
 
 jgl_screen.listen()
 jgl_screen.onkeypress(jgl_paddle.jgl_move_paddle_left, "a")
@@ -41,6 +41,9 @@ while jgl_game_on:
     
     # Detect collision with the paddle
     jgl_ball.jgl_check_collision_with_paddle(jgl_paddle)
+    
+    # Detect collision with bricks
+    jgl_ball.jgl_check_collision_with_bricks()
 
 # TODO: Load in scoreboard
     

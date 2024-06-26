@@ -1,11 +1,11 @@
 """A Turtle ball for the game Breakout!"""
 
 from turtle import Turtle
-
+from walls import jglBrick, jglWalls
 
 class jglBall(Turtle):
 
-    def __init__(self, jgl_position) -> None:
+    def __init__(self, jgl_position, jgl_walls) -> None:
         """Creates the ball"""
         
         super().__init__()
@@ -18,6 +18,7 @@ class jglBall(Turtle):
         self.jgl_y_move = 10
         self.jgl_x_move = 10
         self.jgl_move_speed = 0.1
+        self.jgl_walls = jgl_walls
         
     def jgl_move(self):
         """Allows the ball to move"""
@@ -54,7 +55,7 @@ class jglBall(Turtle):
         jgl_paddle_x = jgl_paddle.xcor()
         jgl_ball_x = self.jgl_ball.xcor()
         
-        if self.jgl_ball.distance(jgl_paddle) < 20 and self.jgl_ball.ycor() < -100:
+        if self.jgl_ball.distance(jgl_paddle) < 30 and self.jgl_ball.ycor() < -100:
             
             # If the paddle is on the right side of the screen
             if jgl_paddle_x > 0:
@@ -102,3 +103,29 @@ class jglBall(Turtle):
         if self.jgl_ball.xcor() > 450 or self.jgl_ball.xcor() < -450:
             self.jgl_bounce(jgl_x_bounce=True, jgl_y_bounce=False)
     
+    def jgl_check_collision_with_bricks(self):
+        """Checks collision with the bricks"""
+        
+        for brick in self.jgl_walls.jgl_bricks[:]:
+            if self.jgl_ball.distance(brick) < 25:
+                self.jgl_walls.jgl_quantity -= 1
+                
+                brick.clear()
+                brick.hideturtle()
+                self.jgl_walls.jgl_bricks.remove(brick)
+                    
+                # Detects collision from the left
+                if self.jgl_ball.xcor() < self.jgl_walls.jgl_left_wall:
+                    self.jgl_bounce(jgl_x_bounce=True, jgl_y_bounce=False)
+                
+                # Detects collision from the right
+                elif self.jgl_ball.xcor() > self.jgl_walls.jgl_right_wall:
+                    self.jgl_bounce(jgl_x_bounce=True, jgl_y_bounce=False)
+                
+                # Detects collision from the bottom
+                elif self.jgl_ball.ycor() < self.jgl_walls.jgl_lower_wall:
+                    self.jgl_bounce(jgl_x_bounce=False, jgl_y_bounce=True)
+                
+                # Detects collision from the top
+                elif self.jgl_ball.ycor() > self.jgl_walls.jgl_upper_wall:
+                    self.jgl_bounce(jgl_x_bounce=False, jgl_y_bounce=True)
