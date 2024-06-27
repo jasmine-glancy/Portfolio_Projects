@@ -1,25 +1,39 @@
 """A Flask/HTML website that lists cafes with wifi and 
 power for remote working"""
 
-from flask import Flask
-from flask_bootstrap import Bootstrap5
+from flask import Flask, render_template
+from flask_bootstrap import Bootstrap
 import os
 
 # Configure application
 app = Flask(__name__)
 
 # Add in Bootstrap
-Bootstrap5(app)
+Bootstrap(app)
 
 # Load in security key
 app.config["SECRET_KEY"] = os.environ.get("KEY")
 
-# TODO: Create index route
-# TODO: Create cafes route which displays the info of
-## all of the cafes
-    # Name, location, google maps link, hours, 
-    # coffe price, wifi price, charging availability,
-    # seats
+@app.route("/", methods=["GET", "POST"])
+def home():
+    """Shows all of the cafes in the database"""
     
+    # TODO: Displays the info of
+    ## all of the cafes
+        # Name, location, google maps link, hours, 
+        # coffee price, wifi price, charging availability,
+        # seats
+    return render_template("index.html")
+
+# INSERT INTO cafes ("name", 
+# 	"map_url",
+# 	"img_url",
+# 	"location",
+#   "hours",
+# 	"seats",
+# 	"has_toilet",
+# 	"has_wifi",
+# 	"has_sockets",
+# 	"can_take_calls") 
 # TODO: Create add route
 # TODO: Create edit route
