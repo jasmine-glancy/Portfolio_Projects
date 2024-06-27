@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, request
-from flask_bootstrap import Bootstrap5
+from flask_bootstrap import Bootstrap
 import os, smtplib
 
 
@@ -8,7 +8,7 @@ import os, smtplib
 app = Flask(__name__)
 
 # Add in Bootstrap
-Bootstrap5(app)
+Bootstrap(app)
 
 def jgl_send_email(jgl_contact_name, jgl_contact_email, jgl_message):
     """Uses the smtp module to send an email."""
