@@ -3,7 +3,7 @@ published by Atari, Inc. and released on May 13, 1976!"""
 
 from ball import jglBall
 from paddle import jglPaddle
-from turtle import Screen
+from turtle import Screen, Turtle
 import time
 from scoreboard import jglScoreboard
 from walls import jglWalls
@@ -47,10 +47,14 @@ while jgl_game_on:
     
     # Checks if the ball has been launched yet to determine movement
     if jgl_ball.jgl_moving_with_paddle:
+        jgl_ball.jgl_display_instructions()
         jgl_ball.jgl_move_with_paddle(jgl_paddle)
     else:
+        jgl_ball.jgl_hide_instructions()
         jgl_ball.jgl_move()
         
+    # Updates the screen and makes the ball move 
+    #  faster as the game goes on
     time.sleep(jgl_ball.jgl_move_speed)
     jgl_screen.update()
     
@@ -66,6 +70,16 @@ while jgl_game_on:
     if jgl_score.jgl_lives == 0:
         print("Game over!")
         jgl_game_on = False
-    
-# TODO: Show high score screen
+        jgl_score.jgl_save_score()
+        
+        # Hide the turtles before showing the final scores
+        jgl_ball.hideturtle()
+        
+        for brick in jgl_walls.jgl_bricks:
+            brick.reset()
+        jgl_paddle.reset()
+        
+        # Show top 10 highest scores
+        jgl_score.jgl_top_scores()
+        
 jgl_screen.exitonclick()

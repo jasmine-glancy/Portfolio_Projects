@@ -18,13 +18,24 @@ class jglPaddle(Turtle):
         self.color("white")
         self.shapesize(stretch_len=5, stretch_wid=1)
         
+        
     def jgl_move_paddle_left(self) -> None:
         jgl_new_x_pos = self.xcor() - MOVE_STEPS
+        
+        if jgl_new_x_pos < -425:
+            """Bounces the paddle back if too far to the left"""
+            jgl_new_x_pos = -425
         self.goto(jgl_new_x_pos, self.ycor())
+        
         
     def jgl_move_paddle_right(self) -> None:
         jgl_new_x_pos = self.xcor() + MOVE_STEPS
+        
+        if jgl_new_x_pos > 425:
+            """Bounces the paddle back if too far to the right"""
+            jgl_new_x_pos = 425
         self.goto(jgl_new_x_pos, self.ycor())
+        
         
     def jgl_reset_paddle_position(self) -> None:
         self.goto((0, -300))

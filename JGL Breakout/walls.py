@@ -15,7 +15,7 @@ class jglBrick(Turtle):
     
     
 class jglWalls(Turtle):
-    """Creats walls with the bricks, suggested by 
+    """Creates walls with the bricks, suggested by 
     https://www.geeksforgeeks.org/create-breakout-game-using-python/"""
     
     def __init__(self) -> None:
@@ -32,6 +32,7 @@ class jglWalls(Turtle):
                       "DarkSlateBlue",
                       "purple4"]
         self.jgl_create_all_rows()
+        
         
     def jgl_create_row(self, jgl_y_cor, jgl_color) -> None:
         """Creates a new row of bricks"""
