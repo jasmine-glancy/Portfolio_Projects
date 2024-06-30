@@ -25,15 +25,16 @@ def home():
         # seats
     return render_template("index.html")
 
-# INSERT INTO cafes ("name", 
-# 	"map_url",
+# INSERT INTO remote_spaces ("name", 
 # 	"img_url",
+# 	"map_url",
 # 	"location",
-#   "hours",
+#   "website",
+#   "open_24_hours",
 # 	"seats",
+# 	"socket_availability",
 # 	"has_toilet",
 # 	"has_wifi",
-# 	"has_sockets",
 # 	"can_take_calls") 
 # TODO: Create add route
 # TODO: Create edit route
