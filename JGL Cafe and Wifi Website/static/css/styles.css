@@ -31,6 +31,47 @@ h3 {
         color: var(--chamoisee);
     }
 
+/* Navigation Bar */
+
+.navbar-dark, .navbar-brand {
+    background-color: var(--coffee);
+    color: var(--tan);
+    --bs-navbar-hover-color: var(--almond);
+}
+    .offcanvas-title {
+        color: var(--tan);
+    }
+
+    .offcanvas-body, .offcanvas-header {
+        background-color: var(--coffee);
+    }
+    
+    .dropdown-menu {
+        background-color: var(--raw_umber);
+    }
+
+    /* Search Bar */
+
+    .form-control {
+        background-color: var(--dun);
+    }
+
+        /* Targeting the inner search font, suggested by CoPilot */
+        form[role="search"] .form-control.me-2[type="search"] {
+            color: var(--coffee);
+        }
+
+/* Buttons */
+
+    /* Navbar Button */
+    .btn {
+        background-color: var(--chamoisee);
+        color: var(--almond);
+        --bs-btn-border-color: var(--chamoisee);
+        --bs-btn-hover-border-color: var(--chamoisee);
+        --bs-btn-hover-bg: var(--tan);
+    }
+
 /* Card CSS */
 .card-group {
     margin-top: 5vw;
