@@ -7,35 +7,210 @@
 <!--TODO: Fix card group CSS-->
 
     <div class="card-group">
-        <div class="card">
-            <img src="https://foodcary.com/wp-content/uploads/2016/06/chanticleer-1491.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h3 class="card-title">I'm baby</h3> <h4>Fries, AK</h4>
-                
-                <p class="card-text">
-                    <b>Seating:</b> <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
-                        <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Charging:</b> <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Toilet Access:</b> <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Has Wifi:</b> <img src="{{ url_for('static', filename='assets/svg/wifi.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/wifi-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Can Take Calls:</b> <img src="{{ url_for('static', filename='assets/svg/phone.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/no-phone.svg')}}" width="25vw">
-                    <br>
-                    praxis mumblecore green juice hell of kickstarter plaid tacos pickled iPhone four loko gentrify cardigan pork belly activated charcoal. 
-                
-                    <h6>
-                        Forage green juice
-                    </h6>
-                </p>
-            </div>
-        </div>
+        {% if cafe_results %}
+            {% for cafe in cafe_results %}
+                <div class="card">
+                    <img src="{{ cafe.img_url }}" class="card-img-top" alt="An image representing {{ cafe.name }}">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ cafe.name }}</h3> <h4>{{ cafe.location }}</h4>
+                        
+                        <p class="card-text">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <b>Price:</b> 
+
+                                        <div class="first_row_a">
+                                            {% if cafe.price == 0 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.price  == 1 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.price == 2 %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.price == 3 %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.price == 4 %}
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                            {% elif cafe.price == 5 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="right">
+                                        <b>Has Wifi:</b> 
+                                        <div class="adjusted_icons_2">
+                                            {% if cafe.has_wifi == 0 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-off.svg')}}" width="25vw">
+                                            {% elif cafe.has_wifi  == 1 or cafe.has_wifi == 2 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-1.svg')}}" width="25vw">
+                                            {% elif cafe.has_wifi  == 3 or cafe.has_wifi == 4 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-3.svg')}}" width="25vw">
+                                            {% elif cafe.has_toilet == 5 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi.svg')}}" width="25vw">
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Seating:</b> 
+
+                                        <div class="second_row_a">
+                                            {% if cafe.seats == 0 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.seats  == 1 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.seats == 2 %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.seats == 3 %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.seats == 4 %}
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                            {% elif cafe.seats == 5 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="right">
+                                        <b>Can Take Calls:</b> 
+                            
+                                        <div class="adjusted_icons">
+                                            {% if cafe.can_take_calls == 0 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/no-phone.svg')}}" width="25vw">
+                                            {% elif cafe.can_take_calls > 0 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/phone.svg')}}" width="25vw">
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <b>Toilet Access:</b> 
+
+                                        <div class="third_row_a">
+                                            {% if cafe.has_toilet == 0 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.has_toilet  == 1 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.has_toilet == 2 %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.has_toilet == 3 %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.has_toilet == 4 %}
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                            {% elif cafe.has_toilet == 5 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="right">
+                                        <b>Charging:</b> 
+                                        {% if cafe.socket_availability == 0 %}
+                                            {% for _ in range(5) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                            {% endfor %}
+                                        {% elif cafe.socket_availability  == 1 %}
+                                            <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                            {% for _ in range(4) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                            {% endfor %}
+                                        {% elif cafe.socket_availability == 2 %}
+                                            {% for _ in range(2) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                            {% endfor %}
+                                            {% for _ in range(3) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                            {% endfor %}
+                                        {% elif cafe.socket_availability == 3 %}
+                                            {% for _ in range(3) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                            {% endfor %}
+                                            {% for _ in range(2) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                            {% endfor %}
+                                        {% elif cafe.socket_availability == 4 %}
+                                            {% for _ in range(4) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                            {% endfor %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                        {% elif cafe.socket_availability == 5 %}
+                                            {% for _ in range(5) %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                            praxis mumblecore green juice hell of kickstarter plaid tacos pickled iPhone four loko gentrify cardigan pork belly activated charcoal. 
+                        
+                            <h6>
+                                Forage green juice
+                            </h6>
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
         <div class="card">
             <img src="https://foodcary.com/wp-content/uploads/2016/06/chanticleer-1491.jpg" class="card-img-top" alt="...">
             <div class="card-body">
