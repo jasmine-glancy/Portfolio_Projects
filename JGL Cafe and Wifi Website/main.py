@@ -2,6 +2,7 @@
 power for remote working"""
 
 from cs50 import SQL
+from datetime import datetime
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 import os
@@ -18,6 +19,11 @@ app.config["SECRET_KEY"] = os.environ.get("KEY")
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///remote_workspaces.db")
 
+# A custom filter to convert string to datetime, suggested by CoPilot
+@app.template_filter("str_to_datetime")
+def str_to_datetime(s, format="%x"):
+    return datetime.strptime(s, "%Y-%m-%d").strftime(format)
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     """Shows all of the cafes in the database"""
@@ -26,6 +32,7 @@ def home():
         "SELECT * FROM remote_spaces"
     )
     print(cafe_results)
+    print(type(cafe_results[0]["last_modified"]))
     # TODO: Displays the info of
     ## all of the cafes
         # Name, location, google maps link, hours, 

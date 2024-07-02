@@ -3,8 +3,6 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<!--TODO: Fill info with database info-->
-<!--TODO: Fix card group CSS-->
 
     <div class="card-group">
         {% if cafe_results %}
@@ -14,7 +12,7 @@
                     <div class="card-body">
                         <h3 class="card-title">{{ cafe.name }}</h3> <h4>{{ cafe.location }}</h4>
                         
-                        <p class="card-text">
+                        <div class="card-text">
                             <table>
                                 <tr>
                                     <td>
@@ -165,48 +163,52 @@
                                     </td>
                                     <td class="right">
                                         <b>Charging:</b> 
-                                        {% if cafe.socket_availability == 0 %}
-                                            {% for _ in range(5) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                                            {% endfor %}
-                                        {% elif cafe.socket_availability  == 1 %}
-                                            <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                                            {% for _ in range(4) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                                            {% endfor %}
-                                        {% elif cafe.socket_availability == 2 %}
-                                            {% for _ in range(2) %}
+
+                                        <div class="third_row_b">
+                                            {% if cafe.socket_availability == 0 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.socket_availability  == 1 %}
                                                 <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                                            {% endfor %}
-                                            {% for _ in range(3) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                                            {% endfor %}
-                                        {% elif cafe.socket_availability == 3 %}
-                                            {% for _ in range(3) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                                            {% endfor %}
-                                            {% for _ in range(2) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                                            {% endfor %}
-                                        {% elif cafe.socket_availability == 4 %}
-                                            {% for _ in range(4) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                                            {% endfor %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                                        {% elif cafe.socket_availability == 5 %}
-                                            {% for _ in range(5) %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                                            {% endfor %}
-                                        {% endif %}
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.socket_availability == 2 %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.socket_availability == 3 %}
+                                                {% for _ in range(3) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                {% for _ in range(2) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% elif cafe.socket_availability == 4 %}
+                                                {% for _ in range(4) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                {% endfor %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                            {% elif cafe.socket_availability == 5 %}
+                                                {% for _ in range(5) %}
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
-                            praxis mumblecore green juice hell of kickstarter plaid tacos pickled iPhone four loko gentrify cardigan pork belly activated charcoal. 
-                        
+                           
+                            {{ cafe.description }}
+
                             <h6>
-                                Forage green juice
+                                Last updated {{ cafe.last_modified|str_to_datetime('%x') }}
                             </h6>
-                        </p>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
