@@ -203,44 +203,53 @@
                                 </tr>
                             </table>
                            
-                            {{ cafe.description }}
 
-                            <h6>
-                                Last updated {{ cafe.last_modified|str_to_datetime('%x') }}
-                            </h6>
+                            {% if cafe_results|length >= 3 %}
+                                {{ cafe.description }}
+                                
+                                <div class="button-container">
+                                    <a href="{{ cafe.map_url }}">
+                                        <button type="button" class="btn directions">
+                                            Directions
+                                        </button>
+                                    </a>
+
+                                    <div class="divider"></div>
+                                    
+                                    <button type="button" class="btn disabled">
+                                        {{ cafe.is_chain|check_if_chain}}
+                                    </button>
+                                </div>
+                                <h6>
+                                    Last updated {{ cafe.last_modified|str_to_datetime("%x") }}
+                                </h6>
+                            {% endif %}
                         </div>
                     </div>
+                    {% if cafe_results|length < 3 %}
+                            <div class="wide">
+                                {{ cafe.description }}
+                                    
+                                <div class="button-container">
+                                    <a href="{{ cafe.map_url }}">
+                                        <button type="button" class="btn directions">
+                                            Directions
+                                        </button>
+                                    </a>
+
+                                    <div class="divider"></div>
+                                    
+                                    <button type="button" class="btn disabled">
+                                        {{ cafe.is_chain|check_if_chain}}
+                                    </button>
+                                </div>
+                                <h6>
+                                    Last updated {{ cafe.last_modified|str_to_datetime("%x") }}
+                                </h6>
+                            </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         {% endif %}
-        <div class="card">
-            <img src="https://foodcary.com/wp-content/uploads/2016/06/chanticleer-1491.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h3 class="card-title">I'm baby</h3> <h4>Fries, AK</h4>
-                
-                <p class="card-text">
-                    <b>Seating:</b> <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
-                        <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Charging:</b> <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Toilet Access:</b> <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Has Wifi:</b> <img src="{{ url_for('static', filename='assets/svg/wifi.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/wifi-off.svg')}}" width="25vw">
-                    <br>
-                    <b>Can Take Calls:</b> <img src="{{ url_for('static', filename='assets/svg/phone.svg')}}" width="25vw">
-                    <img src="{{ url_for('static', filename='assets/svg/no-phone.svg')}}" width="25vw">
-                    <br>
-                    praxis mumblecore green juice hell of kickstarter plaid tacos pickled iPhone four loko gentrify cardigan pork belly activated charcoal. 
-                
-                    <h6>
-                        Forage green juice
-                    </h6>
-                </p>
-            </div>
-        </div>
     </div>
 {% endblock %}

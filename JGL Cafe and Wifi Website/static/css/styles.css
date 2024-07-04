@@ -57,6 +57,11 @@ h3 {
         padding-top: 1vw;
     }
 
+/* Links */
+a:hover {
+    color: var(--chamoisee);
+}
+
 /* Navigation Bar */
 
 .navbar-dark, .navbar-brand {
@@ -96,11 +101,28 @@ h3 {
         --bs-btn-border-color: var(--chamoisee);
         --bs-btn-hover-border-color: var(--chamoisee);
         --bs-btn-hover-bg: var(--tan);
+        min-width: fit-content;
+    }
+
+    /* Cafe Card Buttons */
+
+    .button-container {
+        display: flex;
+    }
+
+    .btn.directions, .btn.disabled {
+        margin-top: 1vw;
+    }
+
+    .divider {
+        width: 7.5vw;
+        height: auto;
+        display: inline-block;
     }
 
 /* Card CSS */
 .card-group {
-    margin-top: 3.75vw;
+    margin-top: 3.25vw;
     display: flex;
     flex-wrap: wrap;
     margin-left: auto;
@@ -119,7 +141,7 @@ h3 {
 }
 
 .card-img-top {
-    max-height: 17.25vw;
+    max-height: 16vw;
     object-fit: cover;
     height: auto;
 }
@@ -131,11 +153,13 @@ h3 {
 
 .card-body {
     color: var(--coffee);
-    margin-top: 1vw;
+    margin-top: 0.5vw;
+    max-width: 25vw;
+    text-align: justify;
 }
 
 .card-text {
-    margin-top: 2vw;
+    margin-top: 1vw;
     margin-left: 2vw;
 }
 
@@ -169,3 +193,12 @@ table {
     .third_row_b {
         top: 0.1vw;
     }
+
+.wide {
+    display: block;
+    margin-left: 25vw;
+    margin-top: -12.5vw;
+    width: 15vw;
+    color: var(--coffee);
+    padding-bottom: 1vw;
+}
