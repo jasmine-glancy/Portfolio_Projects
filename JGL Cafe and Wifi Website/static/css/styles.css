@@ -39,21 +39,21 @@ body::-webkit-scrollbar {
 h3 {
     font-weight: 600;
 }
-    h4 {
-        color: var(--chamoisee);
-    }
 
-    h3, h4 {
+    h3, h4, h5 {
         display: inline;
         margin-right: 0.5vw;
     }
+
+    h4, h5, h6 {
+        color: var(--chamoisee);
+    }
     
     h4 {
-        margin-left: 1.5vw;
+        margin-left: 4vw;
     }
 
     h6 {
-        color: var(--chamoisee);
         padding-top: 1vw;
     }
 
@@ -154,13 +154,18 @@ a:hover {
 .card-body {
     color: var(--coffee);
     margin-top: 0.5vw;
-    max-width: 25vw;
+    min-width: 25vw;
     text-align: justify;
 }
 
 .card-text {
     margin-top: 1vw;
     margin-left: 2vw;
+}
+
+.longer_name {
+    display: inline;
+    margin-left: 1vw;
 }
 
 /* Table */
@@ -194,6 +199,8 @@ table {
         top: 0.1vw;
     }
 
+/* Controls the aesthetic of thinner cards if the database 
+has fewer entries */
 .wide {
     display: block;
     margin-left: 25vw;
@@ -201,4 +208,8 @@ table {
     width: 15vw;
     color: var(--coffee);
     padding-bottom: 1vw;
+}
+
+.top_padding {
+    margin-top: 8vw;
 }

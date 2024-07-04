@@ -7,6 +7,8 @@ from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 import os
 
+# --------------------------- App Setup --------------------------- #
+
 # Configure application
 app = Flask(__name__)
 
@@ -18,6 +20,8 @@ app.config["SECRET_KEY"] = os.environ.get("KEY")
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///remote_workspaces.db")
+
+# ----------------- Custom Jinja Template Filters ----------------- #
 
 # A custom filter to convert string to datetime, suggested by CoPilot
 @app.template_filter("str_to_datetime")
@@ -38,6 +42,7 @@ def check_if_chain(chain_value):
     except Exception as e:
         print(f"Chain value not found, exception: {e}")
     
+# -------------------------- App Routes -------------------------- #
 @app.route("/", methods=["GET", "POST"])
 def home():
     """Shows all of the cafes in the database"""
@@ -47,11 +52,7 @@ def home():
     )
     print(cafe_results)
     print(type(cafe_results[0]["last_modified"]))
-    # TODO: Displays the info of
-    ## all of the cafes
-        # Name, location, google maps link, hours, 
-        # coffee price, wifi price, charging availability,
-        # seats
+    
     return render_template("index.html", cafe_results=cafe_results)
 
 # INSERT INTO remote_spaces ("name", 
@@ -103,6 +104,5 @@ def home():
 # 	"Pared-down, contemporary counter serve selling unique Asian-style rolled ice cream & tea drinks.",
 # 	CURRENT_DATE);
 
-# TODO: Add is_chain to database?
 # TODO: Create add route
 # TODO: Create edit route
