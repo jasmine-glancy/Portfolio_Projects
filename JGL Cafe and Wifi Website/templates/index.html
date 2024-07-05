@@ -3,9 +3,6 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    {% if cafe_results|length < 3 %}
-        <div class="top_padding"></div>
-    {% endif %}
 
     <div class="card-group">
         {% if cafe_results %}
@@ -14,15 +11,11 @@
                     <img src="{{ cafe.img_url }}" class="card-img-top" alt="An image representing {{ cafe.name }}">
                     <div class="card-body">
                         <h3 class="card-title">{{ cafe.name }}</h3> 
-                        {% if cafe.name|length >= 25 and cafe_results|length < 3 %}
-                            <div class="longer_name">    
-                                <h4>{{ cafe.location }}</h4>
-                            </div>
-                        {% else %}
-                            <h4>{{ cafe.location }}</h4>               
-                        {% endif %}
+                        <h4 class="{{ 'longer_name' if cafe.name|length >= 25 and cafe_results|length % 3 != 0 else '' }}">{{ cafe.location }}</h4>
                         
                         <div class="card-text">
+                            <a href="{{ cafe.website }}">{{ cafe.name }}'s Website</a>
+                            
                             <table>
                                 <tr>
                                     <td>
@@ -31,35 +24,35 @@
                                         <div class="first_row_a">
                                             {% if cafe.price == 0 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                             {% elif cafe.price  == 1 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" class="indicator_icons">
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                             {% elif cafe.price == 2 %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                             {% elif cafe.price == 3 %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                             {% elif cafe.price == 4 %}
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" class="indicator_icons">
                                                 {% endfor %}
-                                                <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/price-off.svg')}}" class="indicator_icons">
                                             {% elif cafe.price == 5 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/price.svg')}}" class="indicator_icons">
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -68,13 +61,13 @@
                                         <b>Has Wifi:</b> 
                                         <div class="adjusted_icons_2">
                                             {% if cafe.has_wifi == 0 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wifi-off.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-off.svg')}}" class="indicator_icons" alt="None">
                                             {% elif cafe.has_wifi  == 1 or cafe.has_wifi == 2 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wifi-1.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-1.svg')}}" class="indicator_icons" alt="Weak">
                                             {% elif cafe.has_wifi  == 3 or cafe.has_wifi == 4 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wifi-3.svg')}}" width="25vw">
-                                            {% elif cafe.has_toilet == 5 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wifi.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi-3.svg')}}" class="indicator_icons" alt="Moderate">
+                                            {% elif cafe.has_wifi == 5 %}
+                                                <img src="{{ url_for('static', filename='assets/svg/wifi.svg')}}" class="indicator_icons" alt="Strong">
                                             {% endif %}
                                         </div>
                                     </td>
@@ -86,35 +79,35 @@
                                         <div class="second_row_a">
                                             {% if cafe.seats == 0 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" class="indicator_icons" alt="No seating">
                                                 {% endfor %}
                                             {% elif cafe.seats  == 1 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" class="indicator_icons" alt="Minimum seating">
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" class="indicator_icons" alt="Minimum seating">
                                                 {% endfor %}
                                             {% elif cafe.seats == 2 %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" class="indicator_icons" alt="Minimum seating">
                                                 {% endfor %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" class="indicator_icons" alt="Minimum seating">
                                                 {% endfor %}
                                             {% elif cafe.seats == 3 %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" class="indicator_icons" alt="Moderate seating">
                                                 {% endfor %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" class="indicator_icons" alt="Moderate seating">
                                                 {% endfor %}
                                             {% elif cafe.seats == 4 %}
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" class="indicator_icons" alt="Ample seating">
                                                 {% endfor %}
-                                                <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/chair-off.svg')}}" class="indicator_icons" alt="Ample seating">
                                             {% elif cafe.seats == 5 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/chair.svg')}}" class="indicator_icons" alt="Ample seating">
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -124,9 +117,9 @@
                             
                                         <div class="adjusted_icons">
                                             {% if cafe.can_take_calls == 0 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/no-phone.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/no-phone.svg')}}" class="indicator_icons" alt="No Calls">
                                             {% elif cafe.can_take_calls > 0 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/phone.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/phone.svg')}}" class="indicator_icons" alt="Calls OK">
                                             {% endif %}
                                         </div>
                                     </td>
@@ -138,35 +131,35 @@
                                         <div class="third_row_a">
                                             {% if cafe.has_toilet == 0 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" class="indicator_icons" alt="No Bathroom">
                                                 {% endfor %}
                                             {% elif cafe.has_toilet  == 1 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" class="indicator_icons" alt="Minimum bathrooms">
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" class="indicator_icons" alt="Minimum bathrooms">
                                                 {% endfor %}
                                             {% elif cafe.has_toilet == 2 %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" class="indicator_icons" alt="Minimum bathrooms">
                                                 {% endfor %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" class="indicator_icons" alt="Minimum bathrooms">
                                                 {% endfor %}
                                             {% elif cafe.has_toilet == 3 %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" class="indicator_icons" alt="Moderate bathrooms">
                                                 {% endfor %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" class="indicator_icons" alt="Moderate bathrooms">
                                                 {% endfor %}
                                             {% elif cafe.has_toilet == 4 %}
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" class="indicator_icons" alt="Ample bathrooms">
                                                 {% endfor %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet-off.svg')}}" class="indicator_icons" alt="Ample bathrooms">
                                             {% elif cafe.has_toilet == 5 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/toilet.svg')}}" class="indicator_icons" alt="Ample bathrooms">
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -177,35 +170,35 @@
                                         <div class="third_row_b">
                                             {% if cafe.socket_availability == 0 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" class="indicator_icons" alt="No sockets">
                                                 {% endfor %}
                                             {% elif cafe.socket_availability  == 1 %}
-                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" class="indicator_icons" alt="Minimal sockets">
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" class="indicator_icons" alt="Minimal sockets">
                                                 {% endfor %}
                                             {% elif cafe.socket_availability == 2 %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" class="indicator_icons" alt="Minimal sockets">
                                                 {% endfor %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" class="indicator_icons" alt="Minimal sockets">
                                                 {% endfor %}
                                             {% elif cafe.socket_availability == 3 %}
                                                 {% for _ in range(3) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" class="indicator_icons" alt="Moderate sockets">
                                                 {% endfor %}
                                                 {% for _ in range(2) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" class="indicator_icons" alt="Moderate sockets">
                                                 {% endfor %}
                                             {% elif cafe.socket_availability == 4 %}
                                                 {% for _ in range(4) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" class="indicator_icons" alt="Ample sockets">
                                                 {% endfor %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug-off.svg')}}" class="indicator_icons" alt="Ample sockets">
                                             {% elif cafe.socket_availability == 5 %}
                                                 {% for _ in range(5) %}
-                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" width="25vw">
+                                                    <img src="{{ url_for('static', filename='assets/svg/wall-plug.svg')}}" class="indicator_icons" alt="Ample sockets">
                                                 {% endfor %}
                                             {% endif %}
                                         </div>
@@ -213,53 +206,32 @@
                                 </tr>
                             </table>
                            
-
-                            {% if cafe_results|length >= 3 %}
-                                {{ cafe.description }}
-                                
-                                <div class="button-container">
-                                    <a href="{{ cafe.map_url }}">
-                                        <button type="button" class="btn directions">
-                                            Directions
-                                        </button>
-                                    </a>
-
-                                    <div class="divider"></div>
-                                    
-                                    <button type="button" class="btn disabled">
-                                        {{ cafe.is_chain|check_if_chain}}
+                            {{ cafe.description }}
+                            
+                            <div class="button-container">
+                                <a href="{{ cafe.map_url }}">
+                                    <button type="button" class="btn directions">
+                                        Directions
                                     </button>
-                                </div>
-                                <h6>
-                                    Last updated {{ cafe.last_modified|str_to_datetime("%x") }}
-                                </h6>
-                            {% endif %}
+                                </a>
+
+                                <div class="divider"></div>
+                                
+                                <button type="button" class="btn disabled">
+                                    {{ cafe.is_chain|check_if_chain}}
+                                </button>
+                            </div>
+                            <h6>
+                                Last updated {{ cafe.last_modified|str_to_datetime("%x") }}
+                            </h6>
                         </div>
                     </div>
-                    {% if cafe_results|length < 3 %}
-                            <div class="wide">
-                                {{ cafe.description }}
-                                    
-                                <div class="button-container">
-                                    <a href="{{ cafe.map_url }}">
-                                        <button type="button" class="btn directions">
-                                            Directions
-                                        </button>
-                                    </a>
-
-                                    <div class="divider"></div>
-                                    
-                                    <button type="button" class="btn disabled">
-                                        {{ cafe.is_chain|check_if_chain}}
-                                    </button>
-                                </div>
-                                <h6>
-                                    Last updated {{ cafe.last_modified|str_to_datetime("%x") }}
-                                </h6>
-                            </div>
-                    {% endif %}
                 </div>
             {% endfor %}
         {% endif %}
+
+        <a href="{{ url_for('add') }}">
+            <img src="{{ url_for('static', filename='assets/svg/plus.svg')}}" class="add" alt="Add a Cafe">
+        </a>
     </div>
 {% endblock %}

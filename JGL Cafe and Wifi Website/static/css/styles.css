@@ -14,6 +14,16 @@ body {
     background-color: var(--tan);
 }
 
+/* Add Cafe */
+.add_cafe {
+    background-color: var(--dun);
+    width: 90%;
+    margin-top: 7vw;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5vw;
+    border: 0.5vw double var(--chamoisee);
+}
 
 /* Scrollbar for WebKit browsers like Chrome, Safari, and new Edge */
 body::-webkit-scrollbar {
@@ -36,9 +46,18 @@ body::-webkit-scrollbar {
     }
 
 /* Headings */
-h3 {
-    font-weight: 600;
+
+h1 {
+    color: var(--coffee);
+    text-decoration: underline;
+    font-weight: 700;
+    padding-top: 2vw;
+    margin-left: 5vw;
+    margin-bottom: 5vw;
 }
+    h3 {
+        font-weight: 600;
+    }
 
     h3, h4, h5 {
         display: inline;
@@ -57,18 +76,20 @@ h3 {
         padding-top: 1vw;
     }
 
-/* Links */
-a:hover {
-    color: var(--chamoisee);
-}
 
 /* Navigation Bar */
 
 .navbar-dark, .navbar-brand {
     background-color: var(--coffee);
     color: var(--tan);
-    --bs-navbar-hover-color: var(--almond);
 }
+    .offcanvas {
+        --bs-offcanvas-box-shadow: var(--coffee);
+    }
+
+    .navbar-brand:hover {
+        color: var(--almond);
+    }
     .offcanvas-title {
         color: var(--tan);
     }
@@ -85,12 +106,39 @@ a:hover {
 
     .form-control {
         background-color: var(--dun);
+        color: var(--coffee);
     }
 
         /* Targeting the inner search font, suggested by CoPilot */
-        form[role="search"] .form-control.me-2[type="search"] {
+        .me-2 input::placeholder {
             color: var(--coffee);
         }
+
+/* Form CSS */
+.row.g-3 {
+    margin-left: 15vw;
+    color: var(--coffee);
+}
+    .row.g-3, .row.g-3 input, .form-select {
+        color: var(--coffee);
+    }
+
+    .row.g-3 input, .form-select, .form-control {
+        background-color: var(--almond);
+    }
+
+    .form-control:focus, .form-select:hover {
+        background-color: #faf4eece;
+        color: var(--chamoisee);
+    }
+    #inputGroupPrepend2 {
+        background-color: var(--coffee);
+        color: var(--tan);
+    }
+
+    .break {
+        margin-top: 0.25vw;
+    }
 
 /* Buttons */
 
@@ -104,6 +152,15 @@ a:hover {
         min-width: fit-content;
     }
 
+    .btn-secondary {
+        background-color: var(--coffee);
+        color: var(--tan);
+        --bs-btn-border-color: var(--raw_umber);
+        --bs-btn-hover-border-color: var(--raw_umber);
+        --bs-btn-hover-bg: var(--raw_umber);
+        min-width: fit-content;
+        margin-bottom: 5vw;
+    }
     /* Cafe Card Buttons */
 
     .button-container {
@@ -124,11 +181,12 @@ a:hover {
 .card-group {
     margin-top: 3.25vw;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
     margin-left: auto;
     margin-right: auto;
     max-width: 90vw;
     min-height: 50vh;
+    margin-bottom: 1vw;
 }
 
 .card {
@@ -136,6 +194,7 @@ a:hover {
     background-color: var(--dun);
     min-width: 28.66vw;
     max-height: 45vw;
+    max-width: 28.66vw;
     padding: 1vw;
     margin: 1vw;
 }
@@ -144,6 +203,7 @@ a:hover {
     max-height: 16vw;
     object-fit: cover;
     height: auto;
+    margin-top: 1vw;
 }
 
 .card-title {
@@ -168,9 +228,27 @@ a:hover {
     margin-left: 1vw;
 }
 
+
+    /* Card Links */
+    .card a {
+        color: var(--raw_umber);
+    }
+
+        /* Visited Links */
+        .card a:visited {
+            color: var(--coffee);
+        }
+
+        /* Links on Hover */
+        .card a:hover {
+            color: var(--chamoisee);
+            text-decoration: none;
+        }
+
 /* Table */
 table {
     margin-bottom: 1vw;
+    margin-top: 1vw;
 }
 .adjusted_icons, .adjusted_icons_2 {
     display: inline;
@@ -199,17 +277,13 @@ table {
         top: 0.1vw;
     }
 
-/* Controls the aesthetic of thinner cards if the database 
-has fewer entries */
-.wide {
-    display: block;
-    margin-left: 25vw;
-    margin-top: -12.5vw;
+/* SVGs */
+a .add {
     width: 15vw;
-    color: var(--coffee);
-    padding-bottom: 1vw;
+    margin-top: 15vw;
+    margin-left: 7vw;
 }
 
-.top_padding {
-    margin-top: 8vw;
+.indicator_icons {
+    width: 1.75vw;
 }

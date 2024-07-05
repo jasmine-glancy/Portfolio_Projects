@@ -43,6 +43,7 @@ def check_if_chain(chain_value):
         print(f"Chain value not found, exception: {e}")
     
 # -------------------------- App Routes -------------------------- #
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     """Shows all of the cafes in the database"""
@@ -55,27 +56,13 @@ def home():
     
     return render_template("index.html", cafe_results=cafe_results)
 
-# INSERT INTO remote_spaces ("name", 
-# 	"img_url",
-# 	"map_url",
-# 	"location",
-#     "website",
-#     "open_24_hours",
-# 	"seats",
-# 	"socket_availability",
-# 	"has_toilet",
-# 	"has_wifi",
-# 	"can_take_calls") VALUES ("Chanticleer Cafe & Bakery", 
-# 	"https://foodcary.com/wp-content/uploads/2016/06/chanticleer-1491.jpg",
-# 	"https://www.google.com/maps/dir//6490+Tryon+Rd,+Cary,+NC+27518",
-# 	"Cary, NC",
-#     "http://chanticleercafe.com",
-#     "no",
-# 	"5",
-# 	"0",
-# 	"3",
-# 	"3",
-# 	"1");
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    """Adds a new cafe to the database"""
+    
+    
+    return render_template("add.html")
+
 # INSERT INTO remote_spaces ("name", 
 # 	"img_url",
 # 	"map_url",
@@ -89,19 +76,21 @@ def home():
 # 	"has_wifi",
 # 	"can_take_calls",
 # 	"description",
-# 	"last_modified") VALUES ("MILKLAB", 
-# 	"https://lh3.googleusercontent.com/p/AF1QipNzyQAb3LNrvpHegClSy7U4D4QnnJRBNB2jPrIh=s680-w680-h510",
-# 	"https://www.google.com/maps/dir//6418+Tryon+Rd,+Cary,+NC+27518",
+# 	"is_chain",
+# 	"last_modified") VALUES ("Brecotea", 
+# 	"https://www.carymagazine.com/wp-content/uploads/2020/08/Brecotea-interior2.jpg",
+# 	"https://www.google.com/maps/dir//1144+Kildaire+Farm+Rd,+Cary,+NC+27511",
 # 	"Cary, NC",
-#     "milklabcafe.com",
+#     "https://cary.brecotea.com/",
 #     "no",
+# 	"4",
 # 	"3",
-# 	"2",
-# 	"0",
-# 	"2",
 # 	"1",
+# 	"2",
+# 	"3",
 # 	"1",
-# 	"Pared-down, contemporary counter serve selling unique Asian-style rolled ice cream & tea drinks.",
+# 	"Chic bakeshop with an airy, garden-style interior & a terrace, plus varied sweet & savory bites.",
+# 	"2",
 # 	CURRENT_DATE);
 
 # TODO: Create add route

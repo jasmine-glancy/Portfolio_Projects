@@ -1,0 +1,140 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}Add A Cafe{% endblock %}
+
+{% block content %}
+
+<div class="add_cafe">
+    <h1>Add A New Cafe</h1>
+    
+    <form class="row g-3">
+        <div class="col-md-5">
+            <label for="validationDefault01" class="form-label">Cafe Name</label>
+            <input type="text" class="form-control" id="validationDefault01" name="name" required>
+        </div>
+        <div class="col-md-4">
+            <label for="validationDefault02" class="form-label">Cafe Image</label>
+            <input type="text" class="form-control" id="validationDefault02" name="img" required>
+        </div>
+        <div class="col-md-5">
+            <label for="validationDefault03" class="form-label">Location</label>
+            <input type="text" class="form-control" id="validationDefault03" name="location" required>
+        </div>
+        <div class="col-md-4">
+            <label for="validationDefault03" class="form-label">Cafe Map Link</label>
+            <input type="text" class="form-control" id="validationDefault03" name="map_link" required>
+        </div>
+        <div class="col-md-5">
+            <label for="validationDefault03" class="form-label">Cafe Website (Please enter 'None' if N/A)</label>
+            <div class="input-group">
+                <span class="input-group-text" id="inputGroupPrepend2">http://</span>
+                <input type="text" class="form-control" id="validationDefaultUsername" name="website" aria-describedby="inputGroupPrepend2" required>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label for="validationDefault04" class="form-label">Open 24-Hours a Day?</label>
+            <select class="form-select" id="validationDefault04" name="all_hours" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="validationDefault04" class="form-label">Is This Cafe a Chain?</label>
+            <select class="form-select" id="validationDefault04" name="chain" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option>Local Chain</option>
+                <option>National Chain</option>
+                <option>Not a Chain</option>
+            </select>
+        </div>
+
+        <div class="break"></div>
+
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Seating Availability</label>
+            <select class="form-select" id="validationDefault04" name="seating" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option value="0">✘</option>
+                <option value="1">🪑</option>
+                <option value="2">🪑🪑</option>
+                <option value="3">🪑🪑🪑</option>
+                <option value="4">🪑🪑🪑🪑</option>
+                <option value="5">🪑🪑🪑🪑🪑</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Menu Price</label>
+            <select class="form-select" id="validationDefault04" name="price" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option value="0">✘</option>
+                <option value="1">💵</option>
+                <option value="2">💵💵</option>
+                <option value="3">💵💵💵</option>
+                <option value="4">💵💵💵💵</option>
+                <option value="5">💵💵💵💵💵</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Socket Availability</label>
+            <select class="form-select" id="validationDefault04" name="sockets" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option value="0">✘</option>
+                <option value="1">🔌</option>
+                <option value="2">🔌🔌</option>
+                <option value="3">🔌🔌🔌</option>
+                <option value="4">🔌🔌🔌🔌</option>
+                <option value="5">🔌🔌🔌🔌🔌</option>
+            </select>
+        </div>
+        <br>
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Bathroom Availability</label>
+            <select class="form-select" id="validationDefault04" name="bathrooms" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option value="0">✘</option>
+                <option value="1">🚽</option>
+                <option value="2">🚽🚽</option>
+                <option value="3">🚽🚽🚽</option>
+                <option value="4">🚽🚽🚽🚽</option>
+                <option value="5">🚽🚽🚽🚽🚽</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Wifi Strength Rating</label>
+            <select class="form-select" id="validationDefault04" name="wifi" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option value="0">✘</option>
+                <option value="1">💪</option>
+                <option value="2">💪💪</option>
+                <option value="3">💪💪💪</option>
+                <option value="4">💪💪💪💪</option>
+                <option value="5">💪💪💪💪💪</option>
+            </select>
+        </div>
+        
+
+        <div class="col-md-3">
+            <label for="validationDefault04" class="form-label">Can Take Calls?</label>
+            <select class="form-select" id="validationDefault04" name="calls" required>
+                <option selected disabled value="">Please Make a Selection</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+        <br>
+        <div class="col-md-9">
+            <label for="validationDefault04" class="form-label">Cafe Description</label>
+            <textarea class="form-control" aria-label="With textarea" name="description"></textarea>
+
+        </div>
+        <div class="col-12">
+        <button class="btn btn-secondary" type="submit">Submit form</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
