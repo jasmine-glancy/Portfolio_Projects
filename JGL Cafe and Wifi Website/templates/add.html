@@ -6,10 +6,20 @@
 
 {% block content %}
 
+
+
+
 <div class="add_cafe">
     <h1>Add A New Cafe</h1>
-    
-    <form class="row g-3">
+
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+        {% endif %}
+    {% endwith %}
+
+    <form class="row g-3" action="{{ url_for('add') }}" method="POST">
         <div class="col-md-5">
             <label for="validationDefault01" class="form-label">Cafe Name</label>
             <input type="text" class="form-control" id="validationDefault01" name="name" required>
@@ -37,17 +47,17 @@
             <label for="validationDefault04" class="form-label">Open 24-Hours a Day?</label>
             <select class="form-select" id="validationDefault04" name="all_hours" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option>Yes</option>
-                <option>No</option>
+                <option value="0">No</option>
+                <option value="1">Yes</option>
             </select>
         </div>
         <div class="col-md-2">
             <label for="validationDefault04" class="form-label">Is This Cafe a Chain?</label>
             <select class="form-select" id="validationDefault04" name="chain" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option>Local Chain</option>
-                <option>National Chain</option>
-                <option>Not a Chain</option>
+                <option value="1">Local Chain</option>
+                <option value="2">National Chain</option>
+                <option value="3">Not a Chain</option>
             </select>
         </div>
 
@@ -122,8 +132,8 @@
             <label for="validationDefault04" class="form-label">Can Take Calls?</label>
             <select class="form-select" id="validationDefault04" name="calls" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option>Yes</option>
-                <option>No</option>
+                <option value="0">No</option>
+                <option value="1">Yes</option>
             </select>
         </div>
         <br>

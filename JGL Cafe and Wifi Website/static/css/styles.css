@@ -181,7 +181,9 @@ h1 {
 .card-group {
     margin-top: 3.25vw;
     display: flex;
+    flex-wrap: wrap;
     flex-direction: row;
+    justify-content: center;
     margin-left: auto;
     margin-right: auto;
     max-width: 90vw;
@@ -193,7 +195,8 @@ h1 {
     justify-content: center;
     background-color: var(--dun);
     min-width: 28.66vw;
-    max-height: 45vw;
+    min-height: fit-content;
+    max-height: 48vw;
     max-width: 28.66vw;
     padding: 1vw;
     margin: 1vw;
@@ -203,7 +206,6 @@ h1 {
     max-height: 16vw;
     object-fit: cover;
     height: auto;
-    margin-top: 1vw;
 }
 
 .card-title {
@@ -221,6 +223,13 @@ h1 {
 .card-text {
     margin-top: 1vw;
     margin-left: 2vw;
+}
+
+.description {
+    overflow-y: auto;
+    max-height: 3em;
+    padding-right: 1vw;
+    scrollbar-color: var(--chamoisee) var(--tan);
 }
 
 .longer_name {
@@ -282,6 +291,7 @@ a .add {
     width: 15vw;
     margin-top: 15vw;
     margin-left: 7vw;
+    margin-bottom: 15vw;
 }
 
 .indicator_icons {

@@ -3,7 +3,7 @@ power for remote working"""
 
 from cs50 import SQL
 from datetime import datetime
-from flask import Flask, render_template
+from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_bootstrap import Bootstrap
 import os
 
@@ -26,7 +26,9 @@ db = SQL("sqlite:///remote_workspaces.db")
 # A custom filter to convert string to datetime, suggested by CoPilot
 @app.template_filter("str_to_datetime")
 def str_to_datetime(s, format="%x"):
-    return datetime.strptime(s, "%Y-%m-%d").strftime(format)
+    date_object = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+    
+    return date_object.strftime(format)
 
 @app.template_filter("check_if_chain")
 def check_if_chain(chain_value):
@@ -59,39 +61,56 @@ def home():
 @app.route("/add", methods=["GET", "POST"])
 def add():
     """Adds a new cafe to the database"""
+
     
-    
+    if request.method == "POST":
+        cafe_name = request.form.get("name")
+        img = request.form.get("img")
+        location = request.form.get("location")
+        map_url = request.form.get("map_link")
+        
+        if map_url.startswith("http://") or map_url.startswith("https://"):
+            map_url = map_url
+        else:
+            map_url = f"https://{map_url}"
+            
+        website = request.form.get("website")
+        open_24_hours = request.form.get("all_hours")
+        chain = request.form.get("chain")
+        seating = request.form.get("seating")
+        price = request.form.get("price")
+        sockets = request.form.get("sockets")
+        bathrooms = request.form.get("bathrooms")
+        wifi = request.form.get("wifi")
+        calls = request.form.get("calls")
+        description = request.form.get("description")
+        
+        print(cafe_name, img, location, map_url, website)
+        print(open_24_hours, chain, seating, price, sockets)
+        print(bathrooms, wifi, calls, description)
+        
+        current_date = datetime.today()
+        try:
+            db.execute(
+                "INSERT INTO remote_spaces \
+                    (name, img_url, map_url, location, \
+                      website, open_24_hours, seats, price, \
+            	      socket_availability, has_toilet, has_wifi, \
+            	      can_take_calls, description, is_chain, last_modified) \
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       cafe_name, img, map_url, location, website,
+                       open_24_hours, seating, price, sockets, 
+                       bathrooms, wifi, calls, description, chain,
+                       current_date
+            )
+        except Exception as e:
+            flash(f"Can't insert new cafe. Exception: {e}")
+            return redirect(url_for("add"))
+        
+        return redirect(url_for("home"))
     return render_template("add.html")
 
-# INSERT INTO remote_spaces ("name", 
-# 	"img_url",
-# 	"map_url",
-# 	"location",
-#     "website",
-#     "open_24_hours",
-# 	"seats",
-# 	"price",
-# 	"socket_availability",
-# 	"has_toilet",
-# 	"has_wifi",
-# 	"can_take_calls",
-# 	"description",
-# 	"is_chain",
-# 	"last_modified") VALUES ("Brecotea", 
-# 	"https://www.carymagazine.com/wp-content/uploads/2020/08/Brecotea-interior2.jpg",
-# 	"https://www.google.com/maps/dir//1144+Kildaire+Farm+Rd,+Cary,+NC+27511",
-# 	"Cary, NC",
-#     "https://cary.brecotea.com/",
-#     "no",
-# 	"4",
-# 	"3",
-# 	"1",
-# 	"2",
-# 	"3",
-# 	"1",
-# 	"Chic bakeshop with an airy, garden-style interior & a terrace, plus varied sweet & savory bites.",
-# 	"2",
-# 	CURRENT_DATE);
+
 
 # TODO: Create add route
 # TODO: Create edit route
