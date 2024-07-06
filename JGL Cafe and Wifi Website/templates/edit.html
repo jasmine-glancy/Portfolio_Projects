@@ -17,33 +17,32 @@
     <form class="row g-3" action="{{ url_for('edit') }}" method="POST">
         <div class="col-md-5">
             <label for="validationDefault01" class="form-label">Cafe Name</label>
-            <input type="text" class="form-control" id="validationDefault01" name="name" required>
+            <input type="text" class="form-control" id="validationDefault01" name="name" value="{{ cafe.name }}" required>
         </div>
         <div class="col-md-4">
             <label for="validationDefault02" class="form-label">Cafe Image</label>
-            <input type="text" class="form-control" id="validationDefault02" name="img" required>
+            <input type="text" class="form-control" id="validationDefault02" name="img" value="{{ cafe.img_url }}" required>
         </div>
         <div class="col-md-5">
             <label for="validationDefault03" class="form-label">Location</label>
-            <input type="text" class="form-control" id="validationDefault03" name="location" required>
+            <input type="text" class="form-control" id="validationDefault03" name="location" value="{{ cafe.location }}" required>
         </div>
         <div class="col-md-4">
             <label for="validationDefault03" class="form-label">Cafe Map Link</label>
-            <input type="text" class="form-control" id="validationDefault03" name="map_link" required>
+            <input type="text" class="form-control" id="validationDefault03" name="map_link" value="{{ cafe.map_url }}" required>
         </div>
         <div class="col-md-5">
             <label for="validationDefault03" class="form-label">Cafe Website (Please enter 'None' if N/A)</label>
             <div class="input-group">
-                <span class="input-group-text" id="inputGroupPrepend2">http://</span>
-                <input type="text" class="form-control" id="validationDefaultUsername" name="website" aria-describedby="inputGroupPrepend2" required>
+                <input type="text" class="form-control" id="validationDefaultUsername" name="website" value="{{ cafe.website }}" aria-describedby="inputGroupPrepend2" required>
             </div>
         </div>
         <div class="col-md-2">
             <label for="validationDefault04" class="form-label">Open 24-Hours a Day?</label>
             <select class="form-select" id="validationDefault04" name="all_hours" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
+                <option value="0" {% if cafe.open_24_hours == 0 %}selected{% endif %}>No</option>
+                <option value="1" {% if cafe.open_24_hours == 1 %}selected{% endif %}>Yes</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -134,7 +133,7 @@
         <br>
         <div class="col-md-9">
             <label for="validationDefault04" class="form-label">Cafe Description</label>
-            <textarea class="form-control" aria-label="With textarea" name="description"></textarea>
+            <textarea class="form-control" aria-label="With textarea" name="description">{{ cafe.description }}</textarea>
 
         </div>
         <div class="col-12">

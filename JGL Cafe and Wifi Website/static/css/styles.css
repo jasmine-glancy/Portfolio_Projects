@@ -172,7 +172,7 @@ h1 {
         display: inline-block;
     }
 
-    .edit {
+    .btn.edit {
         position: absolute;
         margin-top: 0.75vw;
         right: 3vw;

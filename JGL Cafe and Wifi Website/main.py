@@ -110,8 +110,29 @@ def add():
         return redirect(url_for("home"))
     return render_template("add.html")
 
-@app.route("/edit/<int:workspace_id>", methods=["GET", "POST"])
-def edit(workspace_id):
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
     """Allows a user to edit a cafe's information"""
     
+    workspace = request.args.get("workspace_id", type=int)
+    
+    print(workspace)
+    
+    try:
+        workspace_query = db.execute(
+            "SELECT * FROM remote_spaces WHERE workspace_id = :workspace",
+            workspace=workspace
+        )
+        
+        print(workspace_query)
+        
+        cafe = workspace_query[0]
+        
+        print(cafe["open_24_hours"], type(cafe["open_24_hours"]))
+        print(cafe["description"])
+        return render_template("edit.html", cafe=cafe)
+        
+    except Exception as e:
+        flash(f"Can't find workspace. Exception: {e}")
+        
     return render_template("edit.html")
