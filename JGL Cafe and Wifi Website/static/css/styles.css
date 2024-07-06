@@ -152,6 +152,13 @@ h1 {
         min-width: fit-content;
     }
 
+    /* Add and Edit Buttons */
+
+    .btn.btn-secondary {
+        margin-top: 1vw;
+        margin-bottom: 5vw;
+    }
+
     /* Cafe Card Buttons */
 
     .button-container {

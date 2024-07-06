@@ -19,6 +19,9 @@
       rel="stylesheet"
     />
 
+    <!-- Load in favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='assets/svg/coffee.svg') }}">
+
     {% endblock %}
 
     <title>
@@ -29,7 +32,7 @@
     <!-- Navigation bar -->
     <nav class="navbar navbar-dark fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Cafes & Workspaces Around RDU</a>
+        <a class="navbar-brand" href="/">Cafes & Workspaces Around RDU</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>

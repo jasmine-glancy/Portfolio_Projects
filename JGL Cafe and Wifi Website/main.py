@@ -135,4 +135,6 @@ def edit():
     except Exception as e:
         flash(f"Can't find workspace. Exception: {e}")
         
+    # TODO: Update "Last edited" column if edit is successful
+        
     return render_template("edit.html")
