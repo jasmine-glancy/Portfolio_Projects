@@ -9,13 +9,29 @@
             {% for cafe in cafe_results %}
                 <div class="card">
                     <img src="{{ cafe.img_url }}" class="card-img-top" alt="An image representing {{ cafe.name }}">
+                    {% if (cafe.name ~ "'s Website")|length >= 35 %}
+                        <div class="chain_indicator_smaller">
+                            <button type="button" class="btn disabled">
+                                {{ cafe.is_chain|check_if_chain}}
+                            </button>
+                        </div>
+                    {% endif %}
                     <div class="card-body">
                         <h3 class="card-title">{{ cafe.name }}</h3> 
-                        <h4 class="{{ 'longer_name' if cafe.name|length >= 14 and cafe_results|length % 3 != 0 else '' }}">{{ cafe.location }}</h4>
+                        <h4 class="{{ 'longer_name' if cafe.name|length >= 12 and cafe_results|length % 3 != 0 else '' }}">{{ cafe.location }}</h4>
                         
+                        <!-- String concatenation suggested by CoPilot -->
+                        {% if (cafe.name ~ "'s Website")|length < 35 %}
+                            <div class="chain_indicator">
+                                <button type="button" class="btn disabled">
+                                    {{ cafe.is_chain|check_if_chain}}
+                                </button>
+                            </div>
+                        {% endif %}
+
                         <div class="card-text">
                             <a href="{{ cafe.website }}">{{ cafe.name }}'s Website</a>
-                            
+                        
                             <table>
                                 <tr>
                                     <td>
@@ -219,9 +235,11 @@
 
                                 <div class="divider"></div>
                                 
-                                <button type="button" class="btn disabled">
-                                    {{ cafe.is_chain|check_if_chain}}
-                                </button>
+                                <a href="{{ url_for('edit', workspace_id=cafe.workspace_id) }}">
+                                    <button type="button" class="edit">
+                                        Edit
+                                    </button>
+                                </a>
                             </div>
                             <h6>
                                 Last updated {{ cafe.last_modified|str_to_datetime("%x") }}

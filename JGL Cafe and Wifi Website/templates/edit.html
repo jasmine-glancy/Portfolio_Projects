@@ -1,14 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Add A Cafe{% endblock %}
+{% block title %}Edit Cafe{% endblock %}
 
 {% block content %}
 
-
-
-
-<div class="add_cafe">
-    <h1>Add A New Cafe</h1>
+<div class="edit_cafe">
+    <h1>Edit Cafe</h1>
 
     <!-- Load in Error messages -->
     {% with messages = get_flashed_messages() %}
@@ -17,7 +14,7 @@
         {% endif %}
     {% endwith %}
 
-    <form class="row g-3" action="{{ url_for('add') }}" method="POST">
+    <form class="row g-3" action="{{ url_for('edit') }}" method="POST">
         <div class="col-md-5">
             <label for="validationDefault01" class="form-label">Cafe Name</label>
             <input type="text" class="form-control" id="validationDefault01" name="name" required>

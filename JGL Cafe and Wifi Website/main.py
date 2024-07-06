@@ -110,7 +110,8 @@ def add():
         return redirect(url_for("home"))
     return render_template("add.html")
 
-
-
-# TODO: Create add route
-# TODO: Create edit route
+@app.route("/edit/<int:workspace_id>", methods=["GET", "POST"])
+def edit(workspace_id):
+    """Allows a user to edit a cafe's information"""
+    
+    return render_template("edit.html")
