@@ -110,18 +110,65 @@ def add():
         return redirect(url_for("home"))
     return render_template("add.html")
 
-@app.route("/edit", methods=["GET", "POST"])
-def edit():
+@app.route("/edit/<workspace_id>", methods=["GET", "POST"])
+def edit(workspace_id):
     """Allows a user to edit a cafe's information"""
     
-    workspace = request.args.get("workspace_id", type=int)
-    
-    print(workspace)
-    
+    # TODO: Update "Last edited" column if edit is successful
+    if request.method == "POST":
+        print("POSTING")
+        
+        cafe_name = request.form.get("name")
+        img = request.form.get("img")
+        location = request.form.get("location")
+        map_url = request.form.get("map_link")
+        
+        if map_url.startswith("http://") or map_url.startswith("https://"):
+            map_url = map_url
+        else:
+            map_url = f"https://{map_url}"
+            
+        website = request.form.get("website")
+        open_24_hours = request.form.get("all_hours")
+        chain = request.form.get("chain")
+        seating = request.form.get("seating")
+        price = request.form.get("price")
+        sockets = request.form.get("sockets")
+        bathrooms = request.form.get("bathrooms")
+        wifi = request.form.get("wifi")
+        calls = request.form.get("calls")
+        description = request.form.get("description")
+        
+
+        current_date = datetime.today()
+        try:
+            db.execute(
+                "UPDATE remote_spaces set name = :name, \
+                    img_url = :img, map_url = :map_url, location = :location, \
+                      website = :website, open_24_hours = :open_24_hours, \
+                          seats = :seating, price = :price, socket_availability = :sockets, \
+                              has_toilet = :bathrooms, has_wifi = :wifi, \
+                                  can_take_calls = :calls, description = :description, \
+                                      is_chain = :chain, last_modified = :date \
+                                          WHERE workspace_id = :workspace_id",
+                       name=cafe_name, img=img, map_url=map_url, 
+                       location=location, website=website, open_24_hours=open_24_hours, 
+                       seating=seating, price=price, sockets=sockets, 
+                       bathrooms=bathrooms, wifi=wifi, calls=calls, 
+                       description=description, chain=chain, date=current_date,
+                       workspace_id=workspace_id
+            )
+            
+            return redirect(url_for("home"))
+        except Exception as e:
+            print(f"Can't edit cafe. Exception: {e}")
+            return redirect(url_for("edit", workspace_id=workspace_id))
+        
+    # If GET
     try:
         workspace_query = db.execute(
             "SELECT * FROM remote_spaces WHERE workspace_id = :workspace",
-            workspace=workspace
+            workspace=workspace_id
         )
         
         print(workspace_query)
@@ -135,6 +182,7 @@ def edit():
     except Exception as e:
         flash(f"Can't find workspace. Exception: {e}")
         
-    # TODO: Update "Last edited" column if edit is successful
+
+        
         
     return render_template("edit.html")

@@ -92,21 +92,28 @@ h1 {
     }
     .offcanvas-title {
         color: var(--tan);
+        font-size: xx-large;
     }
 
     .offcanvas-body, .offcanvas-header {
         background-color: var(--coffee);
     }
-    
-    .dropdown-menu {
-        background-color: var(--raw_umber);
+
+    .offcanvas {
+        font-size: x-large;
     }
 
+    .offcanvas.offcanvas-end.text-bg-dark {
+        max-height: fit-content;
+    }
+
+    
     /* Search Bar */
 
     .form-control {
         background-color: var(--dun);
         color: var(--coffee);
+        border-left: none;
     }
 
         /* Targeting the inner search font, suggested by CoPilot */
@@ -119,23 +126,28 @@ h1 {
     margin-left: 15vw;
     color: var(--coffee);
 }
+
     .row.g-3, .row.g-3 input, .form-select {
         color: var(--coffee);
     }
 
-    .row.g-3 input, .form-select, .form-control {
+    .row.g-3 input, .form-select {
         background-color: var(--almond);
     }
 
-    .form-control:focus, .form-select:hover {
+    .form-select:hover {
         background-color: #faf4eece;
         color: var(--chamoisee);
     }
-    #inputGroupPrepend2 {
+    
+    #inputGroupPrepend1, #inputGroupPrepend2 {
         background-color: var(--coffee);
         color: var(--tan);
     }
 
+    #inputGroupPrepend1 {
+        width: fit-content;
+    }
     .break {
         margin-top: 0.25vw;
     }

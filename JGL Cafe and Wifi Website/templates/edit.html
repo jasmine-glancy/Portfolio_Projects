@@ -14,10 +14,13 @@
         {% endif %}
     {% endwith %}
 
-    <form class="row g-3" action="{{ url_for('edit') }}" method="POST">
+    <form class="row g-3" action="{{ url_for('edit', workspace_id=cafe.workspace_id) }}" method="POST">
         <div class="col-md-5">
             <label for="validationDefault01" class="form-label">Cafe Name</label>
-            <input type="text" class="form-control" id="validationDefault01" name="name" value="{{ cafe.name }}" required>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroupPrepend1"># {{ cafe.workspace_id }}</span>
+                <input type="text" class="form-control" id="validationDefault01" name="name" value="{{ cafe.name }}" required>
+            </div>
         </div>
         <div class="col-md-4">
             <label for="validationDefault02" class="form-label">Cafe Image</label>
@@ -49,9 +52,9 @@
             <label for="validationDefault04" class="form-label">Is This Cafe a Chain?</label>
             <select class="form-select" id="validationDefault04" name="chain" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="1">Local Chain</option>
-                <option value="2">National Chain</option>
-                <option value="3">Not a Chain</option>
+                <option value="1" {% if cafe.is_chain == 1 %}selected{% endif %}>Local Chain</option>
+                <option value="2" {% if cafe.is_chain == 2 %}selected{% endif %}>National Chain</option>
+                <option value="3" {% if cafe.is_chain == 3 %}selected{% endif %}>Not a Chain</option>
             </select>
         </div>
 
@@ -61,12 +64,12 @@
             <label for="validationDefault04" class="form-label">Seating Availability</label>
             <select class="form-select" id="validationDefault04" name="seating" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">✘</option>
-                <option value="1">🪑</option>
-                <option value="2">🪑🪑</option>
-                <option value="3">🪑🪑🪑</option>
-                <option value="4">🪑🪑🪑🪑</option>
-                <option value="5">🪑🪑🪑🪑🪑</option>
+                <option value="0" {% if cafe.seats == 0 %}selected{% endif %}>✘</option>
+                <option value="1" {% if cafe.seats == 1 %}selected{% endif %}>🪑</option>
+                <option value="2" {% if cafe.seats == 2 %}selected{% endif %}>🪑🪑</option>
+                <option value="3" {% if cafe.seats == 3 %}selected{% endif %}>🪑🪑🪑</option>
+                <option value="4" {% if cafe.seats == 4 %}selected{% endif %}>🪑🪑🪑🪑</option>
+                <option value="5" {% if cafe.seats == 5 %}selected{% endif %}>🪑🪑🪑🪑🪑</option>
             </select>
         </div>
 
@@ -74,12 +77,12 @@
             <label for="validationDefault04" class="form-label">Menu Price</label>
             <select class="form-select" id="validationDefault04" name="price" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">✘</option>
-                <option value="1">💵</option>
-                <option value="2">💵💵</option>
-                <option value="3">💵💵💵</option>
-                <option value="4">💵💵💵💵</option>
-                <option value="5">💵💵💵💵💵</option>
+                <option value="0" {% if cafe.price == 0 %}selected{% endif %}>✘</option>
+                <option value="1" {% if cafe.price == 1 %}selected{% endif %}>💵</option>
+                <option value="2" {% if cafe.price == 2 %}selected{% endif %}>💵💵</option>
+                <option value="3" {% if cafe.price == 3 %}selected{% endif %}>💵💵💵</option>
+                <option value="4" {% if cafe.price == 4 %}selected{% endif %}>💵💵💵💵</option>
+                <option value="5" {% if cafe.price == 5 %}selected{% endif %}>💵💵💵💵💵</option>
             </select>
         </div>
 
@@ -87,12 +90,12 @@
             <label for="validationDefault04" class="form-label">Socket Availability</label>
             <select class="form-select" id="validationDefault04" name="sockets" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">✘</option>
-                <option value="1">🔌</option>
-                <option value="2">🔌🔌</option>
-                <option value="3">🔌🔌🔌</option>
-                <option value="4">🔌🔌🔌🔌</option>
-                <option value="5">🔌🔌🔌🔌🔌</option>
+                <option value="0" {% if cafe.socket_availability == 0 %}selected{% endif %}>✘</option>
+                <option value="1" {% if cafe.socket_availability == 1 %}selected{% endif %}>🔌</option>
+                <option value="2" {% if cafe.socket_availability == 2 %}selected{% endif %}>🔌🔌</option>
+                <option value="3" {% if cafe.socket_availability == 3 %}selected{% endif %}>🔌🔌🔌</option>
+                <option value="4" {% if cafe.socket_availability == 4 %}selected{% endif %}>🔌🔌🔌🔌</option>
+                <option value="5" {% if cafe.socket_availability == 4 %}selected{% endif %}>🔌🔌🔌🔌🔌</option>
             </select>
         </div>
         <br>
@@ -100,24 +103,24 @@
             <label for="validationDefault04" class="form-label">Bathroom Availability</label>
             <select class="form-select" id="validationDefault04" name="bathrooms" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">✘</option>
-                <option value="1">🚽</option>
-                <option value="2">🚽🚽</option>
-                <option value="3">🚽🚽🚽</option>
-                <option value="4">🚽🚽🚽🚽</option>
-                <option value="5">🚽🚽🚽🚽🚽</option>
+                <option value="0" {% if cafe.has_toilet == 0 %}selected{% endif %}>✘</option>
+                <option value="1" {% if cafe.has_toilet == 1 %}selected{% endif %}>🚽</option>
+                <option value="2" {% if cafe.has_toilet == 2 %}selected{% endif %}>🚽🚽</option>
+                <option value="3" {% if cafe.has_toilet == 3 %}selected{% endif %}>🚽🚽🚽</option>
+                <option value="4" {% if cafe.has_toilet == 4 %}selected{% endif %}>🚽🚽🚽🚽</option>
+                <option value="5" {% if cafe.has_toilet == 4 %}selected{% endif %}>🚽🚽🚽🚽🚽</option>
             </select>
         </div>
         <div class="col-md-3">
             <label for="validationDefault04" class="form-label">Wifi Strength Rating</label>
             <select class="form-select" id="validationDefault04" name="wifi" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">✘</option>
-                <option value="1">💪</option>
-                <option value="2">💪💪</option>
-                <option value="3">💪💪💪</option>
-                <option value="4">💪💪💪💪</option>
-                <option value="5">💪💪💪💪💪</option>
+                <option value="0" {% if cafe.has_wifi == 0 %}selected{% endif %}>✘</option>
+                <option value="1" {% if cafe.has_wifi == 1 %}selected{% endif %}>💪</option>
+                <option value="2" {% if cafe.has_wifi == 2 %}selected{% endif %}>💪💪</option>
+                <option value="3" {% if cafe.has_wifi == 3 %}selected{% endif %}>💪💪💪</option>
+                <option value="4" {% if cafe.has_wifi == 4 %}selected{% endif %}>💪💪💪💪</option>
+                <option value="5" {% if cafe.has_wifi == 4 %}selected{% endif %}>💪💪💪💪💪</option>
             </select>
         </div>
         
@@ -126,8 +129,8 @@
             <label for="validationDefault04" class="form-label">Can Take Calls?</label>
             <select class="form-select" id="validationDefault04" name="calls" required>
                 <option selected disabled value="">Please Make a Selection</option>
-                <option value="0">No</option>
-                <option value="1">Yes</option>
+                <option value="0" {% if cafe.can_take_calls == 0 %}selected{% endif %}>No</option>
+                <option value="1" {% if cafe.can_take_calls == 1 %}selected{% endif %}>Yes</option>
             </select>
         </div>
         <br>
