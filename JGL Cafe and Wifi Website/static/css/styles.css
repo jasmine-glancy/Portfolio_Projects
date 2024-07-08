@@ -7,6 +7,7 @@
     --tan: #DDB892;
     --chamoisee: #B08968;
     --coffee: #7F5539;
+    --espresso: #5b3d28;
     --raw_umber: #9C6644;
 }
 
@@ -15,7 +16,7 @@ body {
 }
 
 /* Add Cafe */
-.add_cafe, .edit_cafe {
+.add_cafe, .edit_cafe, .login_register {
     background-color: var(--dun);
     width: 90%;
     margin-top: 7vw;
@@ -83,6 +84,11 @@ h1 {
     background-color: var(--coffee);
     color: var(--tan);
 }
+
+    .container-fluid {
+        margin-left: 2vw;
+    }
+
     .offcanvas {
         --bs-offcanvas-box-shadow: var(--coffee);
     }
@@ -90,9 +96,15 @@ h1 {
     .navbar-brand:hover {
         color: var(--almond);
     }
+
     .offcanvas-title {
         color: var(--tan);
         font-size: xx-large;
+        margin-left: 1vw;
+    }
+    
+    .btn-close.btn-close-white {
+        margin-right: 0.5vw;
     }
 
     .offcanvas-body, .offcanvas-header {
@@ -103,11 +115,34 @@ h1 {
         font-size: x-large;
     }
 
+    .nav-item {
+        margin-left: 2vw;
+    }
+
+    .nav-link {
+        margin-left: 0.5vw;
+    }
+
+    .nav-item-icon {
+        display: flex;
+        align-items: center;
+    }
+    
+    .nav-item-icon img.bullet_point {
+        margin-right: 0.5rem; 
+    }
+
     .offcanvas.offcanvas-end.text-bg-dark {
         max-height: fit-content;
     }
 
-    
+    img.bullet_point {
+        color: var(--espresso);
+        margin-top: 0;
+        max-width: 2vw;
+    }
+
+
     /* Search Bar */
 
     .form-control {
@@ -125,6 +160,7 @@ h1 {
 .row.g-3 {
     margin-left: 15vw;
     color: var(--coffee);
+    font-size: larger;
 }
 
     .row.g-3, .row.g-3 input, .form-select {
@@ -194,6 +230,12 @@ h1 {
     .btn.edit {
         position: absolute;
         margin-top: 0.75vw;
+        right: 7vw;
+    }
+
+    .btn.delete {
+        position: absolute;
+        margin-top: 0.75vw;
         right: 3vw;
     }
 
@@ -218,7 +260,7 @@ h1 {
     .chain_indicator_smaller {
         display: flex;
         position: absolute;
-        top: 20vw; 
+        top: 20.75vw; 
         right: 2vw; 
         z-index: 100;
     }
@@ -281,9 +323,13 @@ h1 {
 
 .longer_name {
     display: inline;
-    margin-left: 1vw;
+    margin-left: 2vw;
 }
 
+    .mid_name {  
+        display: inline;
+        margin-left: -0.25vw;
+    }
 
     /* Card Links */
     .card a {
@@ -343,4 +389,24 @@ a .add {
 
 .indicator_icons {
     width: 1.75vw;
+}
+
+/* Error Messages */
+.flash, .heading_flash {
+    text-align: center;
+    font-weight: 700;
+}
+
+    .flash {
+        color: var(--raw_umber);
+    }
+
+    .heading_flash {
+        color: var(--tan);
+        display: inline;
+        margin-left: 25vw;
+    }
+
+.warning {
+    max-width: 2vw;
 }

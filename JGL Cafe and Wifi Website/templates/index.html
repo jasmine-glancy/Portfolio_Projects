@@ -18,7 +18,7 @@
                     {% endif %}
                     <div class="card-body">
                         <h3 class="card-title">{{ cafe.name }}</h3> 
-                        <h4 class="{{ 'longer_name' if cafe.name|length >= 12 and cafe_results|length % 3 != 0 else '' }}">{{ cafe.location }}</h4>
+                        <h4 class="{{ 'longer_name' if cafe.name|length >= 30 and cafe_results|length % 3 != 0 else 'mid_name' if cafe.name|length < 30 else '' }}">{{ cafe.location }}</h4>
                         
                         <!-- String concatenation suggested by CoPilot -->
                         {% if (cafe.name ~ "'s Website")|length < 35 %}
@@ -235,9 +235,16 @@
 
                                 <div class="divider"></div>
                                 
+                                <!-- TODO: Move edit button depending on who is logged in (i.e. admin) -->
                                 <a href="{{ url_for('edit', workspace_id=cafe.workspace_id) }}">
                                     <button type="button" class="btn edit">
                                         Edit
+                                    </button>
+                                </a>
+
+                                <a href="{{ url_for('delete_workspace', workspace_id=cafe.workspace_id) }}">
+                                    <button type="button" class="btn delete">
+                                        Delete
                                     </button>
                                 </a>
                             </div>

@@ -32,7 +32,19 @@
     <!-- Navigation bar -->
     <nav class="navbar navbar-dark fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">Cafes & Workspaces Around RDU</a>
+        <a class="navbar-brand" href="/">Cafes & Workspaces Around RDU
+          {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                  {% for error in messages %}
+                      <p class="heading_flash">
+                          <img src="{{ url_for('static', filename='assets/svg/warning_light.svg')}}" class="warning" alt="Error">
+                          {{ messages[-1] }} 
+                          <img src="{{ url_for('static', filename='assets/svg/warning_light.svg')}}" class="warning" alt="Error">
+                      </p>
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -43,12 +55,29 @@
           </div>
           <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-              <li class="nav-item">
+              <li class="nav-item nav-item-icon">
+                <img src="{{ url_for('static', filename='assets/svg/coffee_bullet.svg')}}" class="bullet_point" alt="*">
                 <a class="nav-link" href="/">Home</a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item nav-item-icon">
+                <img src="{{ url_for('static', filename='assets/svg/coffee_bullet.svg')}}" class="bullet_point" alt="*">
                 <a class="nav-link" href="/add">Add A Cafe</a>
               </li>
+              {% if session["user_id"] %}
+                <li class="nav-item nav-item-icon">
+                  <img src="{{ url_for('static', filename='assets/svg/coffee_bullet.svg')}}" class="bullet_point" alt="*">
+                  <a class="nav-link" href="/logout">Log Out</a>
+                </li>
+              {% else %}
+                <li class="nav-item nav-item-icon">
+                  <img src="{{ url_for('static', filename='assets/svg/coffee_bullet.svg')}}" class="bullet_point" alt="*">
+                  <a class="nav-link" href="/login">Log In</a>
+                </li>
+                <li class="nav-item nav-item-icon">
+                  <img src="{{ url_for('static', filename='assets/svg/coffee_bullet.svg')}}" class="bullet_point" alt="*">
+                  <a class="nav-link" href="/register">Register</a>
+                </li>
+              {% endif %}
             </ul>
           </div>
         </div>

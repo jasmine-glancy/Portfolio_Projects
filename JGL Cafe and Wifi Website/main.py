@@ -3,9 +3,14 @@ power for remote working"""
 
 from cs50 import SQL
 from datetime import datetime
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import Flask, flash, jsonify, redirect, \
+    render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 import os
+from werkzeug.exceptions import NotFound
+from werkzeug.security import check_password_hash, generate_password_hash
+
+
 
 # --------------------------- App Setup --------------------------- #
 
@@ -15,8 +20,9 @@ app = Flask(__name__)
 # Add in Bootstrap
 Bootstrap(app)
 
+API_KEY = os.environ.get("KEY")
 # Load in security key
-app.config["SECRET_KEY"] = os.environ.get("KEY")
+app.config["SECRET_KEY"] = API_KEY
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///remote_workspaces.db")
@@ -57,6 +63,103 @@ def home():
     print(type(cafe_results[0]["last_modified"]))
     
     return render_template("index.html", cafe_results=cafe_results)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Logs an existing user in"""
+        
+    # Checks if the user's data is validated 
+    if request.method == "POST":
+
+        # Check username and hashed password against the database
+        try:
+            user_lookup = db.execute(
+                "SELECT * FROM users WHERE username = ?", request.form.get("username")
+            )
+            
+            if user_lookup == None:
+                flash("Username not found.")
+                return redirect(url_for('login'))
+        
+            # Ensure username exists and password is correct
+            elif not check_password_hash(user_lookup[0]["password"], 
+                                    request.form.get("password")):
+                flash("Invalid password.")
+                return redirect(url_for('login'))
+            
+            else:
+                flash(f"Logged in as {request.form.get("username")}!")
+                
+                # Remember which user has logged in
+                session["user_id"] = user_lookup[0]["user_id"]
+                return redirect(url_for("home"))
+        except Exception as e:
+            flash(f"Can't log in. Exception: {e}")
+            return redirect(url_for('login'))
+    
+        
+        
+    
+    return render_template("login.html")
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Registers a new user"""
+
+    
+    if request.method == "POST":
+        
+        try:
+            # Check user against info in the database
+            find_user = db.execute(
+                "SELECT * FROM users WHERE username = ?", request.form.get("username")
+            )
+            
+            # Check if username exists already in the database
+            if len(find_user) != 0:
+                flash("That username already taken.")
+            # Check if the user's password matches the password verification
+            elif request.form.get("password") != request.form.get("confirm_password"):
+                flash("Passwords must match.")
+
+            # If all checks pass, hash password
+            hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
+        except Exception as e:
+            flash(f"Can't register new user, exception: {e}")
+            return redirect(url_for("register"))
+        else:
+            # Insert data if all checks pass
+            try:
+                # Insert new info into database
+                db.execute("INSERT INTO users (username, password) VALUES(?, ?)", request.form.get("username"), hashed_password)
+                    
+                user = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+            except Exception as e:    
+                flash(f"Can't insert new user into database, exception: {e}")
+                return redirect(url_for("register"))
+        
+            # Remember which user has logged in
+            session["user_id"] = user[0]["user_id"]
+            session["logged_in"] = True
+            
+            logged_in = session["logged_in"]
+                
+            # Redirect to home
+            return render_template("index.html", logged_in=logged_in)
+        
+    return render_template("register.html")
+
+
+@app.route("/logout")
+def logout():
+    """Logs user out"""
+    
+    # Clears the user_id
+    session.clear()
+    
+    # Redirect to home
+    return redirect("/")
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
@@ -114,7 +217,6 @@ def add():
 def edit(workspace_id):
     """Allows a user to edit a cafe's information"""
     
-    # TODO: Update "Last edited" column if edit is successful
     if request.method == "POST":
         print("POSTING")
         
@@ -182,7 +284,23 @@ def edit(workspace_id):
     except Exception as e:
         flash(f"Can't find workspace. Exception: {e}")
         
-
-        
-        
     return render_template("edit.html")
+
+
+@app.route("/delete_workspace/<int:workspace_id>", methods=["DELETE"])
+def delete_workspace(workspace_id):
+    
+    if request.args.get("api-key") == API_KEY:
+        try:
+            #TODO: Select cafe based on the api key
+            
+            db.execute(
+                "DELETE FROM remote_workspaces WHERE workspace_id = :id",
+                id = workspace_id
+            )
+            
+            return jsonify(response={"success": "Successfully deleted from the database!"}), 200
+        except NotFound:
+            return jsonify(error={"Not Found": "Sorry, a cafe with that id was not found in the database"}), 404
+    else:
+        return jsonify(error={"Not Found": "Sorry, that's not allowed. Make sure you have the correct api_key."}), 403

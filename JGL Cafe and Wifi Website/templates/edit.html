@@ -10,7 +10,11 @@
     <!-- Load in Error messages -->
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+            <p class="flash">
+                <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+                 {{ messages[-1] }} 
+                <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+            </p>
         {% endif %}
     {% endwith %}
 
@@ -140,7 +144,7 @@
 
         </div>
         <div class="col-12">
-        <button class="btn btn-secondary" type="submit">Submit form</button>
+            <button class="btn btn-secondary" type="submit">Edit Cafe</button>
         </div>
     </form>
 </div>
