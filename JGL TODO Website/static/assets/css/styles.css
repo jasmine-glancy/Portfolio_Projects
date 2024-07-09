@@ -1,0 +1,84 @@
+:root {
+    /* Palette courtesy of 
+    https://coolors.co/000000-66666e-9999a1-e6e6e9-f4f4f6 */
+
+    --anti_flash_white: #F4F4F6;
+    --platinum: #E6E6E9;
+    --taupe_gray: #9999A1;
+    --dim_gray: #66666E;
+    --black: #000000;
+}
+
+body {
+    background-color: var(--dim_gray);
+}
+
+table.month {
+    width: 70%; 
+    border-collapse: collapse;
+    margin-top: 5vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    table.month th, table.month td {
+        border: 1px solid var(--dim_gray);
+    } 
+
+    table.month th {
+        text-align: center;
+    }
+
+    th.month {
+        padding: 2vw;
+    }
+    
+    table.month td {
+        text-align: top;
+        padding: 1vw 3vw 3vw 1vw;
+        font-weight: 700;
+    }
+    
+    table.month > tbody:nth-child(1) > tr:nth-child(2) {
+        background-color: var(--platinum);
+        color: var(--dim_gray);
+        border-color: var(--taupe_gray);
+        padding: 1vw 1vw 1vw 2vw;
+    }
+
+    table.month > tbody:nth-child(1) > tr:nth-child(n+3) {
+        background-color: var(--anti_flash_white);
+    }
+    .tbody {
+        background-color: var(--platinum);
+    }
+
+    table.month th.month {
+        background-color: var(--anti_flash_white);
+    }
+    
+    table.month td.noday {
+        background-color: var(--taupe_gray);
+    } 
+    /* table.month tr.day_headers th.days  {
+        background-color: var(--dim_gray) !important;
+    }
+    
+
+    
+
+
+
+
+    /* .month {
+        padding: 1vw;
+        background-color: var(--platinum);
+        color: var(--dim_gray)
+    }
+
+    .a, .b, .c, .d, .e, .f, .g {
+        background-color: var(--anti_flash_white);
+        color: var(--dim_gray);
+        border: 1px solid var(--dim_gray);
+    }
+     */

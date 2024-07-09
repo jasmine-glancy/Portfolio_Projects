@@ -1,6 +1,38 @@
 """A Todo List website that helps the user keep track of tasks
 they need to get done throughout the week"""
 
+import calendar
+from datetime import date
+from flask import Flask, flash, redirect, render_template, \
+    request, session, url_for
+from flask_bootstrap import Bootstrap
+import os
+    
+# --------------------------- App Setup --------------------------- #
+
+# Configure application
+app = Flask(__name__)
+
+# Add in Bootstrap
+Bootstrap(app)
+
+# Load in security key
+app.config["SECRET_KEY"] = os.environ.get("KEY")
+
+# -------------------------- App Routes --------------------------- #
+
+@app.route("/", methods=["GET", "POST"])
+def home():
+    """Loads in the calendar for the current month"""
+    
+    c = calendar.HTMLCalendar()
+    
+    # Get the calendar for the current month
+    today = date.today()
+    
+    calendar_html = c.formatmonth(today.year, today.month, withyear=True)
+    
+    return render_template("index.html", calendar=calendar_html)
 # TODO: Load index page with the calendar
     # TODO: The calendar should have buttons to add a new task
 
