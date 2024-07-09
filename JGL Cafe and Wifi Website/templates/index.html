@@ -235,18 +235,22 @@
 
                                 <div class="divider"></div>
                                 
-                                <!-- TODO: Move edit button depending on who is logged in (i.e. admin) -->
-                                <a href="{{ url_for('edit', workspace_id=cafe.workspace_id) }}">
-                                    <button type="button" class="btn edit">
-                                        Edit
-                                    </button>
-                                </a>
-
-                                <a href="{{ url_for('delete_workspace', workspace_id=cafe.workspace_id) }}">
-                                    <button type="button" class="btn delete">
-                                        Delete
-                                    </button>
-                                </a>
+                                <!-- Session.get suggested by CoPilot -->
+                                {% if session.get("user_id", 0) >= 1 %}
+                                    <a href="{{ url_for('edit', workspace_id=cafe.workspace_id) }}">
+                                        <button type="button" class="{{ 'btn edit2' if session["user_id"] == 1 else 'btn edit' }}">
+                                            Edit
+                                        </button>
+                                    </a>
+                                    {% if session.get("user_id", 0) == 1 %}
+                                        <!-- Admins can delete cafes-->
+                                        <form action="{{ url_for('delete_workspace', workspace_id=cafe.workspace_id) }}" method="post">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="api_key" value="{{ api }}">
+                                            <button type="submit" class="btn delete">Delete</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                             <h6>
                                 Last updated {{ cafe.last_modified|str_to_datetime("%x") }}

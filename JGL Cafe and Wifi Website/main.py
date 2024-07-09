@@ -62,7 +62,7 @@ def home():
     print(cafe_results)
     print(type(cafe_results[0]["last_modified"]))
     
-    return render_template("index.html", cafe_results=cafe_results)
+    return render_template("index.html", cafe_results=cafe_results, api=API_KEY)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -96,10 +96,7 @@ def login():
         except Exception as e:
             flash(f"Can't log in. Exception: {e}")
             return redirect(url_for('login'))
-    
-        
-        
-    
+     
     return render_template("login.html")
 
 
@@ -141,12 +138,9 @@ def register():
         
             # Remember which user has logged in
             session["user_id"] = user[0]["user_id"]
-            session["logged_in"] = True
-            
-            logged_in = session["logged_in"]
                 
             # Redirect to home
-            return render_template("index.html", logged_in=logged_in)
+            return render_template("index.html")
         
     return render_template("register.html")
 
@@ -287,15 +281,15 @@ def edit(workspace_id):
     return render_template("edit.html")
 
 
-@app.route("/delete_workspace/<int:workspace_id>", methods=["DELETE"])
+@app.route("/delete_workspace/<int:workspace_id>", methods=["POST"])
 def delete_workspace(workspace_id):
     
-    if request.args.get("api-key") == API_KEY:
+    if request.form.get('_method') == 'DELETE' and request.form.get("api_key") == API_KEY:
         try:
             #TODO: Select cafe based on the api key
             
             db.execute(
-                "DELETE FROM remote_workspaces WHERE workspace_id = :id",
+                "DELETE FROM remote_spaces WHERE workspace_id = :id",
                 id = workspace_id
             )
             
