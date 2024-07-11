@@ -7,7 +7,7 @@ from flask import Flask, flash, redirect, render_template, \
     request, session, url_for
 from flask_bootstrap import Bootstrap
 import os
-    
+
 # --------------------------- App Setup --------------------------- #
 
 # Configure application
@@ -47,7 +47,17 @@ def home():
         # TODO: Allow the user to edit their previous choice of starting day
     
 # TODO: Create day view page
-
+@app.route("/today", methods=["GET", "POST"])
+def today():
+    """Loads in the view of the current day"""
+    
+    today_date = date.today()
+    today_date_full = today_date.strftime("%x")
+    
+    print(today_date_full)
+    print(today_date.day)
+    return render_template("today.html", date=today_date_full,
+                           day=today_date.day)
 # TODO: Create registration page
 
 # TODO: Create login page

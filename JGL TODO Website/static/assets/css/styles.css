@@ -13,6 +13,8 @@ body {
     background-color: var(--dim_gray);
 }
 
+/* Calendar */
+
 table.month {
     width: 70%; 
     border-collapse: collapse;
@@ -60,25 +62,62 @@ table.month {
     table.month td.noday {
         background-color: var(--taupe_gray);
     } 
-    /* table.month tr.day_headers th.days  {
-        background-color: var(--dim_gray) !important;
+
+
+
+/* Today's View */
+.day_view {
+    background-color: var(--anti_flash_white);
+    border: 0.5vw double var(--black);
+    width: 60%;
+    padding: 15vw;
+    margin-top: 5vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.day {
+    font-size: 5vw;
+    border: 0.3vw double var(--black);
+    text-align: center;
+    padding: 0vw 1.5vw 0.15vw 1.5vw;
+    position: absolute;
+    top: 9vw;
+    left: 21vw;
+    color: var(--dim_gray)
+}
+
+    .priorities {  
+        font-size: 3vw;
+        text-decoration: underline;
+        font-weight: 650;
+        color: var(--black);
+        position: absolute;
+        top: 7vw;
+        right: 4vw;
+    }
+
+/* Navigation Bar */
+.navbar-brand {
+    padding-left: 2vw;
+}
+
+    .navbar-brand, .nav-link {
+        color: var(--taupe_gray);
     }
     
-
-    
-
-
-
-
-    /* .month {
-        padding: 1vw;
-        background-color: var(--platinum);
-        color: var(--dim_gray)
+    .nav-link.active  {
+        color: var(--platinum)
     }
 
-    .a, .b, .c, .d, .e, .f, .g {
-        background-color: var(--anti_flash_white);
-        color: var(--dim_gray);
-        border: 1px solid var(--dim_gray);
+    .dropdown-menu {
+        background-color: #212529;
     }
-     */
+        
+        .dropdown-item, .dropdown-item:hover {
+            color: var(--platinum);
+        }
+
+        .dropdown-item:hover {
+            background-color: #2b2f33;
+        }
