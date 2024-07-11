@@ -70,10 +70,10 @@ table.month {
     background-color: var(--anti_flash_white);
     border: 0.5vw double var(--black);
     width: 60%;
-    padding: 15vw;
     margin-top: 5vw;
     margin-left: auto;
     margin-right: auto;
+    z-index: 0;
 }
 
 .day {
@@ -81,10 +81,14 @@ table.month {
     border: 0.3vw double var(--black);
     text-align: center;
     padding: 0vw 1.5vw 0.15vw 1.5vw;
-    position: absolute;
-    top: 9vw;
-    left: 21vw;
-    color: var(--dim_gray)
+    position: relative;
+    margin: 2vw 10vw 20vw 2vw;
+    top: 0vw;
+    left: 0vw;
+    color: var(--dim_gray);
+    width: fit-content;
+    height: fit-content;
+    z-index: 1;
 }
 
     .priorities {  
@@ -121,3 +125,24 @@ table.month {
         .dropdown-item:hover {
             background-color: #2b2f33;
         }
+
+/* Hourly Schedule View */
+.hourly_schedule.am_hours {
+    margin-left: 34vw;
+}
+    
+    .hourly_schedule.am_hours, .hourly_schedule.pm_hours {
+        position: absolute;
+        margin-top: 7vw;
+        border-spacing: 0 0.5vw;
+        z-index: 2;
+    }
+
+    .hourly_schedule.pm_hours {
+        position: absolute;
+        margin-left: 55vw;
+    }
+
+    .hourly_schedule.am_hours td, .hourly_schedule.pm_hours td {
+        padding: 0.5vw;
+    }
