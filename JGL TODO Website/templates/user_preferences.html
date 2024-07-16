@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Preferences{% endblock %}
+
+{% block content %}
+
+<div class="preferences">
+    <h1>Preferences</h1>
+
+    <!-- Outputs error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for error in messages %}
+                <p class="flash">
+                    <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+                    {{ messages[-1] }} 
+                    <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+                </p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div>
+        <form class="row g-3" action="{{ url_for('preferences') }}" method="POST">
+            <div class="col-md-9">
+                <label for="validationDefault01" class="form-label">First day of your week:</label>
+                <select class="form-select" id="validationDefault04" name="start_day" required>
+                    <option selected disabled value="">Choose a Custom Day</option>
+                    <option value="calendar.SUNDAY">Sunday</option>
+                    <option value="calendar.MONDAY">Monday</option>
+                    <option value="calendar.TUESDAY">Tuesday</option>
+                    <option value="calendar.WEDNESDAY">Wednesday</option>
+                    <option value="calendar.THURSDAY">Thursday</option>
+                    <option value="calendar.FRIDAY">Friday</option>
+                    <option value="calendar.SATURDAY">Saturday</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+
+</div>
+{% endblock %}

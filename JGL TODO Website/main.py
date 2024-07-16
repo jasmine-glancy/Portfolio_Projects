@@ -6,7 +6,7 @@ from datetime import date
 from flask import Flask, flash, redirect, render_template, \
     request, session, url_for
 from flask_bootstrap import Bootstrap
-from flask_login import UserMixin, login_user
+from flask_login import current_user, UserMixin, login_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text, ForeignKey
@@ -77,7 +77,7 @@ def home():
             # TODO: allow colors to overlap
             
     # TODO: Allow the user to "zoom" in on a day and week
-    return render_template("index.html", calendar=calendar_html)
+    return render_template("index.html", calendar=calendar_html, current_user=current_user)
 
             
 
@@ -96,7 +96,8 @@ def today():
     print(today_date_full)
     print(today_date.day)
     return render_template("today.html", date=today_date_full,
-                           day=today_date.day)
+                           day=today_date.day,
+                           current_user=current_user)
     
 
 @app.route("/login", methods=["GET", "POST"])
@@ -121,7 +122,7 @@ def login():
             # Ensure username exists and password is correct
             elif not check_password_hash(user.password, password):
                 flash("Invalid password.")
-                return redirect(url_for('login'))
+                return redirect(url_for('login', current_user=current_user))
             
             else:
                 flash(f"Logged in as {username}!")
@@ -131,9 +132,9 @@ def login():
                 return redirect(url_for("home"))
         except Exception as e:
             flash(f"Can't log in. Exception: {e}")
-            return redirect(url_for('login'))
+            return redirect(url_for('login', current_user=current_user))
      
-    return render_template("login.html")
+    return render_template("login.html", current_user=current_user)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -151,15 +152,17 @@ def register():
             # Check if username exists already in the database
             if len(user) != 0:
                 flash("That username already taken.")
+                return redirect(url_for("register", current_user=current_user))
             # Check if the user's password matches the password verification
             elif request.form.get("password") != request.form.get("confirm_password"):
                 flash("Passwords must match.")
+                return redirect(url_for("register", current_user=current_user))
 
             # If all checks pass, hash password
             hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
         except Exception as e:
             flash(f"Can't register new user, exception: {e}")
-            return redirect(url_for("register"))
+            return redirect(url_for("register", current_user=current_user))
         else:
             # Insert data if all checks pass
             try:
@@ -175,16 +178,15 @@ def register():
                 # Remember which user has logged in
                 login_user(add_user)
                                     
-            except Exception as e:    
-                flash(f"Can't insert new user into database, exception: {e}")
-                return redirect(url_for("register"))
-        
-            session["user_id"] = user[0]["user_id"]
-                
-            # TODO: Upon registering, redirect the user to the calendar settings page
+                # TODO: Upon registering, redirect the user to the calendar settings page
     
         
-    return render_template("register.html")
+            except Exception as e:    
+                flash(f"Can't insert new user into database, exception: {e}")
+                return redirect(url_for("register", current_user=current_user))
+                
+
+    return render_template("register.html", current_user=current_user)
 
 
 @app.route("/logout")
@@ -195,9 +197,14 @@ def logout():
     session.clear()
     
     # Redirect to home
-    return redirect("/")
+    return redirect(url_for("home", current_user=current_user))
 
 
+@app.route("/preferences")
+def preferences():
+    """Set week view preferences"""
+    
+    return render_template("user_preferences.html", current_user=current_user)
 # TODO: Create task submission page
     # TODO: Allow the user to choose task color on the calendar
     # TODO: Name the task

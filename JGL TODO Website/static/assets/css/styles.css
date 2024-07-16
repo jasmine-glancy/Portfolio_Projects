@@ -6,11 +6,23 @@
     --platinum: #E6E6E9;
     --taupe_gray: #9999A1;
     --dim_gray: #66666E;
+    --charcoal: #212529;
+    --burnt_charcoal: #2b2f33;
     --black: #000000;
 }
 
 body {
     background-color: var(--dim_gray);
+}
+
+.login_register {
+    background-color: var(--taupe_gray);
+    width: 90%;
+    margin-top: 7vw;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 5vw;
+    border: 0.05vw solid var(--burnt_charcoal);
 }
 
 /* Calendar */
@@ -63,7 +75,15 @@ table.month {
         background-color: var(--taupe_gray);
     } 
 
-
+/* Headings */
+h1 {
+    color: var(--black);
+    text-decoration: underline;
+    font-weight: 700;
+    padding-top: 2vw;
+    margin-left: 5vw;
+    margin-bottom: 2vw;
+}
 
 /* Today's View */
 .day_view {
@@ -115,7 +135,7 @@ table.month {
     }
 
     .dropdown-menu {
-        background-color: #212529;
+        background-color: var(--charcoal);
     }
         
         .dropdown-item, .dropdown-item:hover {
@@ -123,8 +143,34 @@ table.month {
         }
 
         .dropdown-item:hover {
-            background-color: #2b2f33;
+            background-color: var(--burnt_charcoal);
         }
+
+/* Form CSS */
+.row.g-3 {
+    margin-left: 15vw;
+    color: var(--charcoal);
+    font-size: larger;
+}
+
+/* Buttons */
+
+    /* Navbar Button */
+    .btn {
+        background-color: var(--charcoal);
+        color: var(--platinum);
+        --bs-btn-border-color: var(--charcoal);
+        --bs-btn-hover-border-color: var(--charcoal);
+        --bs-btn-hover-bg: var(--burnt_charcoal);
+        min-width: fit-content;
+    }
+
+    /* Add and Edit Buttons */
+
+    .btn.btn-secondary {
+        margin-top: 1vw;
+        margin-bottom: 5vw;
+    }
 
 /* Hourly Schedule View */
 .hourly_schedule.am_hours {
@@ -146,3 +192,24 @@ table.month {
     .hourly_schedule.am_hours td, .hourly_schedule.pm_hours td {
         padding: 0.5vw;
     }
+
+/* Error Messages */
+.flash, .heading_flash {
+    text-align: center;
+    font-weight: 700;
+    font-size: larger;
+}
+
+    .flash {
+        color: var(--charcoal);
+    }
+
+    .heading_flash {
+        color: var(--burnt_charcoal);
+        display: inline;
+        margin-left: 25vw;
+    }
+
+.warning {
+    max-width: 2vw;
+}
