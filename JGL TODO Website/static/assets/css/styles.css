@@ -118,7 +118,7 @@ h1 {
         color: var(--black);
         position: absolute;
         top: 7vw;
-        right: 4vw;
+        left: 4vw;
     }
 
 /* Navigation Bar */

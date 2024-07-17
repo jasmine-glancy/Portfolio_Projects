@@ -3,10 +3,11 @@ they need to get done throughout the week"""
 
 import calendar
 from datetime import date
-from flask import Flask, flash, redirect, render_template, \
-    request, session, url_for
+from flask import Flask, flash, redirect, \
+    render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
-from flask_login import current_user, UserMixin, login_user
+from flask_login import current_user, UserMixin, login_user, LoginManager
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text, ForeignKey
@@ -25,6 +26,11 @@ Bootstrap(app)
 # Load in security key
 app.config["SECRET_KEY"] = os.environ.get("KEY")
 
+# Initialize LoginManager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
 # ---------------------- Configure Database ----------------------- #
 
 # Create Database
@@ -34,6 +40,7 @@ class Base(DeclarativeBase):
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks_todo.db"
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Configure Tables
 class Users(UserMixin, db.Model):
@@ -41,6 +48,7 @@ class Users(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(250), nullable=False)
     password: Mapped[str] = mapped_column(String(250), nullable=False)
+    pref_starting_day: Mapped[str] = mapped_column(String(250), nullable=True)
     tasks = relationship("Tasks", backref="user")
     
 class Tasks(db.Model):
@@ -56,6 +64,11 @@ class Tasks(db.Model):
 with app.app_context():
     db.create_all()
     
+# User loader function
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
 
 # -------------------------- App Routes --------------------------- #
 
@@ -85,7 +98,7 @@ def home():
     # TODO: Allow the user to choose what day their week starts from
         # TODO: Allow the user to edit their previous choice of starting day
     
-# TODO: Create day view page
+
 @app.route("/today", methods=["GET", "POST"])
 def today():
     """Loads in the view of the current day"""
@@ -128,7 +141,7 @@ def login():
                 flash(f"Logged in as {username}!")
                 
                 # Remember which user has logged in
-                session["user_id"] = user.id
+                login_user(user)
                 return redirect(url_for("home"))
         except Exception as e:
             flash(f"Can't log in. Exception: {e}")
@@ -140,7 +153,6 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Registers a new user"""
-
     
     if request.method == "POST":
         
@@ -149,8 +161,9 @@ def register():
             find_user = db.session.execute(db.select(Users).where(Users.username == request.form.get("username")))
             user = find_user.scalar()
             
+            print(f"User: {user}")
             # Check if username exists already in the database
-            if len(user) != 0:
+            if user is not None:
                 flash("That username already taken.")
                 return redirect(url_for("register", current_user=current_user))
             # Check if the user's password matches the password verification
@@ -166,6 +179,7 @@ def register():
         else:
             # Insert data if all checks pass
             try:
+                print(f"Username: {request.form.get("username")}", f"Password: {hashed_password}")
                 # Insert new info into database
                 add_user = Users(
                     username=request.form.get("username"),
@@ -178,8 +192,8 @@ def register():
                 # Remember which user has logged in
                 login_user(add_user)
                                     
-                # TODO: Upon registering, redirect the user to the calendar settings page
-    
+                # Upon registering, redirect the user to the calendar settings page
+                return redirect(url_for("preferences", current_user=current_user, user_id=add_user.id))
         
             except Exception as e:    
                 flash(f"Can't insert new user into database, exception: {e}")
@@ -200,10 +214,35 @@ def logout():
     return redirect(url_for("home", current_user=current_user))
 
 
-@app.route("/preferences")
-def preferences():
+@app.route("/preferences/<int:user_id>", methods=["GET", "POST"])
+def preferences(user_id):
     """Set week view preferences"""
     
+    if request.method == "POST":
+        starting_day = request.form.get("start_day")
+        
+        print(f"Starting day: {starting_day}")
+        try:
+            # Find user in the database
+            found_user = Users.query.get(user_id)
+            
+            if found_user:
+                # Update preferred starting day
+                found_user.pref_starting_day = starting_day
+                
+                # Update the database
+                db.session.commit()
+            
+                print("Preferred starting day updated")
+            else:
+                flash("User not found")
+                
+            return redirect(url_for("home", current_user=current_user))
+        except Exception as e:
+            # Revert if there is an error
+            db.session.rollback()
+            flash(f"Can't update starting day, exception: {e}")
+        
     return render_template("user_preferences.html", current_user=current_user)
 # TODO: Create task submission page
     # TODO: Allow the user to choose task color on the calendar
