@@ -48,7 +48,7 @@ class Users(UserMixin, db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(250), nullable=False)
     password: Mapped[str] = mapped_column(String(250), nullable=False)
-    pref_starting_day: Mapped[str] = mapped_column(String(250), nullable=True)
+    pref_starting_day: Mapped[int] = mapped_column(Integer, nullable=True)
     tasks = relationship("Tasks", backref="user")
     
 class Tasks(db.Model):
@@ -69,19 +69,68 @@ with app.app_context():
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
+# -------------------- Make Clickable Calendar -------------------- #
 
+class ClickableHTMLCalendar(calendar.HTMLCalendar):
+    """Reformatting recommended by CoPilot for clickable days"""
+    
+    def formatday(self, day, month, year, weekday):
+        
+        today = date.today()
+        if day == 0:
+            return "<td class='noday'>&nbsp;</td>"
+        elif day == today:
+            return f"<td class='{self.cssclasses[weekday]} today'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
+        else:
+            print(self.cssclasses[weekday])
+            return f"<td class='{self.cssclasses[weekday]}'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
+
+    def formatmonth(self, theyear, themonth, withyear=True):
+        html_strings = []
+        c = html_strings.append
+        c("<table border='0' cellpadding='0' cellspacing='0' class='month'>")
+        c("\n")
+        c(self.formatmonthname(theyear, themonth, withyear=withyear))
+        c("\n")
+        c(self.formatweekheader())
+        c("\n")
+        for week in self.monthdays2calendar(theyear, themonth):
+            c(self.formatweek(theyear, themonth, week))
+            c("\n")
+        c("</table>")
+        c("\n")
+        return "".join(html_strings)
+    
+    def formatweek(self, theyear, themonth, theweek):
+        s = "".join(self.formatday(d, themonth, theyear, wd) for (d, wd) in theweek)
+        return f"<tr>{s}</tr>"
 # -------------------------- App Routes --------------------------- #
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     """Loads in the calendar for the current month"""
     
-    c = calendar.HTMLCalendar()
+    c = ClickableHTMLCalendar()
     
     # Get the calendar for the current month
     today = date.today()
     
-    calendar_html = c.formatmonth(today.year, today.month, withyear=True)
+    try: 
+        # Gets the user's current ID
+        user_id = current_user.id
+        
+        # If a user has a preferred starting day of the week, set it
+        user_lookup = db.session.execute(db.select(Users.pref_starting_day).where(Users.id == user_id))
+        first_weekday = user_lookup.scalar()
+        
+        print(type(first_weekday))
+        c.setfirstweekday(first_weekday)
+    except Exception as e:
+        print(f"User not found, can't set a custom first day of the week. Exception: {e}")
+        print("Loading default calendar...")
+    finally:
+        print("Loading calendar...")
+        calendar_html = c.formatmonth(today.year, today.month, withyear=True)
     
     # TODO: The calendar should have buttons to add a new task
 
@@ -99,17 +148,27 @@ def home():
         # TODO: Allow the user to edit their previous choice of starting day
     
 
-@app.route("/today", methods=["GET", "POST"])
-def today():
+@app.route("/day_view/<month>/<day>/<year>", methods=["GET", "POST"])
+def day(month, day, year):
     """Loads in the view of the current day"""
     
-    today_date = date.today()
-    today_date_full = today_date.strftime("%x")
-    
+    try:
+        print(day.date())
+        # today_date = date.today()
+        # today_date_full = today_date.strftime("%x")
+
+        date = f"{month}/{day}/{year}"
+        
+        today_date_full = date.strptime(date, "%m/%d/%Y").strftime("%x")
+        
+        # print(today_date.day)
+    except Exception as e:
+        flash(f"Can't find dates. Exception: {e}")
+        today_date_full = None
     print(today_date_full)
-    print(today_date.day)
-    return render_template("today.html", date=today_date_full,
-                           day=today_date.day,
+        
+    return render_template("day.html", date=today_date_full,
+                           day=day,
                            current_user=current_user)
     
 
@@ -244,6 +303,7 @@ def preferences(user_id):
             flash(f"Can't update starting day, exception: {e}")
         
     return render_template("user_preferences.html", current_user=current_user)
+
 # TODO: Create task submission page
     # TODO: Allow the user to choose task color on the calendar
     # TODO: Name the task
