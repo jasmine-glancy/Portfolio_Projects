@@ -304,9 +304,34 @@ def preferences(user_id):
 def add_task():
     """Allows the user to add a new task to the calendar"""
     
-    # TODO: Allow the user to choose task color on the calendar
-    # TODO: Name the task
-    # TODO: Ask for time started and task duration
-    return render_template("add_task.html")
+    if request.method == "POST":
+        task = request.form.get("task_name")
+        task_date = request.form.get("task_date")
+        description = request.form.get("task_description")
+        priority = request.form.get("priority_level")
+        color = request.form.get("task_color")
+        print(color, task, description, task_date, priority)
+        
+        try:
+            
+            add_task = Tasks(
+                user_id=current_user.id,
+                task_name=task,
+                task_date=task_date,
+                description=description,
+                priority_level=priority,
+                task_color=color
+            )
+                
+            db.session.add(add_task)
+            db.session.commit()  
+            
+            return redirect(url_for("home", current_user=current_user))
+        except Exception as e:
+            
+            flash(f"Unable to add task, exception: {e}")
+            return redirect(url_for("add_task", current_user=current_user))
+                
+    return render_template("add_task.html", current_user=current_user)
 
 
