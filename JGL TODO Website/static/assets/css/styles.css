@@ -15,7 +15,7 @@ body {
     background-color: var(--dim_gray);
 }
 
-.login_register {
+.login_register, .add_task {
     background-color: var(--taupe_gray);
     width: 90%;
     margin-top: 7vw;
@@ -155,10 +155,15 @@ h1 {
 
 /* Form CSS */
 .row.g-3 {
-    margin-left: 15vw;
+    margin-left: 8vw;
     color: var(--charcoal);
     font-size: larger;
 }
+
+    .form-control-color {
+        width: 5.5rem;
+        margin-left: 0.5vw;
+    }
 
 /* Buttons */
 
@@ -175,7 +180,7 @@ h1 {
     /* Add and Edit Buttons */
 
     .btn.btn-secondary {
-        margin-top: 1vw;
+        margin-top: 1.85vw;
         margin-bottom: 5vw;
     }
 

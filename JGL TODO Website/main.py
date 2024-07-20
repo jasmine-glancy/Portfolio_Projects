@@ -1,8 +1,8 @@
 """A Todo List website that helps the user keep track of tasks
 they need to get done throughout the week"""
 
-import calendar
-from datetime import date
+from clickable_calendar import ClickableHTMLCalendar
+from datetime import date, datetime
 from flask import Flask, flash, redirect, \
     render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
@@ -69,41 +69,7 @@ with app.app_context():
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
-# -------------------- Make Clickable Calendar -------------------- #
 
-class ClickableHTMLCalendar(calendar.HTMLCalendar):
-    """Reformatting recommended by CoPilot for clickable days"""
-    
-    def formatday(self, day, month, year, weekday):
-        
-        today = date.today()
-        if day == 0:
-            return "<td class='noday'>&nbsp;</td>"
-        elif day == today:
-            return f"<td class='{self.cssclasses[weekday]} today'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
-        else:
-            print(self.cssclasses[weekday])
-            return f"<td class='{self.cssclasses[weekday]}'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
-
-    def formatmonth(self, theyear, themonth, withyear=True):
-        html_strings = []
-        c = html_strings.append
-        c("<table border='0' cellpadding='0' cellspacing='0' class='month'>")
-        c("\n")
-        c(self.formatmonthname(theyear, themonth, withyear=withyear))
-        c("\n")
-        c(self.formatweekheader())
-        c("\n")
-        for week in self.monthdays2calendar(theyear, themonth):
-            c(self.formatweek(theyear, themonth, week))
-            c("\n")
-        c("</table>")
-        c("\n")
-        return "".join(html_strings)
-    
-    def formatweek(self, theyear, themonth, theweek):
-        s = "".join(self.formatday(d, themonth, theyear, wd) for (d, wd) in theweek)
-        return f"<tr>{s}</tr>"
 # -------------------------- App Routes --------------------------- #
 
 @app.route("/", methods=["GET", "POST"])
@@ -150,25 +116,55 @@ def home():
 
 @app.route("/day_view/<month>/<day>/<year>", methods=["GET", "POST"])
 def day(month, day, year):
+    """Loads in the view of the selected day"""
+    
+    try:
+        
+        today = date.today()
+        
+        # Pad the date with 0s if it's within the first 10 days of the month
+        day_date = f"{year}-{int(month):02d}-{int(day):02d}"
+        
+        # Convert day_date string to a datetime object
+        selected_date = datetime.strptime(day_date, "%Y-%m-%d").date()
+        
+        if selected_date == today:
+            
+            # If the selected date matches today's date, redirect to /today
+            print("Today's date")
+            return redirect(url_for("today", current_user=current_user))
+        
+        # Format the date to a string that represents the locale's appropriate date representation
+        day_date_formatted = selected_date.strftime("%x")
+        print(day_date_formatted)
+
+    except Exception as e:
+        flash(f"Can't find dates. Exception: {e}")
+        day_date_formatted = None
+
+
+    return render_template("day.html", date=day_date_formatted,
+                           day=day,
+                           current_user=current_user)
+    
+    
+@app.route("/today", methods=["GET", "POST"])
+def today():
     """Loads in the view of the current day"""
     
     try:
-        print(day.date())
-        # today_date = date.today()
-        # today_date_full = today_date.strftime("%x")
-
-        date = f"{month}/{day}/{year}"
+        today_date = date.today()
+        today_date_full = today_date.strftime("%x")
         
-        today_date_full = date.strptime(date, "%m/%d/%Y").strftime("%x")
-        
-        # print(today_date.day)
+        today = "Today"
+        print(today_date.day)
     except Exception as e:
         flash(f"Can't find dates. Exception: {e}")
         today_date_full = None
     print(today_date_full)
         
-    return render_template("day.html", date=today_date_full,
-                           day=day,
+    return render_template("day.html", date=today,
+                           day=today_date.day,
                            current_user=current_user)
     
 
@@ -304,10 +300,13 @@ def preferences(user_id):
         
     return render_template("user_preferences.html", current_user=current_user)
 
-# TODO: Create task submission page
+@app.route("/new_task", methods=["GET", "POST"])
+def add_task():
+    """Allows the user to add a new task to the calendar"""
+    
     # TODO: Allow the user to choose task color on the calendar
     # TODO: Name the task
     # TODO: Ask for time started and task duration
-    
+    return render_template("add_task.html")
 
 

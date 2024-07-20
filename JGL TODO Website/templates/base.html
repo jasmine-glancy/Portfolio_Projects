@@ -40,17 +40,17 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link {% if request.path == '/' %}active{% endif %}" aria-current="page" href="/">Home</a>
+              <a class="nav-link {% if request.path == '/' %}active{% endif %}" aria-current="page" href="{{ url_for('home') }}">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% if request.path == '/day' %}active{% endif %}" href="/today">Today</a>
+              <a class="nav-link {% if request.path == '/today' %}active{% endif %}" href="{{ url_for('today') }}">Today</a>
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Task Management
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">New Task</a></li>
+                <li><a class="dropdown-item {% if request.path == '/add_task' %}active{% endif %}" href="{{ url_for('add_task') }}">New Task</a></li>
                 <li><a class="dropdown-item" href="#">Modify Task</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#">Something else here</a></li>
@@ -58,14 +58,14 @@
             </li>
             {% if not current_user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="/login">Login</a>
+                <a class="nav-link {% if request.path == '/login' %}active{% endif %}" href="{{ url_for('login') }}">Login</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="/register">Register</a>
+                <a class="nav-link {% if request.path == '/register' %}active{% endif %}" href="{{ url_for('register') }}">Register</a>
               </li>
             {% else %}
               <li class="nav-item">
-                <a class="nav-link" href="/logout">Log Out</a>
+                <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
               </li>
             {% endif %}
           </ul>
