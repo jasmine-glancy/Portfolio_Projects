@@ -15,16 +15,42 @@ body {
     background-color: var(--dim_gray);
 }
 
-.login_register, .add_task {
+.login_register, .add_task, .task_description, .priorities {
     background-color: var(--taupe_gray);
-    width: 90%;
-    margin-top: 7vw;
     margin-left: auto;
     margin-right: auto;
+}
+
+.login_register, .add_task {
+    width: 90%;
+    margin-top: 7vw;
     margin-bottom: 5vw;
     border: 0.05vw solid var(--burnt_charcoal);
 }
 
+    .task_description, .priorities {
+        width: 18%;
+        height: 62%;
+        margin-top: 1vw;    
+    }
+
+    .priorities, .task_description {  
+        font-size: 3vw;
+        text-decoration: underline;
+        font-weight: 650;
+        color: var(--black);
+        position: absolute;
+        top: 7vw;
+    }
+
+    .priorities {
+        left: 1.5vw;
+        padding-left: 2.5vw;
+    }
+    .task_description {
+        right: 1.25vw;
+        padding-left: 0.9vw;
+    }
 /* Calendar */
     
 table.month {
@@ -112,21 +138,13 @@ h1 {
     margin: 2vw 10vw 20vw 2vw;
     top: 0vw;
     left: 0vw;
-    color: var(--dim_gray);
+    color: var(--burnt_charcoal);
     width: fit-content;
     height: fit-content;
     z-index: 1;
 }
 
-    .priorities {  
-        font-size: 3vw;
-        text-decoration: underline;
-        font-weight: 650;
-        color: var(--black);
-        position: absolute;
-        top: 7vw;
-        left: 4vw;
-    }
+
 
 /* Navigation Bar */
 .navbar-brand {

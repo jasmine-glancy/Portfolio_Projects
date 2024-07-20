@@ -57,6 +57,7 @@ class Tasks(db.Model):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     task_name: Mapped[str] = mapped_column(String(250), nullable=False)
     task_date: Mapped[str] = mapped_column(String(250), nullable=False)
+    task_time: Mapped[str] = mapped_column(String(250), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     priority_level: Mapped[int] = mapped_column(Integer, nullable=False)
     task_color: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -307,10 +308,11 @@ def add_task():
     if request.method == "POST":
         task = request.form.get("task_name")
         task_date = request.form.get("task_date")
+        task_time = request.form.get("time")
         description = request.form.get("task_description")
         priority = request.form.get("priority_level")
         color = request.form.get("task_color")
-        print(color, task, description, task_date, priority)
+        print(color, task, description, task_date, task_time, priority)
         
         try:
             
@@ -318,6 +320,7 @@ def add_task():
                 user_id=current_user.id,
                 task_name=task,
                 task_date=task_date,
+                task_time=task_time,
                 description=description,
                 priority_level=priority,
                 task_color=color

@@ -53,7 +53,6 @@
                 <li><a class="dropdown-item {% if request.path == '/add_task' %}active{% endif %}" href="{{ url_for('add_task') }}">New Task</a></li>
                 <li><a class="dropdown-item" href="#">Modify Task</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
               </ul>
             </li>
             {% if not current_user.is_authenticated %}
