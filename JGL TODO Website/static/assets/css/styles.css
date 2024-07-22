@@ -172,11 +172,19 @@ h1 {
         }
 
 /* Form CSS */
-.row.g-3 {
-    margin-left: 8vw;
+
+.row.g-2, .row.g-3 {
+    
     color: var(--charcoal);
     font-size: larger;
 }
+    .row.g-2 {
+        margin-left: 15vw;
+    }
+    .row.g-3 {
+        margin-left: 8vw;
+}
+
 
     .form-control-color {
         width: 5.5rem;

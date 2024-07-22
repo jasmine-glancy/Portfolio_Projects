@@ -11,10 +11,12 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
         today = date.today()
         if day == 0:
             return "<td class='noday'>&nbsp;</td>"
-        elif day == today:
-            return f"<td class='{self.cssclasses[weekday]} today'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
+        elif day == today.day and month == today.month and year == today.year:
+            return "<td class='{} today'><a href='/day_view/{}/{}/{}'>{}</a></td>".format(
+                self.cssclasses[weekday], month, day, year, day)
         else:
-            return f"<td class='{self.cssclasses[weekday]}'><a href='/day_view/{month}/{day}/{year}'>{day}</a></td>"
+            return "<td class='{}'><a href='/day_view/{}/{}/{}'>{}</a></td>".format(
+                self.cssclasses[weekday], month, day, year, day)
 
     def formatmonth(self, theyear, themonth, withyear=True):
         html_strings = []
@@ -35,3 +37,4 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
     def formatweek(self, theyear, themonth, theweek):
         s = "".join(self.formatday(d, themonth, theyear, wd) for (d, wd) in theweek)
         return f"<tr>{s}</tr>"
+    

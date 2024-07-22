@@ -88,15 +88,25 @@ def home():
         
         # If a user has a preferred starting day of the week, set it
         user_lookup = db.session.execute(db.select(Users.pref_starting_day).where(Users.id == user_id))
-        first_weekday = user_lookup.scalar()
         
-        print(type(first_weekday))
-        c.setfirstweekday(first_weekday)
+        if user_lookup is not None:
+            first_weekday = user_lookup.scalar()
+            print(first_weekday)
+            if first_weekday < 0 or first_weekday > 6:
+                print(type(first_weekday))
+                c.setfirstweekday(first_weekday)
+        else:
+            print("User not found")
     except Exception as e:
-        print(f"User not found, can't set a custom first day of the week. Exception: {e}")
+        print(f"Can't set a custom first day of the week. Exception: {e}")
         print("Loading default calendar...")
     finally:
         print("Loading calendar...")
+        try:
+            print(f"Year: {today.year}, Month: {today.month}")
+            calendar_html = c.formatmonth(today.year, today.month, withyear=True)
+        except Exception as e:
+            print(f"Error generating calendar HTML: {e}")
         calendar_html = c.formatmonth(today.year, today.month, withyear=True)
     
     # TODO: The calendar should have buttons to add a new task
