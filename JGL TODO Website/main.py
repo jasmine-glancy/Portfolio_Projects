@@ -2,13 +2,14 @@
 they need to get done throughout the week"""
 
 from clickable_calendar import ClickableHTMLCalendar
-from datetime import date, datetime
+from datetime import date, datetime, time
 from flask import Flask, flash, redirect, \
     render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 from flask_login import current_user, UserMixin, login_user, LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from helpers import format_time, str_to_time
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text, ForeignKey
 import os
@@ -30,6 +31,10 @@ app.config["SECRET_KEY"] = os.environ.get("KEY")
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
+# Register the functions as filters for Jinja to use
+app.jinja_env.filters['str_to_time'] = str_to_time
+app.jinja_env.filters['format_time'] = format_time
 
 # ---------------------- Configure Database ----------------------- #
 
@@ -57,7 +62,7 @@ class Tasks(db.Model):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     task_name: Mapped[str] = mapped_column(String(250), nullable=False)
     task_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    task_time: Mapped[str] = mapped_column(String(250), nullable=False)
+    task_time: Mapped[time] = mapped_column(String(250), nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     priority_level: Mapped[int] = mapped_column(Integer, nullable=False)
     task_color: Mapped[str] = mapped_column(String(10), nullable=False)
@@ -131,6 +136,7 @@ def day(month, day, year):
     
     try:
         
+        # Check today's date
         today = date.today()
         
         # Pad the date with 0s if it's within the first 10 days of the month
@@ -152,17 +158,48 @@ def day(month, day, year):
     except Exception as e:
         flash(f"Can't find dates. Exception: {e}")
         day_date_formatted = None
+        
+    try:
+        print(current_user.id)
+        # Look for existing tasks in the database
+        task_lookup = db.session.execute(db.select(Tasks).where((Tasks.user_id == current_user.id) & (Tasks.task_date == day_date)))
+        print(task_lookup)
+        tasks = task_lookup.scalars().all()
+        print(tasks)
+        
+        # Print detailed information about each task
+        for task in tasks:
+            print(f"Task ID: {task.task_id}")
+            print(f"User ID: {task.user_id}")
+            print(f"Task Name: {task.task_name}")
+            print(f"Task Date: {task.task_date}")
+            print(f"Task Time: {task.task_time}")
+            print(f"Description: {task.description}")
+            print(f"Priority Level: {task.priority_level}")
+            print(f"Task Color: {task.task_color}")
+            print("___________")
+            
+        noon = time(12, 0, 0)
+        midnight = time(0, 0, 0)
+        pre_midnight = time(23, 59, 59)
+    except Exception as e:
+        flash(f"Can't load task list, exception {e}")
 
 
     return render_template("day.html", date=day_date_formatted,
                            day=day,
-                           current_user=current_user)
+                           current_user=current_user,
+                           tasks=tasks,
+                           noon=noon,
+                           midnight=midnight,
+                           pre_midnight=pre_midnight)
     
     
 @app.route("/today", methods=["GET", "POST"])
 def today():
     """Loads in the view of the current day"""
     
+    # Find today's date
     try:
         today_date = date.today()
         today_date_full = today_date.strftime("%x")
@@ -173,7 +210,8 @@ def today():
         flash(f"Can't find dates. Exception: {e}")
         today_date_full = None
     print(today_date_full)
-        
+    
+
     return render_template("day.html", date=today,
                            day=today_date.day,
                            current_user=current_user)
@@ -324,13 +362,16 @@ def add_task():
         color = request.form.get("task_color")
         print(color, task, description, task_date, task_time, priority)
         
+        time = datetime.strptime(task_time, "%H:%M").strftime("%I:%M %p")
+        print(time)
+        
         try:
             
             add_task = Tasks(
                 user_id=current_user.id,
                 task_name=task,
                 task_date=task_date,
-                task_time=task_time,
+                task_time=time,
                 description=description,
                 priority_level=priority,
                 task_color=color

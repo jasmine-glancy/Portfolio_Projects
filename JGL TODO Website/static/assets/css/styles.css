@@ -15,7 +15,7 @@ body {
     background-color: var(--dim_gray);
 }
 
-.login_register, .add_task, .task_description, .priorities {
+.login_register, .add_task, .priorities {
     background-color: var(--taupe_gray);
     margin-left: auto;
     margin-right: auto;
@@ -28,28 +28,25 @@ body {
     border: 0.05vw solid var(--burnt_charcoal);
 }
 
-    .task_description, .priorities {
+    .priorities {
         width: 18%;
         height: 62%;
-        margin-top: 1vw;    
-    }
-
-    .priorities, .task_description {  
+        margin-top: 1vw;     
         font-size: 3vw;
         text-decoration: underline;
         font-weight: 650;
         color: var(--black);
         position: absolute;
         top: 7vw;
-    }
-
-    .priorities {
-        left: 1.5vw;
+        right: 1.5vw;
         padding-left: 2.5vw;
     }
-    .task_description {
-        right: 1.25vw;
-        padding-left: 0.9vw;
+
+    .description {
+        padding-left: 1vw;
+        padding-bottom: 0.5vw;
+        padding-top: 0.25vw;
+        max-width: 16vw;
     }
 /* Calendar */
     
@@ -144,7 +141,14 @@ h1 {
     z-index: 1;
 }
 
+    
+    .add {
+        max-width: 2vw;
+    }
 
+    .edit {
+        max-width: 1.5vw;
+    }
 
 /* Navigation Bar */
 .navbar-brand {
@@ -210,26 +214,19 @@ h1 {
         margin-bottom: 5vw;
     }
 
-/* Hourly Schedule View */
-.hourly_schedule.am_hours {
-    margin-left: 34vw;
+/* Schedule View */
+.task_list {
+    margin-left: 34.5vw;
+    position: absolute;
+    margin-top: 7.5vw;
+    border-spacing: 0 0.5vw;
+    z-index: 2;
 }
-    
-    .hourly_schedule.am_hours, .hourly_schedule.pm_hours {
-        position: absolute;
-        margin-top: 7vw;
-        border-spacing: 0 0.5vw;
-        z-index: 2;
-    }
 
-    .hourly_schedule.pm_hours {
-        position: absolute;
-        margin-left: 55vw;
-    }
-
-    .hourly_schedule.am_hours td, .hourly_schedule.pm_hours td {
+    .task_list td {
         padding: 0.5vw;
     }
+
 
 /* Error Messages */
 .flash, .heading_flash {

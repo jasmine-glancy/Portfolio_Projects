@@ -8,34 +8,45 @@
         Priorities
     </div>
     
-    <table class="hourly_schedule am_hours">
+    <table>
         <tr>
             <td>
                 <!-- TODO: Add tasks in either AM or PM Hours
                  depending on when the task is scheduled-->
-                12am
+                {% if tasks %}
+                    <div class="task_list">
+                        {% for task in tasks %}
+                            <div class="item">
+                                
+                                <input type="checkbox" style="accent-color: {{ task.task_color }};"> 
+
+                                {{ task.task_name }} 
+                                
+                                {{ (task.task_time|str_to_time)|format_time }}
+
+                                <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
+                            </div>
+                            <div class="description">
+                                {{ task.description }}
+                            </div>
+                        {% endfor %}
+
+                        <a href="{{ url_for('add_task') }}">
+                            <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
+                        </a>
+                    </div>
+                    
+                {% endif %}
             </td>
         </tr>
 
     </table>
 
-    <table class="hourly_schedule pm_hours">
-
-        <tr>
-            <td>
-                <!-- TODO: Allow the list to expand -->
-                12pm
-            </td>
-        </tr>
-    </table>
     <div class="day_view">
        <div class="day">
             {{ day }}
        </div>
 
-    </div>
-    <div class="task_description">
-        Description
     </div>
 
 {% endblock %}
