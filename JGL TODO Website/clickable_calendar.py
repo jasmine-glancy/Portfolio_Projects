@@ -9,6 +9,7 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
     def formatday(self, day, month, year, weekday):
         
         today = date.today()
+        
         if day == 0:
             return "<td class='noday'>&nbsp;</td>"
         elif day == today.day and month == today.month and year == today.year:
@@ -35,6 +36,9 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
         return "".join(html_strings)
     
     def formatweek(self, theyear, themonth, theweek):
+        
+        # Create a string that represents HTML for all days in a week
         s = "".join(self.formatday(d, themonth, theyear, wd) for (d, wd) in theweek)
+        
         return f"<tr>{s}</tr>"
     

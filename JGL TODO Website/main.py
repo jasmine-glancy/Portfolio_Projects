@@ -6,12 +6,10 @@ from datetime import date, datetime, time
 from flask import Flask, flash, redirect, \
     render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
-from flask_login import current_user, UserMixin, login_user, LoginManager
-from flask_migrate import Migrate
+from flask_login import current_user, login_user, LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from helpers import format_time, str_to_time
-from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import Integer, String, Text, ForeignKey
+from helpers import format_time, str_to_time, task_lookup
+from task_tracking import db, Users, Tasks
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -38,35 +36,10 @@ app.jinja_env.filters['format_time'] = format_time
 
 # ---------------------- Configure Database ----------------------- #
 
-# Create Database
-class Base(DeclarativeBase):
-    pass
-
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks_todo.db"
-db = SQLAlchemy(model_class=Base)
 db.init_app(app)
-migrate = Migrate(app, db)
 
-# Configure Tables
-class Users(UserMixin, db.Model):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(250), nullable=False)
-    password: Mapped[str] = mapped_column(String(250), nullable=False)
-    pref_starting_day: Mapped[int] = mapped_column(Integer, nullable=True)
-    tasks = relationship("Tasks", backref="user")
-    
-class Tasks(db.Model):
-    __tablename__ = "tasks"
-    task_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    task_name: Mapped[str] = mapped_column(String(250), nullable=False)
-    task_date: Mapped[str] = mapped_column(String(250), nullable=False)
-    task_time: Mapped[time] = mapped_column(String(250), nullable=False)
-    description: Mapped[str] = mapped_column(String(500), nullable=False)
-    priority_level: Mapped[int] = mapped_column(Integer, nullable=False)
-    task_color: Mapped[str] = mapped_column(String(10), nullable=False)
-    
+
 with app.app_context():
     db.create_all()
     
@@ -161,11 +134,9 @@ def day(month, day, year):
         
     try:
         print(current_user.id)
+        
         # Look for existing tasks in the database
-        task_lookup = db.session.execute(db.select(Tasks).where((Tasks.user_id == current_user.id) & (Tasks.task_date == day_date)))
-        print(task_lookup)
-        tasks = task_lookup.scalars().all()
-        print(tasks)
+        tasks = task_lookup(month, day, year)
         
         # Print detailed information about each task
         for task in tasks:
