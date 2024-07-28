@@ -35,8 +35,6 @@ def task_lookup(month, day, year):
     day_date = f"{year}-{int(month):02d}-{int(day):02d}"
         
     task_lookup = db.session.execute(db.select(Tasks).where((Tasks.user_id == current_user.id) & (Tasks.task_date == day_date)))
-    print(task_lookup)
     tasks = task_lookup.scalars().all()
-    print(tasks)
     
     return tasks

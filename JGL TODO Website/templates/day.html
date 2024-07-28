@@ -13,8 +13,9 @@
             <td>
                 <!-- TODO: Add tasks in either AM or PM Hours
                  depending on when the task is scheduled-->
-                {% if tasks %}
-                    <div class="task_list">
+                
+                <div class="task_list">
+                    {% if tasks %}
                         {% for task in tasks %}
                             <div class="item">
                                 
@@ -30,13 +31,11 @@
                                 {{ task.description }}
                             </div>
                         {% endfor %}
-
-                        <a href="{{ url_for('add_task') }}">
-                            <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
-                        </a>
-                    </div>
-                    
-                {% endif %}
+                    {% endif %}
+                    <a href="{{ url_for('add_task') }}">
+                        <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
+                    </a>
+                </div>
             </td>
         </tr>
 
