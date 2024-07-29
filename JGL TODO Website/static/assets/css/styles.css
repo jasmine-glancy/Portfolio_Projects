@@ -58,12 +58,18 @@ table.month {
     margin-right: auto;
 }
 
+    /* Day Cell */
     table.month th, table.month td {
         border: 1px solid var(--dim_gray);
+        width: 14.28%;
     } 
 
     table.month th {
         text-align: center;
+    }
+
+    table.month td {
+        height: 6vw;
     }
 
     th.month {
@@ -108,6 +114,13 @@ table.month {
             top: 1.25vw;
         }
         
+    .task_box {
+        position: relative;
+        width: 1vw;
+        height: 1vw; 
+        margin: 0.25vw;
+        padding-left: 1vw;
+    }
 
     .task_boxes {
         display: flex;
@@ -115,7 +128,6 @@ table.month {
         align-items: center;
         justify-content: flex-start;
         position: absolute;
-        min-width: fit-content;
         top: 1vw;
     }
 
@@ -132,17 +144,9 @@ table.month {
         position: absolute;
         padding-left: 0;
         top: 1.25vw;
-        right: 3.7vw;
+        right: 3.6vw;
     }
     
-    .task_box {
-        position: relative;
-        display: inline-block;
-        width: 1vw;
-        height: 1vw; 
-        margin-left: 0.25vw;
-        padding-left: 1vw;
-    }
 
     table.month > tbody:nth-child(1) > tr:nth-child(2) {
         background-color: var(--platinum);
@@ -168,26 +172,29 @@ table.month {
 
     .tooltip {
         position: relative;
+        display: inline;
     }
-
+    
     .tooltip .tooltiptext {
-
-        
         visibility: hidden;
-        /* Position the tooltip */
-        position: absolute;
-        z-index: 6;
         width: 120px;
-        background-color: var(--black);
-        color: #fff;
+        background-color: var(--anti_flash_white);
+        color: #000;
         text-align: center;
         border-radius: 6px;
-        margin-left: 1vw;
-        margin-top: 5px;
-      }
-
-    .task_box:hover .tooltiptext {
+        padding: 5px;
+        position: absolute;
+        z-index: 3;
+        bottom: 125%; 
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltiptext {
         visibility: visible;
+        opacity: 1;
     }
 /* Headings */
 h1 {

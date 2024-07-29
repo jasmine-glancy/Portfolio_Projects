@@ -13,68 +13,68 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
         
         today = date.today()
         
-        tasks = []
+        task_bank = {}
         if current_user.is_authenticated:
-            tasks = task_lookup(month, day, year)
-            task_html = self.buildtasklist(month, day, year)
+            for day_iter in range(1, calendar.monthrange(year, month)[1] + 1):
+                # Format each task for display
+                tasks = task_lookup(month, day_iter, year)
+                task_html = self.buildtasklist(month, day_iter, year)
+                day_date = f"{month}/{day_iter}/{year}"
+                task_bank[day_date] = task_html
         
         if day == 0:
             return '<td class="noday">&nbsp;</td>'
-        elif day == today.day and month == today.month and year == today.year:
-            
-            if tasks == []:
-                # If today's date doesn't have tasks, set class as no_tasks
-                html_string = '<td class="{} today no_tasks"><a href="/day_view/{}/{}/{}">{}</a></td>'
-                return html_string.format(
-                    self.cssclasses[weekday], month, day, year, day)
-            else:
-                html_string = '<td class="{} today contains_tasks"><a href="/day_view/{}/{}/{}">{}</a></td>'
-                return html_string.format(
-                self.cssclasses[weekday], month, day, year, day, task_html)
         else:
-            
-            if tasks == []:
-                # If any other date doesn't have tasks, set class as no_tasks
-                html_string = '<td class="{} no_tasks"><a href="/day_view/{}/{}/{}">{}</a></td>'
-                return html_string.format(
-                self.cssclasses[weekday], month, day, year, day)
-
+            day_date = f"{month}/{day}/{year}"
+            task_html = task_bank.get(day_date, "")
+            if day == today.day and month == today.month and year == today.year:
+                if not task_html:
+                    # If today's date doesn't have tasks, set class as no_tasks
+                    html_string = '<td class="{} today no_tasks"><a href="/day_view/{}/{}/{}">{}</a></td>'
+                    return html_string.format(
+                        self.cssclasses[weekday], month, day, year, day)
+                else:
+                    html_string = '<td class="{} today contains_tasks"><a href="/day_view/{}/{}/{}">{}</a>{}</td>'
+                    return html_string.format(
+                        self.cssclasses[weekday], month, day, year, day, task_html)
             else:
-                html_string = '<td class="{} contains_tasks"><a href="/day_view/{}/{}/{}">{}</a>{}</td>'
-                return html_string.format(
-                    self.cssclasses[weekday], month, day, year, day, task_html)
-
-    def formatmonth(self, theyear, themonth, withyear=True):
-        html_strings = []
-        c = html_strings.append
-        c('<table border="0" cellpadding="0" cellspacing="0" class="month">')
-        c('\n')
-        c(self.formatmonthname(theyear, themonth, withyear=withyear))
-        c('\n')
-        c(self.formatweekheader())
-        c('\n')
-        for week in self.monthdays2calendar(theyear, themonth):
-            c(self.formatweek(theyear, themonth, week))
-            c('\n')
-        c('</table>')
-        c('\n')
-        return "".join(html_strings)
+                if not task_html:
+                    # If any other date doesn't have tasks, set class as no_tasks
+                    html_string = '<td class="{} no_tasks"><a href="/day_view/{}/{}/{}">{}</a></td>'
+                    return html_string.format(
+                        self.cssclasses[weekday], month, day, year, day)
+                else:
+                    html_string = '<td class="{} contains_tasks"><a href="/day_view/{}/{}/{}">{}</a>{}</td>'
+                    return html_string.format(
+                        self.cssclasses[weekday], month, day, year, day, task_html)
+                    
+    def formatweek(self, theweek, month, year):
+        """Formats a week into a table row"""
+        week_html = '<tr>'
+        for d, wd in theweek:
+            week_html += self.formatday(d, month, year, wd)
+        week_html += '</tr>'
+        return week_html    
     
-    def formatweek(self, theyear, themonth, theweek):
-        
-        # Create a string that represents HTML for all days in a week
-        s = "".join(self.formatday(d, themonth, theyear, wd) for (d, wd) in theweek)
-        
-        return f"<tr>{s}</tr>"
+                  
+    def formatmonth(self, theyear, themonth, withyear=True):
+        """Formats a month into an HTML table"""
+        month_html = '<table border="0" cellpadding="0" cellspacing="0" class="month">'
+        month_html += f'<tr><th colspan="7">{self.formatmonthname(theyear, themonth, withyear=withyear)}</th></tr>'
+        month_html += self.formatweekheader()
+        for week in self.monthdays2calendar(theyear, themonth):
+            month_html += self.formatweek(week, themonth, theyear)
+        month_html += '</table>'
+        return month_html
+    
     
     def buildtasklist(self, month, day, year):
-        
+        """Builds the HTML for the task list for a given day"""
+
         # Format each task for display
         tasks = task_lookup(month, day, year)
         
-        task_list_html = ""
-        task_list_html += '<div class="task_boxes">'
-        
+        task_list_html = '<div class="task_boxes">'
         close_div = "</div>"
         
         print(len(tasks))
