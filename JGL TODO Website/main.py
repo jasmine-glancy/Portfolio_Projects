@@ -8,7 +8,7 @@ from flask import Flask, flash, redirect, \
 from flask_bootstrap import Bootstrap
 from flask_login import current_user, login_user, LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from helpers import format_time, str_to_time, task_lookup
+from helpers import format_time, load_priorities, str_to_time, task_lookup
 from task_tracking import db, Users, Tasks
 import os
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -149,26 +149,25 @@ def day(month, day, year):
             print(f"Priority Level: {task.priority_level}")
             print(f"Task Color: {task.task_color}")
             print("___________")
-            
-        noon = time(12, 0, 0)
-        midnight = time(0, 0, 0)
-        pre_midnight = time(23, 59, 59)
+          
+        # Load priority list
+        priorities = load_priorities(month, day, year)  
+        
     except Exception as e:
         flash(f"Can't load task list, exception {e}")
-
 
     return render_template("day.html", date=day_date_formatted,
                            day=day,
                            current_user=current_user,
                            tasks=tasks,
-                           noon=noon,
-                           midnight=midnight,
-                           pre_midnight=pre_midnight)
+                           priorities=priorities)
     
     
 @app.route("/today", methods=["GET", "POST"])
 def today():
     """Loads in the view of the current day"""
+    
+    tasks = []
     
     # Find today's date
     try:
@@ -176,16 +175,30 @@ def today():
         today_date_full = today_date.strftime("%x")
         
         today = "Today"
-        print(today_date.day)
+        print(f"Today's day: {today_date.day}")
+        print(f"today's month: {today_date.month}")
     except Exception as e:
         flash(f"Can't find dates. Exception: {e}")
         today_date_full = None
     print(today_date_full)
     
+    try:
+                
+        # Look for existing tasks in the database
+        tasks = task_lookup(today_date.month, today_date.day, today_date.year)
+    
+        # Load priority list
+        priorities = load_priorities(today_date.month, today_date.day, today_date.year)  
+    
+    except Exception as e:
+        flash(f"Can't load task list, exception {e}")
+
 
     return render_template("day.html", date=today,
                            day=today_date.day,
-                           current_user=current_user)
+                           current_user=current_user,
+                           tasks=tasks,
+                           priorities=priorities)
     
 
 @app.route("/login", methods=["GET", "POST"])
@@ -360,3 +373,25 @@ def add_task():
     return render_template("add_task.html", current_user=current_user)
 
 
+@app.route("/edit_task/<int:task_id>", methods=["GET", "POST"])
+def edit(task_id):
+    """Allows a user to edit their tasks"""
+    
+
+    try:
+        task_query = db.session.execute(
+            db.select(Tasks).where(Tasks.task_id == task_id)
+            )
+        task = task_query.scalars().first()
+        
+        if task.task_time:
+            # Convert time back to 24 hour format
+            task_24hr = datetime.strptime(task.task_time, "%I:%M %p").strftime("%H:%M")
+            task_time = task_24hr
+            
+        return render_template("edit.html", task=task, task_time=task_time)
+    
+    except Exception as e:
+        flash(f"Can't find task. Exception: {e}")
+        
+    return render_template("edit.html")

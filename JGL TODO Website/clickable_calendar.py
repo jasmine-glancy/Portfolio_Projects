@@ -85,7 +85,12 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
             if box_count == 0:
                 task_list_html += '<div class="row_1">'
             elif box_count == 4:
-                task_list_html += '<div class="row_2">'  
+                task_list_html += '<div class="row_2">' 
+            elif box_count >= 4 and box_count % 4 == 0:
+                # After the first 8 boxes, make extended rows
+                task_list_html += '<div class="extended_row">'
+                
+                
             # Builds a box of color for each task
             task_list_html += f'<div class="task_box" style="background-color: {task.task_color};">'
             

@@ -5,7 +5,15 @@
 {% block content %}
 
     <div class="priorities">
-        Priorities
+        <div class="priority_heading">Priorities</div>
+
+        {% if priorities %}
+            {% for priority in priorities %}
+                <div class="priority_item">
+                   * {{ priority.task_name }}
+                </div>
+            {% endfor %}
+        {% endif %}
     </div>
 
 
@@ -15,43 +23,37 @@
        </div>
 
        <table class="task_table">
-        <tr>
-            <td>
-                <!-- TODO: Add tasks in either AM or PM Hours
-                 depending on when the task is scheduled-->
-                
-                <div class="task_list">
-                    {% if tasks %}
-                        {% for task in tasks %}
-                            <div class="item">
-                                <div class="header">
-                                    <input type="checkbox" style="accent-color: {{ task.task_color }};"> 
+            <tr>
+                <td>
+                    <div class="task_list">
+                        {% if tasks %}
+                            {% for task in tasks %}
+                                <div class="item">
+                                    <div class="{% if task.priority_level < 1 %}header{% elif task.priority_level == 1 %}mid_prio_header{% else %}bold_header{% endif %}">
+                                        <input type="checkbox" style="accent-color: {{ task.task_color }};"> 
 
-                                    {{ task.task_name }} 
-                                    
-                                    {{ (task.task_time|str_to_time)|format_time }}
-
-                                    <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
+                                        {{ task.task_name }} 
+                                            
+                                        {{ (task.task_time|str_to_time)|format_time }}
+                                        
+                                        <a href="{{ url_for('edit', task_id=task.task_id)}}">
+                                            <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
+                                        </a>
+                                    </div>
+                                    <div class="description">
+                                        {{ task.description }}
+                                    </div>
                                 </div>
-                                <div class="description">
-                                    {{ task.description }}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                            {% endfor %}
+                        {% endif %}
 
-                </div>
-                <a href="{{ url_for('add_task') }}">
-                    <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
-                </a>
-            </td>
-            
-        </tr>
-
-    </table>
-
-
-
+                    </div>
+                    <a href="{{ url_for('add_task') }}">
+                        <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
+                    </a>
+                </td>
+            </tr>
+        </table>
     </div>
 
 {% endblock %}

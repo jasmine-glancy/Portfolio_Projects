@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task{% endblock %}
+
+{% block content %}
+
+<div class="edit_task">
+    <h1>Edit Task</h1>
+
+    <!-- Load in Error messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <p class="flash">
+                <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+                 {{ messages[-1] }} 
+                <img src="{{ url_for('static', filename='assets/svg/warning.svg')}}" class="warning" alt="Error">
+            </p>
+        {% endif %}
+    {% endwith %}
+    
+    <div>
+        <form class="row g-3" action="{{ url_for('edit', task_id=task.task_id) }}" method="POST">
+            <form class="row g-3" action="{{ url_for('add_task') }}" method="POST">
+                <div class="col-md-1">
+                    <label for="ColorInput" class="form-label">Task Color:</label>
+                    <input type="color" class="form-control form-control-color" id="ColorInput" value="{{ task.task_color }}" name="task_color" title="Choose your color">
+                </div>
+                <div class="col-md-1">
+                    <label for="validationDefault01" class="form-label">Task:</label>
+                    <input type="text" class="form-control" id="validationDefault01" value="{{ task.task_name }}" name="task_name" required>
+                </div>
+                <div class="col-md-2">
+                    <label for="validationDefault01" class="form-label">Task Description:</label>
+                    <input type="text" class="form-control" id="validationDefault01" value="{{ task.description }}" name="task_description" required>
+                </div>
+                <!-- HTML5 form for date input suggested by Carol Skelly on Stack OverFlow
+                courtesy of https://www.codeply.com/p/zU0EWDmIfn-->
+                <div class="col-md-2">
+                    <label for="validationDefault01" class="form-label">Task Date:</label>
+                    <input class="form-control" id="taskDate" name="task_date" type="date" value="{{ task.task_date }}" required>
+                </div>
+                <!-- Time input suggested by https://www.w3schools.com/tags/att_input_type_time.asp -->
+                <div class="col-md-2">
+                    <label for="validationDefault01" class="form-label">Select a Time:</label>
+                    <input class="form-control" type="time" id="time" value="{{ task_time }}" name="time">
+                </div>
+                <div class="col-md-2">
+                    <label for="validationDefault04" class="form-label">Priority Level</label>
+                    <select class="form-select" id="validationDefault04" value="{{ task.priority_level }}" name="priority_level" required>
+                        <option selected disabled value="">Please Make a Selection</option>
+                        <option value="0" {% if task.priority_level == 0 %}selected{% endif %}>Low</option>
+                        <option value="1" {% if task.priority_level == 1 %}selected{% endif %}>Medium</option>
+                        <option value="2" {% if task.priority_level == 2 %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <button class="btn btn-secondary" type="submit">Edit Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // HTML5 calendar suggested by Carol Skelly on Stack OverFlow
+    $(document).ready(function(){
+
+        // Grab the date from the form and set it as date_input
+        let taskDate = document.getElementById('taskDate')
+        
+        taskDate.addEventListener('change',(e)=>{
+          let taskDateVal = e.target.value
+          document.getElementById('taskDateSelected').innerText = taskDateVal
+        })
+        
+</script>
+{% endblock %}

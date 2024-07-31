@@ -2,6 +2,7 @@
 from datetime import datetime
 from flask import Flask
 from flask_login import current_user
+from sqlalchemy import and_
 from task_tracking import db, Tasks
 
 
@@ -34,7 +35,31 @@ def task_lookup(month, day, year):
     # Pad the date with 0s if it's within the first 10 days of the month
     day_date = f"{year}-{int(month):02d}-{int(day):02d}"
         
-    task_lookup = db.session.execute(db.select(Tasks).where((Tasks.user_id == current_user.id) & (Tasks.task_date == day_date)))
+    task_lookup = db.session.execute(
+        db.select(Tasks).where(
+            and_(
+                Tasks.user_id == current_user.id),
+                Tasks.task_date == day_date))
     tasks = task_lookup.scalars().all()
     
     return tasks
+
+def load_priorities(month, day, year):
+    """Look up priorities in order from most to least urgent"""
+    
+    # Pad the date with 0s if it's within the first 10 days of the month
+    day_date = f"{year}-{int(month):02d}-{int(day):02d}"
+    
+    priority_lookup = db.session.execute(
+        db.select(Tasks).where(
+            and_(
+                Tasks.user_id == current_user.id,
+                Tasks.task_date == day_date,
+                Tasks.priority_level >= 1,
+            )
+        ).order_by(Tasks.priority_level.desc())
+    )
+    priorities = priority_lookup.scalars().all()
+    
+    print(priorities)
+    return priorities
