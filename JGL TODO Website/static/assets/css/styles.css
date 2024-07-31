@@ -42,12 +42,7 @@ body {
         padding-left: 2.5vw;
     }
 
-    .description {
-        padding-left: 1vw;
-        padding-bottom: 0.5vw;
-        padding-top: 0.25vw;
-        max-width: 16vw;
-    }
+
 /* Calendar */
     
 table.month {
@@ -211,6 +206,7 @@ h1 {
     background-color: var(--anti_flash_white);
     border: 0.5vw double var(--black);
     width: 60%;
+    min-height: 60%;
     margin-top: 5vw;
     margin-left: auto;
     margin-right: auto;
@@ -223,7 +219,8 @@ h1 {
     text-align: center;
     padding: 0vw 1.5vw 0.15vw 1.5vw;
     position: relative;
-    margin: 2vw 10vw 20vw 2vw;
+    margin-left: 2vw;
+    margin-top: 2vw;
     top: 0vw;
     left: 0vw;
     color: var(--burnt_charcoal);
@@ -234,12 +231,82 @@ h1 {
 
     
     .add {
+        
+        display: block;
+        position: relative;
         max-width: 2vw;
+        margin-top: -7vw;
+        margin-left: 15vw; 
+        margin-bottom: 1vw;
     }
 
-    .edit {
+    .task_list .item .edit {
         max-width: 1.5vw;
+        margin-top: 0.5vw;
+        margin-left: 1vw;
     }
+
+    .task_table {
+        display: grid;
+        position: relative;
+        height: 50%;
+        width: 30%;
+        top: -8vw;
+        margin-left: 11vw;
+        grid-template-columns: repeat(auto-fill, minmax(25%, 1fr)); /* Adjust column width as needed */
+        grid-template-rows: repeat(auto-fill, minmax(50%, 1fr)); /* Adjust row height as needed */
+        grid-auto-flow: dense;
+    }
+
+    /* Schedule View */
+    .task_list {
+        position: relative;
+        margin-left: 2vw;
+        border-spacing: 0 0.5vw;
+        top: 0vw;
+        z-index: 2;
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr)); 
+        grid-auto-rows: min-content;
+        max-height: 24vw; 
+        min-width: 44vw;
+        overflow-y: auto; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+        gap: 0.5vw; 
+    }
+
+        .task_list .item {
+            display: inline-block;
+            flex-direction: column;
+            flex: 0 0 auto;
+            padding: 0.5vw;
+            margin-bottom: 0.5vw;
+        }
+
+        .task_list .item .header {
+            display: flex;
+            top: 0;
+            gap: 0.5vw; 
+            align-items: center; 
+        }
+
+        .task_list .item .description {
+            padding-left: 1vw;
+            padding-bottom: 0.5vw;
+            padding-top: 0.25vw;
+            max-width: 12vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            white-space: normal; 
+
+            /* Breaks long words */
+            word-wrap: break-word;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 0.5vw;
+        }
 
 /* Navigation Bar */
 .navbar-brand {
@@ -303,19 +370,6 @@ h1 {
     .btn.btn-secondary {
         margin-top: 1.85vw;
         margin-bottom: 5vw;
-    }
-
-/* Schedule View */
-.task_list {
-    margin-left: 34.5vw;
-    position: absolute;
-    margin-top: 7.5vw;
-    border-spacing: 0 0.5vw;
-    z-index: 2;
-}
-
-    .task_list td {
-        padding: 0.5vw;
     }
 
 

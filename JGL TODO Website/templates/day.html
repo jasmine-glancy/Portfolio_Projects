@@ -7,8 +7,14 @@
     <div class="priorities">
         Priorities
     </div>
-    
-    <table>
+
+
+    <div class="day_view">
+       <div class="day">
+            {{ day }}
+       </div>
+
+       <table class="task_table">
         <tr>
             <td>
                 <!-- TODO: Add tasks in either AM or PM Hours
@@ -18,33 +24,29 @@
                     {% if tasks %}
                         {% for task in tasks %}
                             <div class="item">
-                                
-                                <input type="checkbox" style="accent-color: {{ task.task_color }};"> 
+                                <div class="header">
+                                    <input type="checkbox" style="accent-color: {{ task.task_color }};"> 
 
-                                {{ task.task_name }} 
-                                
-                                {{ (task.task_time|str_to_time)|format_time }}
+                                    {{ task.task_name }} 
+                                    
+                                    {{ (task.task_time|str_to_time)|format_time }}
 
-                                <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
-                            </div>
-                            <div class="description">
-                                {{ task.description }}
+                                    <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
+                                </div>
+                                <div class="description">
+                                    {{ task.description }}
+                                </div>
                             </div>
                         {% endfor %}
                     {% endif %}
-                    <a href="{{ url_for('add_task') }}">
-                        <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
-                    </a>
                 </div>
             </td>
         </tr>
-
     </table>
-
-    <div class="day_view">
-       <div class="day">
-            {{ day }}
-       </div>
+    
+    <a href="{{ url_for('add_task') }}">
+        <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
+    </a>
 
     </div>
 

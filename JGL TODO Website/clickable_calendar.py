@@ -101,8 +101,3 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
         
         return task_list_html
             
-        # Create a string representation for each task
-        
-        # Concatenate task representations
-            # Create a single string that contains the HTML for all tasks of the day
-            # Insert tasks strings into the day's cell
