@@ -39,14 +39,18 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+
                 </div>
+                <a href="{{ url_for('add_task') }}">
+                    <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
+                </a>
             </td>
+            
         </tr>
+
     </table>
-    
-    <a href="{{ url_for('add_task') }}">
-        <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
-    </a>
+
+
 
     </div>
 

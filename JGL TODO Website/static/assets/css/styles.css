@@ -206,7 +206,7 @@ h1 {
     background-color: var(--anti_flash_white);
     border: 0.5vw double var(--black);
     width: 60%;
-    min-height: 60%;
+    height: 62vh;
     margin-top: 5vw;
     margin-left: auto;
     margin-right: auto;
@@ -233,11 +233,12 @@ h1 {
     .add {
         
         display: block;
-        position: relative;
+        position: sticky;
         max-width: 2vw;
-        margin-top: -7vw;
-        margin-left: 15vw; 
+        margin-top: 0.5vw;
+        margin-left: 2vw; 
         margin-bottom: 1vw;
+        z-index: 2;
     }
 
     .task_list .item .edit {
@@ -263,7 +264,7 @@ h1 {
         position: relative;
         margin-left: 2vw;
         border-spacing: 0 0.5vw;
-        top: 0vw;
+        top: 0;
         z-index: 2;
         display: grid; 
         grid-template-columns: repeat(auto-fill, minmax(15vw, 1fr)); 
