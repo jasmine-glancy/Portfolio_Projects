@@ -61,5 +61,4 @@ def load_priorities(month, day, year):
     )
     priorities = priority_lookup.scalars().all()
     
-    print(priorities)
     return priorities

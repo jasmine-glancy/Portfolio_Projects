@@ -70,7 +70,7 @@ table.month {
     }
 
     table.month td {
-        height: 6vw;
+        height: 6.5vw;
     }
 
     th.month {
@@ -132,7 +132,7 @@ table.month {
         top: 1vw;
     }
 
-    .row_1, .row_2, .extended_row {
+    .row_1, .row_2, .extended_row, .extended_row_2 {
         display: inline;
     }
 
@@ -153,9 +153,14 @@ table.month {
     .extended_row {
         position: absolute;
         top: 1vw;
-        right: 6.5vw;
+        right: 6.05vw;
     }
     
+    .extended_row_2 {
+        position: absolute;
+        top: 1vw;
+        right: 6.05vw;
+    }
 
     table.month > tbody:nth-child(1) > tr:nth-child(2) {
         background-color: var(--platinum);
@@ -178,6 +183,12 @@ table.month {
         background-color: var(--taupe_gray);
     } 
 
+    .ellipsis {
+        position: relative;
+        top: -2vw;
+        left: 0.35vw;
+        font-size: 3rem;
+    }
 
     .tooltip {
         position: relative;
@@ -289,6 +300,7 @@ h1 {
         overflow-x: auto; 
         white-space: nowrap; 
         gap: 0.5vw; 
+        margin-bottom: 1vw;
     }
 
         .task_list .item {

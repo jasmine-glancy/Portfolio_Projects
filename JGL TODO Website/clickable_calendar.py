@@ -76,19 +76,21 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
         
         task_list_html = '<div class="task_boxes">'
         close_div = "</div>"
-        
-        print(len(tasks))
+
   
         box_count = 0
+        max_box_display = 18
+        
         for task in tasks:
 
             if box_count == 0:
                 task_list_html += '<div class="row_1">'
             elif box_count == 4:
                 task_list_html += '<div class="row_2">' 
-            elif box_count >= 4 and box_count % 4 == 0:
-                # After the first 8 boxes, make extended rows
+            elif box_count == 8:
                 task_list_html += '<div class="extended_row">'
+            elif box_count == 14:
+                task_list_html += '<div class="extended_row_2">'
                 
                 
             # Builds a box of color for each task
@@ -99,10 +101,14 @@ class ClickableHTMLCalendar(calendar.HTMLCalendar):
                 
             box_count += 1 
             
-        if box_count % 4 == 0 and box_count > 0 and box_count <= 8:
+            if box_count == max_box_display:
+                task_list_html += '<div class="ellipsis">...</div>'
+                break
+                
+        if (box_count % 4 == 0 and box_count <= 8) or box_count == 9 or box_count == 15 or box_count == max_box_display:
             task_list_html += close_div
-            
-        task_list_html += close_div
+        else:
+            task_list_html += close_div
         
         return task_list_html
             
