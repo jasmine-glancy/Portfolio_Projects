@@ -1,7 +1,9 @@
 """A program that scans the excel charge logs for each shift
 to build an emailed report of the top focus areas for training"""
 
-# TODO: Import excel sheets for analysis
+# TODO: Import databases
+    
+    # TODO: Create a session to query the database
 
 # TODO: Count over- and under- charge columns
 
