@@ -11,7 +11,7 @@ billing_codes_engine = create_engine(BILLING_CODES_URI)
 
 # Create session for the database
 BillingCodesSession = sessionmaker(bind=billing_codes_engine)
-billing_code_session = BillingCodesSession()
+BILLING_CODES_SESSION = BillingCodesSession()
 
 class Base(DeclarativeBase):
     pass
@@ -89,4 +89,3 @@ class SpecialtyImaging(Base):
     item_code = Column(String)
     item_description = Column(String)
     
-billing_codes = billing_code_session.query(HospitalizationCodes).all()
