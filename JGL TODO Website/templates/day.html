@@ -39,6 +39,11 @@
                                         <a href="{{ url_for('edit', task_id=task.task_id)}}">
                                             <img src="{{ url_for('static', filename='assets/svg/edit.svg')}}" class="edit">
                                         </a>
+                                        <form action="{{ url_for('delete_task', task_id=task.task_id) }}" class="delete_icon" method="POST">
+                                            <input type="hidden" name="method" value="DELETE">
+                                            <input type="hidden" name="api_key" value="{{ api }}">
+                                            <button type="submit" class="btn delete">x</button>
+                                        </form>
                                     </div>
                                     <div class="description">
                                         {{ task.description }}
@@ -51,6 +56,7 @@
                     <a href="{{ url_for('add_task') }}">
                         <img src="{{ url_for('static', filename='assets/svg/add.svg')}}" class="add">
                     </a>
+
                 </td>
             </tr>
         </table>

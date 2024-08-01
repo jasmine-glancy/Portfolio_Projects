@@ -18,12 +18,17 @@ db.init_app(app)
 def str_to_time(time_string, format="%I:%M %p"):
     """Custom filter to convert a string to datetime"""
     
-    time_object = datetime.strptime(time_string, format)
+    try:
+        time_object = datetime.strptime(time_string, format)
+    except ValueError:
+        # If time isn't in correct format, reformat to 24-hour
+        time_object = datetime.strptime(time_string, "%H:%M")
 
     return time_object.time()
 
 @app.template_filter("format_time")
 def format_time(time):
+    
     formatted_time = time.strftime("%I:%M %p").lstrip("0")
     print(formatted_time)
     

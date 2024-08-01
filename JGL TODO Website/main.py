@@ -3,7 +3,7 @@ they need to get done throughout the week"""
 
 from clickable_calendar import ClickableHTMLCalendar
 from datetime import date, datetime, time
-from flask import Flask, flash, redirect, \
+from flask import Flask, flash, jsonify, redirect, \
     render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 from flask_login import current_user, login_user, LoginManager
@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from helpers import format_time, load_priorities, str_to_time, task_lookup
 from task_tracking import db, Users, Tasks
 import os
+from werkzeug.exceptions import NotFound
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -23,7 +24,8 @@ app = Flask(__name__)
 Bootstrap(app)
 
 # Load in security key
-app.config["SECRET_KEY"] = os.environ.get("KEY")
+API_KEY = os.environ.get("KEY")
+app.config["SECRET_KEY"] = API_KEY
 
 # Initialize LoginManager
 login_manager = LoginManager()
@@ -65,16 +67,8 @@ def home():
         user_id = current_user.id
         
         # If a user has a preferred starting day of the week, set it
-        user_lookup = db.session.execute(db.select(Users.pref_starting_day).where(Users.id == user_id))
+        c.set_user_first_weekday(user_id)
         
-        if user_lookup is not None:
-            first_weekday = user_lookup.scalar()
-            print(first_weekday)
-            if first_weekday < 0 or first_weekday > 6:
-                print(type(first_weekday))
-                c.setfirstweekday(first_weekday)
-        else:
-            print("User not found")
     except Exception as e:
         print(f"Can't set a custom first day of the week. Exception: {e}")
         print("Loading default calendar...")
@@ -87,21 +81,8 @@ def home():
             print(f"Error generating calendar HTML: {e}")
         calendar_html = c.formatmonth(today.year, today.month, withyear=True)
     
-    # TODO: The calendar should have buttons to add a new task
 
-    # TODO: If the user is logged in and the user has tasks
-        # TODO: Load in bars to represent each TODO of the day
-            # TODO: allow colors to overlap
-            
-    # TODO: Allow the user to "zoom" in on a day and week
     return render_template("index.html", calendar=calendar_html, current_user=current_user)
-
-            
-
-# TODO: Create week view page
-    # TODO: Allow the user to choose what day their week starts from
-        # TODO: Allow the user to edit their previous choice of starting day
-    
 
 @app.route("/day_view/<month>/<day>/<year>", methods=["GET", "POST"])
 def day(month, day, year):
@@ -160,7 +141,8 @@ def day(month, day, year):
                            day=day,
                            current_user=current_user,
                            tasks=tasks,
-                           priorities=priorities)
+                           priorities=priorities,
+                           api=API_KEY)
     
     
 @app.route("/today", methods=["GET", "POST"])
@@ -198,7 +180,8 @@ def today():
                            day=today_date.day,
                            current_user=current_user,
                            tasks=tasks,
-                           priorities=priorities)
+                           priorities=priorities,
+                           api=API_KEY)
     
 
 @app.route("/login", methods=["GET", "POST"])
@@ -377,7 +360,37 @@ def add_task():
 def edit(task_id):
     """Allows a user to edit their tasks"""
     
-
+    if request.method == "POST":
+        print("POSTING!")
+        
+        task_name = request.form.get("task_name")
+        task_description = request.form.get("task_description")
+        task_color = request.form.get("task_color")
+        task_date = request.form.get("task_date")
+        time = request.form.get("time")
+        priority_level = request.form.get("priority_level")
+        
+        try:   
+            # Look up task by ID for modification
+            task_to_edit_found = db.session.query(Tasks).filter_by(task_id=task_id).first()
+            
+            if task_to_edit_found:
+                # Update information
+                task_to_edit_found.task_name = task_name
+                task_to_edit_found.description = task_description
+                task_to_edit_found.task_color = task_color
+                task_to_edit_found.task_date = task_date
+                task_to_edit_found.task_time = time
+                task_to_edit_found.priority_level = priority_level
+                
+                # Commit changes
+                db.session.commit()
+                return redirect(url_for("home"))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Unable to edit task. Excepiton: {e}")
+        
     try:
         task_query = db.session.execute(
             db.select(Tasks).where(Tasks.task_id == task_id)
@@ -395,3 +408,25 @@ def edit(task_id):
         flash(f"Can't find task. Exception: {e}")
         
     return render_template("edit.html")
+
+
+@app.route("/delete_task/<int:task_id>", methods=["POST"])
+def delete_task(task_id):
+    """Deletes the task that matches the ID"""
+    
+    if request.form.get("method") == "DELETE" and request.form.get("api_key") == API_KEY:
+        try:
+            task = db.get_or_404(Tasks, task_id)
+            
+            # Mark task for deletion if found
+            db.session.delete(task)
+                
+            # Commit changes
+            db.session.commit()
+            print("Successfully deleted from the database!")
+            return redirect(url_for("home"))
+        except NotFound:
+            return jsonify(error={"Not Found": "Sorry, a task with that id was not found in the database"}), 404
+    else:
+        return jsonify(error={"Not Found": "Sorry, that's not allowed. Make sure you have the correct api_key."}), 403
+    

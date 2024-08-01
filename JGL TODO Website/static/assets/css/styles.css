@@ -15,13 +15,13 @@ body {
     background-color: var(--dim_gray);
 }
 
-.login_register, .add_task, .priorities, .edit_task {
+.login_register, .add_task, .priorities, .edit_task, .preferences {
     background-color: var(--taupe_gray);
     margin-left: auto;
     margin-right: auto;
 }
 
-.login_register, .add_task, .edit_task {
+.login_register, .add_task, .edit_task, .preferences {
     width: 90%;
     margin-top: 7vw;
     margin-bottom: 5vw;
@@ -30,11 +30,11 @@ body {
 
     .priorities {
         width: 18%;
-        height: 62%;
+        height: 65vh;
         margin-top: 1vw;     
         position: absolute;
         top: 7vw;
-        left: 1.5vw;
+        left: 5vw;
         padding-left: 2.5vw;
     }
 
@@ -231,10 +231,9 @@ h1 {
     background-color: var(--anti_flash_white);
     border: 0.5vw double var(--black);
     width: 60%;
-    height: 62vh;
+    height: 65vh;
     margin-top: 5vw;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 30vw;
     z-index: 0;
 }
 
@@ -267,8 +266,8 @@ h1 {
     }
 
     .task_list .item .edit {
-        max-width: 1.5vw;
-        margin-top: 0.5vw;
+        max-height: 4vh;
+        margin-top: 1vw;
         margin-left: 1vw;
     }
 
@@ -405,6 +404,15 @@ h1 {
     .btn.btn-secondary {
         margin-top: 1.85vw;
         margin-bottom: 5vw;
+    }
+
+    .btn.delete {
+        margin-top: 1vw;
+        min-height: 2vh;
+        padding-top: 0;
+        padding-left: 0.5vw;
+        padding-right: 0.5vw;
+        color: var(--anti_flash_white);
     }
 
 

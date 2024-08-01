@@ -3,10 +3,28 @@ import calendar
 from datetime import date
 from flask_login import current_user
 from helpers import task_lookup
-
+from task_tracking import db, Users
 
 class ClickableHTMLCalendar(calendar.HTMLCalendar):
     """Reformatting recommended by CoPilot for clickable days"""
+    
+    
+    def set_user_first_weekday(self, user_id):
+        """Sets the first weekday based on the user's preference"""
+        try:
+            user_lookup = db.session.execute(db.select(Users.pref_starting_day).where(Users.id == user_id))
+            if user_lookup is not None:
+                first_weekday = user_lookup.scalar()
+                print(first_weekday)
+                if 0 <= first_weekday <= 6:
+                    self.setfirstweekday(first_weekday)
+                else:
+                    print("Invalid first weekday value:", first_weekday)
+            else:
+                print("User not found")
+        except Exception as e:
+            print(f"Can't set a custom first day of the week. Exception: {e}")
+    
     
     def formatday(self, day, month, year, weekday):
         """Formats days to have clickable dates and loads in task boxes"""
