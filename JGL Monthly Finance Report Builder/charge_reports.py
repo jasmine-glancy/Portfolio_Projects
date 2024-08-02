@@ -1,6 +1,5 @@
 """Imports quarterly_reports.db and allows queries"""
 
-import datetime
 from sqlalchemy import create_engine, Column, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -12,7 +11,7 @@ charge_reports_engine = create_engine(CHARGE_REPORTS_URI)
 
 # Create session for the database
 ChargeReportsSession = sessionmaker(bind=charge_reports_engine)
-charge_reports_session = ChargeReportsSession()
+CHARGE_REPORTS_SESSION = ChargeReportsSession()
 
 class Base(DeclarativeBase):
     pass
