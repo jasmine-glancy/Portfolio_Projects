@@ -77,8 +77,8 @@ class Oxygen(Base):
     item_code = Column(String)
     item_description = Column(String)
 
-class SendOut_RegerenceLabs(Base):        
-    __tablename__ = "SendOut_RegerenceLabs"
+class SendOut_ReferenceLabs(Base):        
+    __tablename__ = "SendOut_ReferenceLabs"
     item_id = Column(Integer, primary_key=True, autoincrement=True)
     item_code = Column(String)
     item_description = Column(String)
