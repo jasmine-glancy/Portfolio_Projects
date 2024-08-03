@@ -5,7 +5,7 @@ to build an emailed report of the top focus areas for training"""
 
 import billing_codes
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, WeekendCharges2024, WeeknightCharges2024
-from helpers import build_report_overcharges, find_t_thru_f_am_overcharges, find_m_thru_th_pm_overcharges
+from helpers import build_report_overcharges, find_f_thru_m_overcharges, find_t_thru_f_am_overcharges, find_m_thru_th_pm_overcharges
 from sqlalchemy import desc, func
 
 # Create billing code session for queries
@@ -63,22 +63,36 @@ weekend_charges = charge_session.query(WeekendCharges2024).all()
         
 # Count and classify recurring item totals
 
-# Weekday Charges
+# ----------------------------- Weekday Charges ----------------------------- #
+
 weekday_over_charged_items = find_t_thru_f_am_overcharges()
 
 print("Weekday charges tallying...")
+
+# Weekday over-charges
 weekday_over_charge_list = build_report_overcharges(weekday_over_charged_items, flattened_code_list)
 print(weekday_over_charge_list)
 
-# Weekend Charges
+# ----------------------------- Weeknight Charges ----------------------------- #
 
-# Weeknight Charges
 weeknight_over_charged_items = find_m_thru_th_pm_overcharges()
 
 print("Weeknight charges tallying...")
 
+# Weeknight over-charges
 weeknight_over_charge_list = build_report_overcharges(weeknight_over_charged_items, flattened_code_list)
 print(weeknight_over_charge_list)
+
+# ----------------------------- Weekend Charges ----------------------------- #
+
+weekend_over_charged_items = find_f_thru_m_overcharges()
+
+print("Weekend charges tallying...")
+
+# Weekend over-charges
+weekend_over_charge_list = build_report_overcharges(weekend_over_charged_items, flattened_code_list)
+print(weekend_over_charge_list)
+
     
     # TODO: Final report should have 5 most missed and/or altered charges
     

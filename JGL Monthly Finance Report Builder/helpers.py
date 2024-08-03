@@ -35,6 +35,20 @@ def find_m_thru_th_pm_overcharges():
     
     return over_charged_items
 
+def find_f_thru_m_overcharges():
+    """Finds the most commonly occurring 
+    over-charged items on the weekends"""
+    
+    over_charged_items = charge_session.query(
+        WeekendCharges2024.Entered_Code,
+        WeekendCharges2024.Item, 
+        func.count(WeekendCharges2024.Entered_Code).label("count_overcharged")
+    ).group_by(WeekendCharges2024.Entered_Code,
+            WeekendCharges2024.Item
+            ).order_by(desc("count_overcharged")).limit(5)
+    
+    return over_charged_items
+
 def build_report_overcharges(shift, code_list):
     """Builds a report of the most commonly occuring over-charges"""
     
