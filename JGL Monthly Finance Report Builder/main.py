@@ -23,6 +23,7 @@ food_codes = codes_session.query(billing_codes.Food).all()
 hospitalization_codes = codes_session.query(billing_codes.HospitalizationCodes).all()
 ih_imaging_codes = codes_session.query(billing_codes.InHouseImaging).all()
 ih_lab_codes = codes_session.query(billing_codes.InHouseLabs).all()
+inj_med_codes = codes_session.query(billing_codes.InjectibleMedications).all()
 monitoring_codes = codes_session.query(billing_codes.Monitoring).all()
 oxygen_codes = codes_session.query(billing_codes.Oxygen).all()
 send_out_lab_codes = codes_session.query(billing_codes.SendOut_ReferenceLabs).all()
@@ -30,7 +31,8 @@ specialty_imaging_codes = codes_session.query(billing_codes.SpecialtyImaging).al
 
 code_list = [transfusion_codes, consultation_transfer_codes, controlled_drug_codes,
              fluid_additive_codes, food_codes, hospitalization_codes, ih_imaging_codes,
-             ih_lab_codes, monitoring_codes, oxygen_codes, send_out_lab_codes, specialty_imaging_codes]
+             ih_lab_codes, inj_med_codes, monitoring_codes, oxygen_codes, send_out_lab_codes, 
+             specialty_imaging_codes]
 
 # Flatten code list, suggested by CoPilot
 flattened_code_list = [code for category in code_list for code in category]
@@ -41,8 +43,8 @@ weeknight_charges = charge_session.query(WeeknightCharges2024).all()
 weekend_charges = charge_session.query(WeekendCharges2024).all()
 
 # Test code below
-# for code in hospitalization_codes:
-#     print(f"Item ID: {code.item_id}, Item Code: {code.item_code}, Description: {code.item_description}")
+for code in inj_med_codes:
+    print(f"Item ID: {code.item_id}, Item Code: {code.item_code}, Description: {code.item_description}")
 
 counter = 0
 # charge_report = charge_session.query(WeeknightCharges2024).all()
@@ -58,7 +60,7 @@ for code in weekday_charges:
             break
         
         
-# TCount and classify recurring item totals
+# Count and classify recurring item totals
 
 # Weekday Charges
 
@@ -66,12 +68,15 @@ for code in weekday_charges:
 
 # Weeknight Charges
 over_charged_items = charge_session.query(
-    WeeknightCharges2024.Entered_Code, 
+    WeeknightCharges2024.Entered_Code,
+    WeeknightCharges2024.Item, 
     func.count(WeeknightCharges2024.Entered_Code).label("count_overcharged")
-).group_by(WeeknightCharges2024.Entered_Code).order_by(desc("count_overcharged")).limit(5)
+).group_by(WeeknightCharges2024.Entered_Code,
+           WeeknightCharges2024.Item
+           ).order_by(desc("count_overcharged")).limit(5)
 
 print("Weeknight charges tallying...")
-for i, (code, count_overcharged) in enumerate(over_charged_items, start=1):
+for i, (code, notes, count_overcharged) in enumerate(over_charged_items, start=1):
     # Enumerate allows you to increment the counted numbers
     
     code_description = None
@@ -87,7 +92,7 @@ for i, (code, count_overcharged) in enumerate(over_charged_items, start=1):
         # If there's a code description, call it
         print(f"{i}. Code: {code_description}, Count: {count_overcharged}")
     else:
-        print(f"{i}. Code: {code}, Count: {count_overcharged}")
+        print(f"{i}. Code: {notes}, Count: {count_overcharged}")
 
     
     
