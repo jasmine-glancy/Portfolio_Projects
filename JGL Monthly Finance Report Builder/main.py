@@ -4,9 +4,12 @@ to build an emailed report of the top focus areas for training"""
 # Import databases
 
 import billing_codes
-from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, WeekendCharges2024, WeeknightCharges2024
-from helpers import build_report_overcharges, find_f_thru_m_overcharges, find_t_thru_f_am_overcharges, find_m_thru_th_pm_overcharges
-from sqlalchemy import desc, func
+from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, \
+    WeekendCharges2024, WeeknightCharges2024
+from helpers import build_report_over_charges, build_report_under_charges, \
+    find_f_thru_m_over_charges, find_f_thru_m_under_charges, \
+        find_t_thru_f_am_over_charges, find_t_thru_f_am_under_charges, \
+            find_m_thru_th_pm_over_charges, find_m_thru_th_pm_under_charges
 
 # Create billing code session for queries
 codes_session = billing_codes.BILLING_CODES_SESSION 
@@ -65,32 +68,54 @@ weekend_charges = charge_session.query(WeekendCharges2024).all()
 
 # ----------------------------- Weekday Charges ----------------------------- #
 
-weekday_over_charged_items = find_t_thru_f_am_overcharges()
+weekday_over_charged_items = find_t_thru_f_am_over_charges()
+weekday_under_charged_items = find_t_thru_f_am_under_charges()
 
-print("Weekday charges tallying...")
+print("---------------- Weekday charges tallying ----------------\n")
+
+# Weekday under-charges
+weekday_under_charge_list = build_report_under_charges(weekday_under_charged_items, flattened_code_list)
+print("Missed Item Charges: \n")
+print(weekday_under_charge_list)
 
 # Weekday over-charges
-weekday_over_charge_list = build_report_overcharges(weekday_over_charged_items, flattened_code_list)
+weekday_over_charge_list = build_report_over_charges(weekday_over_charged_items, flattened_code_list)
+print("Over-charged Items: \n")
 print(weekday_over_charge_list)
+
 
 # ----------------------------- Weeknight Charges ----------------------------- #
 
-weeknight_over_charged_items = find_m_thru_th_pm_overcharges()
+weeknight_over_charged_items = find_m_thru_th_pm_over_charges()
+weeknight_under_charged_items = find_m_thru_th_pm_under_charges()
 
-print("Weeknight charges tallying...")
+print("---------------- Weeknight charges tallying ----------------\n")
+
+# Weeknight under-charges
+weeknight_under_charge_list = build_report_under_charges(weeknight_under_charged_items, flattened_code_list)
+print("Missed Item Charges: \n")
+print(weeknight_under_charge_list)
 
 # Weeknight over-charges
-weeknight_over_charge_list = build_report_overcharges(weeknight_over_charged_items, flattened_code_list)
+weeknight_over_charge_list = build_report_over_charges(weeknight_over_charged_items, flattened_code_list)
+print("Over-charged Items: \n")
 print(weeknight_over_charge_list)
 
 # ----------------------------- Weekend Charges ----------------------------- #
 
-weekend_over_charged_items = find_f_thru_m_overcharges()
+weekend_over_charged_items = find_f_thru_m_over_charges()
+weekend_under_charged_items = find_f_thru_m_under_charges()
 
-print("Weekend charges tallying...")
+print("---------------- Weekend charges tallying ----------------\n")
+
+# Weeknight under-charges
+weekend_under_charge_list = build_report_under_charges(weekend_under_charged_items, flattened_code_list)
+print("Missed Item Charges: \n")
+print(weekend_under_charge_list)
 
 # Weekend over-charges
-weekend_over_charge_list = build_report_overcharges(weekend_over_charged_items, flattened_code_list)
+weekend_over_charge_list = build_report_over_charges(weekend_over_charged_items, flattened_code_list)
+print("Over-charged Items: \n")
 print(weekend_over_charge_list)
 
     
