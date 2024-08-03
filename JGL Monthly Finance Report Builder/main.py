@@ -5,6 +5,7 @@ to build an emailed report of the top focus areas for training"""
 
 import billing_codes
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, WeekendCharges2024, WeeknightCharges2024
+from helpers import build_report_overcharges, find_t_thru_f_am_overcharges, find_m_thru_th_pm_overcharges
 from sqlalchemy import desc, func
 
 # Create billing code session for queries
@@ -43,58 +44,41 @@ weeknight_charges = charge_session.query(WeeknightCharges2024).all()
 weekend_charges = charge_session.query(WeekendCharges2024).all()
 
 # Test code below
-for code in inj_med_codes:
-    print(f"Item ID: {code.item_id}, Item Code: {code.item_code}, Description: {code.item_description}")
+# for code in inj_med_codes:
+#     print(f"Item ID: {code.item_id}, Item Code: {code.item_code}, Description: {code.item_description}")
 
-counter = 0
-# charge_report = charge_session.query(WeeknightCharges2024).all()
+# counter = 0
+# # charge_report = charge_session.query(WeeknightCharges2024).all()
 
-for code in weekday_charges:
-        print(f"Code ID: {code.Charge_ID}, Item: {code.Item}, Notes: {code.Notes}",
-              f"Amount Subtracted: {code.Amount_Subtracted}, Entered Code: {code.Entered_Code}",
-              f"Amount Added: {code.Amount_Added}, Correct Code: {code.Correct_Code}")
+# for code in weekday_charges:
+#         print(f"Code ID: {code.Charge_ID}, Item: {code.Item}, Notes: {code.Notes}",
+#               f"Amount Subtracted: {code.Amount_Subtracted}, Entered Code: {code.Entered_Code}",
+#               f"Amount Added: {code.Amount_Added}, Correct Code: {code.Correct_Code}")
         
-        counter += 1
+#         counter += 1
         
-        if counter == 10:
-            break
+#         if counter == 10:
+#             break
         
         
 # Count and classify recurring item totals
 
 # Weekday Charges
+weekday_over_charged_items = find_t_thru_f_am_overcharges()
+
+print("Weekday charges tallying...")
+weekday_over_charge_list = build_report_overcharges(weekday_over_charged_items, flattened_code_list)
+print(weekday_over_charge_list)
 
 # Weekend Charges
 
 # Weeknight Charges
-over_charged_items = charge_session.query(
-    WeeknightCharges2024.Entered_Code,
-    WeeknightCharges2024.Item, 
-    func.count(WeeknightCharges2024.Entered_Code).label("count_overcharged")
-).group_by(WeeknightCharges2024.Entered_Code,
-           WeeknightCharges2024.Item
-           ).order_by(desc("count_overcharged")).limit(5)
+weeknight_over_charged_items = find_m_thru_th_pm_overcharges()
 
 print("Weeknight charges tallying...")
-for i, (code, notes, count_overcharged) in enumerate(over_charged_items, start=1):
-    # Enumerate allows you to increment the counted numbers
-    
-    code_description = None
-    
-    for item in flattened_code_list:
-        # Checks if the code in the top overcharged items 
-        ## matches a billing code within a category
-        if code == item.item_code:
-            code_description = item.item_description
-            break
-        
-    if code_description:
-        # If there's a code description, call it
-        print(f"{i}. Code: {code_description}, Count: {count_overcharged}")
-    else:
-        print(f"{i}. Code: {notes}, Count: {count_overcharged}")
 
-    
+weeknight_over_charge_list = build_report_overcharges(weeknight_over_charged_items, flattened_code_list)
+print(weeknight_over_charge_list)
     
     # TODO: Final report should have 5 most missed and/or altered charges
     
