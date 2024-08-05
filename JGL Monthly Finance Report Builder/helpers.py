@@ -108,6 +108,8 @@ def build_report_over_charges(shift, code_list):
                 code_description = item.item_description
                 break
             
+        # TODO: If nursing code matches hospitalization code, only count them once
+        
         if code_description:
             # If there's a code description, call it
             over_charge_report += f"{i}. Code: {code_description}, Count: {count_overcharged}\n"
@@ -140,3 +142,72 @@ def build_report_under_charges(shift, code_list):
             under_charge_report += f"{i}. Code: {notes}, Count: {count_under_charged}\n"
 
     return under_charge_report
+
+def build_report_over_charge_total(shift):
+    """Reports the total amount over charged"""
+    
+    if shift == "weekend":
+        shift = WeekendCharges2024
+    elif shift == "weekday":
+        shift = WeekdayCharges2024
+    elif shift == "weeknight":
+        shift = WeeknightCharges2024
+        
+    records = charge_session.query(shift).all()
+    over_charges = 0
+    
+    for record in records:
+        try:
+            if record.Amount_Subtracted:  
+                over_charges += record.Amount_Subtracted
+        except Exception:
+            amt_subtr = record.Amount_Subtracted.replace("$", "").replace(",", "").replace("-", "").replace("--", "")
+            if amt_subtr:  
+                over_charges += float(amt_subtr)
+    over_charges = round(over_charges, 2)  
+    formatted_over_charges = f"{over_charges:,.2f}"
+    
+    return formatted_over_charges
+
+
+def build_report_under_charge_total(shift):
+    """Reports the total amount of missed charges"""
+    
+    
+    if shift == "weekend":
+        shift = WeekendCharges2024
+    elif shift == "weekday":
+        shift = WeekdayCharges2024
+    elif shift == "weeknight":
+        shift = WeeknightCharges2024
+        
+    records = charge_session.query(shift).all()
+    missed_charges = 0
+    
+    for record in records:
+        try:
+            if record.Amount_Added:  
+                missed_charges += record.Amount_Added
+        except Exception:
+            amt_added = record.Amount_Added.replace("$", "").replace(",", "").replace("-", "").replace("--", "")
+            missed_charges += float(amt_added)  
+            
+    missed_charges = round(missed_charges, 2)  
+    formatted_missed_charges = f"{missed_charges:,.2f}"
+    
+    return formatted_missed_charges
+
+def charge_difference(shift):
+    """Finds the difference between missed and over charges"""
+    
+    over_charge_total = build_report_over_charge_total(shift).replace(",", "")
+    under_charge_total = build_report_under_charge_total(shift).replace(",", "")
+    
+    difference = float(over_charge_total) - float(under_charge_total)
+    
+    if difference < 0:
+        formatted_difference = f"(-${abs(difference):,.2f})"
+    else:
+        formatted_difference = f"${difference:,.2f}"
+    
+    return formatted_difference

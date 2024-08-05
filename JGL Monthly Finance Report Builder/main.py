@@ -7,9 +7,10 @@ import billing_codes
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, \
     WeekendCharges2024, WeeknightCharges2024
 from helpers import build_report_over_charges, build_report_under_charges, \
-    find_f_thru_m_over_charges, find_f_thru_m_under_charges, \
-        find_t_thru_f_am_over_charges, find_t_thru_f_am_under_charges, \
-            find_m_thru_th_pm_over_charges, find_m_thru_th_pm_under_charges
+    build_report_over_charge_total, build_report_under_charge_total, charge_difference, \
+        find_f_thru_m_over_charges, find_f_thru_m_under_charges, \
+            find_t_thru_f_am_over_charges, find_t_thru_f_am_under_charges, \
+                find_m_thru_th_pm_over_charges, find_m_thru_th_pm_under_charges
 
 # Create billing code session for queries
 codes_session = billing_codes.BILLING_CODES_SESSION 
@@ -118,14 +119,35 @@ weekend_over_charge_list = build_report_over_charges(weekend_over_charged_items,
 print("Over-charged Items: \n")
 print(weekend_over_charge_list)
 
-    
-    # TODO: Final report should have 5 most missed and/or altered charges
-    
-# TODO: Include focus categories?
+# ------------------------- Missed charges per shift ------------------------- #
+print("------------------------- Charge breakdown per shift -------------------------\n")
 
-    # TODO: Compare billing code database items with reports
+print("--- Weekday missed charges ---\n")
+weekday_missed_charges = build_report_under_charge_total("weekday")
+weekday_over_charges = build_report_over_charge_total("weekday")
+weekday_diff = charge_difference("weekday")
 
-# TODO: Include shift totals
+print(f"Missed charges: ${weekday_missed_charges}")
+print(f"Over charges: ${weekday_over_charges}")
+print(f"Difference: {weekday_diff}\n")
+
+print("--- Weeknight missed charges ---\n")
+weeknight_missed_charges = build_report_under_charge_total("weeknight")
+weeknight_over_charges = build_report_over_charge_total("weeknight")
+weeknight_diff = charge_difference("weeknight")
+
+print(f"Missed charges: ${weeknight_missed_charges}")
+print(f"Over charges: ${weeknight_over_charges}")
+print(f"Difference: {weeknight_diff}\n")
+
+print("--- Weekend missed charges ----\n")
+weekend_missed_charges = build_report_under_charge_total("weekend")
+weekend_over_charges = build_report_over_charge_total("weekend")
+weekend_diff = charge_difference("weekend")
+
+print(f"Missed charges: ${weekend_missed_charges}")
+print(f"Over charges: ${weekend_over_charges}")
+print(f"Difference: {weekend_diff}\n")
 
 # TODO: Include YTD totals per shift
 
