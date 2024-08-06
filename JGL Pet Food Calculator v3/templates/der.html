@@ -67,6 +67,10 @@
             {% endif %}
             
         </div>
+
+        {% if food_form == "cup" %}
+            Please note: Cup amounts are provided based on an 8 oz measuring cup.
+        {% endif %}
     </div>
     <div class="button-container">
         <a href="{{ url_for('rer', pet_id=pet_id) }}">

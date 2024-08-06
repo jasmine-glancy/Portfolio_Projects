@@ -176,6 +176,7 @@ a:hover {
     text-align: center;
     margin: 5px;
     position: relative;
+    margin-top: 1vw;
 }
 
     .btn-sm {
@@ -380,6 +381,10 @@ a:hover {
         margin-bottom: 1vw;
     }
 
+    .columned-form-label {
+        padding-right: 1vw;
+    }
+
 /* Formula formatting */
 .formula {
     text-align: center;
@@ -461,6 +466,10 @@ a:hover {
         margin-top: 100px;
     }
 
+    .xlargeplus_padding {
+        margin-top: 150px;
+    }
+
     .dxl_padding {
         margin-top: 250px;
     }
@@ -519,14 +528,20 @@ a:hover {
 
 /* Container for the SVG */
 
-.report_img_fel, .report_img_k9 {
+.report_img_fel {
     display: flex;
     align-items: flex-start;
     position: sticky;
     transform: translateY(-125px); /* Suggested by CoPilot */
     top: 20px;
-    margin-left: 790px;
+    margin-left: 43vw;
 }
+
+    .report_img_k9 {
+        transform: translateY(-120px); /* Suggested by CoPilot */
+        top: 20px;
+        margin-left: 44vw;
+    }
 
     /* Horizontal line styling */
     .fel_line {
@@ -566,12 +581,18 @@ a:hover {
             max-height: 150px;
         }
 
+        .pet_pic {
+            margin-left: 4vw;
+            margin-right: auto;
+            margin-top: 0.1vw;    
+        }
+
 /* Puzzle feeder images */
 #final_report, #final_report_cat, #preg_fel_final_report, #preg_final_report, 
  #final_report_obese, #final_report_young_obese, #final_report_active {
     display: inline;
     position: absolute;
-    margin-right: 46vw;
+    margin-right: 44vw;
     width: 250px;
     height: fit-content;
     border: 2px solid var(--deep_blue_green);
@@ -597,7 +618,7 @@ a:hover {
     }
 
     #final_report {
-        margin-top: 50px;
+        margin-top: 60px;
     }
 
     #final_report_active {
