@@ -3,6 +3,7 @@
 
 # Project-specific databases
 quarterly_reports.db
+monthly_changes.db
 
 # we ignore the hidden files from Pycharm and VS Code.
 .idea/

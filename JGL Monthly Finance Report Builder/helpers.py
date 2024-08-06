@@ -2,94 +2,46 @@
 
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, WeekendCharges2024, WeeknightCharges2024
 from sqlalchemy import desc, func
+from tabulate import tabulate
 
 
 # Create charge report session for queries
 charge_session = CHARGE_REPORTS_SESSION
 
-def find_t_thru_f_am_over_charges():
+def find_over_charges(shift):
     """Finds the most commonly occurring 
-    over-charged items on the weekdays"""
+    over-charged items"""
+    
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
     
     over_charged_items = charge_session.query(
-        WeekdayCharges2024.Entered_Code,
-        WeekdayCharges2024.Item, 
-        func.count(WeekdayCharges2024.Entered_Code).label("count_overcharged")
-    ).group_by(WeekdayCharges2024.Entered_Code,
-            WeekdayCharges2024.Item
+        shift_db.Entered_Code,
+        shift_db.Item, 
+        func.count(shift_db.Entered_Code).label("count_overcharged")
+    ).group_by(shift_db.Entered_Code,
+            shift_db.Item
             ).order_by(desc("count_overcharged")).limit(5)
     
     return over_charged_items
 
-def find_t_thru_f_am_under_charges():
+def find_under_charges(shift):
     """Finds the most commonly occurring 
-    under-charged items on the weekdays"""
+    missed items not charged for"""
+    
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
     
     under_charged_items = charge_session.query(
-        WeekdayCharges2024.Correct_Code,
-        WeekdayCharges2024.Item, 
-        func.count(WeekdayCharges2024.Correct_Code).label("count_under_charged")
-    ).group_by(WeekdayCharges2024.Correct_Code,
-            WeekdayCharges2024.Item
+        shift_db.Correct_Code,
+        shift_db.Item, 
+        func.count(shift_db.Correct_Code).label("count_under_charged")
+    ).group_by(shift_db.Correct_Code,
+            shift_db.Item
             ).order_by(desc("count_under_charged")).limit(5)
     
     return under_charged_items
-
-def find_m_thru_th_pm_over_charges():
-    """Finds the most commonly occurring 
-    over-charged items on the weeknights"""
-    
-    over_charged_items = charge_session.query(
-        WeeknightCharges2024.Entered_Code,
-        WeeknightCharges2024.Item, 
-        func.count(WeeknightCharges2024.Entered_Code).label("count_overcharged")
-    ).group_by(WeeknightCharges2024.Entered_Code,
-            WeeknightCharges2024.Item
-            ).order_by(desc("count_overcharged")).limit(5)
-    
-    return over_charged_items
-
-def find_m_thru_th_pm_under_charges():
-    """Finds the most commonly occurring 
-    under-charged items on the weeknights"""
-    
-    under_charged_items = charge_session.query(
-        WeeknightCharges2024.Correct_Code,
-        WeeknightCharges2024.Item, 
-        func.count(WeeknightCharges2024.Correct_Code).label("count_under_charged")
-    ).group_by(WeeknightCharges2024.Correct_Code,
-            WeeknightCharges2024.Item
-            ).order_by(desc("count_under_charged")).limit(5)
-    
-    return under_charged_items
-
-def find_f_thru_m_over_charges():
-    """Finds the most commonly occurring 
-    over-charged items on the weekends"""
-    
-    over_charged_items = charge_session.query(
-        WeekendCharges2024.Entered_Code,
-        WeekendCharges2024.Item, 
-        func.count(WeekendCharges2024.Entered_Code).label("count_overcharged")
-    ).group_by(WeekendCharges2024.Entered_Code,
-            WeekendCharges2024.Item
-            ).order_by(desc("count_overcharged")).limit(5)
-    
-    return over_charged_items
-
-def find_f_thru_m_under_charges():
-    """Finds the most commonly occurring 
-    under-charged items on the weekends"""
-    
-    under_charged_items = charge_session.query(
-        WeekendCharges2024.Correct_Code,
-        WeekendCharges2024.Item, 
-        func.count(WeekendCharges2024.Correct_Code).label("count_under_charged")
-    ).group_by(WeekendCharges2024.Correct_Code,
-            WeekendCharges2024.Item
-            ).order_by(desc("count_under_charged")).limit(5)
-    
-    return under_charged_items
+ 
 
 def build_report_over_charges(shift, code_list):
     """Builds a report of the most commonly occurring over-charges"""
@@ -146,14 +98,10 @@ def build_report_under_charges(shift, code_list):
 def build_report_over_charge_total(shift):
     """Reports the total amount over charged"""
     
-    if shift == "weekend":
-        shift = WeekendCharges2024
-    elif shift == "weekday":
-        shift = WeekdayCharges2024
-    elif shift == "weeknight":
-        shift = WeeknightCharges2024
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
         
-    records = charge_session.query(shift).all()
+    records = charge_session.query(shift_db).all()
     over_charges = 0
     
     for record in records:
@@ -173,15 +121,10 @@ def build_report_over_charge_total(shift):
 def build_report_under_charge_total(shift):
     """Reports the total amount of missed charges"""
     
-    
-    if shift == "weekend":
-        shift = WeekendCharges2024
-    elif shift == "weekday":
-        shift = WeekdayCharges2024
-    elif shift == "weeknight":
-        shift = WeeknightCharges2024
-        
-    records = charge_session.query(shift).all()
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
+
+    records = charge_session.query(shift_db).all()
     missed_charges = 0
     
     for record in records:
@@ -190,7 +133,9 @@ def build_report_under_charge_total(shift):
                 missed_charges += record.Amount_Added
         except Exception:
             amt_added = record.Amount_Added.replace("$", "").replace(",", "").replace("-", "").replace("--", "")
-            missed_charges += float(amt_added)  
+            
+            if amt_added:
+                missed_charges += float(amt_added)  
             
     missed_charges = round(missed_charges, 2)  
     formatted_missed_charges = f"{missed_charges:,.2f}"
@@ -211,3 +156,54 @@ def charge_difference(shift):
         formatted_difference = f"${difference:,.2f}"
     
     return formatted_difference
+
+def find_charges_missed_by_dr(shift):
+    
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
+    
+    most_missed_by_dr = charge_session.query(
+        shift_db.Doctor, 
+        func.count(shift_db.Doctor).label("count_missed")
+    ).filter(
+        # Only add to the count if there is data in Correct_Code
+        ## and not in Entered_Code
+        shift_db.Correct_Code.isnot(None),
+        shift_db.Correct_Code != "",
+        (shift_db.Entered_Code.is_(None) | (shift_db.Entered_Code == ""))
+    ).group_by(
+            shift_db.Doctor
+    ).order_by(
+        desc("count_missed")
+        ).limit(3)
+    
+        # Debug: Print the generated SQL query
+    print(f"Generated SQL query: {most_missed_by_dr}")
+    
+    result = most_missed_by_dr.all()
+    missed_drs = ""
+    
+    for i, (doctor, count_missed) in enumerate(result, start=1):
+        # Enumerate allows you to increment the counted numbers
+        missed_drs += f"{i}. Doctor: {doctor}, Count: {count_missed}\n"
+
+    # Print the results in a formatted way
+    table_data = [(correct_code, count_missed) for correct_code, count_missed in result]
+    headers = ["Doctor", "Missed Charges"]
+    
+    
+    print(tabulate(table_data, headers, tablefmt="grid"))
+    
+    return missed_drs
+   
+def return_database(shift):
+    """Returns the table name for each shift"""
+    
+    if shift == "weekend":
+        db = WeekendCharges2024
+    elif shift == "weekday":
+        db = WeekdayCharges2024
+    elif shift == "weeknight":
+        db = WeeknightCharges2024
+        
+    return db

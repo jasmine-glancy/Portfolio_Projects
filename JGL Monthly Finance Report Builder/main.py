@@ -7,10 +7,9 @@ import billing_codes
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, \
     WeekendCharges2024, WeeknightCharges2024
 from helpers import build_report_over_charges, build_report_under_charges, \
-    build_report_over_charge_total, build_report_under_charge_total, charge_difference, \
-        find_f_thru_m_over_charges, find_f_thru_m_under_charges, \
-            find_t_thru_f_am_over_charges, find_t_thru_f_am_under_charges, \
-                find_m_thru_th_pm_over_charges, find_m_thru_th_pm_under_charges
+    build_report_over_charge_total, build_report_under_charge_total, \
+        charge_difference, find_over_charges, find_under_charges, \
+            find_charges_missed_by_dr
 
 # Create billing code session for queries
 codes_session = billing_codes.BILLING_CODES_SESSION 
@@ -69,8 +68,8 @@ weekend_charges = charge_session.query(WeekendCharges2024).all()
 
 # ----------------------------- Weekday Charges ----------------------------- #
 
-weekday_over_charged_items = find_t_thru_f_am_over_charges()
-weekday_under_charged_items = find_t_thru_f_am_under_charges()
+weekday_over_charged_items = find_over_charges("weekday")
+weekday_under_charged_items = find_under_charges("weekday")
 
 print("---------------- Weekday charges tallying ----------------\n")
 
@@ -87,8 +86,8 @@ print(weekday_over_charge_list)
 
 # ----------------------------- Weeknight Charges ----------------------------- #
 
-weeknight_over_charged_items = find_m_thru_th_pm_over_charges()
-weeknight_under_charged_items = find_m_thru_th_pm_under_charges()
+weeknight_over_charged_items = find_over_charges("weeknight")
+weeknight_under_charged_items = find_under_charges("weeknight")
 
 print("---------------- Weeknight charges tallying ----------------\n")
 
@@ -104,8 +103,8 @@ print(weeknight_over_charge_list)
 
 # ----------------------------- Weekend Charges ----------------------------- #
 
-weekend_over_charged_items = find_f_thru_m_over_charges()
-weekend_under_charged_items = find_f_thru_m_under_charges()
+weekend_over_charged_items = find_over_charges("weekend")
+weekend_under_charged_items = find_under_charges("weekend")
 
 print("---------------- Weekend charges tallying ----------------\n")
 
@@ -126,10 +125,11 @@ print("--- Weekday missed charges ---\n")
 weekday_missed_charges = build_report_under_charge_total("weekday")
 weekday_over_charges = build_report_over_charge_total("weekday")
 weekday_diff = charge_difference("weekday")
-
+weekday_missed_by_dr = find_charges_missed_by_dr("weekday")
 print(f"Missed charges: ${weekday_missed_charges}")
 print(f"Over charges: ${weekday_over_charges}")
 print(f"Difference: {weekday_diff}\n")
+print(f"Charges most missed by doctors: {weekday_missed_by_dr}")
 
 print("--- Weeknight missed charges ---\n")
 weeknight_missed_charges = build_report_under_charge_total("weeknight")

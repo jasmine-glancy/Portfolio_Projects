@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, Column, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Define database URIs
-CHARGE_REPORTS_URI = "sqlite:///quarterly_reports.db"
+CHARGE_REPORTS_URI = "sqlite:///monthly_changes.db"
     
 # Create engines for the database
 charge_reports_engine = create_engine(CHARGE_REPORTS_URI)
