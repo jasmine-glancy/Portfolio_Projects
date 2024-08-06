@@ -3,7 +3,7 @@
 from calculate_food import CalculateFood
 from cs50 import SQL
 from flask import Flask, render_template, redirect, url_for, request, flash, session
-from flask_bootstrap import Bootstrap5
+from flask_bootstrap import Bootstrap
 from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm, WorkForm, FoodForm
 from find_info import FindInfo
 from helpers import clear_variable_list, login_required
@@ -20,7 +20,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 app = Flask(__name__)
 
 # Add in Bootstrap
-Bootstrap5(app)
+Bootstrap(app)
 
 # Load environmental variables
 

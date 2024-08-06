@@ -235,7 +235,7 @@ a:hover {
     margin-bottom: 10px;
     border: 5px var(--deep_blue_green);
     border-style: double;
-    width: 73vw;
+    width: 68.5vw;
     height: 25vw;
     display: block;
     margin-left: auto;
@@ -250,7 +250,7 @@ a:hover {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 73vw;
+    width: 75%;
     margin-bottom: 20px;
     background-color: var(--white);
     font-family: "Dosis", sans-serif;
@@ -275,8 +275,13 @@ a:hover {
     }
 
 /* Navigation bar */
+
+.nav {
+    margin-top: 1vw;
+}
+
 .nav.nav-tabs {
-    width: 73vw;
+    width: 68.5vw;
     margin-left: auto;
     margin-right: auto;
     --bs-navbar-color: var(--deep_blue_green);
@@ -364,6 +369,15 @@ a:hover {
   
     .form_divider {
         padding-left: 2px;
+    }
+
+.form-group .form-label {
+    text-align: left !important;
+    padding-left: 1vw;
+}
+
+    .form-control {
+        margin-bottom: 1vw;
     }
 
 /* Formula formatting */

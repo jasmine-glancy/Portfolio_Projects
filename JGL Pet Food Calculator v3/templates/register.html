@@ -1,4 +1,3 @@
-{% from "bootstrap5/form.html" import render_form %}
 
 {% extends 'base.html' %}
 
@@ -8,9 +7,26 @@
 
 <div class="container-lg">
     <h1>Register</h1>
-    <div style="text-align:center">
-        <!-- Render the FlaskForm for Register -->
-        {{ render_form(form) }}
+    <div>
+        <form method="POST" action="{{ url_for('register') }}">
+            <!-- Generates hidden fields for CSRF protection -->
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
     </div>
 
     <!-- Outputs error messages -->

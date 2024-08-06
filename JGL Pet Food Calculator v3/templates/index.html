@@ -7,7 +7,7 @@
 <div class="container-lg">
     {% if user %}
     <p>
-        <h1>Welcome to the Pet Food Calculator, {{ user }}!</h1>
+        <h1>Welcome to the Pet Food Calculator, {{ user|capitalize }}!</h1>
     </p>
     {% else %}
         <h1>Welcome to the Pet Food Calculator!</h1>

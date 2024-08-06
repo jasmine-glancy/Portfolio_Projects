@@ -1,7 +1,10 @@
 """Contains additional checks and decorators (i.e. is user logged in, login decorator)"""
 
-from flask import session, redirect, url_for
+from flask import Flask, session, redirect, url_for
 from functools import wraps
+
+# Configure application
+app = Flask(__name__)
 
 def clear_variable_list():
     """Clear all pet session variables, code reformatting suggested by CoPilot"""
@@ -21,3 +24,11 @@ def login_required(f):
         return f(*args, **kwargs)
     
     return decorated_funtion
+
+# ----------------- Custom Jinja Template Filters ----------------- #
+
+@app.template_filter("capitalize")
+def capitalize(username):
+    cap_username = username.title()
+    
+    return cap_username
