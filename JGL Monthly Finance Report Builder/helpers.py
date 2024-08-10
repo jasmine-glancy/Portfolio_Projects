@@ -155,7 +155,7 @@ def charge_difference(shift):
     over_charge_total = build_report_over_charge_total(shift).replace(",", "")
     under_charge_total = build_report_under_charge_total(shift).replace(",", "")
     
-    difference = float(over_charge_total) - float(under_charge_total)
+    difference = float(under_charge_total) - float(over_charge_total)
     
     if difference < 0:
         formatted_difference = f"(-${abs(difference):,.2f})"

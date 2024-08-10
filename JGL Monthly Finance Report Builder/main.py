@@ -1,14 +1,7 @@
 """A program that scans the excel charge logs for each shift
 to build an emailed report of the top focus areas for training"""
 
-# Import databases
-
-from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, \
-    WeekendCharges2024, WeeknightCharges2024
 import helpers
-
-# Create charge report session for queries
-charge_session = CHARGE_REPORTS_SESSION
 
 # Create list of billing code queries for searching
 flattened_code_list = helpers.create_code_list()
@@ -16,29 +9,6 @@ flattened_code_list = helpers.create_code_list()
 # Create list of staff names for searching
 staff_list = helpers.create_staff_list()
 
-# Create shift iterables from charge reports 
-weekday_charges = charge_session.query(WeekdayCharges2024).all()
-weeknight_charges = charge_session.query(WeeknightCharges2024).all()
-weekend_charges = charge_session.query(WeekendCharges2024).all()
-
-# Test code below
-# for code in inj_med_codes:
-#     print(f"Item ID: {code.item_id}, Item Code: {code.item_code}, Description: {code.item_description}")
-
-# counter = 0
-# # charge_report = charge_session.query(WeeknightCharges2024).all()
-
-# for code in weekday_charges:
-#         print(f"Code ID: {code.Charge_ID}, Item: {code.Item}, Notes: {code.Notes}",
-#               f"Amount Subtracted: {code.Amount_Subtracted}, Entered Code: {code.Entered_Code}",
-#               f"Amount Added: {code.Amount_Added}, Correct Code: {code.Correct_Code}")
-        
-#         counter += 1
-        
-#         if counter == 10:
-#             break
-        
-        
 # Count and classify recurring item totals
 
 # ----------------------------- Weekday Charges ----------------------------- #
@@ -96,7 +66,7 @@ print(weekend_over_charge_list)
 # ------------------------- Missed charges per shift ------------------------- #
 print("------------------------- Charge breakdown per shift -------------------------\n")
 
-print("--- Weekday missed charges ---\n")
+print("--- Weekday charge total ---\n")
 weekday_missed_charges = helpers.build_report_under_charge_total("weekday")
 weekday_over_charges = helpers.build_report_over_charge_total("weekday")
 weekday_diff = helpers.charge_difference("weekday")
@@ -109,12 +79,15 @@ top_3_altered_weekday_by_dr = helpers.build_report_altered_by_dr(weekday_altered
 print(f"Missed charges: ${weekday_missed_charges}")
 print(f"Over charges: ${weekday_over_charges}")
 print(f"Difference: {weekday_diff}\n")
+
+
+print("--- Weekday charge breakdown by staff ---\n")
 print("Charges most missed by staff:")
 print(top_3_missed_weekday_by_dr)
 print("Charges most altered by staff:")
 print(top_3_altered_weekday_by_dr)
 
-print("--- Weeknight missed charges ---\n")
+print("--- Weeknight charge total ---\n")
 weeknight_missed_charges = helpers.build_report_under_charge_total("weeknight")
 weeknight_over_charges = helpers.build_report_over_charge_total("weeknight")
 weeknight_diff = helpers.charge_difference("weeknight")
@@ -127,12 +100,15 @@ top_3_altered_weeknight_by_dr = helpers.build_report_altered_by_dr(weeknight_alt
 print(f"Missed charges: ${weeknight_missed_charges}")
 print(f"Over charges: ${weeknight_over_charges}")
 print(f"Difference: {weeknight_diff}\n")
+
+print("--- Weeknight charge breakdown by staff ---\n")
 print("Charges most missed by staff:")
 print(top_3_missed_weeknight_by_dr)
 print("Charges most altered by staff:")
 print(top_3_altered_weeknight_by_dr)
 
-print("--- Weekend missed charges ----\n")
+
+print("--- Weekend charge total ---\n")
 weekend_missed_charges = helpers.build_report_under_charge_total("weekend")
 weekend_over_charges = helpers.build_report_over_charge_total("weekend")
 weekend_diff = helpers.charge_difference("weekend")
@@ -145,8 +121,9 @@ top_3_altered_weekend_by_dr = helpers.build_report_altered_by_dr(weekend_altered
 print(f"Missed charges: ${weekend_missed_charges}")
 print(f"Over charges: ${weekend_over_charges}")
 print(f"Difference: {weekend_diff}\n")
+
+print("--- Weekend charge breakdown by staff ---\n")
 print("Charges most missed by staff:")
 print(top_3_missed_weekend_by_dr)
 print("Charges most altered by staff:")
 print(top_3_altered_weekend_by_dr)
-
