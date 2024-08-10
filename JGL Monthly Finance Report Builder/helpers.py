@@ -225,6 +225,67 @@ def build_report_missed_by_dr(shift, staff_list):
         
     return top_3_staff_w_missed_charges
 
+def find_charges_altered_by_dr(shift):
+    
+    # Return the table for the respective shift
+    shift_db = return_database(shift)
+    
+        # Debug: Print some sample data from the shift_db table
+    charge_log = charge_session.query(shift_db).all()
+
+    most_altered_by_dr = {}
+    
+    for charge in charge_log:
+
+        if charge.Correct_Code and charge.Entered_Code:
+            if charge.Doctor in most_altered_by_dr:
+                # If the doctor is in the dictionary already, add a count to the tally
+                most_altered_by_dr[charge.Doctor] += 1
+            else:
+                # Otherwise, add them to the dictionary for the first time
+                most_altered_by_dr[charge.Doctor] = 1
+    
+    
+    # Sort the dictionary by missed charges count in descending order
+    sorted_altered_charges = sorted(most_altered_by_dr.items(), key=lambda x: x[1], reverse=True)
+    
+    # Select the top 3 doctors with the most missed charges
+    top_3_altered_charges = sorted_altered_charges[:3]
+    
+    return top_3_altered_charges
+
+def build_report_altered_by_dr(shift, staff_list):
+    """Builds a report of the top 3 most altered 
+    charges by staff member"""
+    
+    top_3_staff_w_altered_charges = ""
+    
+    for i, (initials, count_altered) in enumerate(shift, start=1):
+        staff_name = None
+        
+        for name in staff_list:
+            # Checks the staff column of the charge report
+            ## database against the staff database to find their full name
+            
+            if name.cs_initials == initials:
+                if name.notes:
+                    staff_name = f"{name.first_name} {name.last_name}, {name.notes}"
+                else: 
+                    staff_name = f"{name.first_name} {name.last_name}"
+                break
+            
+        if staff_name:
+            # If the name is in the staff database, 
+            # # call the full name
+            
+            top_3_staff_w_altered_charges += f"{i}. Staff Member: {staff_name}, Count: {count_altered} \n"
+            
+        else:
+            # Otherwise count the initials
+            top_3_staff_w_altered_charges += f"{i}. Staff Member: {initials}, Count: {count_altered} \n"
+        
+    return top_3_staff_w_altered_charges
+
 def return_database(shift):
     """Returns the table name for each shift"""
     
