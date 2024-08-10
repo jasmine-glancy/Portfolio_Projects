@@ -3,43 +3,22 @@ to build an emailed report of the top focus areas for training"""
 
 # Import databases
 
-import billing_codes
 from charge_reports import CHARGE_REPORTS_SESSION, WeekdayCharges2024, \
     WeekendCharges2024, WeeknightCharges2024
-from helpers import build_report_over_charges, build_report_under_charges, \
+from helpers import build_report_over_charges, build_report_under_charges, build_report_missed_by_dr, \
     build_report_over_charge_total, build_report_under_charge_total, \
-        charge_difference, find_over_charges, find_under_charges, \
-            find_charges_missed_by_dr
+        charge_difference, create_code_list, create_staff_list, \
+            find_over_charges, find_under_charges, find_charges_missed_by_dr
 
-# Create billing code session for queries
-codes_session = billing_codes.BILLING_CODES_SESSION 
 
 # Create charge report session for queries
 charge_session = CHARGE_REPORTS_SESSION
 
+# Create list of billing code queries for searching
+flattened_code_list = create_code_list()
 
-# Create billing code iterables
-transfusion_codes = codes_session.query(billing_codes.BloodAndTransfusion).all()
-consultation_transfer_codes = codes_session.query(billing_codes.ConsultationsAndTransfers).all()
-controlled_drug_codes = codes_session.query(billing_codes.ControlledDrugs).all()
-fluid_additive_codes = codes_session.query(billing_codes.FluidAdditives).all()
-food_codes = codes_session.query(billing_codes.Food).all()
-hospitalization_codes = codes_session.query(billing_codes.HospitalizationCodes).all()
-ih_imaging_codes = codes_session.query(billing_codes.InHouseImaging).all()
-ih_lab_codes = codes_session.query(billing_codes.InHouseLabs).all()
-inj_med_codes = codes_session.query(billing_codes.InjectibleMedications).all()
-monitoring_codes = codes_session.query(billing_codes.Monitoring).all()
-oxygen_codes = codes_session.query(billing_codes.Oxygen).all()
-send_out_lab_codes = codes_session.query(billing_codes.SendOut_ReferenceLabs).all()
-specialty_imaging_codes = codes_session.query(billing_codes.SpecialtyImaging).all()
-
-code_list = [transfusion_codes, consultation_transfer_codes, controlled_drug_codes,
-             fluid_additive_codes, food_codes, hospitalization_codes, ih_imaging_codes,
-             ih_lab_codes, inj_med_codes, monitoring_codes, oxygen_codes, send_out_lab_codes, 
-             specialty_imaging_codes]
-
-# Flatten code list, suggested by CoPilot
-flattened_code_list = [code for category in code_list for code in category]
+# Create list of staff names for searching
+staff_list = create_staff_list()
 
 # Create shift iterables from charge reports 
 weekday_charges = charge_session.query(WeekdayCharges2024).all()
@@ -126,28 +105,42 @@ weekday_missed_charges = build_report_under_charge_total("weekday")
 weekday_over_charges = build_report_over_charge_total("weekday")
 weekday_diff = charge_difference("weekday")
 weekday_missed_by_dr = find_charges_missed_by_dr("weekday")
+top_3_missed_weekday_by_dr = build_report_missed_by_dr(weekday_missed_by_dr, staff_list)
+
+# Print weekday reports
 print(f"Missed charges: ${weekday_missed_charges}")
 print(f"Over charges: ${weekday_over_charges}")
 print(f"Difference: {weekday_diff}\n")
-print(f"Charges most missed by doctors: {weekday_missed_by_dr}")
+print("Charges most missed by staff:")
+print(top_3_missed_weekday_by_dr)
 
 print("--- Weeknight missed charges ---\n")
 weeknight_missed_charges = build_report_under_charge_total("weeknight")
 weeknight_over_charges = build_report_over_charge_total("weeknight")
 weeknight_diff = charge_difference("weeknight")
+weeknight_missed_by_dr = find_charges_missed_by_dr("weeknight")
+top_3_missed_weeknight_by_dr = build_report_missed_by_dr(weeknight_missed_by_dr, staff_list)
 
+# Print weeknight reports
 print(f"Missed charges: ${weeknight_missed_charges}")
 print(f"Over charges: ${weeknight_over_charges}")
 print(f"Difference: {weeknight_diff}\n")
+print("Charges most missed by staff:")
+print(top_3_missed_weeknight_by_dr)
 
 print("--- Weekend missed charges ----\n")
 weekend_missed_charges = build_report_under_charge_total("weekend")
 weekend_over_charges = build_report_over_charge_total("weekend")
 weekend_diff = charge_difference("weekend")
+weekend_missed_by_dr = find_charges_missed_by_dr("weekend")
+top_3_missed_weekend_by_dr = build_report_missed_by_dr(weekend_missed_by_dr, staff_list)
 
+# Print weekend reports
 print(f"Missed charges: ${weekend_missed_charges}")
 print(f"Over charges: ${weekend_over_charges}")
 print(f"Difference: {weekend_diff}\n")
+print("Charges most missed by staff:")
+print(top_3_missed_weekend_by_dr)
 
 # TODO: Include YTD totals per shift
 
