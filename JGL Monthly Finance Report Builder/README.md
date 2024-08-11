@@ -50,7 +50,7 @@ Contains three tables based on their corresponding charge logs from inpatient in
 
 The schema for the tables is as follows:
 
-- Charge_ID: An integer of unique primary key that autoincrements
+- Charge_ID: An integer that represents a unique primary key that autoincrements
 - ChargeDate: A string containing the date the charge was "captured"/logged
 - PatientID: An integer representing the patient's ID
 - PatientName: A string containing the patient's name
