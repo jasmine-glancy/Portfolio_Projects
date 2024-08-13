@@ -19,7 +19,6 @@ load_dotenv("D:/Python/EnvironmentVariables/.env")
 
 RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-products"
 HILLS_DOG_FOOD_SEARCH = "https://www.hillspet.com/products/dog-food"
-IAM_DRY_DOG_FOOD_SEARCH = "https://www.iams.com/dog/dog-food/dry"
 EUKANUBA_FOOD_SEARCH = "https://www.eukanuba.com/us/all-products"
 
 class JgWebScraper:
@@ -80,16 +79,20 @@ class JgWebScraper:
         )
         self.driver.execute_script("arguments[0].scrollIntoView(true);", nutritional_info)
         
-        for _ in range(3):  # Retry up to 3 times
+        # Retry clicking nutritional info category up to 3 times
+        for _ in range(3):  
             try:
                 print(nutritional_info.text)
                 self.driver.execute_script("arguments[0].click();", nutritional_info)
                 print("click successful")
-                break  # Exit loop if click is successful
+                
+                # Exit loop if click is successful
+                break  
             except s.common.exceptions.ElementClickInterceptedException:
                 print("Click intercepted, retrying...")
-
-                time.sleep(1)  # Wait before retrying
+                
+                # Wait before retrying
+                time.sleep(1)  
             
     def rc_dog_food_find_calorie_content(self):
         """Gets kcal/kg and kcal/can or cup"""
@@ -101,7 +104,8 @@ class JgWebScraper:
         self.driver.execute_script("arguments[0].scrollIntoView(true);", calorie_content)
         time.sleep(1)
         
-        for _ in range(3):  # Retry up to 3 times
+        # Attempt to find calorie content category up to 3 times
+        for _ in range(3): 
             try:
                 self.driver.execute_script("arguments[0].click();", calorie_content)
                 calorie_content_text = WebDriverWait(self.driver, 10).until(
@@ -131,15 +135,30 @@ class JgWebScraper:
                 else:
                     print("kcal per can or cup pattern not found")
                     
-                break  # Exit loop if click is successful
+                # Exit loop if scrape is successful
+                break  
             except s.common.exceptions.ElementClickInterceptedException:
-                time.sleep(1)  # Wait before retrying
+                # Wait before retrying
+                time.sleep(1)  
                 
                 # TODO: add caloric content to database
+
+                # CREATE TABLE "DogFoods" (
+                #     "food_id" INTEGER UNIQUE,
+                #     "food_name" VARCHAR(300) UNIQUE,
+                #     "food_form" INTEGER,
+                #     "life_stage" VARCHAR(300),
+                #     "description" VARCHAR(500),
+                #     "size" A
+                #     PRIMARY KEY ("diet_id"),
+                #     FOREIGN KEY ("food_form") REFERENCES ("form_id"),
+                #     FOREIGN KEY ("life_stage") REFERENCES ("life_stage_id")
+                # )
                 
             # TODO: "click" on "ingredients" 
                 # TODO: pick protein sources out of the ingredient list 
-                    # TODO: add protein sources to database
+                    # TODO: add protein sources to database by top 5 ingredients by weight
+                    # TODO: add the rest of ingredients to the db
                     # TODO: if protein sources contain a common allergen, add to db
             
         # TODO: if at the end of the result page, click on the next page
@@ -170,30 +189,7 @@ class JgWebScraper:
             
         # TODO: if at the end of the result page, click on the next page
             # TODO: If no "next" page, stop scraping
-            
-    def iams_dry_dog_food_search(self):
-        
-        # Navigate to the specified URL
-        print(f"Navigating to {IAM_DRY_DOG_FOOD_SEARCH}")
-        self.driver.get(IAM_DRY_DOG_FOOD_SEARCH)
-        
-        time.sleep(5)
-        # Verify the correct page is loaded
-        current_url = self.driver.current_url
-        print(f"Current URL: {current_url}")
-        
-        # TODO: For each result in the page, "click" on result 
-        
-            # TODO: "click" on "ingredients" 
-        
-                # TODO: add caloric content to database
-                
-                # TODO: pick protein sources out of the ingredient list 
-                    # TODO: add protein sources to database
-                    # TODO: if protein sources contain a common allergen, add to db
-            
-        # TODO: if at the end of the result page, click on the next page
-            # TODO: If no "next" page, stop scraping
+     
             
     def eukanuba_food_search(self):
         
@@ -223,7 +219,6 @@ class JgWebScraper:
 jg_web_scraper = JgWebScraper()
 jg_web_scraper.rc_dog_food_search()
 # jg_web_scraper.hills_dog_food_search()
-# jg_web_scraper.iams_dry_dog_food_search()
 # jg_web_scraper.eukanuba_food_search()
 # TODO: Scraper should query brands that follow WSAVA guidelines in addition
 ## to BEG brands (Boutique, Exotic, Grain-Free)
