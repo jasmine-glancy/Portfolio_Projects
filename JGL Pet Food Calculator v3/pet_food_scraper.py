@@ -11,9 +11,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from webdriver_manager.chrome import ChromeDriverManager
-
-
 
 load_dotenv("D:/Python/EnvironmentVariables/.env")
 
@@ -70,6 +67,7 @@ class JgWebScraper:
             
             self.rc_dog_food_click_nutritional_info_category()
             self.rc_dog_food_find_calorie_content()
+            self.rc_dog_food_find_ingredient_list()
     
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
@@ -166,16 +164,61 @@ class JgWebScraper:
                 #     FOREIGN KEY ("second_protein_source") REFERENCES "ProteinSources"("protein_id"),
                 #     FOREIGN KEY ("third_protein_source") REFERENCES "ProteinSources"("protein_id")
                 # )
-                
-            # TODO: "click" on "ingredients" 
-                # TODO: pick protein sources out of the ingredient list 
-                    # TODO: add protein sources to database by top 5 ingredients by weight
-                    # TODO: add the rest of ingredients to the db
-                    # TODO: if protein sources contain a common allergen, add to db
-            
+
         # TODO: if at the end of the result page, click on the next page
             # TODO: If no "next" page, stop scraping
         
+    def rc_dog_food_find_ingredient_list(self):
+        """Extract ingredient list"""
+        
+        # "Click" on "ingredients" 
+        ingredients = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, ".//button[h3[contains(text(), 'Ingredients')]]"))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", ingredients)
+        time.sleep(1)
+        
+        self.driver.execute_script("arguments[0].click();", ingredients)
+
+        ingredient_text = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
+        )
+        
+        # Extract contents within "Vitamins [" and "Trace Minerals ["
+        vitamins_content = re.findall(r'vitamins \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
+        trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
+        
+        print("Vitamins Content:", vitamins_content)
+        print("Trace Minerals Content:", trace_minerals_content)
+        # Remove "Vitamins [" and "Trace Minerals [" sections
+        cleaned_text = re.sub(r'vitamins \[.*?\]', "", ingredient_text.text, flags=re.DOTALL)
+        cleaned_text = re.sub(r'trace minerals \[.*?\]', "", cleaned_text, flags=re.DOTALL)
+        
+        print("Cleaned Text:", cleaned_text)
+        if vitamins_content:
+            cleaned_text += ", " + ", ".join(vitamins_content[0].replace("\n", ", ").split(", "))
+        if trace_minerals_content:
+            cleaned_text += ", " + ", ".join(trace_minerals_content[0].replace("\n", ", ").split(", "))
+        
+        # Split the cleaned text into a list of ingredients
+        ingredient_list = [ingredient.strip() for ingredient in cleaned_text.title().split(",") if ingredient.strip()]
+        print("Ingredient List:", ingredient_list)
+        
+        # TODO: pick protein sources out of the ingredient list 
+        for ingredient in ingredient_list:
+            print(ingredient)
+            # TODO: search entire ingredient list against the ProteinSources database
+                # TODO: If ingredient matches a protein source in the database
+                #  # add protein source to first/second/third_protein_source
+                
+                # first/second/third_protein_source is added to by ingredient weight
+                
+                # TODO: add protein sources to database by top 5 ingredients by weight
+                # TODO: add the rest of ingredients to the db
+                # TODO: if protein sources contain a common allergen, add to db
+        
+        return ingredient_list
+    
     def hills_dog_food_search(self):
         # Navigate to the specified URL
         print(f"Navigating to {HILLS_DOG_FOOD_SEARCH}")
