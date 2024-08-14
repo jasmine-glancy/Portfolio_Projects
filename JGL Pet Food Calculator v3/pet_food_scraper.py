@@ -149,10 +149,22 @@ class JgWebScraper:
                 #     "food_form" INTEGER,
                 #     "life_stage" VARCHAR(300),
                 #     "description" VARCHAR(500),
-                #     "size" A
+                #     "size" INTEGER,
+                #     "aafco_statement" INTEGER,
+                #     "kcal_per_kg" INTEGER,
+                #     "kcal_per_cup_can_pouch" INTEGER,
+                #     "first_protein_source" INTEGER,
+                #     "second_protein_source" INTEGER,
+                #     "third_protein_source" INTEGER,
+                #     "ingredient_list" VARCHAR(2000),
                 #     PRIMARY KEY ("diet_id"),
-                #     FOREIGN KEY ("food_form") REFERENCES ("form_id"),
-                #     FOREIGN KEY ("life_stage") REFERENCES ("life_stage_id")
+                #     FOREIGN KEY ("food_form") REFERENCES "FoodForms"("form_id"),
+                #     FOREIGN KEY ("life_stage") REFERENCES "LifeStages"("life_stage_id"),
+                #     FOREIGN KEY ("size") REFERENCES "PackageSizes"("size_id"),
+                #     FOREIGN KEY ("aafco_statement") REFERENCES "AAFCOStatements"("statement_id"),
+                #     FOREIGN KEY ("first_protein_source") REFERENCES "ProteinSources"("protein_id"),
+                #     FOREIGN KEY ("second_protein_source") REFERENCES "ProteinSources"("protein_id"),
+                #     FOREIGN KEY ("third_protein_source") REFERENCES "ProteinSources"("protein_id")
                 # )
                 
             # TODO: "click" on "ingredients" 
