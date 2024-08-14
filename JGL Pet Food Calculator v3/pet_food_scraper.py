@@ -4,6 +4,7 @@ content"""
 
 import re
 from dotenv import load_dotenv
+import pet_food_and_treats as pf
 import selenium as s
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -13,6 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 load_dotenv("D:/Python/EnvironmentVariables/.env")
+
+pet_food_db = pf.PET_FOOD_SESSION
 
 RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-products"
 HILLS_DOG_FOOD_SEARCH = "https://www.hillspet.com/products/dog-food"
@@ -190,6 +193,7 @@ class JgWebScraper:
         
         print("Vitamins Content:", vitamins_content)
         print("Trace Minerals Content:", trace_minerals_content)
+        
         # Remove "Vitamins [" and "Trace Minerals [" sections
         cleaned_text = re.sub(r'vitamins \[.*?\]', "", ingredient_text.text, flags=re.DOTALL)
         cleaned_text = re.sub(r'trace minerals \[.*?\]', "", cleaned_text, flags=re.DOTALL)
@@ -205,9 +209,49 @@ class JgWebScraper:
         print("Ingredient List:", ingredient_list)
         
         # TODO: pick protein sources out of the ingredient list 
+        animal_proteins = []
+        other_proteins = []
         for ingredient in ingredient_list:
-            print(ingredient)
-            # TODO: search entire ingredient list against the ProteinSources database
+            # Search entire ingredient list against the ProteinSources database
+
+            if ingredient != "Fish Oil":
+                protein_source = ingredient.split(" ")[0]
+            elif ingredient == "Hydrolyzed Poultry" or ingredient == "Hydrolyzed Soy" or ingredient == "Hydrolyzed Chicken" or ingredient == "Hydrolyzed Salmon":
+                protein_source = ingredient
+                
+            protein_search = pet_food_db.query(
+                pf.ProteinSources
+            ).filter(pf.ProteinSources.protein_source == protein_source).all()
+            
+            if protein_search:
+                # If ingredient matches a protein source in the database
+                for protein in protein_search:
+                    if protein.protein_source not in animal_proteins and protein.protein_source not in other_proteins:
+                        # Add protein to protein list if it is not there already
+                        if protein.protein_type == "animal":
+                            animal_proteins.append(protein.protein_source)
+                        else:
+                            # Add other protein sources by weight after animal sources 
+                            other_proteins.append(protein.protein_source)
+        
+        proteins = animal_proteins + other_proteins
+        print(proteins)
+        
+        try:
+            # First protein source
+            first_protein_source = proteins[0]
+            
+            print(f"1st protein source: {first_protein_source}")
+            # Second protein source
+            second_protein_source = proteins[1]
+            
+            print(f"2nd protein source: {second_protein_source}")
+            # Third protein source
+            third_protein_source = proteins[2]
+            
+            print(f"3rd protein source: {third_protein_source}")
+        except Exception as e:
+            print(f"Can't find protein sources. Exception: {e}")
                 # TODO: If ingredient matches a protein source in the database
                 #  # add protein source to first/second/third_protein_source
                 
