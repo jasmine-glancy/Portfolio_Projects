@@ -44,6 +44,23 @@ def find_aafco_statement(text):
         
     return -1
             
+def find_size_id(sizes):
+    """Queries the database for the AAFCO statement"""
+    
+    
+    normalized_sizes = sizes.strip().lower()
+    
+    container_sizes = pet_food_db.query(pf.PackageSizes).filter(
+            pf.PackageSizes.package_size.ilike(normalized_sizes)
+        ).all()
+    
+    
+    if container_sizes:
+        for size in container_sizes:
+            return size.size_id
+               
+    return -1
+
 class JgWebScraper:
     def __init__(self):
         # Create the web driver
@@ -99,6 +116,7 @@ class JgWebScraper:
             self.driver.execute_script("arguments[0].click();", self.calorie_content)
 
             self.rc_dog_food_find_aafco_statement()
+            self.rc_get_container_size()
     
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
@@ -313,9 +331,71 @@ class JgWebScraper:
         print(f"AAFCO index: {find_aafco_statement(aafco_statement_text.text)}")
         return aafco_statement_text
     
-    # TODO: Get bag/case sizes
+    def rc_get_container_size(self):
+        """Grab the bag or case size"""
     
-    
+        # TODO: Grab selection dropdown menu or text string for dog food package sizes
+        container_sizes_dropdown = self.driver.find_element(By.XPATH, value="//*[@id='packweightselector']")
+
+        # Retrieve all options within the dropdown
+        options = container_sizes_dropdown.find_elements(By.TAG_NAME, 'option')
+        
+        # Iterate through each option and print its text
+        package_size = ""
+        case_size_options = 0
+        container_size_options = 0
+        for size in options:
+            # Match RC's size formatting to match the PackageSize table entries
+            size_text = size.text.replace("lb", " lbs").replace("oz", " oz")
+            
+            # Split by both "x" and "•" using regular expressions
+            sizes = re.split(r'[x•]', size_text)
+            
+            # Strip leading and trailing whitespace from each element
+            sizes = [s.strip() for s in sizes]
+            
+            # Gets the number in a case of cans
+            try:
+                case_sizes = int(sizes[0])
+                
+                # Gets the bag or can size
+                container_size = sizes[1]
+                
+                if case_sizes != None and case_sizes != 1:
+                    case_size_options += 1
+                
+                # Format package size string for canned food
+                if case_size_options == 1 and container_size:
+                    package_size += f"{container_size}, case of {case_sizes}"
+                elif case_sizes > 1:
+                    print(f"{container_size}")
+                else:
+                    package_size += f", case of {case_sizes}"
+            except (ValueError, IndexError):
+                case_sizes = None
+                container_size = sizes[0]
+            
+            print(sizes)
+            
+            # Add to the container_size_options if there is a container size
+            if container_size != None:
+                container_size_options += 1
+                
+            # Format package size string for dry food
+            if container_size_options == 1:
+                package_size += f"{container_size}"
+            elif container_size_options > 1:
+                package_size += f", {container_size}"
+                
+        # Checks formatting for package sizes
+        print(f"Package sizes: {package_size}")
+        
+        # Finds the size_id of the package size string
+        print(f"Size ID: {find_size_id(package_size)}")
+        
+        
+                
+            
     def hills_dog_food_search(self):
         # Navigate to the specified URL
         print(f"Navigating to {HILLS_DOG_FOOD_SEARCH}")
