@@ -117,6 +117,7 @@ class JgWebScraper:
 
             self.rc_dog_food_find_aafco_statement()
             self.rc_get_container_size()
+            self.rc_get_product_description()
     
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
@@ -334,7 +335,7 @@ class JgWebScraper:
     def rc_get_container_size(self):
         """Grab the bag or case size"""
     
-        # TODO: Grab selection dropdown menu or text string for dog food package sizes
+        # Grab selection dropdown menu or text string for dog food package sizes
         container_sizes_dropdown = self.driver.find_element(By.XPATH, value="//*[@id='packweightselector']")
 
         # Retrieve all options within the dropdown
@@ -393,7 +394,13 @@ class JgWebScraper:
         # Finds the size_id of the package size string
         print(f"Size ID: {find_size_id(package_size)}")
         
+    def rc_get_product_description(self):
+        """Scrapes the product description for dog foods"""
         
+        # Get the text for the product description
+        product_description = self.driver.find_element(By.XPATH, value="//div[@data-qa='product-description' and @class='sc-eqUAAy eYrTKE']/p[contains(@class, 'sc-gEvEer fSrWKp')]")
+
+        print(product_description.text)
                 
             
     def hills_dog_food_search(self):
