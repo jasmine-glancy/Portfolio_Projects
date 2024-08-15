@@ -21,6 +21,29 @@ RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-product
 HILLS_DOG_FOOD_SEARCH = "https://www.hillspet.com/products/dog-food"
 EUKANUBA_FOOD_SEARCH = "https://www.eukanuba.com/us/all-products"
 
+def find_aafco_statement(text):
+    """Queries the database for the AAFCO statement"""
+    
+    aafco_statements = pet_food_db.query(
+                pf.AAFCOStatements
+            ).all()
+    
+    formulated_to_meet = re.compile(r'formulated to meet', re.IGNORECASE)
+    feeding_tests = re.compile(r'feeding tests using', re.IGNORECASE)
+    
+    for statement in aafco_statements:
+        # Find the index of the AAFCO statement
+        match = formulated_to_meet.search(text) or feeding_tests.search(text)
+        
+        # If the phrase is found, return the substring starting from the index
+        if match:
+            matched_text = text[match.start():]
+            
+            if statement.aafco_statement.lower() in matched_text.lower():
+                return statement.statement_id
+        
+    return -1
+            
 class JgWebScraper:
     def __init__(self):
         # Create the web driver
@@ -71,6 +94,11 @@ class JgWebScraper:
             self.rc_dog_food_click_nutritional_info_category()
             self.rc_dog_food_find_calorie_content()
             self.rc_dog_food_find_ingredient_list()
+        
+            self.driver.execute_script("arguments[0].click();", self.ingredients)
+            self.driver.execute_script("arguments[0].click();", self.calorie_content)
+
+            self.rc_dog_food_find_aafco_statement()
     
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
@@ -99,16 +127,16 @@ class JgWebScraper:
         """Gets kcal/kg and kcal/can or cup"""
         
         # "Click" on "calorie content" category
-        calorie_content = WebDriverWait(self.driver, 5).until(
+        self.calorie_content = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, ".//button[h3[contains(text(), 'Calorie Content')]]"))
         )
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", calorie_content)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", self.calorie_content)
         time.sleep(1)
         
         # Attempt to find calorie content category up to 3 times
         for _ in range(3): 
             try:
-                self.driver.execute_script("arguments[0].click();", calorie_content)
+                self.driver.execute_script("arguments[0].click();", self.calorie_content)
                 calorie_content_text = WebDriverWait(self.driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
                 )
@@ -142,32 +170,6 @@ class JgWebScraper:
                 # Wait before retrying
                 time.sleep(1)  
                 
-                # TODO: add caloric content to database
-
-                # CREATE TABLE "DogFoods" (
-                #     "food_id" INTEGER UNIQUE,
-                #     "food_name" VARCHAR(300) UNIQUE,
-                #     "food_form" INTEGER,
-                #     "life_stage" VARCHAR(300),
-                #     "description" VARCHAR(500),
-                #     "size" INTEGER,
-                #     "aafco_statement" INTEGER,
-                #     "kcal_per_kg" INTEGER,
-                #     "kcal_per_cup_can_pouch" INTEGER,
-                #     "first_protein_source" INTEGER,
-                #     "second_protein_source" INTEGER,
-                #     "third_protein_source" INTEGER,
-                #     "ingredient_list" VARCHAR(2000),
-                #     PRIMARY KEY ("diet_id"),
-                #     FOREIGN KEY ("food_form") REFERENCES "FoodForms"("form_id"),
-                #     FOREIGN KEY ("life_stage") REFERENCES "LifeStages"("life_stage_id"),
-                #     FOREIGN KEY ("size") REFERENCES "PackageSizes"("size_id"),
-                #     FOREIGN KEY ("aafco_statement") REFERENCES "AAFCOStatements"("statement_id"),
-                #     FOREIGN KEY ("first_protein_source") REFERENCES "ProteinSources"("protein_id"),
-                #     FOREIGN KEY ("second_protein_source") REFERENCES "ProteinSources"("protein_id"),
-                #     FOREIGN KEY ("third_protein_source") REFERENCES "ProteinSources"("protein_id")
-                # )
-
         # TODO: if at the end of the result page, click on the next page
             # TODO: If no "next" page, stop scraping
         
@@ -175,13 +177,13 @@ class JgWebScraper:
         """Extract ingredient list"""
         
         # "Click" on "ingredients" 
-        ingredients = WebDriverWait(self.driver, 5).until(
+        self.ingredients = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, ".//button[h3[contains(text(), 'Ingredients')]]"))
         )
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", ingredients)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", self.ingredients)
         time.sleep(1)
         
-        self.driver.execute_script("arguments[0].click();", ingredients)
+        self.driver.execute_script("arguments[0].click();", self.ingredients)
 
         ingredient_text = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
@@ -199,6 +201,8 @@ class JgWebScraper:
         cleaned_text = re.sub(r'trace minerals \[.*?\]', "", cleaned_text, flags=re.DOTALL)
         
         print("Cleaned Text:", cleaned_text)
+        
+        # Add vitamin and mineral content to cleaned_text
         if vitamins_content:
             cleaned_text += ", " + ", ".join(vitamins_content[0].replace("\n", ", ").split(", "))
         if trace_minerals_content:
@@ -208,7 +212,7 @@ class JgWebScraper:
         ingredient_list = [ingredient.strip() for ingredient in cleaned_text.title().split(",") if ingredient.strip()]
         print("Ingredient List:", ingredient_list)
         
-        # TODO: pick protein sources out of the ingredient list 
+        # Pick protein sources out of the ingredient list 
         animal_proteins = []
         other_proteins = []
         for ingredient in ingredient_list:
@@ -261,7 +265,56 @@ class JgWebScraper:
                 # TODO: add the rest of ingredients to the db
                 # TODO: if protein sources contain a common allergen, add to db
         
-        return ingredient_list
+                        # TODO: add caloric content to database
+    
+    def rc_dog_food_find_aafco_statement(self):
+        """Extract AAFCO statement if there is one"""
+        
+        # "Click" on "Nutritional Adequacy Statement" 
+        aafco_statement = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-dLMFU fGHSVp']//button[h3[contains(text(), 'Nutritional Adequacy Statement')]]"))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", aafco_statement)
+        time.sleep(1)
+        
+        self.driver.execute_script("arguments[0].click();", aafco_statement)
+        
+        # Find AAFCO statement  
+        aafco_statement_text = WebDriverWait(self.driver, 20).until(
+            EC.visibility_of_element_located((By.XPATH, ".//div[@class='sc-dLMFU fGHSVp']//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
+        )
+        
+
+        print(aafco_statement_text.text)
+                  
+                # CREATE TABLE "DogFoods" (
+                #     "food_id" INTEGER UNIQUE,
+                #     "food_name" VARCHAR(300) UNIQUE,
+                #     "food_form" INTEGER,
+                #     "life_stage" VARCHAR(300),
+                #     "description" VARCHAR(500),
+                #     "size" INTEGER,
+                #     "aafco_statement" INTEGER,
+                #     "kcal_per_kg" INTEGER,
+                #     "kcal_per_cup_can_pouch" INTEGER,
+                #     "first_protein_source" INTEGER,
+                #     "second_protein_source" INTEGER,
+                #     "third_protein_source" INTEGER,
+                #     "ingredient_list" VARCHAR(2000),
+                #     PRIMARY KEY ("diet_id"),
+                #     FOREIGN KEY ("food_form") REFERENCES "FoodForms"("form_id"),
+                #     FOREIGN KEY ("life_stage") REFERENCES "LifeStages"("life_stage_id"),
+                #     FOREIGN KEY ("size") REFERENCES "PackageSizes"("size_id"),
+                #     FOREIGN KEY ("aafco_statement") REFERENCES "AAFCOStatements"("statement_id"),
+                #     FOREIGN KEY ("first_protein_source") REFERENCES "ProteinSources"("protein_id"),
+                #     FOREIGN KEY ("second_protein_source") REFERENCES "ProteinSources"("protein_id"),
+                #     FOREIGN KEY ("third_protein_source") REFERENCES "ProteinSources"("protein_id")
+                # )
+        print(f"AAFCO index: {find_aafco_statement(aafco_statement_text.text)}")
+        return aafco_statement_text
+    
+    # TODO: Get bag/case sizes
+    
     
     def hills_dog_food_search(self):
         # Navigate to the specified URL
