@@ -43,9 +43,67 @@ def find_aafco_statement(text):
                 return statement.statement_id
         
     return -1
+
+    
+def find_life_stage(food_name, product_category):
+    """Queries the database for the life stage of the product"""
+    
+    life_stages = pet_food_db.query(
+                pf.LifeStages
+            ).all()
             
+    puppy = re.compile(r'puppy', re.IGNORECASE)
+    kitten = re.compile(r'kitten', re.IGNORECASE)
+
+    # Gestation/lactation diets
+    dog_lactation_gestation = re.compile(r'babydog', re.IGNORECASE)
+    cat_lactation_gestation = re.compile(r'babycat', re.IGNORECASE)
+    
+    # General dog or cat foods
+    dog = re.compile(r'dog|canine', re.IGNORECASE)
+    cat = re.compile(r'cat|feline', re.IGNORECASE)
+    
+
+    # Mature dogs and cats 
+    age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
+    
+    mature_dogs_or_cats = (dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name) or \
+                          (cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name)
+    
+    # Find the index of the life stage
+    for stage in life_stages:
+        # For neonate or pediatric dogs/cats
+        puppy_kitten_match = puppy.search(food_name) and dog_lactation_gestation.search(food_name) or \
+            puppy.search(food_name) or kitten.search(food_name) and cat_lactation_gestation.search(food_name) or \
+                kitten.search(food_name)
+        
+        # Find gestation or lactation match
+        lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
+        
+        # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
+        dog_or_cat_match = (dog.search(food_name) or dog.search(product_category)) \
+            or (cat.search(food_name) or cat.search(product_category)) 
+        
+        # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
+        if puppy_kitten_match:
+            matched_text = food_name[puppy_kitten_match.start():]
+        elif lactation_gestation_match:
+            matched_text = food_name[lactation_gestation_match.start():]
+        elif mature_dogs_or_cats:
+            matched_text = food_name[mature_dogs_or_cats.start():]
+        else:
+            matched_text = food_name[dog_or_cat_match.start():]
+            
+            
+        if stage.life_stage.lower() in matched_text.lower():
+            return stage.life_stage_id
+            
+        
+    return stage.life_stage_id
+            
+
 def find_size_id(sizes):
-    """Queries the database for the AAFCO statement"""
+    """Queries the database for the container size ID"""
     
     
     normalized_sizes = sizes.strip().lower()
@@ -61,6 +119,30 @@ def find_size_id(sizes):
                
     return -1
 
+def find_food_form(food_name, product_category):
+    """Queries the database for the food form ID"""
+    
+    food_forms = pet_food_db.query(
+                pf.FoodForms
+            ).all()
+    
+    dry = re.compile(r'dry', re.IGNORECASE)
+    canned = re.compile(r'canned|wet', re.IGNORECASE)
+    pouch = re.compile(r'pouch', re.IGNORECASE)
+    
+    for form in food_forms:        
+        # Find the index of the food form
+        food_form_index = pouch.search(food_name) or pouch.search(product_category) or \
+                          dry.search(food_name) or dry.search(product_category) or \
+                          canned.search(food_name) or canned.search(product_category)
+        
+        # If the phrase is found, return the substring starting from the index
+        if food_form_index:
+            matched_text = food_name[food_form_index.start():] if food_form_index else product_category[food_form_index.start():]
+            
+            if form.food_form.lower() in matched_text.lower():
+                return form.form_id
+        
 class JgWebScraper:
     def __init__(self):
         # Create the web driver
@@ -106,7 +188,16 @@ class JgWebScraper:
             # Get the product's name
             food_name = self.driver.find_element(By.XPATH, value=".//h1[@class='ProductTitle-module_product-title__oY0UJ' and @data-qa='product-title']")
             print(food_name.text)
-            time.sleep(5)
+            
+            # Find the product's form and verify species
+            form_and_species = self.driver.find_element(By.XPATH, value=".//h2[@class='sc-bmzYkS cAMzIs' and @data-qa='product-category']")
+            print(form_and_species.text)
+
+            print(f"Life Stage ID: {find_life_stage(food_name.text, form_and_species.text)}")
+            
+            print(f"Food Form ID: {find_food_form(food_name.text, form_and_species.text)}")
+
+            time.sleep(3)
             
             self.rc_dog_food_click_nutritional_info_category()
             self.rc_dog_food_find_calorie_content()
@@ -208,6 +299,7 @@ class JgWebScraper:
             EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
         )
         
+        print(f"Ingredients: {ingredient_text.text}")
         # Extract contents within "Vitamins [" and "Trace Minerals ["
         vitamins_content = re.findall(r'vitamins \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
         trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
@@ -226,15 +318,25 @@ class JgWebScraper:
             cleaned_text += ", " + ", ".join(vitamins_content[0].replace("\n", ", ").split(", "))
         if trace_minerals_content:
             cleaned_text += ", " + ", ".join(trace_minerals_content[0].replace("\n", ", ").split(", "))
-        
+
+
         # Split the cleaned text into a list of ingredients
         ingredient_list = [ingredient.strip() for ingredient in cleaned_text.title().split(",") if ingredient.strip()]
         print("Ingredient List:", ingredient_list)
         
+        # Initialize ingredient_string with the first ingredient
+        ingredient_string = ingredient_list[0] if ingredient_list else ""
+        
         # Pick protein sources out of the ingredient list 
         animal_proteins = []
         other_proteins = []
+        
+        # Add remaining ingredients to ingredient_string
+        for ingredient in ingredient_list[1:]:
+            ingredient_string += f", {ingredient}"
+            
         for ingredient in ingredient_list:
+                
             # Search entire ingredient list against the ProteinSources database
 
             if ingredient != "Fish Oil":
@@ -258,6 +360,7 @@ class JgWebScraper:
                             other_proteins.append(protein.protein_source)
         
         proteins = animal_proteins + other_proteins
+        print(ingredient_string)
         print(proteins)
         
         try:
@@ -366,10 +469,10 @@ class JgWebScraper:
                     case_size_options += 1
                 
                 # Format package size string for canned food
-                if case_size_options == 1 and container_size:
-                    package_size += f"{container_size}, case of {case_sizes}"
+                if case_sizes == 1 and container_size:
+                    package_size += f"{container_size}"
                 elif case_sizes > 1:
-                    print(f"{container_size}")
+                    package_size += f"{container_size}, case of {case_sizes}"
                 else:
                     package_size += f", case of {case_sizes}"
             except (ValueError, IndexError):
