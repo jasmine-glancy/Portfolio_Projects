@@ -63,26 +63,27 @@ def find_life_stage(food_name, product_category):
     dog = re.compile(r'dog|canine', re.IGNORECASE)
     cat = re.compile(r'cat|feline', re.IGNORECASE)
     
-
     # Mature dogs and cats 
     age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
     
-    mature_dogs_or_cats = (dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name) or \
-                          (cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name)
-    
+    mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name)) or \
+                          ((cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name))
+                          
     # Find the index of the life stage
     for stage in life_stages:
         # For neonate or pediatric dogs/cats
-        puppy_kitten_match = puppy.search(food_name) and dog_lactation_gestation.search(food_name) or \
-            puppy.search(food_name) or kitten.search(food_name) and cat_lactation_gestation.search(food_name) or \
-                kitten.search(food_name)
+        puppy_kitten_match = (puppy.search(food_name) and dog_lactation_gestation.search(food_name)) or \
+                             puppy.search(food_name) or \
+                             (kitten.search(food_name) and cat_lactation_gestation.search(food_name)) or \
+                             kitten.search(food_name)
         
         # Find gestation or lactation match
         lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
         
         # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
-        dog_or_cat_match = (dog.search(food_name) or dog.search(product_category)) \
-            or (cat.search(food_name) or cat.search(product_category)) 
+        dog_match = dog.search(food_name) or dog.search(product_category)
+        cat_match = cat.search(food_name) or cat.search(product_category)
+    
         
         # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
         if puppy_kitten_match:
@@ -91,15 +92,21 @@ def find_life_stage(food_name, product_category):
             matched_text = food_name[lactation_gestation_match.start():]
         elif mature_dogs_or_cats:
             matched_text = food_name[mature_dogs_or_cats.start():]
+        elif dog_match:
+            matched_text = "Canine"
+        elif cat_match:
+            matched_text = "Feline"
         else:
-            matched_text = food_name[dog_or_cat_match.start():]
+            matched_text = "" 
             
-            
+        print(f"Matched text: {matched_text}")
+        
         if stage.life_stage.lower() in matched_text.lower():
+            print(f"Match found: {stage.life_stage_id}")
             return stage.life_stage_id
             
-        
-    return stage.life_stage_id
+        print(f"life stage: {stage.life_stage_id}")
+    return -1
             
 
 def find_size_id(sizes):
@@ -132,16 +139,21 @@ def find_food_form(food_name, product_category):
     
     for form in food_forms:        
         # Find the index of the food form
-        food_form_index = pouch.search(food_name) or pouch.search(product_category) or \
-                          dry.search(food_name) or dry.search(product_category) or \
+        pouch_match = pouch.search(food_name) or pouch.search(product_category)
+        food_form_index = dry.search(food_name) or dry.search(product_category) or \
                           canned.search(food_name) or canned.search(product_category)
         
         # If the phrase is found, return the substring starting from the index
         if food_form_index:
-            matched_text = food_name[food_form_index.start():] if food_form_index else product_category[food_form_index.start():]
+            matched_text = food_name[food_form_index.start():]
+        elif pouch_match:
+            matched_text = "Semi-moist"
+        else:
+            matched_text = product_category[food_form_index.start():]
             
-            if form.food_form.lower() in matched_text.lower():
-                return form.form_id
+        if form.food_form.lower() in matched_text.lower():
+            return form.form_id
+            
         
 class JgWebScraper:
     def __init__(self):
@@ -213,16 +225,16 @@ class JgWebScraper:
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
         
-        nutritional_info = WebDriverWait(self.driver, 10).until(
+        self.nutritional_info = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//div[@data-qa='product-accordion' and @tabindex='-1' and contains(@class, 'sc-gsFSXq') and contains(@class, 'gCjrge')]/button[@data-qa='product-accordion-button' and contains(@class, 'sc-dcJsrY') and contains(@class, 'iVRqTF')]"))
         )
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", nutritional_info)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", self.nutritional_info)
         
         # Retry clicking nutritional info category up to 3 times
         for _ in range(3):  
             try:
-                print(nutritional_info.text)
-                self.driver.execute_script("arguments[0].click();", nutritional_info)
+                print(self.nutritional_info.text)
+                self.driver.execute_script("arguments[0].click();", self.nutritional_info)
                 print("click successful")
                 
                 # Exit loop if click is successful
@@ -251,26 +263,31 @@ class JgWebScraper:
                     EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
                 )
                 
-                internal_calorie_content_text = calorie_content_text.text
-                print("Calorie Content Text:", internal_calorie_content_text)
+                self.internal_calorie_content_text = calorie_content_text.text
+                print("Calorie Content Text:", self.internal_calorie_content_text)
                 
                 # Re suggested by CoPilot
                 per_kg = r"\d+ kcal ME/kg|\d+ kilocalories of metabolizable energy \(ME\) per kilogram"
                 per_can_cup = r"\d+ kcal ME/can|\d+ kcal ME/cup|\d+ kilocalories ME per cup|\d+ kilocalories ME per can"
                 
                 # Get ME/kg
-                me_per_kg = re.search(per_kg, internal_calorie_content_text)
+                me_per_kg = re.search(per_kg, self.internal_calorie_content_text)
                 if me_per_kg:
                     kcal_per_kg = me_per_kg.group(0)
+                    self.kcal_per_kg_number = kcal_per_kg.split(" ")[0]
                     print(f"kcal per kg: {kcal_per_kg}")
+                    print(self.kcal_per_kg_number)
                 else:
                     print("ME per kg pattern not found")
                 
                 # Get kcal/can or kcal/cup
-                per_unit = re.search(per_can_cup, internal_calorie_content_text)
+                per_unit = re.search(per_can_cup, self.internal_calorie_content_text)
                 if per_unit:
                     kcal_per_can_or_cup = per_unit.group(0)
+                    self.kcal_per_can_or_cup_number = kcal_per_can_or_cup.split(" ")[0]
+                    
                     print(f"kcal per unit: {kcal_per_can_or_cup}")
+                    print(self.kcal_per_can_or_cup_number)
                 else:
                     print("kcal per can or cup pattern not found")
                     
@@ -295,20 +312,20 @@ class JgWebScraper:
         
         self.driver.execute_script("arguments[0].click();", self.ingredients)
 
-        ingredient_text = WebDriverWait(self.driver, 5).until(
+        self.ingredient_text = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.XPATH, ".//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
         )
         
-        print(f"Ingredients: {ingredient_text.text}")
+        print(f"Ingredients: {self.ingredient_text.text}")
         # Extract contents within "Vitamins [" and "Trace Minerals ["
-        vitamins_content = re.findall(r'vitamins \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
-        trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]', ingredient_text.text, flags=re.DOTALL)
+        vitamins_content = re.findall(r'vitamins \[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
+        trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
         
         print("Vitamins Content:", vitamins_content)
         print("Trace Minerals Content:", trace_minerals_content)
         
         # Remove "Vitamins [" and "Trace Minerals [" sections
-        cleaned_text = re.sub(r'vitamins \[.*?\]', "", ingredient_text.text, flags=re.DOTALL)
+        cleaned_text = re.sub(r'vitamins \[.*?\]', "", self.ingredient_text.text, flags=re.DOTALL)
         cleaned_text = re.sub(r'trace minerals \[.*?\]', "", cleaned_text, flags=re.DOTALL)
         
         print("Cleaned Text:", cleaned_text)
@@ -325,7 +342,7 @@ class JgWebScraper:
         print("Ingredient List:", ingredient_list)
         
         # Initialize ingredient_string with the first ingredient
-        ingredient_string = ingredient_list[0] if ingredient_list else ""
+        self.ingredient_string = ingredient_list[0] if ingredient_list else ""
         
         # Pick protein sources out of the ingredient list 
         animal_proteins = []
@@ -333,7 +350,7 @@ class JgWebScraper:
         
         # Add remaining ingredients to ingredient_string
         for ingredient in ingredient_list[1:]:
-            ingredient_string += f", {ingredient}"
+            self.ingredient_string += f", {ingredient}"
             
         for ingredient in ingredient_list:
                 
@@ -359,23 +376,23 @@ class JgWebScraper:
                             # Add other protein sources by weight after animal sources 
                             other_proteins.append(protein.protein_source)
         
-        proteins = animal_proteins + other_proteins
-        print(ingredient_string)
-        print(proteins)
+        self.proteins = animal_proteins + other_proteins
+        print(self.ingredient_string)
+        print(self.proteins)
         
         try:
             # First protein source
-            first_protein_source = proteins[0]
+            self.first_protein_source = self.proteins[0]
             
-            print(f"1st protein source: {first_protein_source}")
+            print(f"1st protein source: {self.first_protein_source}")
             # Second protein source
-            second_protein_source = proteins[1]
+            self.second_protein_source = self.proteins[1]
             
-            print(f"2nd protein source: {second_protein_source}")
+            print(f"2nd protein source: {self.second_protein_source}")
             # Third protein source
-            third_protein_source = proteins[2]
+            self.third_protein_source = self.proteins[2]
             
-            print(f"3rd protein source: {third_protein_source}")
+            print(f"3rd protein source: {self.third_protein_source}")
         except Exception as e:
             print(f"Can't find protein sources. Exception: {e}")
                 # TODO: If ingredient matches a protein source in the database
@@ -402,38 +419,16 @@ class JgWebScraper:
         self.driver.execute_script("arguments[0].click();", aafco_statement)
         
         # Find AAFCO statement  
-        aafco_statement_text = WebDriverWait(self.driver, 20).until(
+        self.aafco_statement_text = WebDriverWait(self.driver, 20).until(
             EC.visibility_of_element_located((By.XPATH, ".//div[@class='sc-dLMFU fGHSVp']//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
         )
         
 
-        print(aafco_statement_text.text)
+        print(self.aafco_statement_text.text)
                   
-                # CREATE TABLE "DogFoods" (
-                #     "food_id" INTEGER UNIQUE,
-                #     "food_name" VARCHAR(300) UNIQUE,
-                #     "food_form" INTEGER,
-                #     "life_stage" VARCHAR(300),
-                #     "description" VARCHAR(500),
-                #     "size" INTEGER,
-                #     "aafco_statement" INTEGER,
-                #     "kcal_per_kg" INTEGER,
-                #     "kcal_per_cup_can_pouch" INTEGER,
-                #     "first_protein_source" INTEGER,
-                #     "second_protein_source" INTEGER,
-                #     "third_protein_source" INTEGER,
-                #     "ingredient_list" VARCHAR(2000),
-                #     PRIMARY KEY ("diet_id"),
-                #     FOREIGN KEY ("food_form") REFERENCES "FoodForms"("form_id"),
-                #     FOREIGN KEY ("life_stage") REFERENCES "LifeStages"("life_stage_id"),
-                #     FOREIGN KEY ("size") REFERENCES "PackageSizes"("size_id"),
-                #     FOREIGN KEY ("aafco_statement") REFERENCES "AAFCOStatements"("statement_id"),
-                #     FOREIGN KEY ("first_protein_source") REFERENCES "ProteinSources"("protein_id"),
-                #     FOREIGN KEY ("second_protein_source") REFERENCES "ProteinSources"("protein_id"),
-                #     FOREIGN KEY ("third_protein_source") REFERENCES "ProteinSources"("protein_id")
-                # )
-        print(f"AAFCO index: {find_aafco_statement(aafco_statement_text.text)}")
-        return aafco_statement_text
+
+        print(f"AAFCO index: {find_aafco_statement(self.aafco_statement_text.text)}")
+        return self.aafco_statement_text
     
     def rc_get_container_size(self):
         """Grab the bag or case size"""
@@ -445,7 +440,7 @@ class JgWebScraper:
         options = container_sizes_dropdown.find_elements(By.TAG_NAME, 'option')
         
         # Iterate through each option and print its text
-        package_size = ""
+        self.package_size = ""
         case_size_options = 0
         container_size_options = 0
         for size in options:
@@ -470,11 +465,11 @@ class JgWebScraper:
                 
                 # Format package size string for canned food
                 if case_sizes == 1 and container_size:
-                    package_size += f"{container_size}"
+                    self.package_size += f"{container_size}"
                 elif case_sizes > 1:
-                    package_size += f"{container_size}, case of {case_sizes}"
+                    self.package_size += f"{container_size}, case of {case_sizes}"
                 else:
-                    package_size += f", case of {case_sizes}"
+                    self.package_size += f", case of {case_sizes}"
             except (ValueError, IndexError):
                 case_sizes = None
                 container_size = sizes[0]
@@ -487,23 +482,23 @@ class JgWebScraper:
                 
             # Format package size string for dry food
             if container_size_options == 1:
-                package_size += f"{container_size}"
+                self.package_size += f"{container_size}"
             elif container_size_options > 1:
-                package_size += f", {container_size}"
+                self.package_size += f", {container_size}"
                 
         # Checks formatting for package sizes
-        print(f"Package sizes: {package_size}")
+        print(f"Package sizes: {self.package_size}")
         
         # Finds the size_id of the package size string
-        print(f"Size ID: {find_size_id(package_size)}")
+        print(f"Size ID: {find_size_id(self.package_size)}")
         
     def rc_get_product_description(self):
         """Scrapes the product description for dog foods"""
         
         # Get the text for the product description
-        product_description = self.driver.find_element(By.XPATH, value="//div[@data-qa='product-description' and @class='sc-eqUAAy eYrTKE']/p[contains(@class, 'sc-gEvEer fSrWKp')]")
+        self.product_description = self.driver.find_element(By.XPATH, value="//div[@data-qa='product-description' and @class='sc-eqUAAy eYrTKE']/p[contains(@class, 'sc-gEvEer fSrWKp')]")
 
-        print(product_description.text)
+        print(self.product_description.text)
                 
             
     def hills_dog_food_search(self):

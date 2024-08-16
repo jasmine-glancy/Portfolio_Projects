@@ -1,6 +1,6 @@
 """Imports pet_foods_and-treats.db and allows queries"""
 
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, DateTime, Integer, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # Define database URI
@@ -45,3 +45,21 @@ class ProteinSources(Base):
     
     def __repr__(self):
         return f"<ProteinSources(protein_id={self.protein_id}, protein_source='{self.protein_source}', protein_type='{self.protein_type}')>"
+
+class PetFoods(Base):
+    __tablename__ = "PetFoods"
+    food_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    food_name = Column(String, unique=True)
+    food_form = Column(String, ForeignKey("FoodForms.form_id"))
+    life_stage = Column(String, ForeignKey("LifeStages.life_stage_id"))
+    description = Column(String)
+    size = Column(String, ForeignKey("PackageSizes.size_id"))
+    aafco_statement = Column(Integer, ForeignKey("AAFCOStatements.statement_id"))
+    kcal_per_kg = Column(Integer)
+    kcal_per_cup_can_pouch = Column(Integer)
+    first_protein_source = Column(Integer, ForeignKey("ProteinSources.protein_id"))
+    second_protein_source = Column(Integer, ForeignKey("ProteinSources.protein_id"))
+    third_protein_source = Column(Integer, ForeignKey("ProteinSources.protein_id"))
+    ingredient_list = Column(String)
+    date_added = Column(DateTime)
+    date_updated = Column(DateTime)
