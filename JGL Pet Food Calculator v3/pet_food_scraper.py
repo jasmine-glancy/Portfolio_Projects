@@ -318,15 +318,22 @@ class JgWebScraper:
         
         print(f"Ingredients: {self.ingredient_text.text}")
         # Extract contents within "Vitamins [" and "Trace Minerals ["
-        vitamins_content = re.findall(r'vitamins \[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
-        trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
+        vitamins_content = re.findall(r'vitamins \[(.*?)\]|vitamins\[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
+        trace_minerals_content = re.findall(r'trace minerals \[(.*?)\]|trace minerals\[(.*?)\]', self.ingredient_text.text, flags=re.DOTALL)
         
+        # Flatten lists, suggested by CoPilot
+        vitamins_content = [item for sublist in vitamins_content for item in sublist if item]
+        trace_minerals_content = [item for sublist in trace_minerals_content for item in sublist if item]
+    
         print("Vitamins Content:", vitamins_content)
         print("Trace Minerals Content:", trace_minerals_content)
         
         # Remove "Vitamins [" and "Trace Minerals [" sections
-        cleaned_text = re.sub(r'vitamins \[.*?\]', "", self.ingredient_text.text, flags=re.DOTALL)
-        cleaned_text = re.sub(r'trace minerals \[.*?\]', "", cleaned_text, flags=re.DOTALL)
+        cleaned_text = re.sub(r'vitamins \[.*?\]|vitamins\[(.*?)\]', "", self.ingredient_text.text, flags=re.DOTALL)
+        cleaned_text = re.sub(r'trace minerals \[.*?\]|trace minerals\[(.*?)\]', "", cleaned_text, flags=re.DOTALL)
+
+        # Remove periods
+        cleaned_text = re.sub(r'\.', "", cleaned_text)
         
         print("Cleaned Text:", cleaned_text)
         
@@ -439,10 +446,10 @@ class JgWebScraper:
         # Retrieve all options within the dropdown
         options = container_sizes_dropdown.find_elements(By.TAG_NAME, 'option')
         
-        # Iterate through each option and print its text
-        self.package_size = ""
+        self.package_size = []
         case_size_options = 0
-        container_size_options = 0
+        container_sizes = []
+
         for size in options:
             # Match RC's size formatting to match the PackageSize table entries
             size_text = size.text.replace("lb", " lbs").replace("oz", " oz")
@@ -459,36 +466,34 @@ class JgWebScraper:
                 
                 # Gets the bag or can size
                 container_size = sizes[1]
-                
+                if container_size not in container_sizes:
+                    container_sizes.append(f"{container_size}")
+                    
                 if case_sizes != None and case_sizes != 1:
                     case_size_options += 1
                 
                 # Format package size string for canned food
                 if case_sizes == 1 and container_size:
-                    self.package_size += f"{container_size}"
+                    if container_size not in self.package_size:
+                        self.package_size.append(f"{container_size}")
                 elif case_sizes > 1:
-                    self.package_size += f"{container_size}, case of {case_sizes}"
-                else:
-                    self.package_size += f", case of {case_sizes}"
+                    formatted_size = f"case of {case_sizes}"
+                    if formatted_size not in self.package_size:
+                        self.package_size.append(formatted_size)
+                
+                
             except (ValueError, IndexError):
                 case_sizes = None
                 container_size = sizes[0]
-            
+                    
+                # Format package size string for dry food
+                self.package_size.append(f"{container_size}")
             print(sizes)
-            
-            # Add to the container_size_options if there is a container size
-            if container_size != None:
-                container_size_options += 1
-                
-            # Format package size string for dry food
-            if container_size_options == 1:
-                self.package_size += f"{container_size}"
-            elif container_size_options > 1:
-                self.package_size += f", {container_size}"
-                
-        # Checks formatting for package sizes
+
+        # Remove duplicates and join all collected sizes with a comma and a space
+        self.package_size = ", ".join(sorted(set(self.package_size), key=self.package_size.index))
         print(f"Package sizes: {self.package_size}")
-        
+
         # Finds the size_id of the package size string
         print(f"Size ID: {find_size_id(self.package_size)}")
         
