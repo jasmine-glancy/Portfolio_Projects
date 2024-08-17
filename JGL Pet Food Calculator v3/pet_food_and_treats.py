@@ -1,5 +1,6 @@
 """Imports pet_foods_and-treats.db and allows queries"""
 
+import re
 from sqlalchemy import create_engine, Column, DateTime, Integer, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -11,7 +12,7 @@ pet_food_treat_engine = create_engine(PET_FOODS_AND_TREATS_URI)
 
 # Create session for the database
 PetFoodSession = sessionmaker(bind=pet_food_treat_engine)
-PET_FOOD_SESSION = PetFoodSession()
+pet_food_db = PetFoodSession()
 
 class Base(DeclarativeBase):
     pass
@@ -49,6 +50,7 @@ class ProteinSources(Base):
 class PetFoods(Base):
     __tablename__ = "PetFoods"
     food_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    brand = Column(String, ForeignKey("PetFoodBrands.brand_id"))
     food_name = Column(String, unique=True)
     food_form = Column(String, ForeignKey("FoodForms.form_id"))
     life_stage = Column(String, ForeignKey("LifeStages.life_stage_id"))
@@ -63,3 +65,154 @@ class PetFoods(Base):
     ingredient_list = Column(String)
     date_added = Column(DateTime)
     date_updated = Column(DateTime)
+    
+class PetFoodBrands(Base):
+    __tablename__ = "PetFoodBrands"
+    brand_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    brand_name = Column(String, unique=True)
+    company = Column(String)
+    offers_grain_free = Column(String)
+    offers_raw = Column(String)
+    notes = Column(String)
+    
+def find_aafco_statement(text):
+    """Queries the database for the AAFCO statement"""
+    
+    aafco_statements = pet_food_db.query(
+                AAFCOStatements
+            ).all()
+    
+    formulated_to_meet = re.compile(r'formulated to meet', re.IGNORECASE)
+    feeding_tests = re.compile(r'feeding tests using', re.IGNORECASE)
+    
+    for statement in aafco_statements:
+        # Find the index of the AAFCO statement
+        match = formulated_to_meet.search(text) or feeding_tests.search(text)
+        
+        # If the phrase is found, return the substring starting from the index
+        if match:
+            matched_text = text[match.start():]
+            
+            if statement.aafco_statement.lower() in matched_text.lower():
+                return statement.statement_id
+        
+    return -1
+
+    
+def find_life_stage(food_name, product_category):
+    """Queries the database for the life stage of the product"""
+    
+    life_stages = pet_food_db.query(
+                LifeStages
+            ).all()
+            
+    puppy = re.compile(r'puppy', re.IGNORECASE)
+    kitten = re.compile(r'kitten', re.IGNORECASE)
+
+    # Gestation/lactation diets
+    dog_lactation_gestation = re.compile(r'babydog', re.IGNORECASE)
+    cat_lactation_gestation = re.compile(r'babycat', re.IGNORECASE)
+    
+    # General dog or cat foods
+    dog = re.compile(r'dog|canine', re.IGNORECASE)
+    cat = re.compile(r'cat|feline', re.IGNORECASE)
+    
+    # Mature dogs and cats 
+    age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
+    
+    mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name)) or \
+                          ((cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name))
+                          
+    # Find the index of the life stage
+    for stage in life_stages:
+        # For neonate or pediatric dogs/cats
+        puppy_kitten_match = (puppy.search(food_name) and dog_lactation_gestation.search(food_name)) or \
+                             puppy.search(food_name) or \
+                             (kitten.search(food_name) and cat_lactation_gestation.search(food_name)) or \
+                             kitten.search(food_name)
+        
+        # Find gestation or lactation match
+        lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
+        
+        # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
+        dog_match = dog.search(food_name) or dog.search(product_category)
+        cat_match = cat.search(food_name) or cat.search(product_category)
+    
+        
+        # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
+        if puppy_kitten_match:
+            matched_text = food_name[puppy_kitten_match.start():]
+        elif lactation_gestation_match:
+            matched_text = food_name[lactation_gestation_match.start():]
+        elif mature_dogs_or_cats:
+            matched_text = food_name[mature_dogs_or_cats.start():]
+        elif dog_match:
+            matched_text = "Canine"
+        elif cat_match:
+            matched_text = "Feline"
+        else:
+            matched_text = "" 
+            
+        print(f"Matched text: {matched_text}")
+        
+        if stage.life_stage.lower() in matched_text.lower():
+            print(f"Match found: {stage.life_stage_id}")
+            return stage.life_stage_id
+            
+        print(f"life stage: {stage.life_stage_id}")
+    return -1
+            
+
+def find_size_id(sizes):
+    """Queries the database for the container size ID"""
+    
+    
+    normalized_sizes = sizes.strip().lower()
+    
+    container_sizes = pet_food_db.query(PackageSizes).filter(
+            PackageSizes.package_size.ilike(normalized_sizes)
+        ).all()
+    
+    
+    if container_sizes:
+        for size in container_sizes:
+            return size.size_id
+               
+    return -1
+
+def find_food_form(food_name, product_category):
+    """Queries the database for the food form ID"""
+    
+    food_forms = pet_food_db.query(
+                FoodForms
+            ).all()
+    
+    dry = re.compile(r'dry', re.IGNORECASE)
+    canned = re.compile(r'canned|wet', re.IGNORECASE)
+    pouch = re.compile(r'pouch', re.IGNORECASE)
+    
+    for form in food_forms:        
+        # Find the index of the food form
+        pouch_match = pouch.search(food_name) or pouch.search(product_category)
+        food_form_index = dry.search(food_name) or dry.search(product_category) or \
+                          canned.search(food_name) or canned.search(product_category)
+        
+        # If the phrase is found, return the substring starting from the index
+        if food_form_index:
+            matched_text = food_name[food_form_index.start():]
+        elif pouch_match:
+            matched_text = "Semi-moist"
+        else:
+            matched_text = product_category[food_form_index.start():]
+            
+        if form.food_form.lower() in matched_text.lower():
+            return form.form_id
+     
+def check_protein_type(ingredient):
+    """Checks an ingredient against ProteinSources database"""
+    
+    protein_search = pet_food_db.query(
+        ProteinSources
+    ).filter(ProteinSources.protein_source == ingredient).all()
+    
+    return protein_search

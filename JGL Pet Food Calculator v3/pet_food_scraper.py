@@ -15,145 +15,11 @@ import time
 
 load_dotenv("D:/Python/EnvironmentVariables/.env")
 
-pet_food_db = pf.PET_FOOD_SESSION
 
 RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-products"
 HILLS_DOG_FOOD_SEARCH = "https://www.hillspet.com/products/dog-food"
 EUKANUBA_FOOD_SEARCH = "https://www.eukanuba.com/us/all-products"
-
-def find_aafco_statement(text):
-    """Queries the database for the AAFCO statement"""
-    
-    aafco_statements = pet_food_db.query(
-                pf.AAFCOStatements
-            ).all()
-    
-    formulated_to_meet = re.compile(r'formulated to meet', re.IGNORECASE)
-    feeding_tests = re.compile(r'feeding tests using', re.IGNORECASE)
-    
-    for statement in aafco_statements:
-        # Find the index of the AAFCO statement
-        match = formulated_to_meet.search(text) or feeding_tests.search(text)
-        
-        # If the phrase is found, return the substring starting from the index
-        if match:
-            matched_text = text[match.start():]
-            
-            if statement.aafco_statement.lower() in matched_text.lower():
-                return statement.statement_id
-        
-    return -1
-
-    
-def find_life_stage(food_name, product_category):
-    """Queries the database for the life stage of the product"""
-    
-    life_stages = pet_food_db.query(
-                pf.LifeStages
-            ).all()
-            
-    puppy = re.compile(r'puppy', re.IGNORECASE)
-    kitten = re.compile(r'kitten', re.IGNORECASE)
-
-    # Gestation/lactation diets
-    dog_lactation_gestation = re.compile(r'babydog', re.IGNORECASE)
-    cat_lactation_gestation = re.compile(r'babycat', re.IGNORECASE)
-    
-    # General dog or cat foods
-    dog = re.compile(r'dog|canine', re.IGNORECASE)
-    cat = re.compile(r'cat|feline', re.IGNORECASE)
-    
-    # Mature dogs and cats 
-    age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
-    
-    mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name)) or \
-                          ((cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name))
-                          
-    # Find the index of the life stage
-    for stage in life_stages:
-        # For neonate or pediatric dogs/cats
-        puppy_kitten_match = (puppy.search(food_name) and dog_lactation_gestation.search(food_name)) or \
-                             puppy.search(food_name) or \
-                             (kitten.search(food_name) and cat_lactation_gestation.search(food_name)) or \
-                             kitten.search(food_name)
-        
-        # Find gestation or lactation match
-        lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
-        
-        # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
-        dog_match = dog.search(food_name) or dog.search(product_category)
-        cat_match = cat.search(food_name) or cat.search(product_category)
-    
-        
-        # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
-        if puppy_kitten_match:
-            matched_text = food_name[puppy_kitten_match.start():]
-        elif lactation_gestation_match:
-            matched_text = food_name[lactation_gestation_match.start():]
-        elif mature_dogs_or_cats:
-            matched_text = food_name[mature_dogs_or_cats.start():]
-        elif dog_match:
-            matched_text = "Canine"
-        elif cat_match:
-            matched_text = "Feline"
-        else:
-            matched_text = "" 
-            
-        print(f"Matched text: {matched_text}")
-        
-        if stage.life_stage.lower() in matched_text.lower():
-            print(f"Match found: {stage.life_stage_id}")
-            return stage.life_stage_id
-            
-        print(f"life stage: {stage.life_stage_id}")
-    return -1
-            
-
-def find_size_id(sizes):
-    """Queries the database for the container size ID"""
-    
-    
-    normalized_sizes = sizes.strip().lower()
-    
-    container_sizes = pet_food_db.query(pf.PackageSizes).filter(
-            pf.PackageSizes.package_size.ilike(normalized_sizes)
-        ).all()
-    
-    
-    if container_sizes:
-        for size in container_sizes:
-            return size.size_id
-               
-    return -1
-
-def find_food_form(food_name, product_category):
-    """Queries the database for the food form ID"""
-    
-    food_forms = pet_food_db.query(
-                pf.FoodForms
-            ).all()
-    
-    dry = re.compile(r'dry', re.IGNORECASE)
-    canned = re.compile(r'canned|wet', re.IGNORECASE)
-    pouch = re.compile(r'pouch', re.IGNORECASE)
-    
-    for form in food_forms:        
-        # Find the index of the food form
-        pouch_match = pouch.search(food_name) or pouch.search(product_category)
-        food_form_index = dry.search(food_name) or dry.search(product_category) or \
-                          canned.search(food_name) or canned.search(product_category)
-        
-        # If the phrase is found, return the substring starting from the index
-        if food_form_index:
-            matched_text = food_name[food_form_index.start():]
-        elif pouch_match:
-            matched_text = "Semi-moist"
-        else:
-            matched_text = product_category[food_form_index.start():]
-            
-        if form.food_form.lower() in matched_text.lower():
-            return form.form_id
-            
+       
         
 class JgWebScraper:
     def __init__(self):
@@ -177,6 +43,8 @@ class JgWebScraper:
         self.driver = webdriver.Chrome(options=options)
         
     def rc_dog_food_search(self):
+        """Scrapes each item in the dog food list"""
+        
         # Navigate to the specified URL
         print(f"Navigating to {RC_DOG_FOOD_SEARCH}")
         self.driver.get(RC_DOG_FOOD_SEARCH)
@@ -187,41 +55,70 @@ class JgWebScraper:
         print(f"Current URL: {current_url}")
         
         # Gets all the card elements
-        food_card = self.driver.find_elements(By.XPATH, value="//*[@id='product-grid-ref']/ul")
-        for item in food_card:
-            food_link = item.find_element(By.XPATH, ".//h2[@data-qa='product-card-title' and contains(@class, 'sc-bypJrT') and contains(@class, 'hzXXXA')]")
+        while True:
+            food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
             
-            # "Click" on the food name link 
-            print(food_link.text)
-            food_link.click()
+            if not food_links:
+                break
             
-            time.sleep(5)
+            # Loops through each object in the list
+            for i in range(len(food_links)):
+                try:
+                    # Re-fetch the list of links to avoid stale element reference
+                    food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
+                    
+                    # Scroll the element into view, suggested by CoPilot
+                    self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
             
-            # Get the product's name
-            food_name = self.driver.find_element(By.XPATH, value=".//h1[@class='ProductTitle-module_product-title__oY0UJ' and @data-qa='product-title']")
-            print(food_name.text)
-            
-            # Find the product's form and verify species
-            form_and_species = self.driver.find_element(By.XPATH, value=".//h2[@class='sc-bmzYkS cAMzIs' and @data-qa='product-category']")
-            print(form_and_species.text)
-
-            print(f"Life Stage ID: {find_life_stage(food_name.text, form_and_species.text)}")
-            
-            print(f"Food Form ID: {find_food_form(food_name.text, form_and_species.text)}")
-
-            time.sleep(3)
-            
-            self.rc_dog_food_click_nutritional_info_category()
-            self.rc_dog_food_find_calorie_content()
-            self.rc_dog_food_find_ingredient_list()
+                    # Click on the food name link
+                    print(food_links[i].text)
+                    food_links[i].click()
+                    
+                    time.sleep(5)
+                    
+                    # Scrape product information
+                    self.rc_scrape_dog_food()
+                    
+                    # Go back to the diet list page using JavaScript
+                    self.driver.execute_script("window.history.go(-1)")
+                    
+                    # Wait for the page to load
+                    WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
+                    )
+                except Exception as e:
+                    print(f"Error processing item: {e}")
+                    continue 
         
-            self.driver.execute_script("arguments[0].click();", self.ingredients)
-            self.driver.execute_script("arguments[0].click();", self.calorie_content)
+    def rc_scrape_dog_food(self):
+        """Scrapes the information on the diet page"""
+        
+        # Get the product's name
+        food_name = self.driver.find_element(By.XPATH, value=".//h1[@class='ProductTitle-module_product-title__oY0UJ' and @data-qa='product-title']")
+        print(food_name.text)
+        
+        # Find the product's form and verify species
+        form_and_species = self.driver.find_element(By.XPATH, value=".//h2[@class='sc-bmzYkS cAMzIs' and @data-qa='product-category']")
+        print(form_and_species.text)
 
-            self.rc_dog_food_find_aafco_statement()
-            self.rc_get_container_size()
-            self.rc_get_product_description()
+        print(f"Life Stage ID: {pf.find_life_stage(food_name.text, form_and_species.text)}")
+        
+        print(f"Food Form ID: {pf.find_food_form(food_name.text, form_and_species.text)}")
+
+        time.sleep(3)
+        
+        self.rc_dog_food_click_nutritional_info_category()
+        self.rc_dog_food_find_calorie_content()
+        self.rc_dog_food_find_ingredient_list()
     
+        self.driver.execute_script("arguments[0].click();", self.ingredients)
+        self.driver.execute_script("arguments[0].click();", self.calorie_content)
+
+        self.rc_dog_food_find_aafco_statement()
+        self.rc_get_container_size()
+        self.rc_get_product_description()
+        
+        
     def rc_dog_food_click_nutritional_info_category(self):
         """Clicks on nutritional information"""
         
@@ -365,12 +262,13 @@ class JgWebScraper:
 
             if ingredient != "Fish Oil":
                 protein_source = ingredient.split(" ")[0]
-            elif ingredient == "Hydrolyzed Poultry" or ingredient == "Hydrolyzed Soy" or ingredient == "Hydrolyzed Chicken" or ingredient == "Hydrolyzed Salmon":
+            # Don't split any hydrolyzed ingredients or general/nonspecific protein ingredients 
+            elif ingredient == "Hydrolyzed Poultry" or ingredient == "Hydrolyzed Soy" \
+                or ingredient == "Hydrolyzed Chicken" or ingredient == "Hydrolyzed Salmon" \
+                    or ingredient == "Meat By-product":
                 protein_source = ingredient
                 
-            protein_search = pet_food_db.query(
-                pf.ProteinSources
-            ).filter(pf.ProteinSources.protein_source == protein_source).all()
+            protein_search = pf.check_protein_type(protein_source)
             
             if protein_search:
                 # If ingredient matches a protein source in the database
@@ -383,6 +281,8 @@ class JgWebScraper:
                             # Add other protein sources by weight after animal sources 
                             other_proteins.append(protein.protein_source)
         
+        # TODO: If ingredient matches a protein source in the database
+
         self.proteins = animal_proteins + other_proteins
         print(self.ingredient_string)
         print(self.proteins)
@@ -402,7 +302,6 @@ class JgWebScraper:
             print(f"3rd protein source: {self.third_protein_source}")
         except Exception as e:
             print(f"Can't find protein sources. Exception: {e}")
-                # TODO: If ingredient matches a protein source in the database
                 #  # add protein source to first/second/third_protein_source
                 
                 # first/second/third_protein_source is added to by ingredient weight
@@ -430,11 +329,11 @@ class JgWebScraper:
             EC.visibility_of_element_located((By.XPATH, ".//div[@class='sc-dLMFU fGHSVp']//div[@class='sc-fPXMVe gTOXlX' and @data-testid='product-nutrition-content']"))
         )
         
-
+        # Check the statement text
         print(self.aafco_statement_text.text)
                   
-
-        print(f"AAFCO index: {find_aafco_statement(self.aafco_statement_text.text)}")
+        # Match the text to the corresponding index in the AAFCOStatements table
+        print(f"AAFCO index: {pf.find_aafco_statement(self.aafco_statement_text.text)}")
         return self.aafco_statement_text
     
     def rc_get_container_size(self):
@@ -495,7 +394,7 @@ class JgWebScraper:
         print(f"Package sizes: {self.package_size}")
 
         # Finds the size_id of the package size string
-        print(f"Size ID: {find_size_id(self.package_size)}")
+        print(f"Size ID: {pf.find_size_id(self.package_size)}")
         
     def rc_get_product_description(self):
         """Scrapes the product description for dog foods"""
