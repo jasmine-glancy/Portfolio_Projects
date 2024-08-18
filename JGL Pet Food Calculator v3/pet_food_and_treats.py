@@ -169,6 +169,7 @@ def find_size_id(sizes):
     
     normalized_sizes = sizes.strip().lower()
     
+    print(normalized_sizes)
     container_sizes = pet_food_db.query(PackageSizes).filter(
             PackageSizes.package_size.ilike(normalized_sizes)
         ).all()
@@ -208,11 +209,75 @@ def find_food_form(food_name, product_category):
         if form.food_form.lower() in matched_text.lower():
             return form.form_id
      
-def check_protein_type(ingredient):
+def find_food_brand_id(product_description):
+    """Queries the database for the brand ID"""
+    
+    pet_food_brands = pet_food_db.query(
+                PetFoodBrands
+            ).all()
+    
+
+    for brand in pet_food_brands:        
+        # Find the index of the pet food brand
+        if brand.brand_name in product_description:
+            match = brand.brand_id
+            print(f"Match found: {brand.brand_name}, ID: {match}")
+            
+    return match
+        
+def check_protein_id(ingredient):
     """Checks an ingredient against ProteinSources database"""
+
+    try:
+        print(f"Checking ingredient {ingredient}...")
+        protein_sources = pet_food_db.query(
+                    ProteinSources
+                ).all()
+        
+        # Find the index of the protein source
+        for protein in protein_sources:
+
+            if protein.protein_source == ingredient:
+                print(f"Checking protein ID: {protein.protein_source} with ID: {protein.protein_id}")
+
+                return protein.protein_id
+
+        print(f"No protein IDs found for ingredient: {ingredient}")
+        return None
+        
+    except Exception as e:
+        print(f"{ingredient} not found, exception: {e}")
+        return None
     
-    protein_search = pet_food_db.query(
-        ProteinSources
-    ).filter(ProteinSources.protein_source == ingredient).all()
+def check_protein_type(protein):
+    """Checks an ingredient source against ProteinSources database"""
+
+    try:
+        print(f"Checking Protein ID {protein}...")
+        protein_types = pet_food_db.query(
+                    ProteinSources
+                ).filter(ProteinSources.protein_id == protein).all()
+        
+        # Debugging: Print the protein_sources to ensure it's populated
+        print(f"Protein type found: {protein_types}")
+        
+        
+        # Find the index of the protein source
+        for id in protein_types:
+
+            if id.protein_id == protein:
+                print(f"Checking protein source: {protein.protein_source} with ID: {protein.protein_id}")
+                return id.protein_source
+
+        print(f"No protein sources found for ingredient: {protein}")
+        return None
+        
+    except Exception as e:
+        print(f"{protein} not found, exception: {e}")
+        return None
     
-    return protein_search
+    
+               
+
+    
+

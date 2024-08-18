@@ -2,8 +2,9 @@
 available pet food and treats and logs their caloric
 content"""
 
-import re
+import datetime
 from dotenv import load_dotenv
+import re
 import pet_food_and_treats as pf
 import selenium as s
 from selenium import webdriver
@@ -94,16 +95,20 @@ class JgWebScraper:
         """Scrapes the information on the diet page"""
         
         # Get the product's name
-        food_name = self.driver.find_element(By.XPATH, value=".//h1[@class='ProductTitle-module_product-title__oY0UJ' and @data-qa='product-title']")
-        print(food_name.text)
+        self.food_name = self.driver.find_element(By.XPATH, value=".//h1[@class='ProductTitle-module_product-title__oY0UJ' and @data-qa='product-title']")
+        print(self.food_name.text)
         
         # Find the product's form and verify species
         form_and_species = self.driver.find_element(By.XPATH, value=".//h2[@class='sc-bmzYkS cAMzIs' and @data-qa='product-category']")
         print(form_and_species.text)
 
-        print(f"Life Stage ID: {pf.find_life_stage(food_name.text, form_and_species.text)}")
+        # Find the food's general life stage
+        self.life_stage_id = pf.find_life_stage(self.food_name.text, form_and_species.text)
+        print(f"Life Stage ID: {self.life_stage_id}")
         
-        print(f"Food Form ID: {pf.find_food_form(food_name.text, form_and_species.text)}")
+        # Find the corresponding food form from FoodForms
+        self.food_form_id = pf.find_food_form(self.food_name.text, form_and_species.text)
+        print(f"Food Form ID: {self.food_form_id}")
 
         time.sleep(3)
         
@@ -261,51 +266,74 @@ class JgWebScraper:
             # Search entire ingredient list against the ProteinSources database
 
             if ingredient != "Fish Oil":
-                protein_source = ingredient.split(" ")[0]
-            # Don't split any hydrolyzed ingredients or general/nonspecific protein ingredients 
-            elif ingredient == "Hydrolyzed Poultry" or ingredient == "Hydrolyzed Soy" \
-                or ingredient == "Hydrolyzed Chicken" or ingredient == "Hydrolyzed Salmon" \
-                    or ingredient == "Meat By-product":
-                protein_source = ingredient
+                ingredient_split = ingredient.split(" ")
                 
-            protein_search = pf.check_protein_type(protein_source)
+                
+                try:
+                    self.ingredient_first_word = ingredient_split[0]
+                    
+                    self.ingredient_second_word = ingredient_split[1]
+                
+                    if self.ingredient_second_word != "Rice":
+                        protein_source = self.ingredient_first_word
+                    else:
+                        protein_source = self.ingredient_second_word
+                        
+                except IndexError as e:
+                    print(f"Can't set ingredient. IndexError: {e}")
+                    pass
+                except Exception as e:
+                    print(f"Can't set ingredient. Exception: {e}")
+                        
+                
+            # Don't split any hydrolyzed ingredients or general/nonspecific protein ingredients 
+            elif ingredient in ["Hydrolyzed Poultry", "Hydrolyzed Soy", "Hydrolyzed Chicken", "Hydrolyzed Salmon", "Meat By-product"]:
+                protein_source = ingredient
             
-            if protein_search:
-                # If ingredient matches a protein source in the database
-                for protein in protein_search:
-                    if protein.protein_source not in animal_proteins and protein.protein_source not in other_proteins:
-                        # Add protein to protein list if it is not there already
-                        if protein.protein_type == "animal":
-                            animal_proteins.append(protein.protein_source)
-                        else:
-                            # Add other protein sources by weight after animal sources 
-                            other_proteins.append(protein.protein_source)
-        
-        # TODO: If ingredient matches a protein source in the database
+                                
+            protein = pf.check_protein_id(protein_source)
+            print(protein)
 
+            if protein:
+                print(f"Protein IDs for {ingredient}: {protein}")
+                
+                # If ingredient matches a protein source in the database
+                if protein not in animal_proteins and protein not in other_proteins:
+                    # Check the protein ID's type
+                    protein_type = pf.check_protein_type(protein)
+                    
+                    # Add protein to protein list if it is not there already
+                    if protein_type == "animal":
+                        animal_proteins.append(protein)
+                    else:
+                        # Add other protein sources by weight after animal sources 
+                        other_proteins.append(protein)
+            else:
+                print(f"No protein source found for {ingredient}")
+                               
+        print(f"Animal Proteins: {animal_proteins}")   
+        print(f"Other Proteins: {other_proteins}")                     
         self.proteins = animal_proteins + other_proteins
         print(self.ingredient_string)
         print(self.proteins)
         
         try:
             # First protein source
-            self.first_protein_source = self.proteins[0]
-            
+            self.first_protein_source = self.proteins[0] if len(self.proteins) > 0 else None
             print(f"1st protein source: {self.first_protein_source}")
+            
+
             # Second protein source
-            self.second_protein_source = self.proteins[1]
-            
+            self.second_protein_source = self.proteins[1] if len(self.proteins) > 1 else None
             print(f"2nd protein source: {self.second_protein_source}")
+
             # Third protein source
-            self.third_protein_source = self.proteins[2]
-            
+            self.third_protein_source = self.proteins[2] if len(self.proteins) > 2 else None
             print(f"3rd protein source: {self.third_protein_source}")
+
         except Exception as e:
             print(f"Can't find protein sources. Exception: {e}")
-                #  # add protein source to first/second/third_protein_source
-                
-                # first/second/third_protein_source is added to by ingredient weight
-                
+
                 # TODO: add protein sources to database by top 5 ingredients by weight
                 # TODO: add the rest of ingredients to the db
                 # TODO: if protein sources contain a common allergen, add to db
@@ -333,7 +361,8 @@ class JgWebScraper:
         print(self.aafco_statement_text.text)
                   
         # Match the text to the corresponding index in the AAFCOStatements table
-        print(f"AAFCO index: {pf.find_aafco_statement(self.aafco_statement_text.text)}")
+        self.aafco_index = pf.find_aafco_statement(self.aafco_statement_text.text)
+        print(f"AAFCO index: {self.aafco_index}")
         return self.aafco_statement_text
     
     def rc_get_container_size(self):
@@ -394,7 +423,8 @@ class JgWebScraper:
         print(f"Package sizes: {self.package_size}")
 
         # Finds the size_id of the package size string
-        print(f"Size ID: {pf.find_size_id(self.package_size)}")
+        self.package_size_id = pf.find_size_id(self.package_size)
+        print(f"Size ID: {self.package_size_id}")
         
     def rc_get_product_description(self):
         """Scrapes the product description for dog foods"""
@@ -402,9 +432,12 @@ class JgWebScraper:
         # Get the text for the product description
         self.product_description = self.driver.find_element(By.XPATH, value="//div[@data-qa='product-description' and @class='sc-eqUAAy eYrTKE']/p[contains(@class, 'sc-gEvEer fSrWKp')]")
 
-        print(self.product_description.text)
+        # Find the pet food brand's ID in PetFoodBrands
+        self.brand_id = pf.find_food_brand_id(self.product_description.text)
+        print(f"Brand ID: {self.brand_id}")
                 
-            
+
+              
     def hills_dog_food_search(self):
         # Navigate to the specified URL
         print(f"Navigating to {HILLS_DOG_FOOD_SEARCH}")
