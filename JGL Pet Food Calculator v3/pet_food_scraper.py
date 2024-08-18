@@ -274,13 +274,13 @@ class JgWebScraper:
                     
                     self.ingredient_second_word = ingredient_split[1]
                 
-                    if self.ingredient_second_word != "Rice":
-                        protein_source = self.ingredient_first_word
-                    else:
-                        protein_source = self.ingredient_second_word
+                    # TODO: Confirm if rice is a significant source of plant-based protein
+                    # if self.ingredient_second_word != "Rice":
+                    #     protein_source = self.ingredient_first_word
+                    # else:
+                    #     protein_source = self.ingredient_second_word
                         
                 except IndexError as e:
-                    print(f"Can't set ingredient. IndexError: {e}")
                     pass
                 except Exception as e:
                     print(f"Can't set ingredient. Exception: {e}")
@@ -290,24 +290,25 @@ class JgWebScraper:
             elif ingredient in ["Hydrolyzed Poultry", "Hydrolyzed Soy", "Hydrolyzed Chicken", "Hydrolyzed Salmon", "Meat By-product"]:
                 protein_source = ingredient
             
-                                
-            protein = pf.check_protein_id(protein_source)
-            print(protein)
+                        
+            protein_id = pf.check_protein_id(protein_source)
+            print(f"Protein ID: {protein_id}")
 
-            if protein:
-                print(f"Protein IDs for {ingredient}: {protein}")
-                
+            if protein_id:
+                print(f"Protein IDs for {ingredient}: {protein_id}")
+                protein_type = pf.check_protein_type(protein_id)
+
                 # If ingredient matches a protein source in the database
-                if protein not in animal_proteins and protein not in other_proteins:
+                if protein_id not in animal_proteins and protein_id not in other_proteins:
                     # Check the protein ID's type
-                    protein_type = pf.check_protein_type(protein)
                     
+                    print(f"Protein type: {protein_type}")
                     # Add protein to protein list if it is not there already
                     if protein_type == "animal":
-                        animal_proteins.append(protein)
+                        animal_proteins.append(protein_id)
                     else:
                         # Add other protein sources by weight after animal sources 
-                        other_proteins.append(protein)
+                        other_proteins.append(protein_id)
             else:
                 print(f"No protein source found for {ingredient}")
                                
@@ -436,7 +437,26 @@ class JgWebScraper:
         self.brand_id = pf.find_food_brand_id(self.product_description.text)
         print(f"Brand ID: {self.brand_id}")
                 
-
+    def add_diet_to_database(self):
+        """Adds a new diet to the PetFoods"""
+        
+        new_food = pf.PetFoods(
+            brand=self.brand_id,
+            food_name=self.food_name.text,
+            food_form=self.food_form_id,
+            life_stage=self.life_stage_id,
+            description=self.product_description,
+            size=self.package_size_id,
+            aafco_statement=self.aafco_index,
+            kcal_per_kg=self.kcal_per_kg_number,
+            kcal_per_cup_can_pouch=self.kcal_per_can_or_cup_number,
+            first_protein_source=self.first_protein_source,
+            second_protein_source=self.second_protein_source,
+            third_protein_source=self.third_protein_source,
+            ingredient_list=self.ingredient_string,
+            date_added=datetime.now(),
+            date_updated=datetime.now()
+        )  
               
     def hills_dog_food_search(self):
         # Navigate to the specified URL
