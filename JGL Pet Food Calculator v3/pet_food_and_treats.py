@@ -118,11 +118,11 @@ def find_life_stage(food_name, product_category):
     cat = re.compile(r'cat|feline', re.IGNORECASE)
     
     # Mature dogs and cats 
-    age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
+    older_age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
     
-    mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and age_search.search(food_name)) or \
-                          ((cat.search(food_name) or cat.search(product_category)) and age_search.search(food_name))
-                          
+    # Adult dogs and cats
+    adult = re.compile(r'adult', re.IGNORECASE)
+        
     # Find the index of the life stage
     for stage in life_stages:
         # For neonate or pediatric dogs/cats
@@ -134,11 +134,19 @@ def find_life_stage(food_name, product_category):
         # Find gestation or lactation match
         lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
         
+        # Adult dogs or cats
+        adult_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and adult.search(food_name)) or \
+                             ((cat.search(food_name) or cat.search(product_category)) and adult.search(food_name))
+    
+        # Mature/senior dogs or cats
+        mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and older_age_search.search(food_name)) or \
+                              ((cat.search(food_name) or cat.search(product_category)) and older_age_search.search(food_name))
+             
         # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
         dog_match = dog.search(food_name) or dog.search(product_category)
         cat_match = cat.search(food_name) or cat.search(product_category)
     
-        
+       
         # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
         if puppy_kitten_match:
             matched_text = food_name[puppy_kitten_match.start():]
@@ -146,6 +154,8 @@ def find_life_stage(food_name, product_category):
             matched_text = food_name[lactation_gestation_match.start():]
         elif mature_dogs_or_cats:
             matched_text = food_name[mature_dogs_or_cats.start():]
+        elif adult_dogs_or_cats:
+            matched_text = food_name[adult_dogs_or_cats.start():]
         elif dog_match:
             matched_text = "Canine"
         elif cat_match:
@@ -153,13 +163,13 @@ def find_life_stage(food_name, product_category):
         else:
             matched_text = "" 
             
-        print(f"Matched text: {matched_text}")
+        # print(f"Matched text: {matched_text}")
         
         if stage.life_stage.lower() in matched_text.lower():
-            print(f"Match found: {stage.life_stage_id}")
+            # print(f"Match found: {stage.life_stage_id}")
             return stage.life_stage_id
             
-        print(f"life stage: {stage.life_stage_id}")
+        # print(f"life stage: {stage.life_stage_id}")
     return -1
             
 
@@ -179,7 +189,7 @@ def find_size_id(sizes):
         for size in container_sizes:
             return size.size_id
                
-    return -1
+    return None
 
 def find_food_form(food_name, product_category):
     """Queries the database for the food form ID"""
@@ -229,7 +239,7 @@ def check_protein_id(ingredient):
     """Checks an ingredient against ProteinSources database"""
 
     try:
-        print(f"Checking ingredient {ingredient}...")
+        # print(f"Checking ingredient {ingredient}...")
         protein_sources = pet_food_db.query(
                     ProteinSources
                 ).all()
@@ -261,10 +271,10 @@ def check_protein_type(protein):
         
         # Find the index of the protein source
         for id in protein_types:
-            print(f"Checking protein source: {id.protein_source} with ID: {id.protein_id}")
+            # print(f"Checking protein source: {id.protein_source} with ID: {id.protein_id}")
 
             if id.protein_id == protein:
-                print(f"Protein type found: {id.protein_type}")
+                # print(f"Protein type found: {id.protein_type}")
                 return id.protein_type
 
         print(f"No protein sources found for ingredient: {protein}")

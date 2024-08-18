@@ -275,10 +275,11 @@ class JgWebScraper:
                     self.ingredient_second_word = ingredient_split[1]
                 
                     # TODO: Confirm if rice is a significant source of plant-based protein
-                    # if self.ingredient_second_word != "Rice":
-                    #     protein_source = self.ingredient_first_word
-                    # else:
-                    #     protein_source = self.ingredient_second_word
+                    
+                    if self.ingredient_second_word != "Rice":
+                        protein_source = self.ingredient_first_word
+                    else:
+                        protein_source = self.ingredient_second_word
                         
                 except IndexError as e:
                     pass
@@ -427,6 +428,15 @@ class JgWebScraper:
         self.package_size_id = pf.find_size_id(self.package_size)
         print(f"Size ID: {self.package_size_id}")
         
+        if self.package_size_id == None:
+            # TODO: If the size isn't in the database, add it
+            self.add_package_size_to_database()
+            
+            # Query the database again
+            self.package_size_id = pf.find_size_id(self.package_size)
+            print(f"Size ID: {self.package_size_id}")
+
+        
     def rc_get_product_description(self):
         """Scrapes the product description for dog foods"""
         
@@ -436,7 +446,22 @@ class JgWebScraper:
         # Find the pet food brand's ID in PetFoodBrands
         self.brand_id = pf.find_food_brand_id(self.product_description.text)
         print(f"Brand ID: {self.brand_id}")
-                
+    
+    def add_package_size_to_database(self):
+        """Adds a new package size to the PackageSizes"""
+        
+        new_package_size = pf.PackageSizes(
+            package_size=self.package_size,
+        )  
+        
+        try:
+            pf.pet_food_db.add(new_package_size)
+            pf.pet_food_db.commit()
+        except Exception as e:
+            pf.pet_food_db.rollback()
+            print(f"An error occurred: {e}")
+
+                    
     def add_diet_to_database(self):
         """Adds a new diet to the PetFoods"""
         
@@ -457,6 +482,7 @@ class JgWebScraper:
             date_added=datetime.now(),
             date_updated=datetime.now()
         )  
+        
               
     def hills_dog_food_search(self):
         # Navigate to the specified URL
