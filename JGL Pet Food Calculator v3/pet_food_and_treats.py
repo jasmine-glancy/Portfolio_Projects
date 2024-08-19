@@ -118,44 +118,59 @@ def find_life_stage(food_name, product_category):
     cat = re.compile(r'cat|feline', re.IGNORECASE)
     
     # Mature dogs and cats 
-    older_age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+|senior', re.IGNORECASE)
+    older_age_search = re.compile(r'aging\s*\d+\+|mature\s*\d+\+', re.IGNORECASE)
+    senior_search = re.compile(r'senior', re.IGNORECASE)
     
     # Adult dogs and cats
     adult = re.compile(r'adult', re.IGNORECASE)
         
+
     # Find the index of the life stage
     for stage in life_stages:
         # For neonate or pediatric dogs/cats
-        puppy_kitten_match = (puppy.search(food_name) and dog_lactation_gestation.search(food_name)) or \
-                             puppy.search(food_name) or \
-                             (kitten.search(food_name) and cat_lactation_gestation.search(food_name)) or \
-                             kitten.search(food_name)
+        puppy_match = (puppy.search(food_name) and dog_lactation_gestation.search(food_name)) \
+            or puppy.search(food_name)
+
+        kitten_match = (kitten.search(food_name) and cat_lactation_gestation.search(food_name)) \
+            or kitten.search(food_name)
         
         # Find gestation or lactation match
-        lactation_gestation_match = dog_lactation_gestation.search(food_name) or cat_lactation_gestation.search(food_name)
-        
+        lactation_gestation_canine = dog_lactation_gestation.search(food_name)
+        lactation_gestation_feline = cat_lactation_gestation.search(food_name)
+
         # Adult dogs or cats
-        adult_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and adult.search(food_name)) or \
-                             ((cat.search(food_name) or cat.search(product_category)) and adult.search(food_name))
-    
+        adult_dogs = ((dog.search(food_name) or dog.search(product_category)) and adult.search(food_name))
+        adult_cats = ((cat.search(food_name) or cat.search(product_category)) and adult.search(food_name))
+        
         # Mature/senior dogs or cats
-        mature_dogs_or_cats = ((dog.search(food_name) or dog.search(product_category)) and older_age_search.search(food_name)) or \
-                              ((cat.search(food_name) or cat.search(product_category)) and older_age_search.search(food_name))
-             
+        mature_dogs = ((dog.search(food_name) or dog.search(product_category)) and older_age_search.search(food_name))
+        mature_cats = ((cat.search(food_name) or cat.search(product_category)) and older_age_search.search(food_name))
+        senior_dogs = ((dog.search(food_name) or dog.search(product_category)) and senior_search.search(food_name))
+        senior_cats = ((cat.search(food_name) or cat.search(product_category)) and senior_search.search(food_name))
+                
         # If a string matching puppy/kitten or neonate diets is not found, look for canine or feline matches
         dog_match = dog.search(food_name) or dog.search(product_category)
         cat_match = cat.search(food_name) or cat.search(product_category)
-    
-       
+
         # If a specialty match (i.e. puppy, kitten, lactating/gestating mother dogs or cats) is found, return the substring starting from the index
-        if puppy_kitten_match:
-            matched_text = food_name[puppy_kitten_match.start():]
-        elif lactation_gestation_match:
-            matched_text = food_name[lactation_gestation_match.start():]
-        elif mature_dogs_or_cats:
-            matched_text = food_name[mature_dogs_or_cats.start():]
-        elif adult_dogs_or_cats:
-            matched_text = food_name[adult_dogs_or_cats.start():]
+        if puppy_match:
+            matched_text = "Puppy"
+        elif kitten_match:
+            matched_text = "Kitten"
+        elif lactation_gestation_canine:
+            matched_text = "Adult Canine Gestation/Lactation"
+        elif lactation_gestation_feline:
+            matched_text = "Adult Feline Gestation/Lactation"
+        elif adult_dogs:
+            matched_text = "Adult Canine"
+        elif adult_cats:
+            matched_text = "Adult Feline"
+        elif mature_dogs or senior_dogs:
+            matched_text = "Adult Canine Senior"
+        elif mature_cats:
+            matched_text = "Adult Feline Mature"
+        elif senior_cats:
+            matched_text = "Adult Feline Senior"
         elif dog_match:
             matched_text = "Canine"
         elif cat_match:
@@ -202,20 +217,18 @@ def find_food_form(food_name, product_category):
     canned = re.compile(r'canned|wet', re.IGNORECASE)
     pouch = re.compile(r'pouch', re.IGNORECASE)
     
-    for form in food_forms:        
-        # Find the index of the food form
-        pouch_match = pouch.search(food_name) or pouch.search(product_category)
-        food_form_index = dry.search(food_name) or dry.search(product_category) or \
-                          canned.search(food_name) or canned.search(product_category)
+    matched_text = ""
         
-        # If the phrase is found, return the substring starting from the index
-        if food_form_index:
-            matched_text = food_name[food_form_index.start():]
-        elif pouch_match:
+    for form in food_forms:        
+        # Check for matches in food_name and product_category
+        if dry.search(food_name) or dry.search(product_category):
+            matched_text = "Dry"
+        elif pouch.search(food_name) or pouch.search(product_category):
             matched_text = "Semi-moist"
-        else:
-            matched_text = product_category[food_form_index.start():]
-            
+        elif canned.search(food_name) or canned.search(product_category):
+            matched_text = "Canned"
+        
+        # Find the index of the food form
         if form.food_form.lower() in matched_text.lower():
             return form.form_id
      
@@ -226,12 +239,21 @@ def find_food_brand_id(product_description):
                 PetFoodBrands
             ).all()
     
-
+    match = None
+    
     for brand in pet_food_brands:        
         # Find the index of the pet food brand
         if brand.brand_name in product_description:
             match = brand.brand_id
             print(f"Match found: {brand.brand_name}, ID: {match}")
+            break
+        
+    if match is None:
+        # If the pet food brand is not found in the name, 
+        # manually add RC's index number
+        match = 1 
+        
+    print(match)
             
     return match
         

@@ -2,7 +2,7 @@
 available pet food and treats and logs their caloric
 content"""
 
-import datetime
+from datetime import datetime
 from dotenv import load_dotenv
 import re
 import pet_food_and_treats as pf
@@ -57,40 +57,60 @@ class JgWebScraper:
         
         # Gets all the card elements
         while True:
+            # Find all food links on the current page
             food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
             
             if not food_links:
                 break
             
             # Loops through each object in the list
-            for i in range(len(food_links)):
+            while True:
+                for i in range(len(food_links)):
+                    try:
+                        # Grab food links again to refresh the elements
+                        food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
+
+                        # Scroll the element into view, suggested by CoPilot
+                        self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
+                
+                            
+                        # Wait until the element is clickable
+                        WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
+                        )
+                        
+                        # Click on the food name link
+                        print(food_links[i].text)
+                        food_links[i].click()
+                        
+                        time.sleep(5)
+                        
+                        # Scrape product information
+                        self.rc_scrape_dog_food()
+                        
+                        # Add product info to database
+                        self.add_diet_to_database()
+                        
+                        # Go back to the diet list page using JavaScript
+                        self.driver.execute_script("window.history.go(-1)")
+                        
+                        # Wait for the page to load
+                        WebDriverWait(self.driver, 10).until(
+                            EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
+                        )
+                    except Exception as e:
+                        print(f"Error processing item: {e}")
+                        continue 
+                    
+                # Try to find the "next page" button
                 try:
-                    # Re-fetch the list of links to avoid stale element reference
-                    food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
-                    
-                    # Scroll the element into view, suggested by CoPilot
-                    self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
-            
-                    # Click on the food name link
-                    print(food_links[i].text)
-                    food_links[i].click()
-                    
-                    time.sleep(5)
-                    
-                    # Scrape product information
-                    self.rc_scrape_dog_food()
-                    
-                    # Go back to the diet list page using JavaScript
-                    self.driver.execute_script("window.history.go(-1)")
-                    
-                    # Wait for the page to load
-                    WebDriverWait(self.driver, 10).until(
-                        EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
-                    )
+                    next_page = self.driver.find_element(By.XPATH, "//a[@data-qa='product-pagers-next']")
+                    self.driver.execute_script("arguments[0].click();", next_page)
                 except Exception as e:
-                    print(f"Error processing item: {e}")
-                    continue 
-        
+                    print(f"No next button found, exception: {e}")
+                    break
+                
+                
     def rc_scrape_dog_food(self):
         """Scrapes the information on the diet page"""
         
@@ -177,6 +197,8 @@ class JgWebScraper:
                 if me_per_kg:
                     kcal_per_kg = me_per_kg.group(0)
                     self.kcal_per_kg_number = kcal_per_kg.split(" ")[0]
+                    self.kcal_per_kg_number = int(self.kcal_per_kg_number)
+                    
                     print(f"kcal per kg: {kcal_per_kg}")
                     print(self.kcal_per_kg_number)
                 else:
@@ -187,7 +209,8 @@ class JgWebScraper:
                 if per_unit:
                     kcal_per_can_or_cup = per_unit.group(0)
                     self.kcal_per_can_or_cup_number = kcal_per_can_or_cup.split(" ")[0]
-                    
+                    self.kcal_per_can_or_cup_number = int(self.kcal_per_can_or_cup_number)
+                
                     print(f"kcal per unit: {kcal_per_can_or_cup}")
                     print(self.kcal_per_can_or_cup_number)
                 else:
@@ -257,6 +280,8 @@ class JgWebScraper:
         animal_proteins = []
         other_proteins = []
         
+        potential_protein_source = None
+
         # Add remaining ingredients to ingredient_string
         for ingredient in ingredient_list[1:]:
             self.ingredient_string += f", {ingredient}"
@@ -277,9 +302,9 @@ class JgWebScraper:
                     # TODO: Confirm if rice is a significant source of plant-based protein
                     
                     if self.ingredient_second_word != "Rice":
-                        protein_source = self.ingredient_first_word
+                        potential_protein_source = self.ingredient_first_word
                     else:
-                        protein_source = self.ingredient_second_word
+                        potential_protein_source = self.ingredient_second_word
                         
                 except IndexError as e:
                     pass
@@ -289,10 +314,10 @@ class JgWebScraper:
                 
             # Don't split any hydrolyzed ingredients or general/nonspecific protein ingredients 
             elif ingredient in ["Hydrolyzed Poultry", "Hydrolyzed Soy", "Hydrolyzed Chicken", "Hydrolyzed Salmon", "Meat By-product"]:
-                protein_source = ingredient
+                potential_protein_source = ingredient
             
                         
-            protein_id = pf.check_protein_id(protein_source)
+            protein_id = pf.check_protein_id(potential_protein_source)
             print(f"Protein ID: {protein_id}")
 
             if protein_id:
@@ -429,7 +454,7 @@ class JgWebScraper:
         print(f"Size ID: {self.package_size_id}")
         
         if self.package_size_id == None:
-            # TODO: If the size isn't in the database, add it
+            # If the size isn't in the database, add it
             self.add_package_size_to_database()
             
             # Query the database again
@@ -446,7 +471,8 @@ class JgWebScraper:
         # Find the pet food brand's ID in PetFoodBrands
         self.brand_id = pf.find_food_brand_id(self.product_description.text)
         print(f"Brand ID: {self.brand_id}")
-    
+        
+
     def add_package_size_to_database(self):
         """Adds a new package size to the PackageSizes"""
         
@@ -465,24 +491,46 @@ class JgWebScraper:
     def add_diet_to_database(self):
         """Adds a new diet to the PetFoods"""
         
-        new_food = pf.PetFoods(
-            brand=self.brand_id,
-            food_name=self.food_name.text,
-            food_form=self.food_form_id,
-            life_stage=self.life_stage_id,
-            description=self.product_description,
-            size=self.package_size_id,
-            aafco_statement=self.aafco_index,
-            kcal_per_kg=self.kcal_per_kg_number,
-            kcal_per_cup_can_pouch=self.kcal_per_can_or_cup_number,
-            first_protein_source=self.first_protein_source,
-            second_protein_source=self.second_protein_source,
-            third_protein_source=self.third_protein_source,
-            ingredient_list=self.ingredient_string,
-            date_added=datetime.now(),
-            date_updated=datetime.now()
-        )  
+
+        check_food = pf.pet_food_db.query(pf.PetFoods).filter_by(food_name=self.food_name.text).first()
+
+        if check_food:
+            # If there is data for the new food already in the database, 
+            # don't add it again
+            pass
+        else:
+            new_food = pf.PetFoods(
+                brand=self.brand_id,
+                food_name=self.food_name.text,
+                food_form=self.food_form_id,
+                life_stage=self.life_stage_id,
+                description=self.product_description.text,
+                size=self.package_size_id,
+                aafco_statement=self.aafco_index,
+                kcal_per_kg=self.kcal_per_kg_number,
+                kcal_per_cup_can_pouch=self.kcal_per_can_or_cup_number,
+                first_protein_source=self.first_protein_source,
+                second_protein_source=self.second_protein_source,
+                third_protein_source=self.third_protein_source,
+                ingredient_list=self.ingredient_string,
+                date_added=datetime.now(),
+                date_updated=datetime.now()
+            )  
+            
+            print(f"new food: ID {new_food.food_id}, brand ID {new_food.brand}",
+                  f"Food name: {new_food.food_name}, food form: {new_food.food_form}",
+                  f"Life stage ID {new_food.life_stage}, description: {new_food.description}",
+                  f"size: {new_food.size}, AAFCO statement: {new_food.aafco_statement}",
+                  f"{new_food.kcal_per_kg} kcal/kg, {new_food.kcal_per_cup_can_pouch} per can/pouch/cup",
+                  f"1st protein source: {new_food.first_protein_source}, 2nd protein source: {new_food.second_protein_source}",
+                  f"3rd protein source: {new_food.third_protein_source}",
+                  f"Ingredient list: {new_food.ingredient_list}")
         
+            # Add the new food to the database
+            pf.pet_food_db.add(new_food)
+            pf.pet_food_db.commit()
+            
+            print("New food added to the database.")
               
     def hills_dog_food_search(self):
         # Navigate to the specified URL
