@@ -10,6 +10,7 @@ import selenium as s
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+import selenium.common.exceptions as se
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
@@ -46,69 +47,134 @@ class JgWebScraper:
     def rc_dog_food_search(self):
         """Scrapes each item in the dog food list"""
         
+        MAX_RETRIES = 10
+
         # Navigate to the specified URL
         print(f"Navigating to {RC_DOG_FOOD_SEARCH}")
         self.driver.get(RC_DOG_FOOD_SEARCH)
-        
+
         time.sleep(5)
         # Verify the correct page is loaded
         current_url = self.driver.current_url
         print(f"Current URL: {current_url}")
+
+        # Gets all the card elements
+        last_page_reached = False
         
         # Gets all the card elements
-        while True:
+        while not last_page_reached:
             # Find all food links on the current page
             food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
             
             if not food_links:
                 break
             
+            retry_count = 0
+            element_processed = False
+            
             # Loops through each object in the list
-            while True:
-                for i in range(len(food_links)):
-                    try:
-                        # Grab food links again to refresh the elements
-                        food_links = self.driver.find_elements(By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']")
-
-                        # Scroll the element into view, suggested by CoPilot
-                        self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
+            for i in range(len(food_links)):
                 
-                            
+                while retry_count < MAX_RETRIES and not element_processed:
+                    try:
+                        # Scroll the element into view
+                        self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
+                                            
                         # Wait until the element is clickable
                         WebDriverWait(self.driver, 10).until(
                             EC.element_to_be_clickable((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
                         )
                         
                         # Click on the food name link
-                        print(food_links[i].text)
-                        food_links[i].click()
+                        food_card = food_links[i].text.split("\n")
                         
-                        time.sleep(5)
-                        
-                        # Scrape product information
-                        self.rc_scrape_dog_food()
-                        
-                        # Add product info to database
-                        self.add_diet_to_database()
-                        
-                        # Go back to the diet list page using JavaScript
-                        self.driver.execute_script("window.history.go(-1)")
-                        
-                        # Wait for the page to load
-                        WebDriverWait(self.driver, 10).until(
-                            EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
-                        )
+                        if food_card:
+                            food_title = food_card[0]
+                            check_food_in_database = pf.check_if_diet_in_database(food_title)
+                            
+                            if check_food_in_database:
+                                # Don't scrape diets that are in the database already
+                                element_processed = True
+                                break
+
+                            else:
+                                # If the food isn't in the database already, add it
+                                print(food_title)
+                                food_links[i].click()
+                                
+                                time.sleep(5)
+                                
+                                # Scrape product information
+                                self.rc_scrape_dog_food()
+                                
+                                # Add product info to database
+                                self.add_diet_to_database()
+                                
+                                # Go back to the diet list page using JavaScript
+                                self.driver.execute_script("window.history.go(-1)")
+                                
+                                # Wait for the page to load
+                                WebDriverWait(self.driver, 10).until(
+                                    EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
+                                )
+                                
+                                element_processed = True
+
+                        else:
+                            print("Food link text is empty or does not contain expected format.")
+                            element_processed = True
+                            break
+                                    
+                    except se.StaleElementReferenceException:
+                        print(f"StaleElementReferenceException encountered. Retrying {retry_count + 1}/{MAX_RETRIES}...")
+                        retry_count += 1
+                        if retry_count >= MAX_RETRIES:
+                            print(f"Failed to process element after {MAX_RETRIES} retries due to stale element reference.")
+                            element_processed = True
+                            break
+                    except se.ElementClickInterceptedException as e:
+                        print(f"ElementClickInterceptedException encountered: {e}")
+                        retry_count += 1
+                        if retry_count >= MAX_RETRIES:
+                            print(f"Failed to click element after {MAX_RETRIES} retries due to click interception.")
+                            element_processed = True
+                            break
+                    except se.TimeoutException as e:
+                        print(f"TimeoutException encountered: {e}")
+                        retry_count += 1
+                        if retry_count >= MAX_RETRIES:
+                            print(f"Failed to process element after {MAX_RETRIES} retries due to timeout.")
+                            element_processed = True
+                            break
                     except Exception as e:
                         print(f"Error processing item: {e}")
-                        continue 
-                    
-                # Try to find the "next page" button
-                try:
-                    next_page = self.driver.find_element(By.XPATH, "//a[@data-qa='product-pagers-next']")
+                        element_processed = True
+                        break
+                
+            # Try to find the "next page" button
+            try:
+                next_page = self.driver.find_element(By.XPATH, "//a[@data-qa='product-pagers-next']")
+                
+                if not pf.is_link_hidden_or_missing(self.driver, next_page):
                     self.driver.execute_script("arguments[0].click();", next_page)
-                except Exception as e:
-                    print(f"No next button found, exception: {e}")
-                    break
+                    
+                    # Wait for the next page to load
+                    WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
+                    )
+                else:
+                    print("Next page link is either hidden or missing.")
+                    retry_count = 10 
+                    last_page_reached = True
+
+            except se.NoSuchElementException:
+                print("No next button found. Reached the last page.")
+                last_page_reached = True
+
+            except Exception as e:
+                print(f"No next button found, exception: {e}")
+                last_page_reached = True
+
                 
                 
     def rc_scrape_dog_food(self):
@@ -360,12 +426,7 @@ class JgWebScraper:
 
         except Exception as e:
             print(f"Can't find protein sources. Exception: {e}")
-
-                # TODO: add protein sources to database by top 5 ingredients by weight
-                # TODO: add the rest of ingredients to the db
-                # TODO: if protein sources contain a common allergen, add to db
-        
-                        # TODO: add caloric content to database
+            
     
     def rc_dog_food_find_aafco_statement(self):
         """Extract AAFCO statement if there is one"""
@@ -394,13 +455,21 @@ class JgWebScraper:
     
     def rc_get_container_size(self):
         """Grab the bag or case size"""
-    
-        # Grab selection dropdown menu or text string for dog food package sizes
-        container_sizes_dropdown = self.driver.find_element(By.XPATH, value="//*[@id='packweightselector']")
 
-        # Retrieve all options within the dropdown
-        options = container_sizes_dropdown.find_elements(By.TAG_NAME, 'option')
-        
+        try:    
+            # Grab selection dropdown menu or text string for dog food package sizes
+            container_sizes_dropdown = self.driver.find_element(By.XPATH, value="//*[@id='packweightselector']")
+
+            if container_sizes_dropdown:
+                # Retrieve all options within the dropdown
+                options = container_sizes_dropdown.find_elements(By.TAG_NAME, 'option')
+
+        except se.NoSuchElementException:
+            options = self.driver.find_elements(By.XPATH, value="//p[@data-qa='existing-format-label']")    
+
+        except Exception as e:
+            print(f"Sizes not found. Exception: {e}")
+            
         self.package_size = []
         case_size_options = 0
         container_sizes = []
@@ -491,8 +560,7 @@ class JgWebScraper:
     def add_diet_to_database(self):
         """Adds a new diet to the PetFoods"""
         
-
-        check_food = pf.pet_food_db.query(pf.PetFoods).filter_by(food_name=self.food_name.text).first()
+        check_food = pf.check_if_diet_in_database(self.food_name.text)
 
         if check_food:
             # If there is data for the new food already in the database, 

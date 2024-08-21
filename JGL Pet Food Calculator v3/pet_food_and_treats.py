@@ -307,7 +307,40 @@ def check_protein_type(protein):
         return None
     
     
-               
-
+def check_if_diet_in_database(food):
+    """Queries PetFoods for the food name"""
     
 
+    try:
+        check_food = pet_food_db.query(
+            PetFoods
+            ).filter_by(food_name=food).first()
+
+        if check_food:
+            return True
+        
+    except Exception as e:
+        print(f"Diet not found, exception: {e}")
+        return False
+
+
+def is_link_hidden_or_missing(driver, element):
+    """Checks if a link is hidden or missing,
+    suggested by CoPilot"""
+    
+    # Check if the href attribute is empty or missing
+    href = element.get_attribute("href")
+    if not href:
+        return True
+    
+    # Check if the element is hidden using CSS properties
+    style = element.get_attribute("style")
+    if "display: none" in style or "visibility: hidden" in style or "opacity: 0" in style:
+        return True
+    
+    # Check if the element is hidden using computed style
+    is_displayed = driver.execute_script("return window.getComputedStyle(arguments[0]).display !== 'none' && window.getComputedStyle(arguments[0]).visibility !== 'hidden' && window.getComputedStyle(arguments[0]).opacity !== '0';", element)
+    if not is_displayed:
+        return True
+    
+    return False
