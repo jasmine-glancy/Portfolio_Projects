@@ -18,7 +18,7 @@ import time
 load_dotenv("D:/Python/EnvironmentVariables/.env")
 
 
-RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-products"
+RC_DOG_FOOD_SEARCH = "https://www.royalcanin.com/us/dogs/products/retail-products?technology=wet"
 HILLS_DOG_FOOD_SEARCH = "https://www.hillspet.com/products/dog-food"
 EUKANUBA_FOOD_SEARCH = "https://www.eukanuba.com/us/all-products"
        
@@ -81,7 +81,7 @@ class JgWebScraper:
                         self.driver.execute_script("arguments[0].scrollIntoView(true);", food_links[i])
                                             
                         # Wait until the element is clickable
-                        WebDriverWait(self.driver, 10).until(
+                        WebDriverWait(self.driver, 30).until(
                             EC.element_to_be_clickable((By.XPATH, "//li[@data-qa='product-grid-item']//a[@data-qa='product-card' and @data-testid='product-card-link']"))
                         )
                         
