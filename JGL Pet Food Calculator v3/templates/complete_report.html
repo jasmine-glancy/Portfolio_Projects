@@ -32,7 +32,7 @@
         <!-- https://www.etsy.com/shop/wallartbox -->
         
         <div class="{{ 'report_img_k9' if pet_data[0].species == 'Canine' else 'report_img_fel' if pet_data[0].species == 'Feline' }}">
-            <img src="{{ url_for('static', filename=svg) }}" class="pet_pic">
+            <img src="{{ url_for('static', filename=svg) }}" class="pet_pic" alt="A picture of your pet's breed">
         </div>
         <div class="{{ 'k9_line' if pet_data[0].species == 'Canine' else 'k9_line_shortened' if pet_data[0].breed == 'German Shorthaired Pointer' else 'fel_line' if pet_data[0].species == 'Feline' }}"></div>
 

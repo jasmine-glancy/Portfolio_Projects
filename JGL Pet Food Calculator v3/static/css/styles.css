@@ -27,27 +27,36 @@ body {
 
 h1 {
     color: var(--deep_blue_green);
-    font-family: "Arvo", serif;
     font-weight: 700;
-    font-style: bold;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
 }
 
-    h2 {
+    h1, h2 {
         color: var(--deep_blue_green);
-        display: inline-block;
-        padding: 5px;
-        padding-top: 25px;
-        font-family: "Arvo", serif;
-        font-style: bold;
-        font-weight: 600;
-        justify-content: center;
+    }
+
+    h1, h2, h3 {
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+        font-style: bold;
+        font-family: "Arvo", serif;
     }
+
+    h2 {
+        display: inline-block;
+        padding: 5px;
+        padding-top: 25px;
+        font-weight: 600;
+        justify-content: center;
+    }
+
+    h3 {
+        line-height: 5vh;
+        padding-bottom: 2vw;
+        font-size: 20px;
+        padding-top: 1vw;
+    }
+
     
     h4 {
         display: inline-block;
@@ -92,6 +101,7 @@ h1 {
         margin-left: auto;
         margin-right: auto;
     }
+
     hr {
         margin-top: 0px;
         margin-bottom: 0px;
@@ -135,10 +145,6 @@ h1 {
         height: 100%;
     }
 
-    .spacer {
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
 
     .transition {
         font-size: 25px;
@@ -154,6 +160,11 @@ h1 {
         margin-right: auto;
     }
 
+    .no_reports {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
 /* Links */
 a {
     color: var(--darker_lime);
@@ -208,10 +219,20 @@ a:hover {
         }
 
     /* Divider solution suggested by Michael Allen on Slack */
+
+    .divider, .smaller_divider {
+        display: inline-block;
+    }
+
     .divider {
         width: 25vw;
         height: auto;
-        display: inline-block;
+    }
+
+    .smaller_divider {
+        width: 0vw;
+        height: auto;
+        flex-direction: row;
     }
 
     .spacer {
@@ -219,7 +240,10 @@ a:hover {
         flex-direction: column;
         height: 25vw;
         width: auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
+
 /* Progress bar */
 .progress {
     --bs-progress-bg: var(--pale_white_green);
@@ -585,6 +609,22 @@ a:hover {
             margin-left: 4vw;
             margin-right: auto;
             margin-top: 0.1vw;    
+        }
+
+        /* General pet SVGs */
+
+        .img_container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            width: fit-content;
+            gap: 3vw;
+        }
+
+        .general_pet_svg {
+            max-width: 8vw;
+            padding-bottom: 1vw;
         }
 
 /* Puzzle feeder images */
