@@ -19,7 +19,7 @@
         <div class="row">
 
             {% if wip_reports %}
-                <table class="table table-sm">
+                <table class="table table-sm" id="pets">
                     <thead>
                         <tr>
                             <th>
@@ -33,47 +33,49 @@
                             {% if pet.date_of_first_report == None %}
                                 <tr>
                                     <td>
-                                        <h4>{{ pet.name }}</h4>
-                                        <br>
-                                        {% if pet.age_in_years != None and pet.age_in_months != None%}
-                                            {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
-                                                {{ pet.age_in_months }} month old
-                                            {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
-                                                {{ pet.age_in_months }} months old
-                                            {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
-                                                {{ pet.age_in_years }} year old
-                                            {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
-                                                {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
-                                            {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
-                                                {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
-                                            {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
-                                                {{ pet.age_in_years }} years old
-                                            {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
-                                                {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
-                                            {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
-                                                {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
+                                        <div class="pet_signalment">
+                                            <h4>{{ pet.name }}</h4>
+                                            <br>
+                                            {% if pet.age_in_years != None and pet.age_in_months != None%}
+                                                {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
+                                                    {{ pet.age_in_months }} month old
+                                                {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
+                                                    {{ pet.age_in_months }} months old
+                                                {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
+                                                    {{ pet.age_in_years }} year old
+                                                {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
+                                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
+                                                {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
+                                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
+                                                {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
+                                                    {{ pet.age_in_years }} years old
+                                                {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
+                                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
+                                                {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
+                                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
+                                                {% endif %}
                                             {% endif %}
-                                        {% endif %}
+                                            
+                                            {% if pet.sex != None %}
+                                                {% if pet.sex == "female_spayed" %}
+                                                    Female (Spayed)
+                                                {% elif pet.sex == "female" %}
+                                                    Female (Intact)
+                                                {% elif pet.sex == "male_neutered" %}
+                                                    Male (Neutered)
+                                                {% elif pet.sex == "male" %}
+                                                    Male (Intact)
+                                                {% endif %}
+                                            {% endif %}
                                         
-                                        {% if pet.sex != None %}
-                                            {% if pet.sex == "female_spayed" %}
-                                                Female (Spayed)
-                                            {% elif pet.sex == "female" %}
-                                                Female (Intact)
-                                            {% elif pet.sex == "male_neutered" %}
-                                                Male (Neutered)
-                                            {% elif pet.sex == "male" %}
-                                                Male (Intact)
+                                            {% if pet.breed != None %}
+                                                {{ pet.breed }} 
                                             {% endif %}
-                                        {% endif %}
-                                    
-                                    {% if pet.breed != None %}
-                                        {{ pet.breed }} 
-                                    {% endif %}
-                                    
-                                    {% if pet.species != None %}
-                                        ({{ pet.species }})
-                                    {% endif %}
+                                            
+                                            {% if pet.species != None %}
+                                                ({{ pet.species }})
+                                            {% endif %}
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="button-container">
@@ -172,12 +174,12 @@
             
             {% else %}
                 <div class="no_reports">
-                    <h3>
+                    <h4>
                         No reports are currently in progress. Once you 
                         start using the pet food calculator for a pet, 
                         the in-progress reports will show up here so 
                         you have the ability to modify them!
-                    </h3>
+                    </h4>
                 </div>
 
                 <!-- SVGs credited to SVG repo via https://www.svgrepo.com/-->

@@ -17,7 +17,8 @@
     <!-- TODO v2: Cut vertical spacing and make more accessible, view spreadsheet format-->
     <!-- Load in completed reports --> 
         <div class="row">
-            {% if pet_list %}
+
+            {% if pet_list and pet_list.date_of_first_report != None %}
                 <table class="final_report_table">
                     <tbody>
                         {% for pet in pet_list %}
@@ -101,11 +102,11 @@
                 </table>
             {% else %}
 
-                <h3>
+                <h4>
                     No reports have been completed yet. 
                     They will show up here after you use 
                     the pet food calculator!
-                </h3>
+                </h4>
 
                 <!-- SVGs credited to SVG repo via https://www.svgrepo.com/-->
                 <div class="img_container">

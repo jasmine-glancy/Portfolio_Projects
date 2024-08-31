@@ -28,13 +28,14 @@ body {
 h1 {
     color: var(--deep_blue_green);
     font-weight: 700;
+    padding-bottom: 1vw;
 }
 
     h1, h2 {
         color: var(--deep_blue_green);
     }
 
-    h1, h2, h3 {
+    h1, h2 {
         margin-left: auto;
         margin-right: auto;
         text-align: center;
@@ -50,12 +51,10 @@ h1 {
         justify-content: center;
     }
 
-    h3 {
+    /* h3 {
         line-height: 5vh;
-        padding-bottom: 2vw;
         font-size: 20px;
-        padding-top: 1vw;
-    }
+    } */
 
     
     h4 {
@@ -85,9 +84,11 @@ h1 {
     --bs-table-bg: var(--pale_white_green);
     --bs-table-striped-color: var(--light_sky);
     --bs-table-striped-bg: var(--pale_sky_blue);
-    margin-top: 2vw;
-    margin-bottom: 0vw;
 }
+
+    #pets {
+        margin-bottom: 10vw !important;
+    }
 
     thead {
         font-weight: 500;
@@ -110,7 +111,20 @@ h1 {
         margin-right: auto;
         color: var(--darker_lime);
     }
+    
+    .pet_signalment {
+        margin-top: 2.5vw;
+        margin-left: 2.5vw;
+    }
 
+        .table.table-sm td {
+            align-items: center; /* Vertically center the content */
+            justify-content: center; /* Horizontally center the content */
+            text-align: center;
+        }
+
+
+        
     .table_info {
         height: 200px;
     }
@@ -200,6 +214,10 @@ a:hover {
         --bs-btn-active-border-color: var(--darker_lime_transparent);
         --bs-btn-hover-bg: var(--darker_lime_transparent);
         --bs-btn-hover-border-bg: var(--darker_lime_transparent);
+    }
+
+    #hf_lookup {
+        margin-top: 2vw;
     }
 
     .button-container {
@@ -329,11 +347,13 @@ a:hover {
     --bs-accordion-active-color: var(--pale_white_green);
     --bs-accordion-btn-active-icon: #00e043;
     --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem #568b3fa4;
-
+    margin-top: 2vw;
+    margin-bottom: 2vw;
 }
 
-    .accordion-collapse {
-        --bs-accordion-active-color: #000;
+    .accordion-button {
+        --bs-accordion-active-color: var(--darker_lime_transparent);
+        --bs-accordion-active-color: var(--pale_white_green);
     }
 
 .bcs {
@@ -396,7 +416,7 @@ a:hover {
         padding-left: 2px;
     }
 
-.form-group .form-label {
+.form-group .form-label, .hf-form-label {
     text-align: left !important;
     padding-left: 1vw;
 }
@@ -407,6 +427,26 @@ a:hover {
 
     .columned-form-label {
         padding-right: 1vw;
+    }
+
+    #name {
+        width: 20vw;
+        margin-left: 1vw;
+        margin-right: 0.5vw;
+        padding-left: 0.5vw;
+    }
+
+    .hf-form-label, .hf_input {
+        margin-top: 2vw;
+    }
+
+    #hf_submit {
+        margin-top: 0;
+    }
+
+    #hf_form {
+        margin-left: 16vw;
+        margin-bottom: 1vw;
     }
 
 /* Formula formatting */
@@ -619,6 +659,7 @@ a:hover {
             align-items: center;
             margin: 0 auto;
             width: fit-content;
+            padding-top: 2vw;
             gap: 3vw;
         }
 
@@ -741,6 +782,12 @@ a:hover {
     p {
         margin-top: 15px;
         position: relative;
+    }
+
+    .hf {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center; 
     }
 
 .puppy_food_choice, .treats, .wider_treats, .preg_treats {

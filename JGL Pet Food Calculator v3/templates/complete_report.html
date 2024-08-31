@@ -11,13 +11,6 @@
 {% block content %}
 
 <div class="container-lg">
-
-    <!-- Outputs error messages -->
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
-        {% endif %}
-    {% endwith %}
     
     <div class="report_wrapper">
         <div class="report_title">
@@ -37,6 +30,13 @@
         <div class="{{ 'k9_line' if pet_data[0].species == 'Canine' else 'k9_line_shortened' if pet_data[0].breed == 'German Shorthaired Pointer' else 'fel_line' if pet_data[0].species == 'Feline' }}"></div>
 
     </div>
+
+        <!-- Outputs error messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <p class="flash">⚠️ {{ messages[-1] }} ⚠️</p>
+            {% endif %}
+        {% endwith %}
 
         <div class="final_report">
         <div class="data">

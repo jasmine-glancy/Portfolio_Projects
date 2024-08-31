@@ -8,6 +8,7 @@ from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
 from find_info import FindInfo
 from helpers import clear_variable_list, login_required
 import os
+from USDA_food_database_api import human_foods
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -30,6 +31,8 @@ app.config['SECRET_KEY'] = os.environ.get('KEY')
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///pet_food_calculator.db")
 
+# Register the blueprint for human foods
+app.register_blueprint(human_foods)
 
 @app.route("/")
 def home():
@@ -1695,15 +1698,15 @@ def completed_report():
     der_low_end, der_high_end = int(der_low_end), int(der_high_end)
     
     # Begin food transition table for pets switching their diet or who eat multiple diets a day
-    cf = CalculateFood(session["user_id"], id)
-    transitioning_food_amts_rec = cf.transition_food_calculator(pet_data[0]["der"])
-    transitioning_food_amts_rec = None
-    if pet_data[0]["transitioning_food_one_kcal"] != None:
-        cf = CalculateFood(session["user_id"], id)
-            # Loop over each day in transition period and calculate based on DER and percent of food feed
+    # cf = CalculateFood(session["user_id"], id)
+    # transitioning_food_amts_rec = cf.transition_food_calculator(pet_data[0]["der"])
+    # transitioning_food_amts_rec = None
+    # if pet_data[0]["transitioning_food_one_kcal"] != None:
+    #     cf = CalculateFood(session["user_id"], id)
+    #         # Loop over each day in transition period and calculate based on DER and percent of food feed
 
-        transitioning_food_amts_rec = cf.transition_food_calculator(pet_data[0]["der"])
-        print(transitioning_food_amts_rec)
+    #     transitioning_food_amts_rec = cf.transition_food_calculator(pet_data[0]["der"])
+    #     print(transitioning_food_amts_rec)
         # for day in trans_percents:
         #     day_label = f"Day {day}"
 
@@ -1809,7 +1812,7 @@ def completed_report():
         #     if day.startswith("Old Food"):
         #     print(day, day["Old Food"], day["New Food")
 
-    print(transitioning_food_amts_rec)    
+    # print(transitioning_food_amts_rec)    
     
     print(type(pet_data[0]["bcs"]))
     return render_template("complete_report.html",
@@ -1878,3 +1881,6 @@ def wip_reports():
     wip_reports = fi.find_wip_reports(session["user_id"])
     
     return render_template("wip_reports.html", wip_reports=wip_reports)
+
+
+    
