@@ -31,7 +31,13 @@
                 <input type="submit" value="Search" id="hf_submit" class="btn btn-secondary btn-lg">
             </div>
         </form>
-    </div>
 
+        {% if foods %}
+            {% for food in foods %}
+                {{ food.brandName }} {{ food.description }}
+            {% endfor %}
+        {% endif %}
+
+    </div>
 </div>
 {% endblock %}
