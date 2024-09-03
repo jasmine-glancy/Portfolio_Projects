@@ -1,6 +1,7 @@
 :root {
     --white: #f1e4e9;
     --pale_white_green: #c6f1d3;
+    --lighter_white_green: #d1f7dc;
     --pale_sky_blue: #70abad;
     --light_sky: #70c2c3;
     --green_black: #091f19;
@@ -112,6 +113,52 @@ h1 {
         color: var(--darker_lime);
     }
     
+    .big_table {    
+        height: 50vh; /* Set a fixed height */
+        overflow-y: auto; /* Enable vertical scrolling */
+        overflow-x: hidden;
+        width: 75%;
+        margin: 0 auto;
+        padding: 0;
+
+        /* Scroll Bar for Firefox */
+        scrollbar-width: thin; 
+
+        /* Color of the scrollbar thumb and track */
+        scrollbar-color: var(--deep_blue_green) var(--white); 
+    }
+
+        .big_table, .small_table {
+            margin-bottom: 1vh;
+        }
+
+        /* Scroll Bar Colors */
+        /* WebKit browsers (Chrome, Safari) */
+        .big_table::-webkit-scrollbar {
+            width: 12px; 
+        }
+
+        .big_table::-webkit-scrollbar-track {
+            /* Background of the scrollbar track */
+            background: var(--white); 
+        }
+
+        .big_table::-webkit-scrollbar-thumb {
+            /* Color of the scrollbar thumb */
+            background: var(--green_black); 
+            border-radius: 10px; 
+        }
+
+        .big_table::-webkit-scrollbar-thumb:hover {
+            /* Color of the scrollbar thumb on hover */
+            background: var(--deep_blue_green); 
+        }
+
+        /* Scrollbar thumb active state for Firefox */
+        .big_table::-moz-scrollbar-thumb:active {
+            background-color: var(--deep_blue_green); /* Replace with your desired color */
+        }
+    
     .pet_signalment {
         margin-top: 2.5vw;
         margin-left: 2.5vw;
@@ -123,8 +170,53 @@ h1 {
             text-align: center;
         }
 
+    .human_food_container, .human_food {
+        margin-bottom: 1vw;
+    }
+        .human_food_container {
+            margin-left: 0;
+            margin-right: 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
 
+        .human_food_container td {
+            padding: 10px; 
+        }
+
+        .human_food {
+            margin-bottom: 1vw;
+            width: 66%;
+        }
+
+        .hf_button {
+            width: 33%;
+        }
+
+        .hf_button {
+            max-width: fit-content;
+        }
         
+        .even-row {
+            background-color: var(--pale_white_green);
+        }
+
+        .odd-row {
+            background-color: var(--lighter_white_green);
+        }
+        
+        .food_name {
+            font-weight: 500;
+        }
+
+            .food_name, .calorie_info {
+                padding-left: 2vw;
+            }
+
+        .calorie_info {
+            font-style: italic;
+        }
+
     .table_info {
         height: 200px;
     }
@@ -214,6 +306,14 @@ a:hover {
         --bs-btn-active-border-color: var(--darker_lime_transparent);
         --bs-btn-hover-bg: var(--darker_lime_transparent);
         --bs-btn-hover-border-bg: var(--darker_lime_transparent);
+    }
+
+    #treat_calc {
+        margin-left: 2vw;
+        margin-bottom: 1vw;
+        font-size: 1em;
+        padding: 1vw;
+        width: fit-content;
     }
 
     #hf_lookup {
@@ -809,6 +909,7 @@ a:hover {
 .feline_recs {
     margin-top: 0;
 }
+
 
 /* Scroll to Top button suggested by 
 Lukas Web Development (https://www.youtube.com/watch?v=QwE_M2P3CRk) */

@@ -8,7 +8,7 @@ from forms import NewSignalment, GetWeight, ReproStatus, LoginForm, RegisterForm
 from find_info import FindInfo
 from helpers import clear_variable_list, login_required
 import os
-from USDA_food_database_api import human_foods
+from nutrition_api import human_foods
 from werkzeug.security import check_password_hash, generate_password_hash
 
 

@@ -32,10 +32,35 @@
             </div>
         </form>
 
-        {% if foods %}
-            {% for food in foods %}
-                {{ food.brandName }} {{ food.description }}
-            {% endfor %}
+        {% if found_foods %}
+            <div class="{% if found_foods|length > 3 %}big_table{% else %}small_table{% endif %}">
+                <table class="human_food_container">
+                    {% for food in found_foods %}
+                        <tr class="{% if loop.index0 is even %}even-row{% else %}odd-row{% endif %}">
+                            <td class="human_food">
+                                <div class="food_name">
+                                    {% if food.food_type == "Brand" %}
+                                        {{ food.brand_name }} {{ food.food_name}}
+                                    {% elif food.food_type == "Generic" %}
+                                        {{ food.food_name }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="calorie_info">
+                                    {{ food.calorie_string }} ({{ food.serving_size_string }})
+                                </div>
+                            </td>
+                            <td class="hf_button">
+                                <a href="{{ url_for('human_foods.calculate_treat_amounts', treat_kcal_num=food.num_calories, serving_size_num=food.serving_size_number, serving_size_string=food.serving_size_string) }}">
+                                    <button type="button" id="treat_calc" class="btn btn-primary btn-sm">
+                                        Calculate Treat Amounts
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
         {% endif %}
 
     </div>
