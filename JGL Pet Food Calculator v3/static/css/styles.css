@@ -191,9 +191,15 @@ h1 {
 
         .hf_button {
             width: 33%;
+            max-width: fit-content;
         }
 
-        .hf_button {
+        #search_hf {
+            max-width: 75%;
+            margin-left: 5vw;
+        }
+
+        #search_hf_fr {
             max-width: fit-content;
         }
         
@@ -251,6 +257,20 @@ h1 {
         height: 100%;
     }
 
+        .treat_container {
+            padding-left: 5vw;
+            max-width: 95%;
+            margin-bottom: 0;
+        }
+
+        .cal_text {
+            padding-left: 7.5vw;
+        }
+
+        .sig_fr {
+            text-align: center;
+            padding-bottom: 5vh;
+        }
 
     .transition {
         font-size: 25px;
@@ -320,11 +340,17 @@ a:hover {
         margin-top: 2vw;
     }
 
-    .button-container {
+    .button-container, .button-container-fr {
         display: flex;
         justify-content: center;
-        padding: 2vw;
     }
+        .button-container {
+            padding: 2vw;
+        }
+
+        .button-container-fr {
+            padding-bottom: 3vh;
+        }
     
         .button-container-fp {
             display: flex;

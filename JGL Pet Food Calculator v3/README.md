@@ -429,18 +429,34 @@ The database, pet_food_calculator.db, contains several tables:
   - "feline_der_factor_range_end", a float that represents the end of the range of the DER modifier per life stage
   - "notes", a string that contains information that helps clarify row information
 
+## Version 2 (completed 9/3/24)
+
+### Treat Calculator
+
+![a screen grab of the human food lookup page](static/assets/img/human_food_search_default.png)
+
+The portfolio project for day 96 of [100 Days of Code: The Complete Python Pro Bootcamp](https://www.udemy.com/course/100-days-of-code). The goal was to create a web application based on an API we found interesting. I chose the API from [FatSecret](https://platform.fatsecret.com/) because I wanted to to see the caloric information of various human foods. Using this information, the Pet Food Calculator calculates how much of a chosen human food they can receive per day without unbalancing their diet. Treat amounts are between 8-10% of a pet's resting energy requirements.
+
+#### Choosing a Human Food
+
+![a screen grab of the human food lookup page with search results](static/assets/img/human_food_search_results.png)
+
+The user can choose the food that they want to calculate for by clicking the "Calculate Treat Amounts" button.
+
+#### Final Treat Page Result
+
+![a screen grab of the final treat calculation page](static/assets/img/human_food_calculation.png)
+
+The final treat calculation page provides a reminder of the max amount of calories a pet can have per day from treats without unbalancing their diet. If there is more than a certain amount of a type of treat, users are cautioned to ensure with their vet that there will be no expected side effects or potential health issues.
+
 ### Future version goals
 
-This was a project I had a lot of fun with, and I could work on it forever! This is version 1 of my final project, but I have the following goals for future versions:
+This was a project I had a lot of fun with, and I could work on it forever! This is version 2 of my final project, but I have the following goals for future versions:
 
 - Food transition calculator
   - This would help users transition their pet from their current diet to another food by providing a table in the final report
   - This would calculate volumetric feeding amounts per each day (5-7 days for pets that don't have a sensitive stomach, or 10-14 days for pets that have a sensitive stomach)
   - There would be an additional route that asks for information for up to 2 new foods if the user is interested in transitioning their pet to a new food or if they are interested in feeding more than one diet
-- Smart treat calculator
-  - Allows the user to input a string that calls the USDA food database
-  - The user will be able to choose from a list of similar options to what they input if applicable
-  - The information for how much of a certain human food the pet should get per day would be inserted into the final report
 - Refactoring for speed and to reduce redundancy
 - AI body condition scorer
   - Allow the user to upload several pictures of their pet (bird's eye, from the side, from the front) to attempt to determine the pet's body condition score

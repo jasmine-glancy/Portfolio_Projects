@@ -63,14 +63,14 @@
             {% endif %}
 
             <!-- Sex conditionals -->
-            {% if pet_data[0].sex == "female_spayed" %}
-                spayed female
-            {% elif pet_data[0].sex == "female" %}
-                intact female
-            {% elif pet_data[0].sex == "male_neutered" %}
-                neutered male
-            {% elif pet_data[0].sex == "male" %}
-                intact male
+            {% if pet_data[0].sex == 2 %}
+                Female (Spayed)
+            {% elif pet_data[0].sex == 1 %}
+                Female (Intact)
+            {% elif pet_data[0].sex == 3 %}
+                Male (Intact)
+            {% elif pet_data[0].sex == 4 %}
+                Male (Neutered)
             {% endif %}
 
             <!-- Reproductive status conditionals -->
@@ -130,7 +130,7 @@
             <!-- Give RER and DER information -->
             {{ pet_data[0].name }}'s Resting Energy Rate (RER) was calculated to be 
             {{ rer }} kcal based off of 
-            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                 {{ possessive_pronoun }} 
             {% else %}
                 {{ object_pronoun }} 
@@ -233,7 +233,7 @@
             {% if pet_data[0].species == "Feline" %}
                 <div class="xlarge_padding"></div>
             {% elif pet_data[0].species == "Canine" %}
-                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                {% if pet_data[0].activity_level == 3 or pet_data[0].activity_level == 4 %}
                     <div class="xlarge_padding"></div>
                 {% else %}
                     <div class="quarter_padding"></div>
@@ -263,7 +263,7 @@
                         <div class="mid_padding"></div>
                     {% elif pet_data[0].is_pediatric == "y" or pet_data[0].is_pregnant == "y" %} 
                         <div class="smaller_padding"></div>
-                    {% elif pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                    {% elif pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == 3 or pet_data[0].activity_level == 4 %}
                         <div class="xlarge_padding"></div>
                     {% endif %}
 
@@ -278,14 +278,14 @@
                     {{ pet_data[0].current_food_amt_rec }} (or approximately 
                     {{ pet_data[0].current_food_amt_per_meal }} per meal over {{ meals_per_day }}
                     meals) of 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
                     {% endif %} current diet.
                 {% else %}
                     {{ pet_data[0].current_food_amt_rec }} of 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
@@ -310,7 +310,7 @@
                     {% endif %}
 
                 {% endif %}
-                {% if pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                {% if pet_data[0].activity_level == 3 or pet_data[0].activity_level == 4 %}
                     
                     <!-- If dog is active, provide additional recommendations-->
                     <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
@@ -326,7 +326,7 @@
                     It is important to let {{ pet_data[0].name }} rest between 2-3 hours after a meal before allowing 
                     {{ object_pronoun }} to exercise or engage in heavy play. You may also consider discussing 
                     {{ pet_data[0].name }}'s activity level with 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
@@ -339,13 +339,13 @@
 
                 {% if pet_data[0].species == "Feline" %}
                     Be sure to place 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
                     {% endif %} 
                     food bowl away from
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
@@ -360,7 +360,7 @@
                         <div class="smaller_padding"></div>
                         {{ pet_data[0].name }}'s needs are dynamic as a growing kitten, so it is essential 
                         to regularly weigh {{ object_pronoun }} and check 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -390,14 +390,14 @@
                         {% if pet_data[0].meals_per_day < 3 %}
                             <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
                             It is recommended to feed {{ pet_data[0].name }} 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }} 
                             {% endif %}
                             daily amount over 3-4 small meals, as providing {{ object_pronoun }} food 
                             free-choice can increase                         
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }} 
@@ -415,7 +415,7 @@
                         <div class="smaller_padding"></div>
                         <!-- Provide cat water recommendations -->
                         At {{ pet_data[0].name }}'s age, it is important to keep a closer eye on 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -451,7 +451,7 @@
                         {{ pet_data[0].name }}'s needs are dynamic as a growing puppy, 
                         so it is essential to regularly weigh {{ object_pronoun }} and 
                         check 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -474,7 +474,7 @@
                 {% endif %}
             </div>
             {% if pet_data[0].species == "Canine" %}
-                {% if pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == "Moderate" or pet_data[0].activity_level == "Heavy" %}
+                {% if pet_data[0].is_pregnant != "y" and pet_data[0].activity_level == 3 or pet_data[0].activity_level == 4 %}
                     <div class="exercise">
                         <!-- If dog is active, provide additional recommendations-->
                         <!-- https://www.vet.cornell.edu/departments-centers-and-institutes/riney-canine-health-center/canine-health-information/feeding-your-performance-dog -->
@@ -486,7 +486,7 @@
                         others have a higher carbohydrate to fat ratio. Additionally, they are more
                         calorically dense, meaning {{ pet_data[0].name }} will need to eat less of the
                         diet to hit                         
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -572,7 +572,7 @@
                 </div>
                 
 
-                {% if pet_data[0].activity_level != "Moderate" and pet_data[0].activity_level != "Heavy" 
+                {% if pet_data[0].activity_level != 3 and pet_data[0].activity_level != 4 
                 and pet_data[0].is_pregnant != "y" and pet_data[0].is_nursing != "y" and pet_data[0].is_pediatric != "y" %}
                     <!-- If dog is not already getting moderate to heavy exercise, and is not pregnant or nursing --> 
                     <div class="exercise">
@@ -599,7 +599,7 @@
                             
 
                         Feeding {{ pet_data[0].name }}
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -705,7 +705,7 @@
                             to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
                             with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
                             occasionally to cater to 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }} 
@@ -762,7 +762,7 @@
                     to play with a laser pointer (if there are no dogs in the house), a flirt pole, or 
                     with puzzle feeders can help encourage exercise. If possible, consider moving your cat's food dish 
                     occasionally to cater to 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
@@ -783,14 +783,14 @@
                     {% if pet_data[0].meals_per_day < 2 %}
                         <!-- If pet is not already getting 3+ meals per day, make additional recommendations -->
                         It is recommended to feed {{ pet_data[0].name }} 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
                         {% endif %}
                         daily amount over 2-3 meals, as providing {{ object_pronoun }} food 
                         free-choice can increase                         
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -861,8 +861,8 @@
         {% endif %}
 
         <div class="wider_reproduction_recs">
-            {% if pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Moderate"
-            or pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == "Heavy" %}
+            {% if pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == 3
+            or pet_data[0].is_pregnant == "y" and pet_data[0].activity_level == 4 %}
                 <!-- If dog is pregnant, provide gestation specific recommendations -->
                 {% if pet_data[0].weeks_gestating >= 6 %}
                     <!-- If a dog is 6 weeks pregnant, recommend specifics 
@@ -905,14 +905,14 @@
                         <h2>Body Fat Percentage</h2>
                         <div class="smaller_padding"></div>
                         Based off of 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
                         {% endif %}
                         current body condition score, it is not recommended to help {{ pet_data[0].name }} 
                         lose weight by reducing 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
@@ -923,13 +923,13 @@
                         is around 15-20%. {{ pet_data[0].name }}'s ideal body weight is estimated to be around 
                         {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                         Speak with {{ pet_data[0].name }}'s veterinarian about what can be done to balance 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
                         {% endif %} 
                         quality of life with 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
@@ -941,7 +941,7 @@
                         <h2>Feeding Frequency</h2>
                         <div class="smaller_padding"></div>
                         Feeding {{ pet_data[0].name }}
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -954,7 +954,7 @@
                         
                         For further weight loss options, please discuss how to help 
                         {{ pet_data[0].name }} lose weight with 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -967,14 +967,14 @@
 
                         <!-- Provide disclaimer on food reduction in pets with a BCS of 7 or higher -->
                         Based off of 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
                         {% endif %}
                         current body condition score, it is not recommended to help {{ pet_data[0].name }} 
                         lose weight by reducing 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
@@ -991,7 +991,7 @@
                         to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                         For further weight loss options, please discuss how to help {{ pet_data[0].name }} lose 
                         weight with 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }} 
@@ -1005,14 +1005,14 @@
                         <div class="smaller_padding"></div>
                         <!-- Provide disclaimer on food reduction in older cats with a BCS of 7 or higher -->
                         Based off of 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
                         {% endif %}
                         current body condition score, it is not recommended to help {{ pet_data[0].name }} 
                         lose weight by reducing 
-                        {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                        {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                             {{ possessive_pronoun }} 
                         {% else %}
                             {{ object_pronoun }}
@@ -1026,13 +1026,13 @@
                         to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                         {% if pet_data[0].age_in_years > 7 %}
                             Speak with {{ pet_data[0].name }}'s veterinarian about what can be done to balance 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }}
                             {% endif %} 
                             quality of life with 
-                            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                                 {{ possessive_pronoun }} 
                             {% else %}
                                 {{ object_pronoun }}
@@ -1051,7 +1051,7 @@
                     to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                     At {{ pet_data[0].name }}'s current body condition, it is recommended to feed {{ pet_data[0].name }}
                     based on 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }}
@@ -1067,7 +1067,7 @@
                     to be around {{ pet_data[0].ideal_weight_lbs }} lbs ({{ pet_data[0].ideal_weight_kgs }} kgs).
                     At {{ pet_data[0].name }}'s current body condition, it is recommended to feed {{ pet_data[0].name }}
                     based on 
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }}
@@ -1087,7 +1087,7 @@
                     <div class="smaller_padding"></div>
                     {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                     day from treats. This is 8% of
-                    {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                    {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                         {{ possessive_pronoun }} 
                     {% else %}
                         {{ object_pronoun }} 
@@ -1101,7 +1101,7 @@
                 <div class="smaller_padding"></div>
                 {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
                 day from treats. This is 8% of
-                {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+                {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                     {{ possessive_pronoun }} 
                 {% else %}
                     {{ object_pronoun }} 
@@ -1131,7 +1131,7 @@
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->
             {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
             day from treats. This is 10% of 
-            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                 {{ possessive_pronoun }} 
             {% else %}
                 {{ object_pronoun }} 
@@ -1145,7 +1145,7 @@
             <!-- recommend treat amounts, |round|int suggested by CoPilot -->
             {{ pet_data[0].name }} may receive up to {{ pet_data[0].rec_treat_kcal_per_day|round|int }} kcal per 
             day from treats. This is 10% of 
-            {% if pet_data[0].sex == "male" or pet_data[0].sex == "male_neutered" %}
+            {% if pet_data[0].sex == 3 or pet_data[0].sex == 4 %}
                 {{ possessive_pronoun }} 
             {% else %}
                 {{ object_pronoun }} 
@@ -1165,6 +1165,10 @@
         <div class="button-container-fp">
             <a href="{{ url_for('der', pet_id=pet_id) }}">
                 <button type="button" class="btn btn-secondary btn-lg">Go to Part 6: Pet's DER</button>
+            </a>
+
+            <a href="{{ url_for('human_foods.search_human_foods', pet_id=pet_id) }}">
+                <button type="submit" id="search_hf_fr" class="btn btn-secondary btn-lg">Calculate Treat Amounts for Human Food</button>
             </a>
         </div>
     </div>

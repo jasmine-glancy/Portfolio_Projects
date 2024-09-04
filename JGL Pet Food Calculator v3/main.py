@@ -325,6 +325,7 @@ def pet_info_continued(pet_id):
                 flash("Please enter 0 or a number greater than zero.")
                 return redirect(url_for('pet_info_continued', pet_id=pet_id))    
             else:
+                pet_sex = int(pet_sex)
                 print(pet_age_years, pet_age_months)
                 if pet_age_months > 12:
                     # If more than 12 months is input, add number to years
@@ -354,7 +355,8 @@ def pet_info_continued(pet_id):
                 partial_years = float(pet_age_months / 12)
                 pet_age = pet_age_years + partial_years    
                 
-                print(pet_age)   
+                print(pet_age)
+                print(pet_sex, type(pet_sex))   
                 
                 # Set flags to see if a pet is between pediatric and sexually mature ages
                 is_pediatric = "n"
@@ -451,12 +453,12 @@ def pet_info_continued(pet_id):
                             
                     # List for condensed conditionals suggested by CoPilot
                     if not_pediatric_not_mature or sexually_mature:
-                        if pet_sex in ["female_spayed", "male_neutered"]:
+                        if pet_sex == 2 or pet_sex == 4:
                             # Non-pediatric, sexually immature and older dogs that are neutered or spayed
                             print("DER Modifier * 1.4-1.6")
                             der_factor_id = 1
                             
-                        elif pet_sex in ["male", "female"]:
+                        elif pet_sex == 1 or pet_sex == 3:
                             # Non-pediatric, sexually immature or intact male dogs
                             print("DER Modifier * 1.6-1.8")
                             der_factor_id = 2
@@ -526,12 +528,12 @@ def pet_info_continued(pet_id):
                         der_factor_id = 5
                         
                     if not_pediatric_not_mature or sexually_mature:
-                        if pet_sex in ["female_spayed", "male_neutered"]:
+                        if pet_sex == 2 or pet_sex == 4:
                             # Non-pediatric, sexually immature and older cats that are neutered or spayed
                             print("DER Modifier * 1.2-1.4")
                             der_factor_id = 1
                             
-                        elif pet_sex in ["male", "female"]:
+                        elif pet_sex == 1 or pet_sex == 3:
                             # Non-pediatric, sexually immature or intact male cats
                             print("DER Modifier * 1.4-1.6")
                             der_factor_id = 2
@@ -558,7 +560,7 @@ def pet_info_continued(pet_id):
                 session["is_pediatric"] = is_pediatric
                     
                 
-                if pet_age >= 2 and pet_sex == "female":
+                if pet_age >= 2 and pet_sex == 1:
                     # If the pet is a mature intact female, redirect to pregnancy questions
                     return redirect(url_for('repro_status', pet_id=pet_id))
                 else:
@@ -1098,21 +1100,21 @@ def activity(pet_id):
         # https://perfectlyrawsome.com/raw-feeding-knowledgebase/activity-level-canine-calorie-calculations/
         if light_work_hours < 0.5 and heavy_work_hours <= 1:
             # Sedentary: 0-30 minutes of light activity daily
-            activity_level = "Sedentary"
+            activity_level = 1
             
             if not_preg_or_nursing_non_obese and is_pediatric == "n":
                 der_factor_id = 3
         elif light_work_hours >= 0.5 and light_work_hours <= 1 and heavy_work_hours == 0 or \
             light_work_hours >= 0.5 and light_work_hours <= 1 and heavy_work_hours < 1:
             # Low activity: 30 minutes to 1 hour (i.e. walking on lead)
-            activity_level = "Low"
+            activity_level = 2
             
             if not_preg_or_nursing_non_obese and is_pediatric == "n":
                 der_factor_id = 21
         elif light_work_hours >= 1 and light_work_hours <= 2 and heavy_work_hours == 0 or \
             heavy_work_hours > 0 and heavy_work_hours < 3:
             # Moderate activity: 1-2 hours of low impact activity
-            activity_level = "Moderate"
+            activity_level = 3
             
             if not_preg_or_nursing and is_pediatric == "n":
                 # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
@@ -1120,14 +1122,14 @@ def activity(pet_id):
                 
         elif heavy_work_hours >= 1 and heavy_work_hours < 3 and light_work_hours == 0:
             # Moderate activity: 1-3 hours of high impact activity (i.e. running off-lead, playing ball, playing off-lead with other dogs)
-            activity_level = "Moderate"
+            activity_level = 3
             
             if not_preg_or_nursing and is_pediatric == "n":
                 # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
                 der_factor_id = 22
         elif heavy_work_hours >= 3 and light_work_hours >= 1:
             # Working and performance: 3+ hours (i.e. working dog)
-            activity_level = "Heavy"
+            activity_level = 4
             
             if not_preg_or_nursing and is_pediatric == "n":
                 # Modify DER factor ID even for obese prone breeds if the dog gets adequate activity
@@ -1144,8 +1146,6 @@ def activity(pet_id):
                 der_factor_id=der_factor_id, activity=activity_level, pet_id=pet_id, user_id=session["user_id"]
             )
                 
-            # TODO: Integer for activity level ID (set PK), search for strings is slower. 
-            # TODO: Add activity level table
         except Exception as e:
             flash(f"Unable to update activity data, Exception: {e}")
             return redirect(url_for("activity", pet_id=pet_id))
@@ -1203,6 +1203,8 @@ def current_food():
             flash("Please choose from the current food form dropdown.")
             return redirect(url_for("current_food", pet_id=pet_id))
         else:
+            current_food_form = int(current_food_form)
+            
             try:
                 print(session["pet_name"])
                 print(session["user_id"])
@@ -1220,7 +1222,7 @@ def current_food():
             # Otherwise, create new session variables
             session["meals_per_day"] = meals_per_day
             session["current_food_kcal"] = current_food_kcal
-            session["current_food_form"] = current_food_form
+            session["current_food_form"] = int(current_food_form)
                 
 
             # If user doesn't want a transition, calculate RER
@@ -1243,7 +1245,7 @@ def rer(pet_id):
     
     # Import food calculator
     cf = CalculateFood(session["user_id"], pet_id)
-    rer = cf.calculcate_rer()
+    rer = cf.calculate_rer()
     
     pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
 
@@ -1425,16 +1427,16 @@ def der(pet_id):
         daily_partial_volumetric = "0"
         
     food_form = ""
-    if current_food_form == "dry":
+    if current_food_form == 1:
         food_form = "cup"
-    elif current_food_form == "can":
+    elif current_food_form == 2:
         food_form = "can"
-    elif current_food_form == "pouch":
+    elif current_food_form == 3:
         food_form = "pouch"
     
     # Shortened conditional variables suggested by CoPilot
     whole_cans_or_cups = int(daily_whole_cans_or_cups)
-    is_pouch = current_food_form == "pouch"
+    is_pouch = current_food_form == 3
     is_half_tablespoon = daily_partial_volumetric == "1/2 tablespoon"
     food_form_plural = f"{food_form}{'es' if is_pouch else 's'}"
 
@@ -1614,7 +1616,7 @@ def completed_report():
         
     pet_data = fi.pet_data_dictionary(session["user_id"], pet_id)
         
-    rer = "{:.2f}".format(pet_data[0]["rer"])
+    rer = int(pet_data[0]["rer"])
     der = pet_data[0]["der"]
         
     print(der)

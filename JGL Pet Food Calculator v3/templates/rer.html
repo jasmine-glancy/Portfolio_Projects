@@ -27,7 +27,7 @@
             maintain         
 
             <!-- If pet is male, use "his" instead of "him" -->
-            {% if sex == "male" or sex == "male_neutered" %}
+            {% if sex == 3 or sex == 4 %}
                 {{ possessive_pronoun }} 
             {% else %}
                 {{ object_pronoun }} 

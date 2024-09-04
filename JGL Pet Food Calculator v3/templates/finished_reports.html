@@ -43,35 +43,37 @@
                                                 {% endif %}
                                                 </div>
                                                 
-                                                {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
-                                                    {{ pet.age_in_months }} month old
-                                                {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
-                                                    {{ pet.age_in_months }} months old
-                                                {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
-                                                    {{ pet.age_in_years }} year old
-                                                {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
-                                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
-                                                {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
-                                                    {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
-                                                {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
-                                                    {{ pet.age_in_years }} years old
-                                                {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
-                                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
-                                                {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
-                                                    {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
-                                                {% endif %}
-                                                    
-                                                {% if pet.sex == "female_spayed" %}
-                                                    Female (Spayed)
-                                                {% elif pet.sex == "female" %}
-                                                    Female (Intact)
-                                                {% elif pet.sex == "male_neutered" %}
-                                                    Male (Neutered)
-                                                {% elif pet.sex == "male" %}
-                                                    Male (Intact)
-                                                {% endif %}
-                                                {{ pet.breed }} ({{ pet.species }})
-                                                <br>    
+                                                <div class="sig_fr">
+                                                    {% if pet.age_in_years == 0 and pet.age_in_months == 1 %}
+                                                        {{ pet.age_in_months }} month old
+                                                    {% elif pet.age_in_years == 0 and pet.age_in_months > 1 %}
+                                                        {{ pet.age_in_months }} months old
+                                                    {% elif pet.age_in_years == 1 and pet.age_in_months == 0 %}
+                                                        {{ pet.age_in_years }} year old
+                                                    {% elif pet.age_in_years == 1 and pet.age_in_months == 1 %}
+                                                        {{ pet.age_in_years }} year {{ pet.age_in_months }} month old
+                                                    {% elif pet.age_in_years == 1 and pet.age_in_months > 1 %}
+                                                        {{ pet.age_in_years }} year {{ pet.age_in_months }} months old
+                                                    {% elif pet.age_in_years > 1 and pet.age_in_months == 0 %}
+                                                        {{ pet.age_in_years }} years old
+                                                    {% elif pet.age_in_years > 1 and pet.age_in_months == 1 %}
+                                                        {{ pet.age_in_years }} years {{ pet.age_in_months }} month old
+                                                    {% elif pet.age_in_years > 1 and pet.age_in_months > 1 %}
+                                                        {{ pet.age_in_years }} years {{ pet.age_in_months }} months old
+                                                    {% endif %}
+                                                        
+                                                    {% if pet.sex == 1 %}
+                                                        Female (Intact)
+                                                    {% elif pet.sex == 2 %}
+                                                        Female (Spayed)
+                                                    {% elif pet.sex == 3 %}
+                                                        Male (Intact)
+                                                    {% elif pet.sex == 4 %}
+                                                        Male (Neutered)
+                                                    {% endif %}
+                                                    <br> 
+                                                    {{ pet.breed }} ({{ pet.species }})
+                                                </div>   
                                                 
                                                 <!-- Bowl SVG by RostoumArt on Etsy, https://www.etsy.com/shop/RostoumArt -->
 
@@ -84,14 +86,18 @@
                                         </div>
                                     </td>
                                     <td class="button_table_info">
-                                        <div class="button-container">
+                                        <div class="button-container-fr">
                                             <a href="{{ url_for('completed_report', pet_id=pet.pet_id) }}">
                                                 <button type="button" class="btn btn-secondary btn-sm">Go to Pet's Final Report</button>
                                             </a> 
                                         
-                                            <!-- TODO: Add modify capability -->
+                                            <!-- Add modify capability -->
                                             <a href="{{ url_for('edit_info', pet_id=pet.pet_id) }}">   
                                                 <button type="button" class="btn btn-secondary btn-sm">Modify Report</button>
+                                            </a>
+
+                                            <a href="{{ url_for('human_foods.search_human_foods', pet_id=pet.pet_id) }}">   
+                                                <button type="button" class="btn btn-secondary btn-sm">Calculate Human Food Amounts</button>
                                             </a>
                                         </div>
                                     </td>

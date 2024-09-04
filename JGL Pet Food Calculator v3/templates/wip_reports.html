@@ -57,14 +57,14 @@
                                             {% endif %}
                                             
                                             {% if pet.sex != None %}
-                                                {% if pet.sex == "female_spayed" %}
-                                                    Female (Spayed)
-                                                {% elif pet.sex == "female" %}
+                                                {% if pet.sex == 1 %}
                                                     Female (Intact)
-                                                {% elif pet.sex == "male_neutered" %}
+                                                {% elif pet.sex == 2 %}
+                                                    Female (Spayed)
+                                                {% elif pet.sex == 3 %}
+                                                        Male (Intact)
+                                                {% elif pet.sex == 4 %}
                                                     Male (Neutered)
-                                                {% elif pet.sex == "male" %}
-                                                    Male (Intact)
                                                 {% endif %}
                                             {% endif %}
                                         

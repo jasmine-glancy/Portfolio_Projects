@@ -29,9 +29,9 @@ class CalculateFood():
             print(f"Exception occurred: {e}")
             
         if self.pet_data is not None:
-            self.calculate_rer(self.pet_data)
+            self.calculate_rer()
         
-    def calculcate_rer(self):
+    def calculate_rer(self):
         """Calculates the minimum number of calories a pet needs at rest per day"""
             
         print(self.pet_data[0]["weight"], self.pet_data[0]["units"])

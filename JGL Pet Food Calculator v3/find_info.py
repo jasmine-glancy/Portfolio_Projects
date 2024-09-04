@@ -496,11 +496,11 @@ class FindInfo():
         """Returns pronouns"""
         object_pronoun = ""
         possessive_pronoun = ""
-        if sex == "female" or sex == "female_spayed":
+        if sex == 1 or sex == 2:
             # Subject pronoun is she
             object_pronoun = "her"
             subject_pronoun = "she"
-        elif sex == "male" or sex == "male_neutered":
+        elif sex == 3 or sex == 4:
             # Subject pronoun is he
             object_pronoun = "him"
             possessive_pronoun = "his"
@@ -509,3 +509,24 @@ class FindInfo():
         return {"object_pronoun": object_pronoun, 
                 "possessive_pronoun": possessive_pronoun,
                 "subject_pronoun": subject_pronoun}
+        
+    def find_max_treat_amounts(self, pet_id) -> int:
+        """Finds the max amount of treats the pet can have"""
+        
+        try:
+            if self.pet_data and "rec_treat_kcal_per_day" in self.pet_data[0]:
+                # If the user is logged in, verify table variables
+                self.rec_treat_kcal_per_day = self.pet_data[0]["rec_treat_kcal_per_day"]
+                print(f"Pet's current food form: {self.rec_treat_kcal_per_day}")
+        except Exception as e:
+            flash(f"Can't find pet's max recommended treats. Exception: {e}")
+                
+        else:    
+            if "rec_treat_kcal_per_day" in session and session["rec_treat_kcal_per_day"] is not None:
+                self.rec_treat_kcal_per_day = session["rec_treat_kcal_per_day"]
+            
+            print(f"Session max treat kcal: {self.rec_treat_kcal_per_day} kcals") 
+            
+        # Return whatever max treat kcal variable ends up being found 
+        return self.rec_treat_kcal_per_day  
+        

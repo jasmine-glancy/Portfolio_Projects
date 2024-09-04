@@ -23,7 +23,7 @@
         {% endif %}
         kcal per day. The DER is amount of calories that 
         {{ name }} needs based on                         
-        {% if sex == "male" or sex == "male_neutered" %}
+        {% if sex == 3 or sex == 4 %}
             {{ possessive_pronoun }} 
         {% else %}
             {{ object_pronoun }} 
@@ -35,7 +35,7 @@
         {% endif %}
         of 
         <!-- If pet is male, use "his" instead of "him" -->
-        {% if sex == "male" or sex == "male_neutered" %}
+        {% if sex == 3 or sex == 4 %}
             {{ possessive_pronoun }} 
         {% else %}
             {{ object_pronoun }} 
@@ -68,7 +68,7 @@
             
         </div>
 
-        {% if food_form == "cup" %}
+        {% if food_form == 1 %}
             Please note: Cup amounts are provided based on an 8 oz measuring cup.
         {% endif %}
     </div>
@@ -80,9 +80,15 @@
         <!-- Divider solution suggested by Michael Allen on Stack Overflow -->
         
         <div class="divider"></div>
+        <a href="{{ url_for('human_foods.search_human_foods', pet_id=pet_id) }}">
+            <button type="submit" id="search_hf" class="btn btn-secondary btn-lg">Calculate Treat Amounts for Human Food</button>
+        </a>
+
         <a href="{{ url_for('completed_report', pet_id=pet_id) }}">
             <button type="submit" class="btn btn-secondary btn-lg">Go to Final Report</button>
         </a>
+
+
     </div>
     
 

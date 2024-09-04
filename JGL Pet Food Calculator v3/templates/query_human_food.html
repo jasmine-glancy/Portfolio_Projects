@@ -24,14 +24,15 @@
     <!-- Prompt user to give a human food to look up in the USDA food database -->
 
     <div>
-        <form method="POST" action="{{ url_for('human_foods.search_human_foods') }}">
+        <form method="POST" action="{{ url_for('human_foods.search_human_foods', pet_id=pet_id) }}">
             <div id="hf_form" class="form-group">
                 <label for="food_name" class="hf-form-label">Food name:</label>
                 <input type="text" id="name" name="food_name" class="hf_input" placeholder="Please type the name of a food to look up">
+                <input type="hidden" name="form_type" value="search">
                 <input type="submit" value="Search" id="hf_submit" class="btn btn-secondary btn-lg">
             </div>
         </form>
-
+    
         {% if found_foods %}
             <div class="{% if found_foods|length > 3 %}big_table{% else %}small_table{% endif %}">
                 <table class="human_food_container">
@@ -40,22 +41,33 @@
                             <td class="human_food">
                                 <div class="food_name">
                                     {% if food.food_type == "Brand" %}
-                                        {{ food.brand_name }} {{ food.food_name}}
+                                        {{ food.brand_name }} {{ food.food_name }}
                                     {% elif food.food_type == "Generic" %}
                                         {{ food.food_name }}
                                     {% endif %}
                                 </div>
-
+    
                                 <div class="calorie_info">
                                     {{ food.calorie_string }} ({{ food.serving_size_string }})
                                 </div>
                             </td>
                             <td class="hf_button">
-                                <a href="{{ url_for('human_foods.calculate_treat_amounts', treat_kcal_num=food.num_calories, serving_size_num=food.serving_size_number, serving_size_string=food.serving_size_string) }}">
-                                    <button type="button" id="treat_calc" class="btn btn-primary btn-sm">
+                                <!-- Form to select a food item -->
+                                <form method="POST" action="{{ url_for('human_foods.search_human_foods', pet_id=pet_id) }}">
+                                    <input type="hidden" name="form_type" value="select">
+                                    <input type="hidden" name="food_name" value="{{ food.food_name }}">
+                                    <input type="hidden" name="food_type" value="{{ food.food_type }}">
+                                    <input type="hidden" name="brand_name" value="{{ food.brand_name }}">
+                                    <input type="hidden" name="serving_size_number" value="{{ food.serving_size_number }}">
+                                    <input type="hidden" name="serving_size_unit" value="{{ food.serving_size_unit }}">
+                                    <input type="hidden" name="serving_size_string" value="{{ food.serving_size_string }}">
+                                    <input type="hidden" name="num_calories" value="{{ food.num_calories }}">
+                                    <input type="hidden" name="calorie_string" value="{{ food.calorie_string }}">
+                                    <input type="hidden" name="food_id" value="{{ food.food_id }}">
+                                    <button type="submit" id="treat_calc" class="btn btn-primary btn-sm">
                                         Calculate Treat Amounts
                                     </button>
-                                </a>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}

@@ -136,14 +136,14 @@
                     </a>
                 </td>
                 <td>
-                    {% if pet_data[0].sex == "female_spayed" %}
-                        Female (Spayed)
-                    {% elif pet_data[0].sex == "female" %}
+                    {% if pet_data[0].sex == 1 %}
                         Female (Intact)
-                    {% elif pet_data[0].sex == "male_neutered" %}
-                        Male (Neutered)
-                    {% elif pet_data[0].sex == "male" %}
+                    {% elif pet_data[0].sex == 2 %}
+                        Female (Spayed)
+                    {% elif pet_data[0].sex == 3 %}
                         Male (Intact)
+                    {% elif pet_data[0].sex == 4 %}
+                        Male (Neutered)
                     {% endif %}
 
                     <a href="{{ url_for('pet_info_continued', pet_id=pet_id) }}">
@@ -167,7 +167,15 @@
                 </td>
                 {% if pet_data[0].activity_level != None %}
                     <td>
-                        {{ pet_data[0].activity_level }}
+                        {% if pet_data[0].activity_level == 1 %}
+                            Sedentary
+                        {% elif pet_data[0].activity_level == 2 %}
+                            Low
+                        {% elif pet_data[0].activity_level == 3 %}
+                            Moderate
+                        {% elif pet_data[0].activity_level == 4 %}
+                            Heavy
+                        {% endif %}
 
                         <a href="{{ url_for('activity', pet_id=pet_id) }}">
                             <button type="button" class="btn btn-secondary btn-sm">Edit</button>

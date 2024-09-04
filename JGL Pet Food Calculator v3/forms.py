@@ -22,10 +22,10 @@ class NewSignalment(FlaskForm):
                                             "id": "breed"})
     pet_sex = SelectField(u"Pet's Sex:",
                               choices=[("default", "Please make a selection"),
-                              ("female", "Female (Intact)"),
-                              ("female_spayed", "Female (Spayed)"),
-                              ("male", "Male (Intact)"),
-                              ("male_neutered", "Male (Neutered)")],
+                              (1, "Female (Intact)"),
+                              (2, "Female (Spayed)"),
+                              (3, "Male (Intact)"),
+                              (4, "Male (Neutered)")],
                               validators=[DataRequired()],
                               render_kw={"option": {"default": {"disabled": ""}},
                                          "id": "sex"})
@@ -131,9 +131,9 @@ class FoodForm(FlaskForm):
         validators=[DataRequired()])
     current_food_form = SelectField(u"What form of this diet do you feed?: ",
                                   choices=[("default", "Please make a selection"),
-                                            ("can", "Canned"),
-                                            ("dry", "Dry"),
-                                            ("pouch", "Semi-Moist Pouches")],
+                                            ("1", "Dry"),
+                                            ("2", "Canned"),
+                                            ("3", "Semi-Moist Pouches")],
                                   render_kw={"default": {"disabled": ""}})
     meals_per_day = FloatField(
         "How many meals per day* does your pet get?: ",
