@@ -1,5 +1,6 @@
 """A Python version of the 1978 shoot 'em up game Space Invaders!"""
 
+from bunkers import JglBunkers
 from cannon import JglCannon
 from turtle import Screen
 
@@ -19,6 +20,7 @@ jgl_cannon = JglCannon()
 # TODO: Create "aliens" 
 
 # TODO: Create bunkers
+jgl_bunkers = JglBunkers()
 
 # Event listeners to check for user input
 jgl_screen.listen()
