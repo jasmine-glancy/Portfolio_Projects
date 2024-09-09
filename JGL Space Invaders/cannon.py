@@ -65,6 +65,8 @@ class JglCannon(turtle.Turtle):
         # Total distance to move
         laser_max_distance = 675  
 
+        # Creates a new laser instance and manages it independently
+        # # Suggested by CoPilot
         def move_laser():
             nonlocal laser_distance
             if laser_distance < laser_max_distance:
