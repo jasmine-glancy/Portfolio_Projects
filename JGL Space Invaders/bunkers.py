@@ -38,6 +38,7 @@ class JglBunkers(Turtle):
         
     
     # TODO: Bunkers are gradually destroyed from the top by the alien lasers
-    
+        # TODO: Reduce bunker size when hit
+        
     # TODO: If the player fires underneath the bunker, the bottoms get destroyed
     

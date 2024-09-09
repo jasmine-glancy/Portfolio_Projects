@@ -19,7 +19,7 @@ jgl_cannon = JglCannon()
 
 # TODO: Create "aliens" 
 
-# TODO: Create bunkers
+# Create bunkers
 jgl_bunkers = JglBunkers()
 
 # Event listeners to check for user input
@@ -28,6 +28,9 @@ jgl_screen.listen()
 # Movement is controlled by the "A" and "D" keys
 jgl_screen.onkeypress(jgl_cannon.jgl_move_paddle_left, "a")
 jgl_screen.onkeypress(jgl_cannon.jgl_move_paddle_right, "d")
+
+# Cannon is fired with the space bar
+jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
 
 # Set game flag
 jgl_game_on = True
