@@ -60,7 +60,7 @@ class JglCannon(turtle.Turtle):
         laser_distance = 0  
         
         # Distance to move in each step
-        laser_step = 1  
+        laser_step = 10 
         
         # Total distance to move
         laser_max_distance = 675  
@@ -74,7 +74,7 @@ class JglCannon(turtle.Turtle):
                 laser_distance += laser_step
                 
                 # Schedule next step after 5ms
-                turtle.ontimer(move_laser, 5)  
+                turtle.ontimer(move_laser, 20)  
             else:
                 # Remove the line after a short delay
                 # Schedule clearing after 0.5 second

@@ -81,23 +81,31 @@ class JglRowsOfAliens(Turtle):
             """Starts moving aliens right if they 
             touch the wall"""
             self.moving_left = False
+            self.jgl_move_aliens_down()
             
     def jgl_move_aliens_right(self):
         """Moves aliens right as a group"""
         
         for alien in self.jgl_aliens:
-            new_x = alien.xcor() + TINIER_MOVE_STEPS
-            alien.goto(new_x, alien.ycor())
+            jgl_new_x_pos = alien.xcor() + TINIER_MOVE_STEPS
+            alien.goto(jgl_new_x_pos, alien.ycor())
         
         # Check if any alien has touched the right wall
         if any(alien.xcor() > 425 for alien in self.jgl_aliens):
             """Starts moving aliens left if they 
             touch the wall"""
             self.moving_left = True
-        
-    # TODO: Aliens move downward toward the shooter each time they touch the 
-    # # edge of the screen
+            self.jgl_move_aliens_down()
     
+    def jgl_move_aliens_down(self):    
+        """Aliens move downward toward the shooter 
+        each time they touch the edge of the screen"""
+    
+        for alien in self.jgl_aliens:
+            jgl_new_y_pos = alien.ycor() - TINIER_MOVE_STEPS
+            alien.goto(alien.xcor(), jgl_new_y_pos)
+            
+            
     # TODO: Aliens fire projectiles toward the player
     
     # TODO: A special "mystery ship" occasionally moves across the top of the screen
