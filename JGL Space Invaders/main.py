@@ -4,6 +4,7 @@ from aliens import JglRowsOfAliens
 from bunkers import JglBunkers
 from cannon import JglCannon
 from turtle import Screen
+import time
 
 # Create screen
 jgl_screen = Screen()
@@ -18,7 +19,7 @@ jgl_screen.tracer(0)
 # Create cannon
 jgl_cannon = JglCannon()
 
-# TODO: Create "aliens" 
+# Create "aliens" 
 jgl_aliens = JglRowsOfAliens()
 
 # Create bunkers
@@ -28,8 +29,8 @@ jgl_bunkers = JglBunkers()
 jgl_screen.listen()
 
 # Movement is controlled by the "A" and "D" keys
-jgl_screen.onkeypress(jgl_cannon.jgl_move_paddle_left, "a")
-jgl_screen.onkeypress(jgl_cannon.jgl_move_paddle_right, "d")
+jgl_screen.onkeypress(jgl_cannon.jgl_move_cannon_left, "a")
+jgl_screen.onkeypress(jgl_cannon.jgl_move_cannon_right, "d")
 
 # Cannon is fired with the space bar
 jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
@@ -50,5 +51,8 @@ jgl_game_on = True
 
 while jgl_game_on:
     jgl_screen.update()
+    
+    time.sleep(0.5)
+    jgl_aliens.jgl_move_aliens()
     
 jgl_screen.exitonclick()

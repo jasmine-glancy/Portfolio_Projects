@@ -26,7 +26,7 @@ class JglCannon(turtle.Turtle):
         self.cannon_top.color("lime")
         self.cannon_top.shapesize(stretch_len=1.5, stretch_wid=2)
 
-    def jgl_move_paddle_left(self) -> None:
+    def jgl_move_cannon_left(self) -> None:
         jgl_new_x_pos = self.xcor() - MOVE_STEPS
         
         if jgl_new_x_pos < -425:
@@ -36,7 +36,7 @@ class JglCannon(turtle.Turtle):
         self.cannon_top.goto(jgl_new_x_pos, self.cannon_top.ycor()) 
 
         
-    def jgl_move_paddle_right(self) -> None:
+    def jgl_move_cannon_right(self) -> None:
         jgl_new_x_pos = self.xcor() + MOVE_STEPS
         
         if jgl_new_x_pos > 425:

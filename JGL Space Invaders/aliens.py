@@ -2,6 +2,7 @@
 
 from turtle import Turtle
 
+TINIER_MOVE_STEPS = 10
 
 # Create "aliens" 
 class JglAlien(Turtle):
@@ -10,6 +11,7 @@ class JglAlien(Turtle):
         super().__init__()
         self.penup()
         self.shape("turtle")
+        self.setheading(270)
         self.shapesize(stretch_wid=2, stretch_len=2)
         self.color(jgl_color)
         self.goto(x=jgl_x_cor, y=jgl_y_cor)
@@ -19,7 +21,7 @@ class JglRowsOfAliens(Turtle):
     
     def __init__(self) -> None:
         super().__init__()
-        self.jgl_y_start = 150
+        self.jgl_y_start = 100
         self.jgl_y_end = 350
         self.jgl_aliens = [] 
         self.jgl_colors = [
@@ -42,7 +44,7 @@ class JglRowsOfAliens(Turtle):
     def jgl_create_all_rows(self) -> None:
         """Creates all rows"""
         
-        jgl_row_height = 40
+        jgl_row_height = 50
         
         # Create 5 rows of 11 "aliens"
         jgl_number_of_rows = 5
@@ -54,10 +56,45 @@ class JglRowsOfAliens(Turtle):
             jgl_color = self.jgl_colors[i % len(self.jgl_colors)]
             self.jgl_create_row(jgl_y_cor, jgl_color)
         
-
-    
-    # TODO: Aliens move left and right as a group
-    
+    def jgl_move_aliens(self):
+        """Moves aliens left or right as a 
+        group based on the current direction"""
+        
+        try:
+            
+            if self.moving_left:
+                self.jgl_move_aliens_left()
+            else:
+                self.jgl_move_aliens_right()
+                
+        except AttributeError:
+            self.jgl_move_aliens_left()
+            
+    def jgl_move_aliens_left(self):
+        """Moves aliens left as a group"""
+        
+        for alien in self.jgl_aliens:
+            jgl_new_x_pos = alien.xcor() - TINIER_MOVE_STEPS
+            alien.goto(jgl_new_x_pos, alien.ycor())
+            
+        if any(alien.xcor() < -425 for alien in self.jgl_aliens):
+            """Starts moving aliens right if they 
+            touch the wall"""
+            self.moving_left = False
+            
+    def jgl_move_aliens_right(self):
+        """Moves aliens right as a group"""
+        
+        for alien in self.jgl_aliens:
+            new_x = alien.xcor() + TINIER_MOVE_STEPS
+            alien.goto(new_x, alien.ycor())
+        
+        # Check if any alien has touched the right wall
+        if any(alien.xcor() > 425 for alien in self.jgl_aliens):
+            """Starts moving aliens left if they 
+            touch the wall"""
+            self.moving_left = True
+        
     # TODO: Aliens move downward toward the shooter each time they touch the 
     # # edge of the screen
     
