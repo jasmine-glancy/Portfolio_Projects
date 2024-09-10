@@ -1,11 +1,13 @@
 """The aliens for the python version of Space Invaders using Turtle!"""
 
-from turtle import Turtle
+import turtle
+import time
+import random
 
 TINIER_MOVE_STEPS = 10
 
 # Create "aliens" 
-class JglAlien(Turtle):
+class JglAlien(turtle.Turtle):
 
     def __init__(self, jgl_x_cor, jgl_y_cor, jgl_color) -> None:
         super().__init__()
@@ -16,7 +18,7 @@ class JglAlien(Turtle):
         self.color(jgl_color)
         self.goto(x=jgl_x_cor, y=jgl_y_cor)
     
-class JglRowsOfAliens(Turtle):
+class JglRowsOfAliens(turtle.Turtle):
     """Create rows of aliens that move together"""
     
     def __init__(self) -> None:
@@ -102,12 +104,49 @@ class JglRowsOfAliens(Turtle):
         each time they touch the edge of the screen"""
     
         for alien in self.jgl_aliens:
-            jgl_new_y_pos = alien.ycor() - TINIER_MOVE_STEPS
+            jgl_new_y_pos = alien.ycor() - 25
             alien.goto(alien.xcor(), jgl_new_y_pos)
             
+    def jgl_alien_lasers(self):     
+        """Aliens fire projectiles toward the player at random"""
+        
+        # Select a random alien from self.jgl_aliens
+        jgl_chosen_alien = random.choice(self.jgl_aliens)
+        
+        # Create a new turtle.Turtle instance for the projectile
+        jgl_alien_laser = turtle.Turtle()
+        jgl_alien_laser.color("white")
+        jgl_alien_laser.shape("circle")
+        jgl_alien_laser.pensize(2)
+        jgl_alien_laser.shapesize(stretch_len=0.5, stretch_wid=0.5)
+        jgl_alien_laser.penup()
+        
+        # Set the projectile's initial position to the selected alien's position
+        jgl_alien_laser.goto(jgl_chosen_alien.xcor(), jgl_chosen_alien.ycor() - 50)
+        jgl_alien_laser.setheading(270)
+        
+        # Initialize distance traveled
+        jgl_alien_laser_distance = 0
+        
+        # Distance to move in each step
+        jgl_alien_laser_step = 10 
+        
+        def jgl_move_alien_laser():
+            nonlocal jgl_alien_laser_distance
             
-    # TODO: Aliens fire projectiles toward the player
-    
+            if jgl_alien_laser.ycor() > -300:
+                # Moves the projectile downward
+                jgl_alien_laser.forward(jgl_alien_laser_step)
+                jgl_alien_laser_distance += jgl_alien_laser_step
+                
+                # Schedule next step after 20ms
+                turtle.ontimer(jgl_move_alien_laser, 20)
+            else:
+                jgl_alien_laser.hideturtle()
+                jgl_alien_laser.clear()    
+            
+        jgl_move_alien_laser()
+
     # TODO: A special "mystery ship" occasionally moves across the top of the screen
         # TODO: This ship rewards bonus points if hit
     

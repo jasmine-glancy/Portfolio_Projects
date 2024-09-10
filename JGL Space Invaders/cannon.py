@@ -73,7 +73,7 @@ class JglCannon(turtle.Turtle):
                 laser.forward(laser_step)
                 laser_distance += laser_step
                 
-                # Schedule next step after 5ms
+                # Schedule next step after 20ms
                 turtle.ontimer(move_laser, 20)  
             else:
                 # Remove the line after a short delay

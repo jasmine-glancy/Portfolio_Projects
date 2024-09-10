@@ -3,7 +3,7 @@
 from aliens import JglRowsOfAliens
 from bunkers import JglBunkers
 from cannon import JglCannon
-from turtle import Screen
+from turtle import Screen, ontimer
 import time
 
 # Create screen
@@ -12,7 +12,14 @@ jgl_screen.setup(width=950, height=750)
 jgl_screen.bgcolor("black")
 jgl_screen.title("Space Invaders by JGL")
 
-
+def update_game():
+    jgl_aliens.jgl_move_aliens()
+    ontimer(update_game, 1000)
+    
+def fire_alien_laser():
+    jgl_aliens.jgl_alien_lasers()
+    ontimer(fire_alien_laser, 3000)
+        
 # Turn off automatic screen updates
 jgl_screen.tracer(0)
 
@@ -49,10 +56,13 @@ jgl_game_on = True
     # TODO: When all the aliens are defeated, bring another wave which starts lower
         # Loop continues
 
+# Start the game updates and laser firing
+update_game()
+fire_alien_laser()
+
+# Main loop to keep the screen updating
 while jgl_game_on:
     jgl_screen.update()
-    
-    time.sleep(0.5)
-    jgl_aliens.jgl_move_aliens()
+    time.sleep(0.1)
     
 jgl_screen.exitonclick()
