@@ -173,3 +173,5 @@ class JglRowsOfAliens(turtle.Turtle):
             
         jgl_move_alien_laser()
         
+
+# TODO: Aliens move a little faster with each one that is hit

@@ -1,11 +1,30 @@
 """The scoreboard and lives for the python version of 
 Space Invaders using Turtle!"""
 
-# TODO: Player has 3 lives
-    # TODO: But the game ends immediately if the aliens reach the bottom of the screen
-    
-# TODO: Create table for the player's lives
+from turtle import Turtle
 
+class JglScoreBoard(Turtle):
+    def __init__(self) -> None:
+        """Initializes the score and number of lives"""
+        
+        super().__init__()
+        self.color("white")
+        self.penup()
+        self.hideturtle()
+        self.jgl_score = 0
+        self.jgl_lives = 3
+        self.jgl_update_scoreboard()
+        
+    def jgl_update_scoreboard(self) -> None:
+        """Keeps score and lives updated"""
+        
+        self.clear()
+        self.goto(-460, -365)
+        self.write(f"Lives: {self.jgl_lives} | Score: {self.jgl_score}", align="left", font=("Courier", 24, "normal"))
+        
+        
+# TODO: Game ends immediately if the aliens reach the bottom of the screen
+    
 # TODO: Create table for the player's score
     # TODO: Create score values for the aliens
     # Bottom invaders–10 points.

@@ -1,12 +1,11 @@
 """A Python version of the 1978 shoot 'em up game Space Invaders!"""
 
-from aliens import JglRowsOfAliens
 from bunkers import JglBunkers
 from cannon import JglCannon
 import gameplay as gp
 import time
 from screen_setup import jgl_screen
-
+from scoreboard import JglScoreBoard
 
 # Create cannon
 jgl_cannon = JglCannon()
@@ -27,9 +26,10 @@ jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
 # Set game flag
 jgl_game_on = True
 
-# TODO: Player has 3 lives
-    # TODO: But the game ends immediately if the aliens reach the bottom of the screen
-    
+# Show scoreboard
+jgl_score = JglScoreBoard()
+
+# TODO: The game ends immediately if the aliens reach the bottom of the screen
     
 # TODO: The goal is to eliminate all of the aliens by shooting them
 
