@@ -47,5 +47,6 @@ gp.jgl_schedule_mystery_ship()
 while jgl_game_on:
     jgl_screen.update()
     time.sleep(0.1)
+    gp.jgl_check_bunker_collision(jgl_cannon.lasers, gp.jgl_aliens.jgl_alien_laser_list, jgl_bunkers) 
     
 jgl_screen.exitonclick()

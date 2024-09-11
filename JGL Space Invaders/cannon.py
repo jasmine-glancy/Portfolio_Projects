@@ -25,6 +25,8 @@ class JglCannon(turtle.Turtle):
         self.cannon_top.shape("square")
         self.cannon_top.color("lime")
         self.cannon_top.shapesize(stretch_len=1.5, stretch_wid=2)
+        
+        self.lasers = []
 
     def jgl_move_cannon_left(self) -> None:
         jgl_new_x_pos = self.xcor() - MOVE_STEPS
@@ -54,34 +56,37 @@ class JglCannon(turtle.Turtle):
         laser.penup()
         laser.goto(self.xcor(), self.ycor() + 50)
         laser.setheading(90)
-
+        self.lasers.append(laser) 
+        self.jgl_move_laser(laser)
         
-        # Initialize distance traveled
-        laser_distance = 0  
+    
+    # Creates a new laser instance and manages it independently
+    # # Suggested by CoPilot
+    def jgl_move_laser(self, laser):
         
         # Distance to move in each step
         laser_step = 10 
         
         # Total distance to move
         laser_max_distance = 675  
-
-        # Creates a new laser instance and manages it independently
-        # # Suggested by CoPilot
-        def move_laser():
-            nonlocal laser_distance
-            if laser_distance < laser_max_distance:
+        
+        def move():
+            if laser.ycor() < laser_max_distance:
                 laser.forward(laser_step)
-                laser_distance += laser_step
                 
                 # Schedule next step after 20ms
-                turtle.ontimer(move_laser, 20)  
+                turtle.ontimer(move, 20)  
             else:
                 # Remove the line after a short delay
-                # Schedule clearing after 0.5 second
-                turtle.ontimer(clear_laser, 500)  
-
-        def clear_laser():
+                self.clear_laser(laser)
+        
+        move() 
+        
+    def clear_laser(self, laser):
+        if laser in self.lasers:
             laser.clear()
             laser.hideturtle()
-
-        move_laser() 
+            self.lasers.remove(laser)
+        else:
+            print("Laser is not in the list.")
+        

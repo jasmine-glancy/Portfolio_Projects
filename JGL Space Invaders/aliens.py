@@ -51,6 +51,7 @@ class JglRowsOfAliens(turtle.Turtle):
         self.jgl_y_start = 100
         self.jgl_y_end = 350
         self.jgl_aliens = [] 
+        self.jgl_alien_laser_list = [] 
         self.jgl_colors = [
             "MidnightBlue",
             "Navy",
@@ -151,6 +152,9 @@ class JglRowsOfAliens(turtle.Turtle):
         jgl_alien_laser.goto(jgl_chosen_alien.xcor(), jgl_chosen_alien.ycor() - 50)
         jgl_alien_laser.setheading(270)
         
+        # Add the laser to the list of alien lasers
+        self.jgl_alien_laser_list.append(jgl_alien_laser)
+        
         # Initialize distance traveled
         jgl_alien_laser_distance = 0
         
@@ -170,6 +174,7 @@ class JglRowsOfAliens(turtle.Turtle):
             else:
                 jgl_alien_laser.hideturtle()
                 jgl_alien_laser.clear()    
+                self.jgl_alien_laser_list.remove(jgl_alien_laser)
             
         jgl_move_alien_laser()
         
