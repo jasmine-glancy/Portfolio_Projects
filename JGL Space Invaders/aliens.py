@@ -6,6 +6,31 @@ import random
 
 TINIER_MOVE_STEPS = 10
 
+class JglMysteryShip(turtle.Turtle):
+    """A special "mystery ship" occasionally moves 
+    across the top of the screen"""
+        
+    def __init__(self) -> None:
+        super().__init__()
+        self.jgl_surprise_alien = turtle.Turtle()
+        self.jgl_surprise_alien.color("BlueViolet")
+        self.jgl_surprise_alien.shape("turtle")
+        self.jgl_surprise_alien.pensize(2)
+        self.jgl_surprise_alien.shapesize(stretch_wid=2, stretch_len=2)
+        self.jgl_surprise_alien.penup()
+        
+        # Set the mystery ships's initial position to the far left
+        self.jgl_surprise_alien.goto(500, 345)
+        self.jgl_surprise_alien.setheading(180)
+
+    def jgl_fly_mystery_ship(self):
+        """Allows the mystery ship to fly across the screen"""
+        
+        self.jgl_surprise_alien.forward(TINIER_MOVE_STEPS)
+        
+        # TODO: This ship rewards bonus points if hit
+    
+
 # Create "aliens" 
 class JglAlien(turtle.Turtle):
 
@@ -21,7 +46,7 @@ class JglAlien(turtle.Turtle):
 class JglRowsOfAliens(turtle.Turtle):
     """Create rows of aliens that move together"""
     
-    def __init__(self) -> None:
+    def __init__(self, screen) -> None:
         super().__init__()
         self.jgl_y_start = 100
         self.jgl_y_end = 350
@@ -33,6 +58,7 @@ class JglRowsOfAliens(turtle.Turtle):
             "MediumBlue",
             "Blue"
         ]
+        self.screen = screen
         self.jgl_create_all_rows()
         
     def jgl_create_row(self, jgl_y_cor, jgl_color) -> None:
@@ -146,7 +172,4 @@ class JglRowsOfAliens(turtle.Turtle):
                 jgl_alien_laser.clear()    
             
         jgl_move_alien_laser()
-
-    # TODO: A special "mystery ship" occasionally moves across the top of the screen
-        # TODO: This ship rewards bonus points if hit
-    
+        
