@@ -2,7 +2,9 @@
 
 from aliens import JglRowsOfAliens, JglMysteryShip
 from bunkers import JglBunkers
+import queries as q
 from turtle import ontimer
+import scoreboard as sb
 from screen_setup import jgl_screen
 
 # ------------------ Alien functionality ------------------ #
@@ -40,7 +42,43 @@ def jgl_schedule_mystery_ship() -> None:
     
 # ---------------- Collision functionality ---------------- #
 
+jgl_scoreboard = sb.JglScoreBoard()
 
+def jgl_check_alien_collision(player_lasers, cannon) -> None:
+    """Checks if the cannon's laser has hit one of the aliens"""
+    
+    # Iterate over alien list and laser lists
+    for alien in jgl_aliens.jgl_aliens_list:
+        for laser in player_lasers:
+            if laser.distance(alien) < 25:
+                # The laser hits the alien!
+                
+                # Get the color of the alien
+                alien_color = alien.color()[0] 
+                
+                # Query the database for the ID that matches the color string
+                color_id = q.jgl_find_color_id(alien_color)
+                
+                # Query the database for the score associated with the alien color ID
+                score = q.jgl_find_score_value(color_id)
+                
+                print(f"Alien hit! Color: {alien_color}, Color ID: {color_id}, Score: {score}")
+                jgl_scoreboard.jgl_increase_score(score=score)
+                
+                jgl_aliens.jgl_alien_quantity -= 1
+                
+                # Remove the alien from the list
+                alien.clear()
+                alien.hideturtle()
+                jgl_aliens.jgl_aliens_list.remove(alien)
+                
+                # Remove the laser from the list
+                laser.clear()
+                laser.hideturtle()
+                cannon.clear_laser(laser)
+                
+                
+    
 def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers) -> None:
     """Checks if any laser has "blasted" the bunkers"""
     
@@ -91,10 +129,3 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
                 # Exit the loop once a collision is detected
                 break
         
-    # TODO: Bunkers are gradually destroyed from the top by the alien lasers
-    
-    # If bunker x distance is less than either laser x distance, reduce bunker size
-
-        
-    # TODO: If the player fires underneath the bunker, the bottoms get destroyed
-    

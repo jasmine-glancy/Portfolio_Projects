@@ -21,7 +21,13 @@ class JglScoreBoard(Turtle):
         self.clear()
         self.goto(-460, -365)
         self.write(f"Lives: {self.jgl_lives} | Score: {self.jgl_score}", align="left", font=("Courier", 24, "normal"))
+    
+    def jgl_increase_score(self, score) -> None:
+        """Increases the score and updates the scoreboard"""
         
+        self.jgl_score += score
+        self.clear()
+        self.jgl_update_scoreboard()   
         
 # TODO: Game ends immediately if the aliens reach the bottom of the screen
     

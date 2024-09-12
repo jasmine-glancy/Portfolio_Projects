@@ -75,11 +75,11 @@ class JglBunkers(Turtle):
             x = bunker.xcor()
             y = bunker.ycor()
 
-            stretch_wid, stretch_len = bunker.shapesize()[0], bunker.shapesize()[1]
+            stretch_height, stretch_len = bunker.shapesize()[0], bunker.shapesize()[1]
             
             # Default turtle width and height are 20 pixels
             width = stretch_len * 20
-            height = stretch_wid
+            height = stretch_height
             return {
                 "x_range": (x - width / 2, x + width / 2),
                 "y_range": (y - height / 2, y + height / 2)
@@ -93,6 +93,6 @@ class JglBunkers(Turtle):
         }
         
         # Debug print to verify the ranges
-        print(f"Bunker ranges: {bunker_ranges}")
+        # print(f"Bunker ranges: {bunker_ranges}")
         
         return bunker_ranges

@@ -50,7 +50,7 @@ class JglRowsOfAliens(turtle.Turtle):
         super().__init__()
         self.jgl_y_start = 100
         self.jgl_y_end = 350
-        self.jgl_aliens = [] 
+        self.jgl_aliens_list = [] 
         self.jgl_alien_laser_list = [] 
         self.jgl_colors = [
             "MidnightBlue",
@@ -68,7 +68,7 @@ class JglRowsOfAliens(turtle.Turtle):
         for i in range(-325, 375, 65):
             # Builds a new brick in each row
             jgl_alien = JglAlien(i, jgl_y_cor, jgl_color)  
-            self.jgl_aliens.append(jgl_alien)
+            self.jgl_aliens_list.append(jgl_alien)
             
     def jgl_create_all_rows(self) -> None:
         """Creates all rows"""
@@ -84,6 +84,8 @@ class JglRowsOfAliens(turtle.Turtle):
             # Assigns color by row number
             jgl_color = self.jgl_colors[i % len(self.jgl_colors)]
             self.jgl_create_row(jgl_y_cor, jgl_color)
+        
+        self.jgl_alien_quantity = len(self.jgl_aliens_list) 
         
     def jgl_move_aliens(self):
         """Moves aliens left or right as a 
@@ -102,11 +104,11 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_move_aliens_left(self):
         """Moves aliens left as a group"""
         
-        for alien in self.jgl_aliens:
+        for alien in self.jgl_aliens_list:
             jgl_new_x_pos = alien.xcor() - TINIER_MOVE_STEPS
             alien.goto(jgl_new_x_pos, alien.ycor())
             
-        if any(alien.xcor() < -425 for alien in self.jgl_aliens):
+        if any(alien.xcor() < -425 for alien in self.jgl_aliens_list):
             """Starts moving aliens right if they 
             touch the wall"""
             self.moving_left = False
@@ -115,12 +117,12 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_move_aliens_right(self):
         """Moves aliens right as a group"""
         
-        for alien in self.jgl_aliens:
+        for alien in self.jgl_aliens_list:
             jgl_new_x_pos = alien.xcor() + TINIER_MOVE_STEPS
             alien.goto(jgl_new_x_pos, alien.ycor())
         
         # Check if any alien has touched the right wall
-        if any(alien.xcor() > 425 for alien in self.jgl_aliens):
+        if any(alien.xcor() > 425 for alien in self.jgl_aliens_list):
             """Starts moving aliens left if they 
             touch the wall"""
             self.moving_left = True
@@ -130,7 +132,7 @@ class JglRowsOfAliens(turtle.Turtle):
         """Aliens move downward toward the shooter 
         each time they touch the edge of the screen"""
     
-        for alien in self.jgl_aliens:
+        for alien in self.jgl_aliens_list:
             jgl_new_y_pos = alien.ycor() - 25
             alien.goto(alien.xcor(), jgl_new_y_pos)
             
@@ -138,7 +140,7 @@ class JglRowsOfAliens(turtle.Turtle):
         """Aliens fire projectiles toward the player at random"""
         
         # Select a random alien from self.jgl_aliens
-        jgl_chosen_alien = random.choice(self.jgl_aliens)
+        jgl_chosen_alien = random.choice(self.jgl_aliens_list)
         
         # Create a new turtle.Turtle instance for the projectile
         jgl_alien_laser = turtle.Turtle()
@@ -177,6 +179,28 @@ class JglRowsOfAliens(turtle.Turtle):
                 self.jgl_alien_laser_list.remove(jgl_alien_laser)
             
         jgl_move_alien_laser()
+        
+    def jgl_get_alien_borders(self):
+        """Gets the borders of each alien"""
+        
+        alien_borders = {}
+        
+        for index, alien in enumerate(self.jgl_aliens_list):
+            alien_x = alien.xcor()
+            alien_y = alien.ycor()
+            
+            stretch_height, stretch_len = alien.shapesize()[0], alien.shapesize()[1]
+            
+            # Default turtle width and height are 20 pixels
+            width = stretch_len * 20
+            height = stretch_height * 20
+            
+            alien_borders[index] = {
+                "x_range": (alien_x - width / 2, alien_x + width / 2),
+                "y_range": (alien_y - height / 2, alien_y + height / 2)
+            }
+            
+        return alien_borders
         
 
 # TODO: Aliens move a little faster with each one that is hit
