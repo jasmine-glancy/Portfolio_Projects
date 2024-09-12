@@ -27,6 +27,15 @@ class JglCannon(turtle.Turtle):
         self.cannon_top.shapesize(stretch_len=1.5, stretch_wid=2)
         
         self.lasers = []
+        
+    def jgl_cannon_top(self) -> float:
+        """Gets the top border of the cannon"""
+        
+        cannon_gun_height = self.shapesize()[1] * 20
+        
+        top_border = self.cannon_top.ycor() + cannon_gun_height 
+        
+        return top_border
 
     def jgl_move_cannon_left(self) -> None:
         jgl_new_x_pos = self.xcor() - MOVE_STEPS

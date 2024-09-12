@@ -47,7 +47,13 @@ gp.jgl_schedule_mystery_ship()
 while jgl_game_on:
     jgl_screen.update()
     time.sleep(0.1)
+    gp.jgl_check_aliens_in_list()
     gp.jgl_check_bunker_collision(jgl_cannon.lasers, gp.jgl_aliens.jgl_alien_laser_list, jgl_bunkers) 
     gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon)
+    
+    
+    if gp.jgl_aliens_reach_player(jgl_cannon) == True:
+        gp.jgl_stop_aliens()
+        print("Game over!")
     
 jgl_screen.exitonclick()

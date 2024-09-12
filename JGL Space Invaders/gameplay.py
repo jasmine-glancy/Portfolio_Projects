@@ -7,7 +7,7 @@ from turtle import ontimer
 import scoreboard as sb
 from screen_setup import jgl_screen
 
-# ------------------ Alien functionality ------------------ #
+# ---------------------- Alien functionality ---------------------- #
  
 # Build the aliens
 jgl_aliens = JglRowsOfAliens(jgl_screen)
@@ -18,11 +18,28 @@ def update_game() -> None:
     jgl_aliens.jgl_move_aliens()
     ontimer(update_game, 1000)
     
+    
 def fire_alien_laser() -> None:
     """Allows the "aliens" to fire a laser at the player"""
     jgl_aliens.jgl_alien_lasers()
     ontimer(fire_alien_laser, 3000)
+  
         
+def jgl_check_aliens_in_list() -> bool:
+    """Makes sure the aliens exist"""
+    
+    if jgl_aliens.jgl_aliens_list:
+        return True
+    
+    return False
+
+
+def jgl_stop_aliens() -> None:
+    """Stops aliens if the game is over"""
+    
+    jgl_aliens.jgl_stop_movement()
+    
+    
 # Build the mystery ship
 jgl_mystery_ship = JglMysteryShip()
 
@@ -33,6 +50,7 @@ def jgl_show_mystery_ship() -> None:
     jgl_mystery_ship.jgl_fly_mystery_ship()
     ontimer(jgl_show_mystery_ship, 100)
     
+    
 def jgl_schedule_mystery_ship() -> None:
     """Schedules the mystery ship to appear every 20 seconds"""
     
@@ -40,7 +58,7 @@ def jgl_schedule_mystery_ship() -> None:
     jgl_show_mystery_ship()
     ontimer(jgl_schedule_mystery_ship, 20000)
     
-# ---------------- Collision functionality ---------------- #
+# -------------------- Collision functionality -------------------- #
 
 jgl_scoreboard = sb.JglScoreBoard()
 
@@ -67,18 +85,21 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
                 
                 jgl_aliens.jgl_alien_quantity -= 1
                 
-                # Remove the alien from the list
-                alien.clear()
-                alien.hideturtle()
-                jgl_aliens.jgl_aliens_list.remove(alien)
+                # Increase alien speed
+                jgl_aliens.jgl_increase_alien_speed()
                 
+                # Remove the alien from the list
+                if alien in jgl_aliens.jgl_aliens_list:
+                    alien.clear()
+                    alien.hideturtle()
+                    jgl_aliens.jgl_aliens_list.remove(alien)
+                    
                 # Remove the laser from the list
                 laser.clear()
                 laser.hideturtle()
                 cannon.clear_laser(laser)
                 
-                
-    
+                   
 def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers) -> None:
     """Checks if any laser has "blasted" the bunkers"""
     
@@ -129,3 +150,19 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
                 # Exit the loop once a collision is detected
                 break
         
+     
+# ---------------------- Losing conditionals ---------------------- #
+
+def jgl_aliens_reach_player(cannon) -> bool:
+    """Checks if the aliens have reached the player"""
+    
+    top_of_cannon = cannon.jgl_cannon_top()
+    
+    for alien in jgl_aliens.jgl_aliens_list:
+            
+        if alien.ycor() <= top_of_cannon:
+            # If the aliens have reached the player, trigger "game over"
+            
+            return True
+    
+    return False

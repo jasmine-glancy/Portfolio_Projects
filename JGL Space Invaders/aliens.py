@@ -50,6 +50,7 @@ class JglRowsOfAliens(turtle.Turtle):
         super().__init__()
         self.jgl_y_start = 100
         self.jgl_y_end = 350
+        self.movement_speed = TINIER_MOVE_STEPS
         self.jgl_aliens_list = [] 
         self.jgl_alien_laser_list = [] 
         self.jgl_colors = [
@@ -61,6 +62,7 @@ class JglRowsOfAliens(turtle.Turtle):
         ]
         self.screen = screen
         self.jgl_create_all_rows()
+        self.moving_left = True
         
     def jgl_create_row(self, jgl_y_cor, jgl_color) -> None:
         """Create a new row of aliens"""
@@ -90,43 +92,38 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_move_aliens(self):
         """Moves aliens left or right as a 
         group based on the current direction"""
-        
-        try:
             
-            if self.moving_left:
-                self.jgl_move_aliens_left()
-            else:
-                self.jgl_move_aliens_right()
-                
-        except AttributeError:
+        if self.moving_left:
             self.jgl_move_aliens_left()
+        else:
+            self.jgl_move_aliens_right()
             
     def jgl_move_aliens_left(self):
         """Moves aliens left as a group"""
+    
         
-        for alien in self.jgl_aliens_list:
-            jgl_new_x_pos = alien.xcor() - TINIER_MOVE_STEPS
-            alien.goto(jgl_new_x_pos, alien.ycor())
-            
-        if any(alien.xcor() < -425 for alien in self.jgl_aliens_list):
+        if any(alien.xcor() - self.movement_speed < -425 for alien in self.jgl_aliens_list):
             """Starts moving aliens right if they 
             touch the wall"""
             self.moving_left = False
             self.jgl_move_aliens_down()
+        else:
+            for alien in self.jgl_aliens_list:
+                jgl_new_x_pos = alien.xcor() - self.movement_speed
+                alien.goto(jgl_new_x_pos, alien.ycor())
             
     def jgl_move_aliens_right(self):
         """Moves aliens right as a group"""
         
-        for alien in self.jgl_aliens_list:
-            jgl_new_x_pos = alien.xcor() + TINIER_MOVE_STEPS
-            alien.goto(jgl_new_x_pos, alien.ycor())
-        
-        # Check if any alien has touched the right wall
-        if any(alien.xcor() > 425 for alien in self.jgl_aliens_list):
+        if any(alien.xcor() + self.movement_speed > 425 for alien in self.jgl_aliens_list):
             """Starts moving aliens left if they 
             touch the wall"""
             self.moving_left = True
             self.jgl_move_aliens_down()
+        else:
+            for alien in self.jgl_aliens_list:
+                jgl_new_x_pos = alien.xcor() + self.movement_speed
+                alien.goto(jgl_new_x_pos, alien.ycor())
     
     def jgl_move_aliens_down(self):    
         """Aliens move downward toward the shooter 
@@ -202,5 +199,14 @@ class JglRowsOfAliens(turtle.Turtle):
             
         return alien_borders
         
-
-# TODO: Aliens move a little faster with each one that is hit
+    def jgl_increase_alien_speed(self):
+        """Aliens move a little faster with each one that is hit"""
+        
+        self.movement_speed *= 1.2
+        
+    def jgl_stop_movement(self):
+        """Stops the aliens moving if the game is over"""
+        
+        self.movement_speed = 0
+        
+        
