@@ -184,3 +184,13 @@ def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> bool:
                 return True
     
     return False
+
+
+# ----------------------- Check for "wins" ----------------------- #
+
+def jgl_check_all_aliens_gone() -> None:
+    """Checks if the current wave is gone"""
+    
+    if jgl_aliens.jgl_alien_quantity <= 0:
+        # TODO: Reset aliens and start their position slightly lower
+        pass
