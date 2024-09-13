@@ -12,7 +12,7 @@ from screen_setup import jgl_screen
 # Build the aliens
 jgl_aliens = JglRowsOfAliens(jgl_screen)
 
-# Functions suggested by CoPilot
+# Functions not tagged by jgl were suggested by CoPilot
 def update_game() -> None:
     """Moves the aliens and updates the screen"""
     jgl_aliens.jgl_move_aliens()

@@ -32,8 +32,6 @@ jgl_game_on = True
 
 # TODO: The goal is to eliminate all of the aliens by shooting them
 
-    # TODO: As the aliens are defeated, their movement and the music speed up
-
     # TODO: When all the aliens are defeated, bring another wave which starts lower
         # Loop continues
 
@@ -55,6 +53,8 @@ while jgl_game_on:
         gp.jgl_stop_aliens()
         jgl_notify.jgl_game_over()
         print("Game over!")
+        
+        # TODO: Allow player to save their high score
         jgl_game_on = False
     
 jgl_screen.exitonclick()
