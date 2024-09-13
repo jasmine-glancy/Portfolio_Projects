@@ -5,13 +5,16 @@ from cannon import JglCannon
 import gameplay as gp
 import time
 from screen_setup import jgl_screen
-from scoreboard import JglScoreBoard
+from scoreboard import JglNotifications
 
 # Create cannon
 jgl_cannon = JglCannon()
 
 # Create bunkers
 jgl_bunkers = JglBunkers()
+
+# Import notifications
+jgl_notify = JglNotifications()
 
 # Event listeners to check for user input
 jgl_screen.listen()
@@ -26,11 +29,7 @@ jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
 # Set game flag
 jgl_game_on = True
 
-# # Show scoreboard
-# jgl_score = JglScoreBoard()
 
-# TODO: The game ends immediately if the aliens reach the bottom of the screen
-    
 # TODO: The goal is to eliminate all of the aliens by shooting them
 
     # TODO: As the aliens are defeated, their movement and the music speed up
@@ -52,8 +51,10 @@ while jgl_game_on:
     gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon)
     
     
-    if gp.jgl_aliens_reach_player(jgl_cannon) == True:
+    if gp.jgl_aliens_reach_player(jgl_cannon, jgl_bunkers) == True:
         gp.jgl_stop_aliens()
+        jgl_notify.jgl_game_over()
         print("Game over!")
+        jgl_game_on = False
     
 jgl_screen.exitonclick()

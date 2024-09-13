@@ -65,29 +65,24 @@ jgl_scoreboard = sb.JglScoreBoard()
 def jgl_check_alien_collision(player_lasers, cannon) -> None:
     """Checks if the cannon's laser has hit one of the aliens"""
     
+    jgl_surprise_alien = jgl_mystery_ship.jgl_surprise_alien
+    # Check if surprise alien is hit
+    for laser in player_lasers:
+        if laser.distance(jgl_surprise_alien) < 25:
+            # Surprise alien has been hit
+            jgl_alien_hit(jgl_surprise_alien)
+            jgl_surprise_alien.clear()
+            jgl_surprise_alien.hideturtle()
+            
     # Iterate over alien list and laser lists
     for alien in jgl_aliens.jgl_aliens_list:
         for laser in player_lasers:
             if laser.distance(alien) < 25:
                 # The laser hits the alien!
                 
-                # Get the color of the alien
-                alien_color = alien.color()[0] 
-                
-                # Query the database for the ID that matches the color string
-                color_id = q.jgl_find_color_id(alien_color)
-                
-                # Query the database for the score associated with the alien color ID
-                score = q.jgl_find_score_value(color_id)
-                
-                print(f"Alien hit! Color: {alien_color}, Color ID: {color_id}, Score: {score}")
-                jgl_scoreboard.jgl_increase_score(score=score)
-                
+                jgl_alien_hit(alien)
                 jgl_aliens.jgl_alien_quantity -= 1
-                
-                # Increase alien speed
-                jgl_aliens.jgl_increase_alien_speed()
-                
+                    
                 # Remove the alien from the list
                 if alien in jgl_aliens.jgl_aliens_list:
                     alien.clear()
@@ -98,7 +93,22 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
                 laser.clear()
                 laser.hideturtle()
                 cannon.clear_laser(laser)
-                
+
+def jgl_alien_hit(alien):
+    # Get the color of the alien
+    alien_color = alien.color()[0] 
+    
+    # Query the database for the ID that matches the color string
+    color_id = q.jgl_find_color_id(alien_color)
+    
+    # Query the database for the score associated with the alien color ID
+    score = q.jgl_find_score_value(color_id)
+    
+    print(f"Alien hit! Color: {alien_color}, Color ID: {color_id}, Score: {score}")
+    jgl_scoreboard.jgl_increase_score(score=score)
+    
+    # Increase alien speed
+    jgl_aliens.jgl_increase_alien_speed()                
                    
 def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers) -> None:
     """Checks if any laser has "blasted" the bunkers"""
@@ -153,16 +163,24 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
      
 # ---------------------- Losing conditionals ---------------------- #
 
-def jgl_aliens_reach_player(cannon) -> bool:
+def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> bool:
     """Checks if the aliens have reached the player"""
     
     top_of_cannon = cannon.jgl_cannon_top()
+    bunker_y_coords = bunkers.get_bunker_y_coords()
     
-    for alien in jgl_aliens.jgl_aliens_list:
+    for bunker in bunkers.bunker_map:
+        
+        bunker_name = bunkers.bunker_map[bunker]
+        for alien in jgl_aliens.jgl_aliens_list:
+                
+            if bunkers.hit_counters[bunker_name] >= 3 and alien.ycor() <= top_of_cannon:
+                # If the bunkers have been destroyed aliens have reached the player
             
-        if alien.ycor() <= top_of_cannon:
-            # If the aliens have reached the player, trigger "game over"
+                return True
             
-            return True
+            elif bunkers.hit_counters[bunker_name] < 3 and alien.ycor() <= bunker_y_coords[bunker_name]:
+                # If the bunkers are still up and the aliens reach them, trigger game over
+                return True
     
     return False

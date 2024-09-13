@@ -29,4 +29,18 @@ class JglScoreBoard(Turtle):
         self.clear()
         self.jgl_update_scoreboard()   
         
-# TODO: Game ends immediately if the aliens reach the bottom of the screen
+class JglNotifications(Turtle):
+    """Controls the notifications displayed to the player"""
+    
+    def __init__(self):
+        super().__init__()
+        self.jgl_game_status = Turtle()
+        self.jgl_game_status.hideturtle()
+        self.jgl_game_status.penup()
+        self.jgl_game_status.color("white")
+        
+    def jgl_game_over(self):
+        """Notifies the player the game has stopped"""
+        
+        self.jgl_game_status.goto(0, 0)
+        self.jgl_game_status.write("GAME OVER!", align="center", font=("Courier", 20, "bold"))

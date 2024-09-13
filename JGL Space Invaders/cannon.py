@@ -41,8 +41,9 @@ class JglCannon(turtle.Turtle):
         jgl_new_x_pos = self.xcor() - MOVE_STEPS
         
         if jgl_new_x_pos < -425:
-            """Bounces the paddle back if too far to the left"""
+            """Bounces the cannon back if too far to the left"""
             jgl_new_x_pos = -425
+            
         self.goto(jgl_new_x_pos, self.ycor())        
         self.cannon_top.goto(jgl_new_x_pos, self.cannon_top.ycor()) 
 
@@ -51,8 +52,9 @@ class JglCannon(turtle.Turtle):
         jgl_new_x_pos = self.xcor() + MOVE_STEPS
         
         if jgl_new_x_pos > 425:
-            """Bounces the paddle back if too far to the right"""
+            """Bounces the cannon back if too far to the right"""
             jgl_new_x_pos = 425
+            
         self.goto(jgl_new_x_pos, self.ycor())
         self.cannon_top.goto(jgl_new_x_pos, self.cannon_top.ycor())
     

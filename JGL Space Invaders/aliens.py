@@ -27,9 +27,7 @@ class JglMysteryShip(turtle.Turtle):
         """Allows the mystery ship to fly across the screen"""
         
         self.jgl_surprise_alien.forward(TINIER_MOVE_STEPS)
-        
-        # TODO: This ship rewards bonus points if hit
-    
+            
 
 # Create "aliens" 
 class JglAlien(turtle.Turtle):
@@ -202,7 +200,7 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_increase_alien_speed(self):
         """Aliens move a little faster with each one that is hit"""
         
-        self.movement_speed *= 1.2
+        self.movement_speed *= 1.1
         
     def jgl_stop_movement(self):
         """Stops the aliens moving if the game is over"""

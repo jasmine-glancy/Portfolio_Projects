@@ -51,6 +51,10 @@ class JglBunkers(Turtle):
         stretch_len = self.shapesize()[0]  
         return default_size * stretch_len
     
+    def get_bunker_y_coords(self):
+        """Returns the y-coordinates of the bunkers"""
+        return {name: bunker.ycor() for bunker, name in self.bunker_map.items()}
+    
     def shrink_bunker(self, bunker: Turtle, shrink_factor: float = math.sqrt(0.5)) -> None:
         """Shrinks the given bunker by the shrink factor, suggested by CoPilot"""
         
