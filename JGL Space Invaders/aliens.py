@@ -47,9 +47,11 @@ class JglRowsOfAliens(turtle.Turtle):
     def __init__(self, screen) -> None:
         super().__init__()
         self.jgl_y_start = 100
+        self.jgl_lower_increment = 50
         self.jgl_y_end = 350
         self.movement_speed = TINIER_MOVE_STEPS
         self.jgl_aliens_list = [] 
+        self.jgl_alien_quantity = 0
         self.jgl_alien_laser_list = [] 
         self.jgl_colors = [
             "MidnightBlue",
@@ -65,10 +67,26 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_create_row(self, jgl_y_cor, jgl_color) -> None:
         """Create a new row of aliens"""
         
-        for i in range(-325, 375, 65):
+        # Number of columns
+        num_columns = 11
+        
+        # Calculate the step size based on the range and number of columns
+        start_x = -325
+        end_x = 325
+        step_size = (end_x - start_x) // (num_columns - 1)
+        
+        for i in range(num_columns):
+            x_cor = start_x + i * step_size
+            
             # Builds a new brick in each row
-            jgl_alien = JglAlien(i, jgl_y_cor, jgl_color)  
+            jgl_alien = JglAlien(x_cor, jgl_y_cor, jgl_color)  
             self.jgl_aliens_list.append(jgl_alien)
+            
+            print(f"Created alien at ({x_cor}, {jgl_y_cor})")
+            
+        self.jgl_alien_quantity = len(self.jgl_aliens_list)
+
+        
             
     def jgl_create_all_rows(self) -> None:
         """Creates all rows"""
@@ -84,8 +102,23 @@ class JglRowsOfAliens(turtle.Turtle):
             # Assigns color by row number
             jgl_color = self.jgl_colors[i % len(self.jgl_colors)]
             self.jgl_create_row(jgl_y_cor, jgl_color)
+                   
+        print(f"Total Quantity: {self.jgl_alien_quantity}")
+        print(f"Total Aliens Created: {len(self.jgl_aliens_list)}")
+       
+       
+    def get_alien_quantity(self) -> int:
+        """Return the current quantity of aliens"""
+        return self.jgl_alien_quantity
+     
+    def jgl_lower_starting_position(self) -> None:
+        """lowers the starting position of the aliens 
+        after the first wave is defeated"""
         
-        self.jgl_alien_quantity = len(self.jgl_aliens_list) 
+        self.jgl_y_start -= self.jgl_lower_increment
+        
+        # Create a fresh set of rows
+        self.jgl_create_all_rows()
         
     def jgl_move_aliens(self):
         """Moves aliens left or right as a 
@@ -96,7 +129,7 @@ class JglRowsOfAliens(turtle.Turtle):
         else:
             self.jgl_move_aliens_right()
             
-    def jgl_move_aliens_left(self):
+    def jgl_move_aliens_left(self) -> None:
         """Moves aliens left as a group"""
     
         
@@ -110,7 +143,7 @@ class JglRowsOfAliens(turtle.Turtle):
                 jgl_new_x_pos = alien.xcor() - self.movement_speed
                 alien.goto(jgl_new_x_pos, alien.ycor())
             
-    def jgl_move_aliens_right(self):
+    def jgl_move_aliens_right(self) -> None:
         """Moves aliens right as a group"""
         
         if any(alien.xcor() + self.movement_speed > 425 for alien in self.jgl_aliens_list):
@@ -123,7 +156,7 @@ class JglRowsOfAliens(turtle.Turtle):
                 jgl_new_x_pos = alien.xcor() + self.movement_speed
                 alien.goto(jgl_new_x_pos, alien.ycor())
     
-    def jgl_move_aliens_down(self):    
+    def jgl_move_aliens_down(self) -> None:    
         """Aliens move downward toward the shooter 
         each time they touch the edge of the screen"""
     
@@ -131,7 +164,7 @@ class JglRowsOfAliens(turtle.Turtle):
             jgl_new_y_pos = alien.ycor() - 25
             alien.goto(alien.xcor(), jgl_new_y_pos)
             
-    def jgl_alien_lasers(self):     
+    def jgl_alien_lasers(self) -> None:     
         """Aliens fire projectiles toward the player at random"""
         
         # Select a random alien from self.jgl_aliens
@@ -175,7 +208,7 @@ class JglRowsOfAliens(turtle.Turtle):
             
         jgl_move_alien_laser()
         
-    def jgl_get_alien_borders(self):
+    def jgl_get_alien_borders(self) -> dict:
         """Gets the borders of each alien"""
         
         alien_borders = {}
@@ -197,12 +230,12 @@ class JglRowsOfAliens(turtle.Turtle):
             
         return alien_borders
         
-    def jgl_increase_alien_speed(self):
+    def jgl_increase_alien_speed(self) -> None:
         """Aliens move a little faster with each one that is hit"""
         
-        self.movement_speed *= 1.1
+        self.movement_speed *= 0.95
         
-    def jgl_stop_movement(self):
+    def jgl_stop_movement(self) -> None:
         """Stops the aliens moving if the game is over"""
         
         self.movement_speed = 0

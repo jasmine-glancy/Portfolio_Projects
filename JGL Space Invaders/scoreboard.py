@@ -29,6 +29,13 @@ class JglScoreBoard(Turtle):
         self.clear()
         self.jgl_update_scoreboard()   
         
+    def jgl_remove_life(self) -> None:
+        """Increases the score and updates the board"""
+        
+        self.jgl_lives -= 1
+        self.clear()
+        self.jgl_update_scoreboard()
+        
 class JglNotifications(Turtle):
     """Controls the notifications displayed to the player"""
     
@@ -39,7 +46,7 @@ class JglNotifications(Turtle):
         self.jgl_game_status.penup()
         self.jgl_game_status.color("white")
         
-    def jgl_game_over(self):
+    def jgl_game_over(self) -> None:
         """Notifies the player the game has stopped"""
         
         self.jgl_game_status.goto(0, 0)

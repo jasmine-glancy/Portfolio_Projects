@@ -12,6 +12,12 @@ from screen_setup import jgl_screen
 # Build the aliens
 jgl_aliens = JglRowsOfAliens(jgl_screen)
 
+ALIEN_QUANTITY_MAX = jgl_aliens.get_alien_quantity()
+
+# Make a copy of the global variable for modification
+alien_quantity = ALIEN_QUANTITY_MAX
+
+
 # Functions not tagged by jgl were suggested by CoPilot
 def update_game() -> None:
     """Moves the aliens and updates the screen"""
@@ -61,9 +67,10 @@ def jgl_schedule_mystery_ship() -> None:
 # -------------------- Collision functionality -------------------- #
 
 jgl_scoreboard = sb.JglScoreBoard()
-
+ 
 def jgl_check_alien_collision(player_lasers, cannon) -> None:
     """Checks if the cannon's laser has hit one of the aliens"""
+    global alien_quantity
     
     jgl_surprise_alien = jgl_mystery_ship.jgl_surprise_alien
     # Check if surprise alien is hit
@@ -75,24 +82,41 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
             jgl_surprise_alien.hideturtle()
             
     # Iterate over alien list and laser lists
+    aliens_to_remove = []
+    lasers_to_remove = []
+    
+
     for alien in jgl_aliens.jgl_aliens_list:
         for laser in player_lasers:
             if laser.distance(alien) < 25:
                 # The laser hits the alien!
-                
                 jgl_alien_hit(alien)
-                jgl_aliens.jgl_alien_quantity -= 1
-                    
-                # Remove the alien from the list
-                if alien in jgl_aliens.jgl_aliens_list:
-                    alien.clear()
-                    alien.hideturtle()
-                    jgl_aliens.jgl_aliens_list.remove(alien)
-                    
-                # Remove the laser from the list
-                laser.clear()
-                laser.hideturtle()
-                cannon.clear_laser(laser)
+                alien_quantity -= 1
+                
+                print(f"ALIEN_QUANTITY: {alien_quantity}")
+
+                # Mark the alien and laser for removal
+                aliens_to_remove.append(alien)
+                lasers_to_remove.append(laser)    
+                            
+                # Break out of the inner loop to prevent double hits
+                break
+
+    # Remove the marked aliens and lasers
+    for alien in aliens_to_remove:
+        if alien in jgl_aliens.jgl_aliens_list:
+            print(f"Removing alien at ({alien.xcor()}, {alien.ycor()})")
+            alien.clear()
+            alien.hideturtle()
+            jgl_aliens.jgl_aliens_list.remove(alien)
+
+    for laser in lasers_to_remove:
+        laser.clear()
+        laser.hideturtle()
+        cannon.clear_laser(laser)
+
+    # Debugging: Print the length of the alien list
+    print(f"ALIEN_QUANTITY: {alien_quantity}, Actual list length: {len(jgl_aliens.jgl_aliens_list)}")
 
 def jgl_alien_hit(alien):
     # Get the color of the alien
@@ -191,6 +215,14 @@ def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> bool:
 def jgl_check_all_aliens_gone() -> None:
     """Checks if the current wave is gone"""
     
-    if jgl_aliens.jgl_alien_quantity <= 0:
-        # TODO: Reset aliens and start their position slightly lower
-        pass
+    global alien_quantity, ALIEN_QUANTITY_MAX
+    
+    if alien_quantity == 0:
+        # Reset aliens and start their position slightly lower
+        jgl_aliens.jgl_lower_starting_position()
+        print("All aliens are gone. Resetting...")
+        
+        # Reset alien quantity
+        alien_quantity = ALIEN_QUANTITY_MAX
+        
+        

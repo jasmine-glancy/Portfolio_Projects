@@ -30,8 +30,6 @@ jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
 jgl_game_on = True
 
 
-# TODO: The goal is to eliminate all of the aliens by shooting them
-
     # TODO: When all the aliens are defeated, bring another wave which starts lower
         # Loop continues
 
@@ -48,6 +46,7 @@ while jgl_game_on:
     gp.jgl_check_bunker_collision(jgl_cannon.lasers, gp.jgl_aliens.jgl_alien_laser_list, jgl_bunkers) 
     gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon)
     
+    gp.jgl_check_all_aliens_gone()
     
     if gp.jgl_aliens_reach_player(jgl_cannon, jgl_bunkers) == True:
         gp.jgl_stop_aliens()
