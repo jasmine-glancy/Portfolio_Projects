@@ -202,9 +202,10 @@ class JglRowsOfAliens(turtle.Turtle):
                 # Schedule next step after 20ms
                 turtle.ontimer(jgl_move_alien_laser, 20)
             else:
-                jgl_alien_laser.hideturtle()
-                jgl_alien_laser.clear()    
-                self.jgl_alien_laser_list.remove(jgl_alien_laser)
+                if jgl_alien_laser in self.jgl_alien_laser_list:
+                    jgl_alien_laser.hideturtle()
+                    jgl_alien_laser.clear()    
+                    self.jgl_alien_laser_list.remove(jgl_alien_laser)
             
         jgl_move_alien_laser()
         
@@ -233,7 +234,10 @@ class JglRowsOfAliens(turtle.Turtle):
     def jgl_increase_alien_speed(self) -> None:
         """Aliens move a little faster with each one that is hit"""
         
-        self.movement_speed *= 0.95
+        self.movement_speed += 0.95
+        
+        # Debugging: High-speed movement
+        # self.movement_speed *= 3
         
     def jgl_stop_movement(self) -> None:
         """Stops the aliens moving if the game is over"""
@@ -245,7 +249,3 @@ class JglRowsOfAliens(turtle.Turtle):
             laser.clear()
             laser.hideturtle()
             self.jgl_alien_laser_list.remove(laser)
-        else:
-            print("Laser is not in the list.")
-        
-        

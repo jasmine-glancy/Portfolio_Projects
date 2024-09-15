@@ -1,7 +1,7 @@
 """Builds the functionality to work with SQLAlchemy
 to keep track of player's Space Invader's score"""
 
-from sqlalchemy import create_engine, Column, ForeignKey, Integer, String
+from sqlalchemy import create_engine, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
@@ -22,10 +22,17 @@ class Base(DeclarativeBase):
 class AlienColors(Base):
     __tablename__ = "alien_colors"
     color_id = Column(Integer, primary_key=True, autoincrement=True)
-    color = Column(String)
+    color = Column(String(50))
     
 class ScoreValues(Base):
     __tablename__ = "score_values"
     score_id = Column(Integer, primary_key=True, autoincrement=True)
     score_color = Column(Integer, ForeignKey("alien_colors.color_id"))
     value = Column(Integer)
+    
+class HighScores(Base):
+    __tablename__ = "high_scores"
+    player_id = Column(Integer, primary_key=True, autoincrement=True)
+    player_name = Column(String(500))
+    score = Column(Integer)
+    score_obtained_on = Column(DateTime)

@@ -5,7 +5,7 @@ from cannon import JglCannon
 import gameplay as gp
 import time
 from screen_setup import jgl_screen
-from scoreboard import JglNotifications
+from scoreboard import JglNotifications, JglScoreBoard
 
 # Create cannon
 jgl_cannon = JglCannon()
@@ -13,8 +13,9 @@ jgl_cannon = JglCannon()
 # Create bunkers
 jgl_bunkers = JglBunkers()
 
-# Import notifications
-jgl_notify = JglNotifications()
+# Create an instance of JglScoreBoard and JglNotifications
+jgl_scoreboard = JglScoreBoard()
+jgl_notify = JglNotifications(jgl_scoreboard)
 
 # Event listeners to check for user input
 jgl_screen.listen()
@@ -45,26 +46,33 @@ while jgl_game_on:
     time.sleep(0.1)
     gp.jgl_check_aliens_in_list()
     gp.jgl_check_bunker_collision(jgl_cannon.lasers, gp.jgl_aliens.jgl_alien_laser_list, jgl_bunkers) 
-    gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon)
-    gp.jgl_check_cannon_collision(gp.jgl_aliens.jgl_alien_laser_list, jgl_cannon)
+    gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon, jgl_scoreboard)
+    gp.jgl_check_cannon_collision(gp.jgl_aliens.jgl_alien_laser_list, jgl_cannon, jgl_scoreboard)
     gp.jgl_check_all_aliens_gone()
     
-    if gp.jgl_aliens_reach_player(jgl_cannon, jgl_bunkers) == True:
+    jgl_reach_status = gp.jgl_aliens_reach_player(jgl_cannon, jgl_bunkers)
+    if jgl_reach_status == "player":
         gp.jgl_stop_aliens()
         jgl_notify.jgl_game_over()
-        print("Game over!")
-        
-        # TODO: Allow player to save their high score
+        print("Game over! Aliens have reached the player.")
+        jgl_game_on = False
+    elif jgl_reach_status == "bunker":
+        gp.jgl_stop_aliens()
+        jgl_notify.jgl_game_over()
+        print("Game over! Aliens have reached the bunkers.")
         jgl_game_on = False
           
-    jgl_lives_left = gp.jgl_check_if_lives_left()
+    jgl_lives_left = gp.jgl_check_if_lives_left(jgl_scoreboard)
     
     if jgl_lives_left == False:
         
         jgl_notify.jgl_game_over()
         print("Game over!")
-        
-        # TODO: Allow player to save their high score
         jgl_game_on = False
+  
+if jgl_game_on == False:
+    jgl_notify.jgl_save_score()
     
+    # Show top 10 highest scores
+    jgl_notify.jgl_top_scores()
 jgl_screen.exitonclick()

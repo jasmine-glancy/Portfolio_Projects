@@ -65,10 +65,8 @@ def jgl_schedule_mystery_ship() -> None:
     ontimer(jgl_schedule_mystery_ship, 20000)
     
 # -------------------- Collision functionality -------------------- #
-
-jgl_scoreboard = sb.JglScoreBoard()
  
-def jgl_check_alien_collision(player_lasers, cannon) -> None:
+def jgl_check_alien_collision(player_lasers, cannon, jgl_scoreboard) -> None:
     """Checks if the cannon's laser has hit one of the aliens"""
     global alien_quantity
     
@@ -77,7 +75,7 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
     for laser in player_lasers:
         if laser.distance(jgl_surprise_alien) < 25:
             # Surprise alien has been hit
-            jgl_alien_hit(jgl_surprise_alien)
+            jgl_alien_hit(jgl_surprise_alien, jgl_scoreboard)
             jgl_surprise_alien.clear()
             jgl_surprise_alien.hideturtle()
             
@@ -90,10 +88,10 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
         for laser in player_lasers:
             if laser.distance(alien) < 25:
                 # The laser hits the alien!
-                jgl_alien_hit(alien)
+                jgl_alien_hit(alien, jgl_scoreboard)
                 alien_quantity -= 1
                 
-                print(f"ALIEN_QUANTITY: {alien_quantity}")
+                # print(f"ALIEN_QUANTITY: {alien_quantity}")
 
                 # Mark the alien and laser for removal
                 aliens_to_remove.append(alien)
@@ -116,9 +114,9 @@ def jgl_check_alien_collision(player_lasers, cannon) -> None:
         cannon.clear_laser(laser)
 
     # Debugging: Print the length of the alien list
-    print(f"ALIEN_QUANTITY: {alien_quantity}, Actual list length: {len(jgl_aliens.jgl_aliens_list)}")
+    # print(f"ALIEN_QUANTITY: {alien_quantity}, Actual list length: {len(jgl_aliens.jgl_aliens_list)}")
 
-def jgl_alien_hit(alien):
+def jgl_alien_hit(alien, jgl_scoreboard):
     # Get the color of the alien
     alien_color = alien.color()[0] 
     
@@ -184,7 +182,7 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
                 # Exit the loop once a collision is detected
                 break
             
-def jgl_check_cannon_collision(alien_lasers, cannon) -> None:
+def jgl_check_cannon_collision(alien_lasers, cannon, jgl_scoreboard) -> None:
     """Checks if any aliens have hit the player"""
     
     lasers_to_remove = []
@@ -203,27 +201,37 @@ def jgl_check_cannon_collision(alien_lasers, cannon) -> None:
      
 # ---------------------- Losing conditionals ---------------------- #
 
-def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> bool:
+def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> str:
     """Checks if the aliens have reached the player"""
     
     top_of_cannon = cannon.jgl_cannon_top()
     bunker_y_coords = bunkers.get_bunker_y_coords()
     
-    for bunker in bunkers.bunker_map:
-        
-        bunker_name = bunkers.bunker_map[bunker]
-        for alien in jgl_aliens.jgl_aliens_list:
-                
-            if bunkers.hit_counters[bunker_name] >= 3 and alien.ycor() <= top_of_cannon:
-                # If the bunkers have been destroyed aliens have reached the player
-            
-                return True
-            
-            elif bunkers.hit_counters[bunker_name] < 3 and alien.ycor() <= bunker_y_coords[bunker_name]:
-                # If the bunkers are still up and the aliens reach them, trigger game over
-                return True
+    print(f"Top of Cannon: {top_of_cannon}")
+    print(f"Number of Aliens: {len(jgl_aliens.jgl_aliens_list)}")
     
-    return False
+    for alien in jgl_aliens.jgl_aliens_list:
+        alien_y = alien.ycor()
+
+        for bunker in bunkers.bunker_map:
+            bunker_name = bunkers.bunker_map[bunker]
+            hit_counter = bunkers.hit_counters[bunker_name]
+            
+            print(f"Alien Y-Coordinate: {alien_y}, Bunker: {bunker_name}, Hit Counter: {hit_counter}")
+            
+            if bunkers.hit_counters[bunker_name] < 3 and alien.ycor() <= bunker_y_coords[bunker_name]:
+                # If the bunkers are still up and the aliens reach them, trigger game over
+                
+                print("Aliens have reached the bunkers!")
+                return "bunker"
+        
+        if alien.ycor() <= top_of_cannon:
+            # If aliens have reached the player
+                
+            print("Aliens have reached the player!")
+            return "player"
+        
+    return "none"
 
 
 # ----------------------- Check for "wins" ----------------------- #
@@ -241,7 +249,7 @@ def jgl_check_all_aliens_gone() -> None:
         # Reset alien quantity
         alien_quantity = ALIEN_QUANTITY_MAX
         
-def jgl_check_if_lives_left() -> None:
+def jgl_check_if_lives_left(jgl_scoreboard) -> None:
     """Checks if the user has any lives left"""
     
     lives = int(jgl_scoreboard.jgl_lives)

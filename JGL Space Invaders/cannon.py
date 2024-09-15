@@ -33,7 +33,7 @@ class JglCannon(turtle.Turtle):
         
         cannon_gun_height = self.shapesize()[1] * 20
         
-        top_border = self.cannon_top.ycor() + cannon_gun_height 
+        top_border = self.cannon_top.ycor() + cannon_gun_height / 2
         
         return top_border
 
@@ -98,6 +98,4 @@ class JglCannon(turtle.Turtle):
             laser.clear()
             laser.hideturtle()
             self.lasers.remove(laser)
-        else:
-            print("Laser is not in the list.")
         
