@@ -51,7 +51,7 @@ class JglBunkers(Turtle):
         stretch_len = self.shapesize()[0]  
         return default_size * stretch_len
     
-    def get_bunker_y_coords(self):
+    def get_bunker_y_coords(self) -> dict:
         """Returns the y-coordinates of the bunkers"""
         return {name: bunker.ycor() for bunker, name in self.bunker_map.items()}
     
@@ -61,7 +61,7 @@ class JglBunkers(Turtle):
         if bunker in self.bunker_map:
             bunker_name = self.bunker_map[bunker]
             self.hit_counters[bunker_name] += 1
-            if self.hit_counters[bunker_name] >= 3:
+            if self.hit_counters[bunker_name] == 3:
                 bunker.clear()
                 bunker.hideturtle()
                 del self.hit_counters[bunker_name]
@@ -83,12 +83,19 @@ class JglBunkers(Turtle):
             
             # Default turtle width and height are 20 pixels
             width = stretch_len * 20
-            height = stretch_height
+            height = stretch_height * 20
+            
+            # Calculate the height of the arrow's sloped borders
+            arrow_height = height * 0.3
+            
+            # Adjust the height for the arrow shape
+            adjusted_height = height - arrow_height
+            
             return {
                 "x_range": (x - width / 2, x + width / 2),
-                "y_range": (y - height / 2, y + height / 2)
+                "y_range": (y - height / 2, y + adjusted_height / 2)
             }
-        
+                
         # Calculate the range for each bunker based on its position and size
         bunker_ranges = {
             "left_bunker": calculate_range(self.jgl_left_bunker),

@@ -157,7 +157,7 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
             if x_range[0] < laser_x < x_range[1]and y_range[0] < laser_y < y_range[1]:
                 # If the left edge of the bunker is less than or equal to the lasers' x-coordinates
                 ## or the lasers' x-coordinates are greater than or equal to the right edge of the bunker
-                # print(f"Laser hits the {jgl_bunker_name} at ({laser_x}, {laser_y})")
+                print(f"Laser hits the {jgl_bunker_name} at ({laser_x}, {laser_y})")
                 
                 
                 # Reduce bunker size when hit
@@ -183,7 +183,23 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
                 
                 # Exit the loop once a collision is detected
                 break
-        
+            
+def jgl_check_cannon_collision(alien_lasers, cannon) -> None:
+    """Checks if any aliens have hit the player"""
+    
+    lasers_to_remove = []
+    
+    for laser in alien_lasers:
+        if laser.distance(cannon) < 25:
+            # Alien hits the player!
+            print("Player is hit!")
+            
+            jgl_scoreboard.jgl_remove_life()
+            lasers_to_remove.append(laser)
+            
+    for laser in lasers_to_remove:
+        jgl_aliens.clear_laser(laser)
+
      
 # ---------------------- Losing conditionals ---------------------- #
 
@@ -224,5 +240,17 @@ def jgl_check_all_aliens_gone() -> None:
         
         # Reset alien quantity
         alien_quantity = ALIEN_QUANTITY_MAX
+        
+def jgl_check_if_lives_left() -> None:
+    """Checks if the user has any lives left"""
+    
+    lives = int(jgl_scoreboard.jgl_lives)
+    
+    if lives > 0:
+        return True
+    
+    return False
+    
+    
         
         

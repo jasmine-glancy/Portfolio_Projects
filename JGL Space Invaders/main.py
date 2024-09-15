@@ -38,6 +38,7 @@ gp.update_game()
 gp.fire_alien_laser()
 gp.jgl_schedule_mystery_ship()
 
+
 # Main loop to keep the screen updating
 while jgl_game_on:
     jgl_screen.update()
@@ -45,11 +46,21 @@ while jgl_game_on:
     gp.jgl_check_aliens_in_list()
     gp.jgl_check_bunker_collision(jgl_cannon.lasers, gp.jgl_aliens.jgl_alien_laser_list, jgl_bunkers) 
     gp.jgl_check_alien_collision(jgl_cannon.lasers, jgl_cannon)
-    
+    gp.jgl_check_cannon_collision(gp.jgl_aliens.jgl_alien_laser_list, jgl_cannon)
     gp.jgl_check_all_aliens_gone()
     
     if gp.jgl_aliens_reach_player(jgl_cannon, jgl_bunkers) == True:
         gp.jgl_stop_aliens()
+        jgl_notify.jgl_game_over()
+        print("Game over!")
+        
+        # TODO: Allow player to save their high score
+        jgl_game_on = False
+          
+    jgl_lives_left = gp.jgl_check_if_lives_left()
+    
+    if jgl_lives_left == False:
+        
         jgl_notify.jgl_game_over()
         print("Game over!")
         

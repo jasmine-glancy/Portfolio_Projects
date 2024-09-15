@@ -240,4 +240,12 @@ class JglRowsOfAliens(turtle.Turtle):
         
         self.movement_speed = 0
         
+    def clear_laser(self, laser):
+        if laser in self.jgl_alien_laser_list:
+            laser.clear()
+            laser.hideturtle()
+            self.jgl_alien_laser_list.remove(laser)
+        else:
+            print("Laser is not in the list.")
+        
         
