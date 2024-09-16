@@ -30,10 +30,6 @@ jgl_screen.onkeypress(jgl_cannon.jgl_shoot_cannon, "space")
 # Set game flag
 jgl_game_on = True
 
-
-    # TODO: When all the aliens are defeated, bring another wave which starts lower
-        # Loop continues
-
 # Start the game updates and laser firing
 gp.update_game()
 gp.fire_alien_laser()

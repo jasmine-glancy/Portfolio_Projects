@@ -185,10 +185,17 @@ def jgl_check_bunker_collision(player_lasers, alien_lasers, bunkers: JglBunkers)
 def jgl_check_cannon_collision(alien_lasers, cannon, jgl_scoreboard) -> None:
     """Checks if any aliens have hit the player"""
     
+    jgl_cannon_borders = cannon.jgl_cannon_borders()
     lasers_to_remove = []
     
     for laser in alien_lasers:
-        if laser.distance(cannon) < 25:
+        
+        jgl_laser_x = laser.xcor()
+        jgl_laser_y = laser.ycor()
+        
+        # Abridged border condition checks recommended by CoPilot
+        if (jgl_cannon_borders["left"] <= jgl_laser_x <= jgl_cannon_borders["right"] and
+            jgl_cannon_borders["bottom"] <= jgl_laser_y <= jgl_cannon_borders["top"]):
             # Alien hits the player!
             print("Player is hit!")
             
@@ -204,10 +211,10 @@ def jgl_check_cannon_collision(alien_lasers, cannon, jgl_scoreboard) -> None:
 def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> str:
     """Checks if the aliens have reached the player"""
     
-    top_of_cannon = cannon.jgl_cannon_top()
+    jgl_cannon_borders = cannon.jgl_cannon_borders()
     bunker_y_coords = bunkers.get_bunker_y_coords()
     
-    print(f"Top of Cannon: {top_of_cannon}")
+    print(f"Cannon Borders: {jgl_cannon_borders}")
     print(f"Number of Aliens: {len(jgl_aliens.jgl_aliens_list)}")
     
     for alien in jgl_aliens.jgl_aliens_list:
@@ -225,7 +232,7 @@ def jgl_aliens_reach_player(cannon, bunkers: JglBunkers) -> str:
                 print("Aliens have reached the bunkers!")
                 return "bunker"
         
-        if alien.ycor() <= top_of_cannon:
+        if alien.ycor() <= jgl_cannon_borders["top"]:
             # If aliens have reached the player
                 
             print("Aliens have reached the player!")

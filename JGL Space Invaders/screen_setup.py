@@ -6,7 +6,7 @@ from turtle import Screen
 jgl_screen = Screen()
 jgl_screen.setup(width=950, height=750)
 jgl_screen.bgcolor("black")
-jgl_screen.title("Space Invaders by JGL")
+jgl_screen.title("Turtle Invaders by JGL")
 
 
 # Turn off automatic screen updates

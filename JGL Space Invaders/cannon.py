@@ -28,14 +28,41 @@ class JglCannon(turtle.Turtle):
         
         self.lasers = []
         
-    def jgl_cannon_top(self) -> float:
+    def jgl_cannon_borders(self) -> dict:
         """Gets the top border of the cannon"""
         
-        cannon_gun_height = self.shapesize()[1] * 20
+        # Calculate the width and height of self
+        jgl_base_width = self.shapesize()[0] * 20
+        jgl_base_height = self.shapesize()[1] * 20
         
-        top_border = self.cannon_top.ycor() + cannon_gun_height / 2
+        # Calculate the width and height of cannon_top
+        jgl_top_width = self.cannon_top.shapesize()[0] * 20
+        jgl_top_height = self.cannon_top.shapesize()[1] * 20
         
-        return top_border
+        # Calculate the borders for self
+        jgl_base_left = self.xcor() - jgl_base_width
+        jgl_base_right = self.xcor() + jgl_base_width
+        jgl_base_bottom = self.ycor() - jgl_base_height / 2
+        jgl_base_top = self.ycor() + jgl_base_height / 2
+        
+        # Calculate the borders for cannon_top
+        jgl_top_left = self.cannon_top.xcor() - jgl_top_width
+        jgl_top_right = self.cannon_top.xcor() + jgl_top_width
+        jgl_top_bottom = self.cannon_top.ycor() - jgl_top_height / 2
+        jgl_top_top = self.cannon_top.ycor() + jgl_top_height / 2
+        
+        # Determine the overall borders
+        overall_left = min(jgl_base_left, jgl_top_left)
+        overall_right = max(jgl_base_right, jgl_top_right)
+        overall_bottom = min(jgl_base_bottom, jgl_top_bottom)
+        overall_top = max(jgl_base_top, jgl_top_top)
+        
+        return {
+            "left": overall_left,
+            "right": overall_right,
+            "bottom": overall_bottom,
+            "top": overall_top
+        }
 
     def jgl_move_cannon_left(self) -> None:
         jgl_new_x_pos = self.xcor() - MOVE_STEPS
