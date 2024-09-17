@@ -38,4 +38,10 @@ def home():
 def products():
     """Showcases a list of products to buy"""
     
-    return render_template("onecolumn.html", date=JGL_CURRENT_YEAR)
+    return render_template("products.html", date=JGL_CURRENT_YEAR)
+
+@app.route("/products/<int:product_id>", methods=["GET", "POST"])
+def for_sale_info():
+    """Provides more info on each product"""
+    
+    return render_template("product_page.html", date=JGL_CURRENT_YEAR)
