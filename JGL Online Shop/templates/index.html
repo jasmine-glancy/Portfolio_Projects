@@ -20,14 +20,20 @@
 							<div class="col-6 col-12-medium">
 
 								<!-- Banner Copy -->
-									<p>We do something really useful, important, and unique. Learn all about it here ...</p>
-									<a href="#" class="button-large">Go on, click me!</a>
+									<p>
+										Welcome to my shop!
+										<br><br>
+										I believe creativity fuels us all, and I am passionate about
+										creating things that people will use and enjoy. From leather working to 
+										writing, let me create something for you!
+									</p>
+									<a href="{{ url_for('products') }}" class="button-large">What's in Stock?</a>
 
 							</div>
 							<div class="col-6 col-12-medium imp-medium">
 
-								<!-- Banner Image -->
-									<a href="#" class="bordered-feature-image"><img src="{{ url_for('static', filename='assets/images/banner.jpg')}}" alt="" /></a>
+								<!-- Banner Image, photo credit to Maria Ikenberry of Eyes, Ears, Nose & Paws -->
+									<a href="#" class="bordered-feature-image"><img src="{{ url_for('static', filename='assets/images/about.png')}}" alt="A woman and a black Labrador" /></a>
 
 							</div>
 						</div>
@@ -108,13 +114,17 @@
 								<section>
 									<header>
 										<h2>Who We Are</h2>
-										<h3>A subheading about who we are</h3>
+										<h3>Creating costumes, writing, and more!</h3>
 									</header>
-									<a href="#" class="feature-image"><img src="{{ url_for('static', filename='assets/images/pic05.jpg')}}" alt="" /></a>
+									<a href="#" class="feature-image"><img src="{{ url_for('static', filename='assets/images/jewel.png')}}" 
+										alt="A black Labrador Retriever looking through the trees in the late afternoon" /></a>
 									<p>
-										Duis neque nisi, dapibus sed mattis quis, rutrum accumsan magna sed.
-										Suspendisse eu varius nibh. Suspendisse vitae magna eget odio amet mollis
-										justo facilisis quis. Sed sagittis amet lorem ipsum.
+										My name is Jasmine. I am passionate about creating things that impact people. 
+										<br><br>
+										I have an appreciation for statistics and the way data can influence decision-making, 
+										and I strive to find solutions that lead to the best outcome for everyone involved. I have 
+										some experience working with leather to make leashes, collars, and costumes (including patterning 
+										for dogs!). If you are interested in what else I have to offer, please feel free to contact me!
 									</p>
 								</section>
 
@@ -124,15 +134,17 @@
 							<!-- Box #2 -->
 								<section>
 									<header>
-										<h2>What We Do</h2>
-										<h3>A subheading about what we do</h3>
+										<h2>What I Offer</h2>
+										<h3>A short list of my services</h3>
 									</header>
 									<ul class="check-list">
-										<li>Sed mattis quis rutrum accum</li>
-										<li>Eu varius nibh suspendisse lorem</li>
-										<li>Magna eget odio amet mollis justo</li>
-										<li>Facilisis quis sagittis mauris</li>
-										<li>Amet tellus gravida lorem ipsum</li>
+										<li>Costume design</li>
+										<li>Working with leather and acrylic fur</li>
+										<li>Leather embossing</li>
+										<li>Creative writing</li>
+										<li>Powerpoint creation</li>
+										<li>Python/Flask/Django web application design</li>
+										<li>And more!</li>
 									</ul>
 								</section>
 
@@ -142,24 +154,25 @@
 							<!-- Box #3 -->
 								<section>
 									<header>
-										<h2>What People Are Saying</h2>
-										<h3>And a final subheading about our clients</h3>
+										<h2>Where to Find Me</h2>
+										<h3>Social media and other ongoing projects</h3>
 									</header>
 									<ul class="quote-list">
 										<li>
-											<img src="{{ url_for('static', filename='assets/images/pic06.jpg')}}" alt="" />
-											<p>"Neque nisidapibus mattis"</p>
-											<span>Jane Doe, CEO of UntitledCorp</span>
+											<a href="{{ socials.github_link }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/github.svg')}}" 
+												alt="A blue GitHub logo" /></a>
+											<a href="{{ socials.linkedin_link }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/linkedin.svg')}}" 
+												alt="A blue LinkedIn logo" /></a>
+											<a href="{{ socials.discord_link }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/discord.svg')}}" 
+												alt="A blue Discord logo" /></a>
 										</li>
 										<li>
-											<img src="{{ url_for('static', filename='assets/images/pic07.jpg')}}" alt="" />
-											<p>"Lorem ipsum consequat!"</p>
-											<span>John Doe, President of FakeBiz</span>
-										</li>
-										<li>
-											<img src="{{ url_for('static', filename='assets/images/pic08.jpg')}}" alt="" />
-											<p>"Magna veroeros amet tempus"</p>
-											<span>Mary Smith, CFO of UntitledBiz</span>
+											<a href="{{ socials.fiverr_link }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/fiverr.svg')}}" 
+												alt="A blue Fiverr logo" /></a>
+											<a href="{{ socials.email_address }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/email.svg')}}" 
+												alt="A blue email logo" /></a>
+											<a href="{{ socials.youtube_link }}" class="feature-icon"><img src="{{ url_for('static', filename='assets/images/youtube.svg')}}" 
+												alt="A blue YouTube logo" /></a>
 										</li>
 									</ul>
 								</section>

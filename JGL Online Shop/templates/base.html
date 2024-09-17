@@ -19,7 +19,9 @@
       rel="stylesheet"
     />
 
-    
+    <!-- Load in favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='assets/favicon.svg') }}">
+
     {% endblock %}
 
     <title>
@@ -63,36 +65,17 @@
                                 <h2>Links to Important Stuff</h2>
                                 <div>
                                     <div class="row">
-                                        <div class="col-3 col-12-small">
+                                        <div class="col-6 col-12-small">
                                             <ul class="link-list last-child">
-                                                <li><a href="https://www.fiverr.com/jasmine_glancy">Fiverr</a></li>
-                                                <li><a href="#">Sed mattis quis rutrum</a></li>
-                                                <li><a href="#">Accumsan suspendisse</a></li>
-                                                <li><a href="#">Eu varius vitae magna</a></li>
+                                                <li><a href="{{ socials.fiverr_link }}">Fiverr</a></li>
+                                                <li><a href="{{ socials.discord_link }}">Discord</a></li>
+                                                <li><a href="{{ socials.linkedin_link }}">Linkedin</a></li>
                                             </ul>
                                         </div>
-                                        <div class="col-3 col-12-small">
+                                        <div class="col-6 col-12-small">
                                             <ul class="link-list last-child">
-                                                <li><a href="https://github.com/jglancy95/Portfolio_Projects">GitHub Portfolio</a></li>
-                                                <li><a href="#">Sed mattis quis rutrum</a></li>
-                                                <li><a href="#">Accumsan suspendisse</a></li>
-                                                <li><a href="#">Eu varius vitae magna</a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-3 col-12-small">
-                                            <ul class="link-list last-child">
-                                                <li><a href="https://www.linkedin.com/in/jasmine-glancy-2741562ab/">Linkedin</a></li>
-                                                <li><a href="#">Sed mattis quis rutrum</a></li>
-                                                <li><a href="#">Accumsan suspendisse</a></li>
-                                                <li><a href="#">Eu varius vitae magna</a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-3 col-12-small">
-                                            <ul class="link-list last-child">
-                                                <li><a href="#">Neque amet dapibus</a></li>
-                                                <li><a href="#">Sed mattis quis rutrum</a></li>
-                                                <li><a href="#">Accumsan suspendisse</a></li>
-                                                <li><a href="#">Eu varius vitae magna</a></li>
+                                                <li><a href="{{ socials.github_link }}">GitHub</a></li>
+                                                <li><a href="{{ socials.youtube_link }}">YouTube</a></li>
                                             </ul>
                                         </div>
                                     </div>
