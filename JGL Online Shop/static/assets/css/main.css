@@ -1455,7 +1455,7 @@ input, select, textarea {
 		}
 
 		.feature-image img {
-			width: 100%;
+			width: 100%;		
 		}
 
 		.feature-icon img {
@@ -1463,7 +1463,7 @@ input, select, textarea {
 			margin: 0.5vw;
 		}
 
-	.bordered-feature-image {
+	.bordered-feature-image, .bordered-feature-image-list {
 		display: block;
 		background: #fff url("images/bg04.png");
 		padding: 10px;
@@ -1472,9 +1472,14 @@ input, select, textarea {
 		outline: 0;
 	}
 
-		.bordered-feature-image img {
+		.bordered-feature-image img, .bordered-feature-image-list img {
 			display: block;
 			width: 100%;
+		}
+
+		.bordered-feature-image-list img {
+			height: 20vh;
+			object-fit: cover;
 		}
 
 	.button-large {
