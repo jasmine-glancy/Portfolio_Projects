@@ -38,7 +38,16 @@
                     <div class="col-12">
     
                         <!-- Logo -->
-                        <h1><a href="{{ url_for('home') }}" id="logo">Halcyonic</a></h1>
+                        <h1 id="logo">
+                            <a href="{{ url_for('home') }}" id="logo-link">
+                                <img src="{{ url_for('static', filename='assets/images/cobra-logo.svg')}}" 
+									 alt="A picture of a coiled King Cobra" 
+                                     class="icon-logo"/>
+                                <div class="logo-text">
+                                    Cobra Creative Works
+                                </div>
+                            </a>
+                        </h1>
     
                         <!-- Nav -->
                         <nav id="nav">

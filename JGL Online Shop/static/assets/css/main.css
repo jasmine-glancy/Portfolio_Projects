@@ -1463,6 +1463,32 @@ input, select, textarea {
 			margin: 0.5vw;
 		}
 
+		.icon-logo {
+			display: inline-block;
+			width: 5vw;
+			padding-top: 25vw;
+			margin-right: 10px;
+		}
+		
+		#logo {
+			display: flex;
+			align-items: center; 
+			justify-content: center; 
+		}
+
+		.logo-link {
+			display: flex;
+			align-items: center; 
+			text-decoration: none; 
+			color: inherit;
+		}
+
+		.logo-text {
+			display: inline-block;
+			color: inherit;
+			transform: translateY(-75%);
+		}
+
 	.bordered-feature-image, .bordered-feature-image-list {
 		display: block;
 		background: #fff url("images/bg04.png");
