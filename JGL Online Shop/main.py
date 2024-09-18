@@ -3,7 +3,9 @@
 from datetime import datetime
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
+import helpers as h
 import os
+import queries as q
 
 # Configure application
 app = Flask(__name__)
@@ -14,41 +16,13 @@ Bootstrap(app)
 # Load in security key
 KEY = os.environ.get("security_key")
 
+JGL_CURRENT_YEAR = h.current_year()
+JGL_SOCIALS = h.social_links()
 
-def current_year():
-    """Returns the current year"""
-    
-    # Convert current date to a string
-    jgl_date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    
-    # Grab only the year
-    jgl_current_year = jgl_date_str[:4]
-    
-    return jgl_current_year
 
-def social_links():
-    """Returns the social media links"""
-    
-    github = os.environ.get("github")
-    linkedin = os.environ.get("linkedin")
-    discord = os.environ.get("discord")
-    fiverr = os.environ.get("fiverr")
-    email = os.environ.get("email")
-    youtube = os.environ.get("youtube")
-    
-    socials = {
-        "github_link": github,
-        "linkedin_link": linkedin,
-        "discord_link": discord,
-        "fiverr_link": fiverr,
-        "email_address": email,
-        "youtube_link": youtube
-        }
-    
-    return socials
-
-JGL_CURRENT_YEAR = current_year()
-JGL_SOCIALS = social_links()
+@app.template_filter("datetime_format")
+def datetime_format(s, format="%x"):    
+    return s.strftime(format)
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -62,16 +36,26 @@ def home():
 
 @app.route("/products", methods=["GET", "POST"])
 def products():
-    """Showcases a list of products to buy"""
+    """Showcases a list of products and services to buy"""
+    
+    products_services = q.find_product_list()
+    print(products_services)
     
     return render_template("products.html", 
                            date=JGL_CURRENT_YEAR,
-                           socials=JGL_SOCIALS)
+                           socials=JGL_SOCIALS,
+                           products_services=products_services)
 
 @app.route("/products/<int:product_id>", methods=["GET", "POST"])
-def for_sale_info():
+def for_sale_info(product_id):
     """Provides more info on each product"""
+    
+    # Fetch product information based on product_id
+    product = q.find_product_by_id(product_id)
+    
+    print(product)
     
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
-                           socials=JGL_SOCIALS)
+                           socials=JGL_SOCIALS,
+                           product=product)

@@ -23,83 +23,46 @@
 									<section>
 										<header>
 											<h2>Goods and Services for Sale</h2>
-											<h3>A generic one column layout</h3>
 										</header>
 										<p>
-											<!-- TODO: Replace shop description -->
-											I'm baby you probably haven't heard of them gluten-free drinking 
-											vinegar, banh mi salvia fingerstache selvage. Try-hard tote bag man 
-											bun JOMO, plaid polaroid big mood adaptogen butcher retro roof party 
-											squid fit blue bottle pork belly. 3 wolf moon yr helvetica, lyft gochujang 
-											blackbird spyplane cornhole pitchfork meditation kombucha. Waistcoat hashtag 
-											praxis, bitters roof party bodega boys chicharrones brunch humblebrag. 
-											Fixie YOLO vape unicorn, shaman humblebrag microdosing pabst copper mug 
-											chambray DIY intelligentsia hexagon cupping offal.
+											Welcome to my shop page! Below is a list of my currently offered 
+											crafts and services. Prices are negotiable and may depend on supply,
+											demand, experience level with that particular project, et cetra. For any 
+											projects that I have not completed before, there will be a "learning discount". 
+											I will never put out a product or service I would not appreciate for myself! 
+											Thank you for your consideration.
 										</p>
 										<div class="card-group">
-											<!-- TODO: Query and display database information instead of Hipster Ipsum -->
-											<div class="card">
-											  <!-- Img credit to Jasmine Glancy -->
-											  <img class="card-img-top" 
-											  src="{{ url_for('static', filename='assets/images/leather_patches.png') }}" 
-											  alt="Hand-embossed leather patches that say 'EENP Medical Alert Dog' and 'Ask To Pet'">
-											  <div class="card-body">
-												<h5 class="card-title">Leather Patches and Projects</h5>
-												<button type="button" class="btn disabled" aria-disabled="true">Supplies + $10/hour</button>
-												<div class="divider"></div>
-												<!-- TODO: Link to product information page -->
-												<button type="button" class="btn btn-primary">Learn More</button>
-												<p class="card-text">
-													Keytar bespoke distillery woke 8-bit, skateboard 90's lyft taiyaki kinfolk 
-													PBR&B chillwave street art mumblecore live-edge. Asymmetrical dreamcatcher 
-													raclette small batch, YOLO big mood pop-up jean shorts unicorn snackwave 8-bit. 
-													Jean shorts food truck kale chips venmo hot chicken, slow-carb shaman umami echo 
-													park pop-up health goth bushwick pok pok lumbersexual. Praxis af cornhole gatekeep 
-													pitchfork blue bottle selfies salvia echo park poke letterpress bicycle rights 
-													activated charcoal taiyaki. Bespoke pickled tote bag lomo tousled +1.
-												</p>
-												<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-											  </div>
-											</div>
-											<div class="card">
-												<!-- Img credit to StockSnap.io -->
-											  <img class="card-img-top" 
-											  src="{{ url_for('static', filename='assets/images/writing.jpg') }}" 
-											  alt="A close-up, top-down view of a desk with pencils, notebooks, and coffee">
-											  <div class="card-body">
-												<h5 class="card-title">Custom Non-Fiction Written Work</h5>
-												<p class="card-text">
-													Vibecession cardigan sustainable freegan shoreditch venmo organic truffaut 
-													normcore mumblecore raclette you probably haven't heard of them selvage 
-													intelligentsia. Tacos prism synth, hot chicken literally craft beer meggings 
-													blue bottle master cleanse selvage. Chia shoreditch cornhole franzen tumeric 
-													jianbing. Solarpunk bicycle rights farm-to-table you probably haven't heard of 
-													them, tilde narwhal man braid forage tbh DSA meggings put a bird on it. Master 
-													cleanse chartreuse migas art party. Af trust fund everyday carry, taiyaki 
-													cold-pressed PBR&B biodiesel cronut hammock.
-												</p>
-												<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-											  </div>
-											</div>
-											<div class="card">
-											  <!-- Img credit to GoodFon.com -->
-											  <img class="card-img-top" src="{{ url_for('static', filename='assets/images/fiction.png') }}" alt="Card image cap">
-											  <div class="card-body">
-												<h5 class="card-title">Custom Fiction Written Work</h5>
-												<p class="card-text">
-													Venmo salvia pitchfork, solarpunk twee paleo pour-over yuccie 
-													cray waistcoat before they sold out. Hashtag irony freegan artisan messenger 
-													bag ascot 90's helvetica next level kale chips kinfolk. Gentrify tbh aesthetic, 
-													hammock XOXO hot chicken gochujang kombucha twee fingerstache woke gorpcore jean 
-													shorts. Ethical palo santo hammock bushwick green juice. Organic JOMO waistcoat 
-													edison bulb, single-origin coffee cronut flexitarian tofu williamsburg retro 
-													subway tile. Mukbang poke selvage health goth mustache. Wayfarers shabby chic 
-													taxidermy +1 master cleanse, ascot franzen waistcoat affogato vape next level.
-												</p>
-												<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-											  </div>
-											</div>
-										  </div>
+											{% for product in products_services %}
+												<div class="card">
+												<img class="card-img-top" 
+												src="{{ url_for('static', filename=product.image_path) }}" 
+												alt="{{ product.image_alt }}">
+												<div class="card-body">
+													<h5 class="card-title">{{ product.name }}</h5>
+													<button type="button" class="btn disabled" aria-disabled="true">
+														{% if product.notes == "Supplies +" %}
+															{{ product.notes }}
+														{% endif %}
+														${{ product.rate }}/{{ product.rate_unit }}
+													</button>
+														{% if product.notes == "Supplies +" %}
+															<div class="small_divider"></div>
+														{% else %}
+															<div class="divider"></div>
+														{% endif %}
+													<!-- TODO: Link to product information page -->
+													<a href="{{ url_for('for_sale_info', product_id=product.service_product_id) }}">
+														<button type="button" class="btn btn-primary">Learn More</button>
+													</a>
+													<p class="card-text">
+														<small class="text-muted">
+															Last updated {{ product.last_updated|datetime_format("%x") }} 
+														</small>
+													</p>
+												</div>
+												</div>
+											{% endfor %}
 									</section>
 
 							</div>

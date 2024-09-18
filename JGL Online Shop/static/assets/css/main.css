@@ -1488,6 +1488,7 @@ input, select, textarea {
 			color: inherit;
 			transform: translateY(-75%);
 		}
+	
 
 	.bordered-feature-image, .bordered-feature-image-list {
 		display: block;
@@ -1507,6 +1508,14 @@ input, select, textarea {
 			height: 20vh;
 			object-fit: cover;
 		}
+
+	.product_img {
+		max-width: 100%;
+		height: auto;
+		object-fit: cover;
+		display: flex;
+		justify-content: center;
+	}
 
 	.button-large {
 		background-image: -moz-linear-gradient(top, #18448D, #000523);
@@ -2079,19 +2088,23 @@ input, select, textarea {
 }
 
 .card {
+	display: flex; 
+    flex-direction: column; 
+    align-items: center; 
     justify-content: center;
     position: relative;
     background-color: #f7f7f7;
     min-height: fit-content;
+    min-width: 15vw;
     max-height: 50vw;
-    max-width: 28.66vw;
+    max-width: 18vw;
     padding: 1vw;
     margin: 1vw;
 }
 
 .card-img-top {
 	width: 100%;
-    height: 25vh;
+	height: auto;
     object-fit: cover;
 }
 
@@ -2113,8 +2126,47 @@ input, select, textarea {
 		background-color: #222628 !important;
 	}
 	
-	.divider {
+	.divider, .small_divider {
         display: inline-block;
-        width: 3.5vw;
         height: auto;
     }
+
+		.divider {
+			width: 6vw;
+		}
+
+		.small_divider {
+			width: 2vw;
+		}
+
+
+
+/* Scrollbar for WebKit browsers like Chrome, Safari, and new Edge */
+body::-webkit-scrollbar {
+    margin-right: 5vw;
+  }
+
+    /* Track */
+    body::-webkit-scrollbar-track {
+        background: #c6c8c8;
+    }
+
+    /* Handle */
+    body::-webkit-scrollbar-thumb {
+        background: #3e484a;
+    }
+
+    /* Handle on hover */
+    body::-webkit-scrollbar-thumb:hover {
+        background: #323a3b;
+    }
+
+	.disclaimers {
+		font-weight: 500;
+	}
+
+input[type="text"],
+	textarea {
+		width: 100%;
+		box-sizing: border-box;
+		background-color: #f7f7f7;
