@@ -53,9 +53,24 @@ def for_sale_info(product_id):
     # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     
+    # Fetch leather goods for dropdown
+    leather_options = q.find_leather_goods()
+        
+    # Fetch leather color for dropdown
+    leather_colors = q.look_up_leather_colors()
+        
+    # Fetch sizes for dropdown
+    sizes = q.find_sizes()
+    
+    # TODO: If writing service
+    
+        # TODO: Fetch services for dropdown
     print(product)
     
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
                            socials=JGL_SOCIALS,
-                           product=product)
+                           product=product,
+                           leather_options=leather_options,
+                           leather_colors=leather_colors,
+                           sizes=sizes)
