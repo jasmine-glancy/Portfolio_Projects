@@ -3,6 +3,7 @@
 from sqlalchemy import create_engine, Column, DateTime, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
+
 # Define database URI
 ONLINE_SHOP_URI = "sqlite:///online_shop.db"
 
@@ -27,7 +28,12 @@ class ProductsAndServices(Base):
     notes = Column(String(200))
     last_updated = Column(DateTime, nullable=False)
     image_path = Column(String(200))
-    
+
+class WritingOptions(Base):
+    __tablename__ = "writing_options"
+    option_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    product_type = Column(String(200), unique=True, nullable=False)
+
 class LeatherColors(Base):
     __tablename__ = "leather_colors"
     leather_color_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
@@ -50,7 +56,7 @@ class Sizes(Base):
     size_inches = Column(Integer, unique=True, nullable=False)
     size_centimeters = Column(Float, unique=True, nullable=False)
     
-class WritingOptions(Base):
-    __tablename__ = "writing_options"
+class SoftwareOptions(Base):
+    __tablename__ = "software_options"
     option_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     product_type = Column(String(200), unique=True, nullable=False)

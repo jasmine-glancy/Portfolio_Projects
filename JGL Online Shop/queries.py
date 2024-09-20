@@ -59,3 +59,24 @@ def look_up_metal_colors():
     ).all()
     
     return metal_colors
+
+def writing(product_ids):
+    """Returns a list of written products"""
+    
+    written_products = shop_session.query(
+        sh.WritingOptions.option_id,
+        sh.WritingOptions.product_type
+    ).filter(
+        sh.WritingOptions.option_id.in_(product_ids)
+    ).all()
+    
+    return written_products
+
+def software():
+    """Returns a list of software goods"""
+    
+    software_goods = shop_session.query(
+        sh.SoftwareOptions
+    ).all()
+    
+    return software_goods

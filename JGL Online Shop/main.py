@@ -53,22 +53,52 @@ def for_sale_info(product_id):
     # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     
-    # Fetch leather goods for dropdown
-    leather_options = q.find_leather_goods()
+    leather_options = None
+    leather_colors = None
+    metal_colors = None
+    sizes = None
+    nonfiction = None
+    fiction = None 
+    software = None
+    
+    if product_id == 1:
+        # Leather options
         
-    # Fetch leather color for dropdown
-    leather_colors = q.look_up_leather_colors()
-    
-    # Fetch metal color for dropdown
-    metal_colors = q.look_up_metal_colors()
+        # Fetch leather goods for dropdown
+        leather_options = q.find_leather_goods()
         
-    # Fetch sizes for dropdown
-    sizes = q.find_sizes()
+        # Fetch leather color for dropdown
+        leather_colors = q.look_up_leather_colors()
     
-    # TODO: If writing service
+        # Fetch metal color for dropdown
+        metal_colors = q.look_up_metal_colors()
+        
+        # Fetch sizes for dropdown
+        sizes = q.find_sizes()  
+    elif product_id == 2:
+        # For non-fiction written services
+        
+        # IDs non-fiction services
+        nonfiction_service_options = [1, 2, 3, 7]
+        nonfiction = q.writing(nonfiction_service_options)
+        
+        # for option in nonfiction:
+        #     print("Non-fiction options:", option)
+
+    elif product_id == 3:
+        # For fiction written services
+        
+        # IDs of fiction services
+        fiction_service_options = [4, 5, 6, 7]
+        fiction = q.writing(fiction_service_options)
     
-        # TODO: Fetch services for dropdown
-    print(product)
+        # for option in fiction:
+        #     print("Fiction options:", option)
+
+    elif product_id == 4:
+        # For software-based services
+        
+        software = q.software()
     
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
@@ -77,4 +107,7 @@ def for_sale_info(product_id):
                            leather_options=leather_options,
                            leather_colors=leather_colors,
                            metal_colors=metal_colors,
-                           sizes=sizes)
+                           sizes=sizes,
+                           nonfiction=nonfiction,
+                           fiction=fiction,
+                           software=software)

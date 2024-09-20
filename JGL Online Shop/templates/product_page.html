@@ -34,7 +34,7 @@
                             
                             
                             <form id="colorForm">
-                                {% if product.name == "Leather Patches and Projects" %}
+                                {% if leather_options and leather_colors and metal_colors and sizes %}
                                     <div class="form-group">
                                         <div class="mb-3">
                                             <label for="leather_goods" class="form-label">
@@ -90,7 +90,45 @@
 											</select>
                                         </div>
                                     </div>
-                                {% endif %}
+                                {% elif fiction and nonfiction %}
+                                    <div class="form-group">
+                                        <div class="mb-3">
+                                            <label for="writing_option" class="form-label">
+                                                Choose an Option:
+                                            </label>
+											{% if fiction %}
+												<select class="form-select" aria-label="writing" name="writing_options">
+													{% for option in fiction %}
+														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
+													{% endfor %}
+													<option selected>Please make a selection</option>
+												</select>
+											{% endif %}
+											{% if nonfiction %}
+												<select class="form-select" aria-label="writing" name="writing_options">
+													{% for option in nonfiction %}
+														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
+													{% endfor %}
+													<option selected>Please make a selection</option>
+												</select>
+											{% endif %}
+                                        </div>
+                                    </div>
+                                {% elif software %}
+									<div class="form-group">
+										<div class="mb-3">
+											<label for="software_option" class="form-label">
+												Choose an Option:
+											</label>
+											<select class="form-select" aria-label="writing" name="writing_options">
+												{% for option in software %}
+													<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
+												{% endfor %}
+												<option selected>Please make a selection</option>
+											</select>
+										</div>
+									</div>
+								{% endif %}
                             </form>
                         </section>
 
