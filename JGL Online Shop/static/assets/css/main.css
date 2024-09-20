@@ -84,7 +84,7 @@ input, select, textarea {
 	body {
 		background: #D4D9DD url("images/bg03.jpg");
 		color: #474f51;
-		font-size: 13.5pt;
+		font-size: 14pt;
 		font-family: 'Yanone Kaffeesatz';
 		line-height: 1.85em;
 		font-weight: 300;
@@ -92,7 +92,7 @@ input, select, textarea {
 
 	input, textarea, select {
 		color: #474f51;
-		font-size: 13.5pt;
+		font-size: 14pt;
 		font-family: 'Yanone Kaffeesatz';
 		line-height: 1.85em;
 		font-weight: 300;
@@ -2116,6 +2116,7 @@ input, select, textarea {
 	border: #222628 !important;
 	opacity: 100%;
 	margin-bottom: 2vh;
+	font-size: 14pt;
 }
 
 	.btn:hover {
@@ -2132,14 +2133,22 @@ input, select, textarea {
     }
 
 		.divider {
-			width: 6vw;
+			width: 5vw;
 		}
 
 		.small_divider {
 			width: 2vw;
 		}
 
-
+		input[type=submit] {
+			color: #f8f8f8;
+			background-color: #3B4346;
+			border-radius: 25px;
+		}
+		
+		.add_to_cart {
+			margin-left: 0.5vw;
+		}
 
 /* Scrollbar for WebKit browsers like Chrome, Safari, and new Edge */
 body::-webkit-scrollbar {
@@ -2197,4 +2206,6 @@ input[type="text"],
 
 	.form-select {
 		background-color: #f8f8f8;
+		font-size: 14pt;
 	}
+

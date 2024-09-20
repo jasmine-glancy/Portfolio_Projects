@@ -33,6 +33,7 @@
                             </header>
                             
                             
+							<!-- TODO: Add form action and method -->
                             <form id="colorForm">
                                 {% if leather_options and leather_colors and metal_colors and sizes %}
                                     <div class="form-group">
@@ -129,8 +130,10 @@
 										</div>
 									</div>
 								{% endif %}
+								<input type="submit" class="btn" value="Add to Cart"></input>
                             </form>
-                        </section>
+                        
+						</section>
 
                     </div>
                     <div class="col-7 col-12-medium imp-medium">
@@ -164,15 +167,17 @@
                                     <h2>Contact</h2>
                                 </header>
                                 <p>Please fill out the form below to contact me. I look forward to hearing from you!</p>
-                                <form method="post" action="contact">
+                                
+								<!-- TODO: Add contact link -->
+								<form method="post" action="contact">
                                     <div class="row">
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="name" placeholder="Name" /></div>
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="email" placeholder="Email" /></div>
                                         <div class="col-12">
-                                            <textarea name="message" placeholder="Message"></textarea>
+                                            <textarea name="message" placeholder="Message">Re: {{ product.name }}</textarea>
                                         </div>
                                         <div class="col-12">
-                                            <input type="submit" value="Send Message" />
+                                            <input type="submit" class="btn" value="Send Message"></input>
                                         </div>
                                     </div>
                                 </form>
