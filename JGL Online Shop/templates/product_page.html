@@ -47,16 +47,30 @@
                                                 <option selected>Please make a selection</option>
                                             </select>
                                         </div>
-                                        <br>
+										
                                         <div class="mb-3">
                                             <label for="leather_goods" class="form-label">
                                                 Leather Colors:
                                             </label>
-											<select id="leather_colors" class="form-select" name="color">
+											<select id="leather_colors" class="form-select" name="leather_color">
 												<option selected>Please make a selection</option>
 												{% for color in leather_colors %}
 													<option value="{{ color.leather_color_id }}" style="background-color: {{ color.hex_code }}; color: {{ color.hex_code }};">
 														{{ color.color_string|title }}
+													</option>
+												{% endfor %}
+											</select>
+                                        </div>	
+
+                                        <div class="mb-3">
+                                            <label for="metal_color_choices" class="form-label">
+                                                Metal Colors:
+                                            </label>
+											<select id="metal_colors" class="form-select" name="metal_color">
+												<option selected>Please make a selection</option>
+												{% for color in metal_colors %}
+													<option value="{{ color.metal_color_id }}">
+														{{ color.metal_type|title }}
 													</option>
 												{% endfor %}
 											</select>

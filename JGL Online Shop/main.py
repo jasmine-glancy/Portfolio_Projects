@@ -58,6 +58,9 @@ def for_sale_info(product_id):
         
     # Fetch leather color for dropdown
     leather_colors = q.look_up_leather_colors()
+    
+    # Fetch metal color for dropdown
+    metal_colors = q.look_up_metal_colors()
         
     # Fetch sizes for dropdown
     sizes = q.find_sizes()
@@ -73,4 +76,5 @@ def for_sale_info(product_id):
                            product=product,
                            leather_options=leather_options,
                            leather_colors=leather_colors,
+                           metal_colors=metal_colors,
                            sizes=sizes)

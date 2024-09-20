@@ -50,3 +50,12 @@ def find_sizes():
     ).all()
     
     return sizes
+
+def look_up_metal_colors():
+    """Returns a list of metal colors"""
+    
+    metal_colors = shop_session.query(
+        sh.MetalColors
+    ).all()
+    
+    return metal_colors
