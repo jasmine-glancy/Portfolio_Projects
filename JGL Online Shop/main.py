@@ -99,6 +99,8 @@ def for_sale_info(product_id):
         # For software-based services
         
         software = q.software()
+        
+    print(product)
     
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
