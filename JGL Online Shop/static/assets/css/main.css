@@ -1463,32 +1463,39 @@ input, select, textarea {
 			margin: 0.5vw;
 		}
 
-		.icon-logo {
+		.icon-logo, .logo-text, .cart_logo {
 			display: inline-block;
-			width: 5vw;
-			padding-top: 25vw;
-			margin-right: 10px;
 		}
+
+			.icon-logo {
+				width: 5vw;
+				padding-top: 25vw;
+				margin-right: 10px;
+				transform: translateY(2%);
+			}
+			
+			#logo {
+				display: flex;
+				align-items: center; 
+				justify-content: center; 
+			}
+
+			.logo-link {
+				display: flex;
+				align-items: center; 
+				text-decoration: none; 
+				color: inherit;
+			}
+
+			.logo-text {
+				color: inherit;
+				transform: translateY(-50%);
+			}
 		
-		#logo {
-			display: flex;
-			align-items: center; 
-			justify-content: center; 
-		}
-
-		.logo-link {
-			display: flex;
-			align-items: center; 
-			text-decoration: none; 
-			color: inherit;
-		}
-
-		.logo-text {
-			display: inline-block;
-			color: inherit;
-			transform: translateY(-75%);
-		}
-	
+			.cart_logo {
+				width: 2.5vw;
+				transform: translateY(20%);
+			}
 
 	.bordered-feature-image, .bordered-feature-image-list {
 		display: block;
@@ -1585,14 +1592,14 @@ input, select, textarea {
 		#header nav {
 			position: absolute;
 			right: 0;
-			bottom: 35px;
+			bottom: 40px;
 			font-weight: 200;
 		}
 
 			#header nav a {
 				color: #c6c8c8;
 				text-decoration: none;
-				font-size: 1.4em;
+				font-size: 2em;
 				margin-left: 60px;
 				outline: 0;
 			}

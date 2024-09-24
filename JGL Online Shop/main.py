@@ -1,7 +1,9 @@
-"""An online shop using Flask and Python"""
+"""
+An online shop using Flask and Python
+"""
 
 from datetime import datetime
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
 import helpers as h
 import os
@@ -15,6 +17,7 @@ Bootstrap(app)
 
 # Load in security key
 KEY = os.environ.get("security_key")
+
 
 JGL_CURRENT_YEAR = h.current_year()
 JGL_SOCIALS = h.social_links()
@@ -52,6 +55,14 @@ def for_sale_info(product_id):
     
     # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
+    print(f"Product ID: {product.service_product_id}")
+    print(f"Product Name: {product.name}")
+    print(f"Product Description: {product.description}")
+    print(f"Product Rate: {product.rate}")
+    print(f"Product Rate Unit: {product.rate_unit}")
+    print(f"Product Notes: {product.notes}")
+    print(f"Product Last Updated: {product.last_updated}")
+    print(f"Product Image Path: {product.image_path}")
     
     leather_options = None
     leather_colors = None
@@ -102,6 +113,16 @@ def for_sale_info(product_id):
         
     print(product)
     
+    if request.method == "POST":
+        if product_id == 1:
+            # For leather goods
+            good = request.form.get("leather_product")
+            leather_color = request.form.get("leather_color")
+            metal_color = request.form.get("metal_color")
+            size = request.form.get("size")
+            
+            print(good, leather_color, leather_color, metal_color, size)
+    
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
                            socials=JGL_SOCIALS,
@@ -113,3 +134,10 @@ def for_sale_info(product_id):
                            nonfiction=nonfiction,
                            fiction=fiction,
                            software=software)
+    
+@app.route("/cart", methods=["GET", "POST"])
+def cart():
+    """Shows the user's current cart"""
+    
+    return render_template("cart.html",
+                           socials=JGL_SOCIALS,)

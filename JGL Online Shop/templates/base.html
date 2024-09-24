@@ -53,6 +53,11 @@
                         <nav id="nav">
                             <a href="{{ url_for('home') }}">Home</a>
                             <a href="{{ url_for('products') }}">Products</a>
+                            <a href="{{ url_for('cart') }}">
+                                <img src="{{ url_for('static', filename='assets/images/cart.svg')}}" 
+                                alt="A cart with a plus sign, indicating the cart is empty" 
+                                class="cart_logo"/>
+                            </a>
                         </nav>
     
                     </div>

@@ -34,7 +34,7 @@
                             
                             
 							<!-- TODO: Add form action and method -->
-                            <form id="colorForm">
+                            <form id="colorForm" action="{{ url_for('for_sale_info') }}" method="POST">
                                 {% if leather_options and leather_colors and metal_colors and sizes %}
                                     <div class="form-group">
                                         <div class="mb-3">
