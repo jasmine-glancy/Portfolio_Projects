@@ -167,6 +167,19 @@
                                 </header>
                                 <p>Please fill out the form below to contact me. I look forward to hearing from you!</p>
                                 
+                                <!-- Outputs error messages -->
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                        {% for error in messages %}
+                                            <p class="flash">
+                                                <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
+                                                {{ messages[-1] }} 
+                                                <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
+                                            </p>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                                
 								<!-- TODO: Add contact link -->
 								<form method="post" action="contact">
                                     <div class="row">

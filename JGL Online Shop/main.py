@@ -117,22 +117,37 @@ def for_sale_info(product_id):
     print(product)
     
     if request.method == "POST":
-        if product_id == 1:
-            # For leather goods
-            good = request.form.get("leather_product")
-            leather_color = request.form.get("leather_color")
-            metal_color = request.form.get("metal_color")
-            size = request.form.get("size")
+        if "add_to_cart" in request.form:
+            if product_id == 1:
+                # For leather goods
+                good = request.form.get("leather_product")
+                leather_color = request.form.get("leather_color")
+                metal_color = request.form.get("metal_color")
+                size = request.form.get("size")
+                
+                print(good, leather_color, leather_color, metal_color, size)
+            elif product_id == 2 or product_id == 3:
+                # For written services
+                written_product = request.form.get("writing_options")
+                
+            elif product_id == 4:
+                # For software-based services   
+                software_id = request.form.get("software_options") 
+        
+            # TODO: If there is a shopping session, reference it
             
-            print(good, leather_color, leather_color, metal_color, size)
-        elif product_id == 2 or product_id == 3:
-            # For written services
-            written_product = request.form.get("writing_options")
+                # TODO: Add shopping_session created_at
+            # TODO: If there isn't a shopping session already, create one
             
-        elif product_id == 4:
-            # For software-based services   
-            software_id = request.form.get("software_options") 
+            # TODO: Add options to the cart
+             
+        elif "send_message" in request.form:
+            name = request.form.get("name")
+            email = request.form.get("email")
+            message = request.form.get("message")
             
+            # TODO: Make contact work
+   
         
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
@@ -150,6 +165,23 @@ def for_sale_info(product_id):
 def cart():
     """Shows the user's current cart"""
     
+    # TODO: Query database for the user's cart
+    # TODO: Add shopping cart total
+
+        # TODO: Query database for prices
+        
+        # TODO: Add final total of the cart to shopping_session table
+
+    # TODO: If user hits checkout
+    
+        # TODO: Create a new order_items entry
+            # TODO: All items from the same order should be accounted for
+            
+        # TODO: Create a new order_details entry
+        
+        # TODO: log payment details
+        
+        # TODO: Go to successfull checkout page
     return render_template("cart.html",
                            socials=JGL_SOCIALS)
     
