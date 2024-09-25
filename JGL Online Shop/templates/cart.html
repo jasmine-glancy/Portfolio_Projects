@@ -17,80 +17,55 @@
 				<section id="content">
 					<div class="container">
 						<div class="row">
-							<div class="col-9 col-12-medium">
+							<div class="col-8 col-12-medium">
 
 								<!-- Main Content -->
 									<section>
 										<header>
-											<h2>Two Column #1</h2>
-											<h3>A generic two column layout</h3>
+											<h2>Shopping Cart</h2>
+
+											<!-- TODO: Enable deselect/delete cart items functionality -->
+											<h3>Deselect all items</h3>
 										</header>
 										<p>
-											Doggo ipsum corgo ruff fat boi very hand that feed 
-											shibe heckin good boys, long woofer dat tungg tho. 
-											Adorable doggo woofer doge pats borking doggo shoob 
-											long bois doggorino, puggo borkdrive you are doing me 
-											the shock clouds very taste wow. Many pats puggo doge 
-											vvv, floofs heckin. Long water shoob aqua doggo long 
-											woofer adorable doggo, wrinkler very jealous pupper dat 
-											tungg tho pats, wrinkler adorable doggo. lotsa pats 
-											you are doing me the shock. Pupper yapper super chub 
-											long water shoob smol, you are doing me the shock h*ck 
-											long doggo.
+											<!-- TODO: Require login for checking out? -->
+											{% if session["username"] %}
+												<!-- TODO: Iterate over cart items to display -->
+												Logged in!
+											{% else %}
+												<div class="cart_icons_container">
+													<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
+													alt="A picture of a King Cobra in a basket" 
+													class="basket_snake"/>
+													<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
+													alt="A cart moving fast" 
+													class="empty_cart"/>
+												</div>
+
+												<div class="notification">
+													You are not currently logged in. Please 
+													<a href="{{ url_for('login') }}">log in</a> to continue.
+												</div>
+											{% endif %}
 										</p>
-										<p>
-											I am bekom fat dat tungg tho length boy doggo such treat,
-											 doggorino such treat floofs. Adorable doggo wrinkler 
-											 wow very biscit blop, heckin angery woofer most angery 
-											 pupper I have ever seen. Shoob smol wow such tempt h*ck 
-											 waggy wags heckin good boys and girls extremely cuuuuuute, 
-											 fat boi shoob pupper you are doin me a concern. Shoober 
-											 heckin wrinkler long bois doge doggo, puggorino mlem aqua 
-											 doggo tungg. Blop woofer blep wrinkler boofers heckin, aqua 
-											 doggo doggo pupper. Maximum borkdrive wow such tempt smol 
-											 borking doggo with a long snoot for pats puggorino very jealous
-											  pupper, borkf very jealous pupper clouds. Smol borking doggo 
-											  with a long snoot for pats boofers stop it fren very taste wow,
-											porgo. Heckin good boys and girls doge dat tungg tho shooberino, 
-											pupperino snoot.
-										</p>
-										<p>
-											Corgo heckin 
-											fluffer long woofer, borkdrive. What a nice floof 
-											adorable doggo smol heckin angery woofer long doggo 
-											blep, most angery pupper I have ever seen clouds blep.
-											Tungg blep thicc ur givin me a spook very jealous pupper
-											sub woofer, corgo pupper porgo. Pats very hand that feed 
-											shibe h*ck tungg shoob wow such tempt, smol borking doggo
-											with a long snoot for pats length boy aqua doggo such treat.
-											Maximum borkdrive ur givin me a spook big ol pupper heckin,
-											long bois bork.
-											Pupper ur givin me a spook floofs heckin good
-											boys and girls puggo, extremely cuuuuuute clouds. 
-											blop. long water shoob lotsa pats.
-										</p>
+										
 									</section>
 
 							</div>
-							<div class="col-3 col-12-medium">
+							<div class="col-4 col-12-medium">
 
 								<!-- Sidebar -->
 									<section>
 										<header>
-											<h2>Magna Phasellus</h2>
+											<!-- TODO: Replace placeholders with info -->
+											<h2>Subtotal (xxx items): $price</h2>
 										</header>
-										<ul class="link-list">
-											<li><a href="#">Sed dolore viverra</a></li>
-											<li><a href="#">Ligula non varius</a></li>
-											<li><a href="#">Nec sociis natoque</a></li>
-											<li><a href="#">Penatibus et magnis</a></li>
-											<li><a href="#">Dis parturient montes</a></li>
-											<li><a href="#">Nascetur ridiculus</a></li>
-										</ul>
+										<input type="submit" class="button-large" value="Proceed to Checkout"></input>
 									</section>
 									<section>
 										<header>
-											<h2>Borkdrive Super Chub Doge</h2>
+											<!-- TODO: Recommend like items -->
+											<h2>More items</h2>
 										</header>
 										<p>
 											Lotsa pats aqua doggo fluffer heckin, 

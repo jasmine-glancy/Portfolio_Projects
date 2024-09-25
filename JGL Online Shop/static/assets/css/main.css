@@ -1463,7 +1463,8 @@ input, select, textarea {
 			margin: 0.5vw;
 		}
 
-		.icon-logo, .logo-text, .cart_logo, .cobra_icon {
+		.icon-logo, .logo-text, .cart_logo, 
+		.cobra_icon, .empty_cart, .basket_snake {
 			display: inline-block;
 		}
 
@@ -1502,6 +1503,26 @@ input, select, textarea {
 				margin-right: 1vw;
 				transform: translateY(25%);
 			}
+
+			.cart_icons_container {
+				display: flex;
+				justify-content: center; 
+				align-items: center;     
+				width: 100%;             
+			}
+
+				.empty_cart {
+					width: 9vw;
+					transform: translateY(18%);
+					padding-bottom: 0.5vw;
+				}
+
+				.basket_snake {
+					width: 10vw;
+					margin-bottom: 1vw;
+					transform: translateY(5%);
+				}
+
 
 	.bordered-feature-image, .bordered-feature-image-list {
 		display: block;
@@ -2256,3 +2277,16 @@ input[type="text"],
 	color: #c6c8c8;
 	transform: translateY(-100%);
 }			
+
+/* Cart CSS */
+.notification {
+    display: flex;
+    justify-content: center;
+    font-size: 1.5rem;
+	margin-top: 2vh;
+}
+
+	.notification a {
+		margin-left: 0.25vw;
+		margin-right: 0.25vw;
+	}
