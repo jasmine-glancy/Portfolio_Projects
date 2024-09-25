@@ -32,9 +32,8 @@
                                 <h2>Options</h2>
                             </header>
                             
-                            
-							<!-- TODO: Add form action and method -->
-                            <form id="colorForm" action="{{ url_for('for_sale_info') }}" method="POST">
+
+                            <form id="colorForm" action="{{ url_for('for_sale_info', product_id=product.service_product_id) }}" method="POST">
                                 {% if leather_options and leather_colors and metal_colors and sizes %}
                                     <div class="form-group">
                                         <div class="mb-3">
@@ -121,7 +120,7 @@
 											<label for="software_option" class="form-label">
 												Choose an Option:
 											</label>
-											<select class="form-select" aria-label="writing" name="writing_options">
+											<select class="form-select" aria-label="writing" name="software_options">
 												{% for option in software %}
 													<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
 												{% endfor %}

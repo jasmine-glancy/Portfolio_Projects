@@ -1,0 +1,62 @@
+<!--
+	Modified from the wonderful template Halcyonic by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+
+{% block title %}Login{% endblock %}
+
+{% extends "base.html" %}
+
+{% block content %}
+	<body class="subpage">
+		<div id="page-wrapper">
+
+			<!-- Content -->
+				<section id="content">
+					<div class="container">
+						<div class="row">
+							<div class="col-12">
+
+								<!-- Main Content -->
+									
+									<section>
+										<header>
+											<h2>Login</h2>
+										</header>
+
+                                        <!-- Outputs error messages -->
+                                        {% with messages = get_flashed_messages() %}
+                                            {% if messages %}
+                                                {% for error in messages %}
+                                                    <p class="flash">
+                                                        <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
+                                                        {{ messages[-1] }} 
+                                                        <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
+                                                    </p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endwith %}
+
+										<div>
+                                            <form class="row g-3" action="{{ url_for('login') }}" method="POST">
+                                                <div class="col-md-9">
+                                                    <label for="validationDefault01" class="form-label">Username:</label>
+                                                    <input type="text" class="form-control" id="validationDefault01" name="username" required>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <label for="validationDefault02" class="form-label">Password:</label>
+                                                    <input type="text" class="form-control" id="validationDefault02" name="password" required>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="button-large" id="login_button" type="submit">Login</button>
+                                                </div>
+                                            </form>
+                                        </div>
+									</section>
+
+							</div>
+						</div>
+					</div>
+				</section>
+{% endblock %}

@@ -3,11 +3,14 @@ An online shop using Flask and Python
 """
 
 from datetime import datetime
-from flask import Flask, render_template, request
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 import helpers as h
+from online_shop import Users, SHOP_SESSION
 import os
 import queries as q
+from werkzeug.security import check_password_hash, generate_password_hash
+
 
 # Configure application
 app = Flask(__name__)
@@ -16,7 +19,7 @@ app = Flask(__name__)
 Bootstrap(app)
 
 # Load in security key
-KEY = os.environ.get("security_key")
+app.secret_key = os.environ.get("security_key")
 
 
 JGL_CURRENT_YEAR = h.current_year()
@@ -122,7 +125,15 @@ def for_sale_info(product_id):
             size = request.form.get("size")
             
             print(good, leather_color, leather_color, metal_color, size)
-    
+        elif product_id == 2 or product_id == 3:
+            # For written services
+            written_product = request.form.get("writing_options")
+            
+        elif product_id == 4:
+            # For software-based services   
+            software_id = request.form.get("software_options") 
+            
+        
     return render_template("product_page.html",
                            date=JGL_CURRENT_YEAR,
                            socials=JGL_SOCIALS,
@@ -140,4 +151,138 @@ def cart():
     """Shows the user's current cart"""
     
     return render_template("cart.html",
-                           socials=JGL_SOCIALS,)
+                           socials=JGL_SOCIALS)
+    
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Registers a new user"""
+
+    # Store socials in session
+    session['socials'] = JGL_SOCIALS
+    
+    if request.method == "POST":
+        
+        try:
+            # Check user against info in the database
+            find_user = q.find_user(request.form.get("username"))
+            find_email = q.find_email(request.form.get("email"))
+            
+            # Check if username exists already in the database
+            if find_user is not None:
+                flash("That username is already taken.")
+                return redirect(url_for("register"))
+
+            # Check if the user's password matches the password verification
+            elif request.form.get("password") != request.form.get("confirm_password"):
+                flash("Passwords must match.")
+                return redirect(url_for("register"))
+
+            # Check if the email address is in the database
+            elif find_email is not None:
+                flash("That email address is already in use.")
+                return redirect(url_for("register"))
+
+            # If all checks pass, hash password
+            hashed_password = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
+        except Exception as e:
+            flash(f"Can't register new user, exception: {e}")
+            return redirect(url_for("register"))
+        else:
+            print("success!")
+            username = request.form.get("username")
+            email = request.form.get("email")
+            print(username, email)
+            
+            # Insert data if all checks pass
+            try:
+                # Insert new info into database
+                new_user = Users(
+                    username=username,
+                    password=hashed_password,
+                    email=email,
+                    created_at=datetime.now(),
+                    modified_at=datetime.now()
+                )
+            
+                print(new_user.username,
+                      new_user.password,
+                      new_user.email,
+                      new_user.created_at,
+                      new_user.modified_at)
+                
+                SHOP_SESSION.add(new_user)
+                SHOP_SESSION.commit()
+                
+                session["username"] = new_user.username
+
+            except Exception as e:
+                SHOP_SESSION.rollback()
+                
+                flash(f"Can't insert new user into database, exception: {e}")
+                return redirect(url_for("register"))
+                
+            try:
+                # Get the user id and save it to the session
+                look_up_id = q.find_user_id(username)
+                
+                if look_up_id is not None:
+                    print(look_up_id["user_id"])
+                    
+                    # Remember which user has logged in
+                    session["user_id"] = look_up_id["user_id"]
+                                        
+            except Exception as e:
+                print("Can't find user ID")
+                
+            # Redirect to home
+            return redirect(url_for("home"))
+
+    return render_template("register.html",
+                           socials=JGL_SOCIALS)
+    
+@app.route("/logout")
+def logout():
+    """Logs user out"""
+    
+    # Clears the user_id
+    session.clear()
+    
+    # Redirect to home
+    return redirect(url_for("home", socials=JGL_SOCIALS))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Logs an existing user in"""
+        
+    # Checks if the user's data is validated 
+    if request.method == "POST":
+
+        # Check username and hashed password against the database
+        try:
+            user_lookup = q.find_user(request.form.get("username"))
+            
+            if user_lookup == None:
+                flash("Username not found.")
+                return redirect(url_for("login"))
+        
+            # Ensure username exists and password is correct
+            elif not check_password_hash(user_lookup.password, 
+                                    request.form.get("password")):
+                flash("Invalid password.")
+                return redirect(url_for("login"))
+            
+            else:
+                flash(f"Logged in as {request.form.get("username")}!")
+                
+                # Remember which user has logged in
+                session["user_id"] = user_lookup.user_id
+                session["username"] = user_lookup.username
+                
+                print(session["user_id"], session["username"])
+                return redirect(url_for("home"))
+        except Exception as e:
+            flash(f"Can't log in. Exception: {e}")
+            return redirect(url_for("login"))
+     
+    return render_template("login.html", socials=JGL_SOCIALS)

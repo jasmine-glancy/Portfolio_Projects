@@ -80,3 +80,30 @@ def software():
     ).all()
     
     return software_goods
+
+def find_user(name):
+    """Looks up the user by name"""
+    
+    user_search = shop_session.query(
+        sh.Users
+    ).filter_by(username=name).first()
+    
+    return user_search
+
+def find_email(form_email):
+    """Looks up the user by email"""
+    
+    user_search = shop_session.query(
+        sh.Users
+    ).filter_by(email=form_email).first()
+    
+    return user_search
+
+def find_user_id(username):
+    """Looks up ID by username"""
+    
+    user_search = shop_session.query(
+        sh.Users
+    ).filter_by(username=username).first()
+    
+    return user_search
