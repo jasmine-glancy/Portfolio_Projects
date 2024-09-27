@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_bootstrap import Bootstrap
 import helpers as h
-from online_shop import Users, SHOP_SESSION
+from online_shop import CartItems, Users, SHOP_SESSION, ShoppingSessions
 import os
 import queries as q
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -56,7 +56,7 @@ def products():
 def for_sale_info(product_id):
     """Provides more info on each product"""
     
-    # Fetch product information based on product_id
+        # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     print(f"Product ID: {product.service_product_id}")
     print(f"Product Name: {product.name}")
@@ -67,6 +67,10 @@ def for_sale_info(product_id):
     print(f"Product Last Updated: {product.last_updated}")
     print(f"Product Image Path: {product.image_path}")
     
+    if product:
+        id = product.service_product_id
+        print(f"ID: {id}")
+        
     leather_options = None
     leather_colors = None
     metal_colors = None
@@ -74,7 +78,7 @@ def for_sale_info(product_id):
     nonfiction = None
     fiction = None 
     software = None
-    
+            
     if product_id == 1:
         # Leather options
         
@@ -117,30 +121,98 @@ def for_sale_info(product_id):
     print(product)
     
     if request.method == "POST":
+        print("posted")
         if "add_to_cart" in request.form:
-            if product_id == 1:
+            print("Add to Cart button clicked")
+            
+            # Calculate price
+            item_price = q.find_product_price(id)
+            
+            print(f"Item Price: {item_price}")
+            
+            # If there is a shopping session, reference it
+            if "shopping_session" in session:
+                print("Shopping session found!")
+                
+                if session.get("user_id") and item_price:
+                    # Find existing shopping session total
+                    shopping_session = q.shopping_session_search(session["shopping_session"])
+                    session_total = shopping_session.total
+                    
+                    new_price = session_total + item_price
+                    
+                    print(new_price)
+            else:
+                
+                # If there isn't a shopping session already, create one
+                if session.get("user_id") and item_price:
+                    
+                    try:
+                        new_shopping_session = ShoppingSessions(
+                            user_id=session["user_id"],
+                            total=item_price,
+                            created_at=datetime.now(),
+                            modified_at=datetime.now()
+                        )
+                        
+                        print(new_shopping_session.session_id,
+                            new_shopping_session.total,
+                            new_shopping_session.user_id)
+                        
+                        SHOP_SESSION.add(new_shopping_session)
+                        SHOP_SESSION.commit()
+                        
+                        # Update the shopping session
+                        session["shopping_session"] = new_shopping_session.session_id
+                        
+                        print(f"Shopping session: {session["shopping_session"]}")
+                        
+                    except Exception as e:
+                        SHOP_SESSION.rollback()
+                        
+                        flash(f"Unable to add shopping session. Exception: {e}")
+                    
+                        return redirect(url_for("for_sale_info"))
+                    
+            if id == 1:
                 # For leather goods
                 good = request.form.get("leather_product")
                 leather_color = request.form.get("leather_color")
                 metal_color = request.form.get("metal_color")
                 size = request.form.get("size")
+                quantity = request.form.get("quantity")
                 
-                print(good, leather_color, leather_color, metal_color, size)
-            elif product_id == 2 or product_id == 3:
+                if good == "default" or leather_color == "default" \
+                    or metal_color == "default" or size == "default":
+                        flash("Please make a selection", "selection_error")
+
+                if quantity < 0 or quantity > 10:
+                    flash("Please choose a number between 1 and 10", "selection_error")
+                
+                print(f"Leather Product: {good}, Leather Color: {leather_color}, Metal Color: {metal_color}, Size: {size}")
+                # TODO: Add options to the cart
+            elif id == 2 or id == 3:
                 # For written services
                 written_product = request.form.get("writing_options")
-                
-            elif product_id == 4:
+                print(f"Written Product: {written_product}")
+
+                # TODO: Add options to the cart
+            elif id == 4:
                 # For software-based services   
                 software_id = request.form.get("software_options") 
         
-            # TODO: If there is a shopping session, reference it
+                print(f"Software ID: {software_id}")
+                # TODO: Add options to the cart
             
-                # TODO: Add shopping_session created_at
-            # TODO: If there isn't a shopping session already, create one
-            
-            # TODO: Add options to the cart
-             
+            # # TODO: Add options to the cart
+            # new_cart_item = CartItems(
+            #     session_id=session["shopping_session"],
+            #     product_id=id,
+            #     quantity=xxx,
+            #     created_at=datetime.now(),
+            #     modified_at=datetime.now(),
+                
+            # )
         elif "send_message" in request.form:
             name = request.form.get("name")
             email = request.form.get("email")
@@ -191,7 +263,7 @@ def register():
     """Registers a new user"""
 
     # Store socials in session
-    session['socials'] = JGL_SOCIALS
+    session["socials"] = JGL_SOCIALS
     
     if request.method == "POST":
         

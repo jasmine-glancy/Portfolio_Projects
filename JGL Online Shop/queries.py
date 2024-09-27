@@ -107,3 +107,26 @@ def find_user_id(username):
     ).filter_by(username=username).first()
     
     return user_search
+
+def find_product_price(product_id):
+    """Returns the price of an item"""
+    
+    price_search = shop_session.query(
+        sh.ProductsAndServices
+    ).filter_by(service_product_id=product_id).first()
+    
+    if price_search:
+        item_price = price_search.rate
+        
+        return item_price
+    
+    return price_search
+
+def shopping_session_search(session_id):
+    """Finds any shopping session"""
+    
+    shopping_session = shop_session.query(
+        sh.ShoppingSessions
+    ).filter_by(session_id=session_id).first()
+    
+    return shopping_session

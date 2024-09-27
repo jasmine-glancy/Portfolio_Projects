@@ -2144,20 +2144,27 @@ input, select, textarea {
 
 /* Buttons */
 
-.btn, .btn.disabled {
+.btn, .btn.disabled, .button {
 	background-color: #474f51 !important;
 	color: #c6c8c8 !important;
 	border: #222628 !important;
 	opacity: 100%;
 	margin-bottom: 2vh;
 	font-size: 14pt;
+
 }
 
-	.btn:hover {
-		background-color: #515a5c;
+	.button{
+		padding: 10px 30px;
+		border-radius: 25px;
+		justify-content: center;
 	}
 
-	.btn:active {
+	.btn:hover, .button:hover {
+		background-color: #515a5c !important;
+	}
+
+	.btn:active, .button:active {
 		background-color: #222628 !important;
 	}
 	
@@ -2177,10 +2184,9 @@ input, select, textarea {
 		input[type=submit] {
 			color: #f8f8f8;
 			background-color: #3B4346;
-			border-radius: 25px;
 		}
 		
-		input[type=email] {
+		input[type=email], input[type=number] {
 			background-color: #f7f7f7;
 		}
 
@@ -2224,6 +2230,22 @@ input[type="text"],
 	}
 
 /* Forms */
+
+#colorForm, #contactForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#contactForm .row {
+    width: 100%; }
+
+	#contactForm .col-12 {
+		width: 100%; 
+		display: flex;
+		justify-content: center;
+	}
+
 .form-label,
 .form-select {
     display: inline-block;
@@ -2249,6 +2271,12 @@ input[type="text"],
 	.form-select {
 		background-color: #f8f8f8;
 		font-size: 14pt;
+	}
+
+	#quantity {
+		width: 11vw;
+		margin-top: 1vw;
+		margin-bottom: 1vw;
 	}
 
 /* Login and Register  */
@@ -2290,3 +2318,4 @@ input[type="text"],
 		margin-left: 0.25vw;
 		margin-right: 0.25vw;
 	}
+
