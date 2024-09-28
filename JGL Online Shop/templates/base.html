@@ -72,11 +72,19 @@
                                 <a href="{{ url_for('register') }}">Register</a>
                             {% endif %}
 
-                            <a href="{{ url_for('cart') }}">
-                                <img src="{{ url_for('static', filename='assets/images/cart.svg')}}" 
-                                alt="A cart with a plus sign, indicating the cart is empty" 
-                                class="cart_logo"/>
-                            </a>
+                            {% if session["cart_contains_items"] %}
+                                <a href="{{ url_for('cart') }}">
+                                    <img src="{{ url_for('static', filename='assets/images/cart_with_items.svg')}}" 
+                                    alt="A cart with items in it" 
+                                    class="cart_logo"/>
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('cart') }}">
+                                    <img src="{{ url_for('static', filename='assets/images/cart.svg')}}" 
+                                    alt="A cart with a plus sign, indicating the cart is empty" 
+                                    class="cart_logo"/>
+                                </a>
+                            {% endif %}
                         </nav>
     
                     </div>

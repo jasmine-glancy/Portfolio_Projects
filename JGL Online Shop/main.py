@@ -250,6 +250,8 @@ def for_sale_info(product_id):
                 SHOP_SESSION.rollback()
                 flash(f"Unable to update cart. Exception: {e}", "selection_error")
                 
+            session["cart_contains_items"] = True
+                
         elif "send_message" in request.form:
             name = request.form.get("name")
             email = request.form.get("email")
@@ -386,7 +388,7 @@ def register():
 def logout():
     """Logs user out"""
     
-    # Clears the user_id
+    # Clears the session variables
     session.clear()
     
     # Redirect to home
