@@ -156,7 +156,19 @@
                         <!-- Main Content -->
                         <section>
                             <header>
-                                <h2>{{ product.name }}</h2>
+                                <h2>
+                                    {{ product.name }}
+
+                                    {% with messages = get_flashed_messages(category_filter=["successful_add"]) %}
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <p class="flash_success">
+                                                    Added to Cart!
+                                                </p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+                                </h2>
                                 <h3>
                                     {% if product.notes == "Supplies +" %}
                                         {{ product.notes }}

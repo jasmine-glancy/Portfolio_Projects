@@ -131,7 +131,7 @@ def for_sale_info(product_id):
             print(f"Item Price: {item_price}")
             
             # If there is a shopping session, reference it
-            if "shopping_session" in session:
+            if "shopping_session" in session and session.get("shopping_session"):
                 print("Shopping session found!")
                 
                 if session.get("user_id") and item_price:
@@ -139,9 +139,18 @@ def for_sale_info(product_id):
                     shopping_session = q.shopping_session_search(session["shopping_session"])
                     session_total = shopping_session.total
                     
+                    # Update the total
                     new_price = session_total + item_price
+                    shopping_session.total = new_price
+                    shopping_session.modified_at = datetime.now()
                     
-                    print(new_price)
+                    try:
+                        SHOP_SESSION.commit()
+                        print(f"Updated total: {new_price}")
+                        
+                    except Exception as e:
+                        SHOP_SESSION.rollback()
+                        flash(f"Unable to update shopping session. Exception: {e}")
             else:
                 
                 # If there isn't a shopping session already, create one
@@ -173,46 +182,74 @@ def for_sale_info(product_id):
                         flash(f"Unable to add shopping session. Exception: {e}")
                     
                         return redirect(url_for("for_sale_info"))
+            
+            
+            quantity = int(request.form.get("quantity"))
+            
+            if quantity < 0 or quantity > 10:
+                flash("Please choose a number between 1 and 10", "selection_error")
                     
+            # Add options to the cart
+            new_cart_item = CartItems(
+                session_id=session["shopping_session"],
+                product_id=id,
+                quantity=quantity,
+                created_at=datetime.now(),
+                modified_at=datetime.now(),
+                
+            )        
+            
             if id == 1:
                 # For leather goods
                 good = request.form.get("leather_product")
                 leather_color = request.form.get("leather_color")
                 metal_color = request.form.get("metal_color")
                 size = request.form.get("size")
-                quantity = request.form.get("quantity")
                 
                 if good == "default" or leather_color == "default" \
                     or metal_color == "default" or size == "default":
                         flash("Please make a selection", "selection_error")
 
-                if quantity < 0 or quantity > 10:
-                    flash("Please choose a number between 1 and 10", "selection_error")
-                
                 print(f"Leather Product: {good}, Leather Color: {leather_color}, Metal Color: {metal_color}, Size: {size}")
-                # TODO: Add options to the cart
+                
+                # Add options to the cart
+                new_cart_item.leather_good_id = good
+                new_cart_item.leather_color_id = leather_color
+                new_cart_item.metal_color_id = metal_color
+                new_cart_item.leather_goods_size_id = size
+                
             elif id == 2 or id == 3:
                 # For written services
                 written_product = request.form.get("writing_options")
                 print(f"Written Product: {written_product}")
-
-                # TODO: Add options to the cart
+                
+                if written_product == "default":
+                    flash("Please make a selection", "selection_error")
+                    
+                # Add options to the cart
+                new_cart_item.writing_option_id = written_product
+                
             elif id == 4:
                 # For software-based services   
                 software_id = request.form.get("software_options") 
         
                 print(f"Software ID: {software_id}")
-                # TODO: Add options to the cart
-            
-            # # TODO: Add options to the cart
-            # new_cart_item = CartItems(
-            #     session_id=session["shopping_session"],
-            #     product_id=id,
-            #     quantity=xxx,
-            #     created_at=datetime.now(),
-            #     modified_at=datetime.now(),
                 
-            # )
+                if software_id == "default":
+                    flash("Please make a selection", "selection_error")
+                    
+                # Add options to the cart
+                new_cart_item.software_id = software_id
+            
+            try:
+                SHOP_SESSION.add(new_cart_item)
+                SHOP_SESSION.commit()
+                flash("Added to cart!", "successful_add")
+                
+            except Exception as e:
+                SHOP_SESSION.rollback()
+                flash(f"Unable to update cart. Exception: {e}", "selection_error")
+                
         elif "send_message" in request.form:
             name = request.form.get("name")
             email = request.form.get("email")

@@ -2290,6 +2290,14 @@ input[type="text"],
     font-weight: 700;
 }
 
+.flash_success {
+	display: inline-block;
+	font-weight: 200 !important;
+	padding-left: 5vw;
+	color: #96a9b5;
+	margin-bottom: 0;
+}
+
 .warning {
     max-width: 2vw;
 	margin-left: 1vw;

@@ -23,7 +23,7 @@ class CartItems(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     session_id = Column(Integer, ForeignKey("shopping_sessions.session_id"), nullable=False)
     product_id = Column(Integer, ForeignKey("products_and_services.service_product_id"), nullable=False)
-    quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer)
     created_at = Column(DateTime, nullable=False)
     modified_at = Column(DateTime, nullable=False)
     leather_good_id = Column(Integer, ForeignKey("leather_goods.leather_item_id"))
