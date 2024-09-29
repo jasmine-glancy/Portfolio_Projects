@@ -25,10 +25,40 @@ app.secret_key = os.environ.get("security_key")
 JGL_CURRENT_YEAR = h.current_year()
 JGL_SOCIALS = h.social_links()
 
+# ------------------ Template filters ------------------ #
 
 @app.template_filter("datetime_format")
 def datetime_format(s, format="%x"):    
     return s.strftime(format)
+
+@app.template_filter("get_product_name")
+def get_product_name(product_id):
+    product_or_service = q.find_product_by_id(product_id)
+    
+    product_service_title = product_or_service.name
+    
+    return product_service_title
+
+@app.template_filter("image")
+def image(product_id):
+    product_or_service = q.find_product_by_id(product_id)
+    
+    product_service_img = product_or_service.image_path
+    
+    return product_service_img
+
+@app.template_filter("cart_price")
+def cart_price(session_id):
+    cart_items = q.cart_price(session_id)
+    
+    cart_total = cart_items.total
+    
+        # Format the total price to two decimal places
+    formatted_total = f"{cart_total:.2f}"
+    
+    return formatted_total
+
+# ----------------------- Routes ----------------------- #
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -136,7 +166,7 @@ def for_sale_info(product_id):
                 
                 if session.get("user_id") and item_price:
                     # Find existing shopping session total
-                    shopping_session = q.shopping_session_search(session["shopping_session"])
+                    shopping_session = q.shopping_session_search(session["2"])
                     session_total = shopping_session.total
                     
                     # Update the total
@@ -145,7 +175,7 @@ def for_sale_info(product_id):
                     shopping_session.modified_at = datetime.now()
                     
                     try:
-                        SHOP_SESSION.commit()
+                        SHOP_SESSION.commit(2)
                         print(f"Updated total: {new_price}")
                         
                     except Exception as e:
@@ -276,7 +306,12 @@ def for_sale_info(product_id):
 def cart():
     """Shows the user's current cart"""
     
-    # TODO: Query database for the user's cart
+    
+    cart_items = None
+    if "shopping_session" in session and session["shopping_session"]:
+        # TODO: Query database for the user's cart
+        cart_items = q.find_cart(session["shopping_session"])
+        
     # TODO: Add shopping cart total
 
         # TODO: Query database for prices
@@ -294,7 +329,8 @@ def cart():
         
         # TODO: Go to successfull checkout page
     return render_template("cart.html",
-                           socials=JGL_SOCIALS)
+                           socials=JGL_SOCIALS,
+                           cart_items=cart_items)
     
 
 @app.route("/register", methods=["GET", "POST"])

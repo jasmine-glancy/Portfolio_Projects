@@ -20,7 +20,7 @@ def find_product_by_id(product_id):
     
     product_or_service = shop_session.query(
         sh.ProductsAndServices
-    ).filter_by(service_product_id=product_id).first()
+    ).filter_by(service_product_id=product_id).one_or_none()
     
     return product_or_service
 
@@ -130,3 +130,22 @@ def shopping_session_search(session_id):
     ).filter_by(session_id=session_id).first()
     
     return shopping_session
+
+def find_cart(shopping_session_id):
+    """Returns the cart items associated with
+    a shopping session"""
+    
+    cart_items = shop_session.query(
+        sh.CartItems
+    ).filter_by(session_id=shopping_session_id).all()
+    
+    return cart_items
+
+def cart_price(shopping_session_id):
+    """Grabs the total of the cart"""
+    
+    session_totals = shop_session.query(
+        sh.ShoppingSessions
+    ).filter_by(session_id=shopping_session_id).one_or_none()
+
+    return session_totals

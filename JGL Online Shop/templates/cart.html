@@ -32,6 +32,32 @@
 											{% if session["username"] %}
 												<!-- TODO: Iterate over cart items to display -->
 												Logged in!
+												{% if session["shopping_session"] %}
+													{% for item in cart_items %}
+														<div class="cart_row">
+															<img src="{{ url_for('static', filename=item.product_id|image) }}" 
+																alt="{{ item.image_alt }}" 
+																class="cart_img"/>
+															<div class="product_info">
+																{{ item.image_path }}
+																{{ item.product_id|get_product_name }} 
+										
+																<!-- TODO: Make quantity a dropdown and allow it to change -->
+																{{ item.quantity }} 
+																
+																<!-- TODO: Display options -->
+
+																<!-- TODO: Display rate and price -->
+																
+																<!-- TODO: Allow user to save items for later -->
+
+																<!-- TODO: Allow user to remove item -->
+															</div>
+														</div>
+													{% endfor %}
+												{% else %}
+													<p>Your cart is empty.</p>
+												{% endif %}
 											{% else %}
 												<div class="cart_icons_container">
 													<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
@@ -58,7 +84,11 @@
 									<section>
 										<header>
 											<!-- TODO: Replace placeholders with info -->
-											<h2>Subtotal (xxx items): $price</h2>
+											{% if cart_items and session["shopping_session"] %}
+												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price }}</h2>
+											{% else %}
+												<h2>Subtotal (0 items): $0.00</h2>
+											{% endif %}
 										</header>
 										<input type="submit" class="button-large" value="Proceed to Checkout"></input>
 									</section>

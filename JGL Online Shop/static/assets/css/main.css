@@ -2327,3 +2327,19 @@ input[type="text"],
 		margin-right: 0.25vw;
 	}
 
+	.cart_row {
+		display: flex;
+		align-items: center;
+		padding-bottom: 2vw;
+	}
+	
+		.cart_img {
+			width: 12vw;
+			margin-right: 2vw;
+		}
+
+		.product_info {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
