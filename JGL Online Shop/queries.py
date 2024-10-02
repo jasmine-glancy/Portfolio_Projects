@@ -24,6 +24,7 @@ def find_product_by_id(product_id):
     
     return product_or_service
 
+
 def find_leather_goods():
     """Returns a list of leather goods"""
     
@@ -279,7 +280,3 @@ def get_size(size_id):
         print(f"Exception: {e}")
         
     return size
-
-# TODO: Query metal color by ID
-
-# TODO: Query goods size by ID

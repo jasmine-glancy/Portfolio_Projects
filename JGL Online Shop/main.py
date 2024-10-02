@@ -45,6 +45,16 @@ def image(product_id):
     
     return product_service_img
 
+@app.template_filter("get_image_alt")
+def get_image_alt(product_id):
+    """Returns the alt for the image"""
+    
+    product_or_service = q.find_product_by_id(product_id)
+    
+    product_service_alt = product_or_service.image_alt
+    
+    return product_service_alt
+
 @app.template_filter("cart_price")
 def cart_price(session_id):
     """Finds the price of the cart as a whole"""
@@ -100,6 +110,15 @@ def display_size(size_id):
         return None
     
     return size
+
+@app.template_filter("update_unique_items")
+def update_unique_items(unique_items, item_key, quantity):
+    """Update the unique items dictionary with the summed quantity."""
+    if item_key in unique_items:
+        unique_items[item_key] += quantity
+    else:
+        unique_items[item_key] = quantity
+    return unique_items
 
 # Register the blueprint for routes 
 app.register_blueprint(main_bp)

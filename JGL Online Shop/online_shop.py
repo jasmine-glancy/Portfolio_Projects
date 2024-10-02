@@ -57,6 +57,7 @@ class ProductsAndServices(Base):
     notes = Column(String(200))
     last_updated = Column(DateTime, nullable=False)
     image_path = Column(String(200))
+    image_alt = Column(String(200))
     
     # Define the relationships
     cart_items = relationship("CartItems", back_populates="product")
