@@ -2344,6 +2344,6 @@ input[type="text"],
 			justify-content: center;
 		}
 
-	.product_option, .product_quantity {
+	.product_option, .product_quantity, .product_color, .metal_color, .size {
 		margin-left: 1vw;
 	}

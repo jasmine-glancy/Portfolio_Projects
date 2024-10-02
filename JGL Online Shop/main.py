@@ -68,6 +68,39 @@ def get_option_text(product_id, option_id):
     
     return options
 
+@app.template_filter("get_leather_color")
+def get_leather_color(color_id):
+    """Finds the color string"""
+    
+    leather_color = q.find_leather_color(color_id)
+    
+    if not leather_color:
+        return None
+    
+    return leather_color
+
+@app.template_filter("get_metal_color")
+def get_metal_color(color_id):
+    """Finds the chosen metal color"""
+    
+    metal_color = q.find_metal_color(color_id)
+    
+    if not metal_color:
+        return None
+    
+    return metal_color
+
+@app.template_filter("display_size")
+def display_size(size_id):
+    """Finds the chosen size of leather project"""
+    
+    size = q.get_size(size_id)
+    
+    if not size:
+        return None
+    
+    return size
+
 # Register the blueprint for routes 
 app.register_blueprint(main_bp)
 

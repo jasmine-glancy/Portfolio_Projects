@@ -150,14 +150,6 @@ def cart_price(shopping_session_id):
 
     return session_totals
 
-# TODO: Query leather goods by ID
-
-# TODO: Query leather color by ID
-
-# TODO: Query metal color by ID
-
-# TODO: Query goods size by ID
-
 def find_option_text(product_id, option_id):
     """Find text for an option based on ID"""
     
@@ -220,3 +212,74 @@ def find_option_text(product_id, option_id):
             
     return option
     
+def find_leather_color(color_id):
+    """Query leather color by ID"""
+
+    color = None
+    
+    try:
+        color_results = shop_session.query(
+            sh.LeatherColors
+        ).filter_by(leather_color_id=color_id).first()
+
+        if color_results is None:
+            print("No matching color found")
+            
+        color = color_results.color_string
+        
+        print(f"Option: {color}")
+    
+    except Exception as e:
+        print(f"Exception: {e}")
+        
+    return color
+
+def find_metal_color(color_id):
+    """Query metal color by ID"""
+
+    color = None
+    
+    try:
+        color_results = shop_session.query(
+            sh.MetalColors
+        ).filter_by(metal_color_id=color_id).first()
+
+        if color_results is None:
+            print("No matching metal color found")
+            
+        color = color_results.metal_type
+        
+        print(f"Option: {color}")
+    
+    except Exception as e:
+        print(f"Exception: {e}")
+        
+    return color
+
+def get_size(size_id):
+    """Query size table"""
+
+    size = None
+    
+    try:
+        size_results = shop_session.query(
+            sh.Sizes
+        ).filter_by(size_id=size_id).first()
+
+        if size_results is None:
+            print("No matching sizes found")
+            
+        size_inches = size_results.size_inches
+        size_centi = size_results.size_centimeters
+    
+        size = f"{size_inches} inches ({size_centi} centimeters)"
+        print(f"Option: {size}")
+    
+    except Exception as e:
+        print(f"Exception: {e}")
+        
+    return size
+
+# TODO: Query metal color by ID
+
+# TODO: Query goods size by ID

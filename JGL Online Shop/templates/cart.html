@@ -30,8 +30,7 @@
 										<p>
 											<!-- TODO: Require login for checking out? -->
 											{% if session["username"] %}
-												<!-- TODO: Iterate over cart items to display -->
-												Logged in!
+												<!-- Iterate over cart items to display -->
 												{% if session["shopping_session"] %}
 													{% for item in cart_items %}
 														<div class="cart_row">
@@ -42,33 +41,51 @@
 																{{ item.image_path }}
 																{{ item.product_id|get_product_name }} 
 																
-																<div class="product_option">
-																	<!-- TODO: Display options -->
-																	{% if item.product_id == 1 %}
+																
+																<!-- Display options -->
+																{% if item.product_id == 1 %}
+																	<div class="product_option">
 																		<!-- Leather options -->
 																		{{ item.product_id|get_option_text(item.leather_good_id)|title }}
+																	</div>
+																	
+																	<div class="product_color">
+																		Color: {{ item.leather_color_id|get_leather_color|title }}
+																	</div>
 
-																	{% elif item.product_id == 2 or item.product_id == 3 %}
+																	<div class="metal_color">
+																		Metal Color: {{ item.metal_color_id|get_metal_color|title }}
+																	</div>
+
+																	<div class="size">
+																		Size: {{ item.leather_goods_size_id|display_size|title }}
+																	</div>
+																{% elif item.product_id == 2 or item.product_id == 3 %}
+																	<div class="product_option">
 																		<!-- Written options -->
 																		{{ item.product_id|get_option_text(item.writing_option_id)|title }}
-																		
-																	{% elif item.product_id == 4 %}
+																	</div>	
+																{% elif item.product_id == 4 %}
+																	<div class="product_option">
 																		<!-- Software options -->
 																		{{ item.product_id|get_option_text(item.software_id)|title }}
 																		
-																	{% endif %}
-																</div>
+																	</div>
+																{% endif %}
 										
-																<!-- TODO: Make quantity a dropdown and allow it to change -->
-																<div class="product_quantity">
-																	x {{ item.quantity }} 
-																</div>
 
 																<!-- TODO: Display rate and price -->
 																
 																<!-- TODO: Allow user to save items for later -->
 
 																<!-- TODO: Allow user to remove item -->
+
+																<!-- TODO: Make quantity a dropdown and allow it to change -->
+
+																<div class="product_quantity">
+																	x {{ item.quantity }} 
+																</div>
+
 															</div>
 														</div>
 													{% endfor %}
