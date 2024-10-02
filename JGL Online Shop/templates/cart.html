@@ -5,7 +5,7 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 	
-{% block title %}Two Column 1 - Halcyonic by HTML5 UP{% endblock %}
+{% block title %}Cart{% endblock %}
 
 {% extends "base.html" %}
 
@@ -41,11 +41,28 @@
 															<div class="product_info">
 																{{ item.image_path }}
 																{{ item.product_id|get_product_name }} 
+																
+																<div class="product_option">
+																	<!-- TODO: Display options -->
+																	{% if item.product_id == 1 %}
+																		<!-- Leather options -->
+																		{{ item.product_id|get_option_text(item.leather_good_id)|title }}
+
+																	{% elif item.product_id == 2 or item.product_id == 3 %}
+																		<!-- Written options -->
+																		{{ item.product_id|get_option_text(item.writing_option_id)|title }}
+																		
+																	{% elif item.product_id == 4 %}
+																		<!-- Software options -->
+																		{{ item.product_id|get_option_text(item.software_id)|title }}
+																		
+																	{% endif %}
+																</div>
 										
 																<!-- TODO: Make quantity a dropdown and allow it to change -->
-																{{ item.quantity }} 
-																
-																<!-- TODO: Display options -->
+																<div class="product_quantity">
+																	x {{ item.quantity }} 
+																</div>
 
 																<!-- TODO: Display rate and price -->
 																
@@ -56,6 +73,14 @@
 														</div>
 													{% endfor %}
 												{% else %}
+													<div class="cart_icons_container">
+														<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
+														alt="A picture of a King Cobra in a basket" 
+														class="basket_snake"/>
+														<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
+														alt="A cart moving fast" 
+														class="empty_cart"/>
+													</div>
 													<p>Your cart is empty.</p>
 												{% endif %}
 											{% else %}
@@ -70,7 +95,7 @@
 
 												<div class="notification">
 													You are not currently logged in. Please 
-													<a href="{{ url_for('login') }}">log in</a> to continue.
+													<a href="{{ url_for('main.login') }}">log in</a> to continue.
 												</div>
 											{% endif %}
 										</p>

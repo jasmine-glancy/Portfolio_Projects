@@ -51,8 +51,9 @@
 														{% else %}
 															<div class="divider"></div>
 														{% endif %}
-													<!-- TODO: Link to product information page -->
-													<a href="{{ url_for('for_sale_info', product_id=product.service_product_id) }}">
+														
+													<!-- Link to product information page -->
+													<a href="{{ url_for('main.for_sale_info', product_id=product.service_product_id) }}">
 														<button type="button" class="btn btn-primary">Learn More</button>
 													</a>
 													<p class="card-text">

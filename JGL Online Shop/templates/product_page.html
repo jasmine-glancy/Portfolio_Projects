@@ -45,7 +45,7 @@
                                 {% endif %}
                             {% endwith %}
 
-                            <form id="colorForm" action="{{ url_for('for_sale_info', product_id=product.service_product_id) }}" method="POST">
+                            <form id="colorForm" action="{{ url_for('main.for_sale_info', product_id=product.service_product_id) }}" method="POST">
                                 <div class="form-group">
                                     {% if leather_options and leather_colors and metal_colors and sizes %}
                                         <div class="mb-3">
@@ -209,7 +209,7 @@
                                 {% endwith %}
                                 
 								<!-- TODO: Add contact link -->
-								<form id="contactForm" action="{{ url_for('for_sale_info', product_id=product.service_product_id) }}" method="POST">
+								<form id="contactForm" action="{{ url_for('main.for_sale_info', product_id=product.service_product_id) }}" method="POST">
                                     <div class="row">
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="name" placeholder="Name" /></div>
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="email" placeholder="Email" /></div>

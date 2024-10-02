@@ -149,3 +149,74 @@ def cart_price(shopping_session_id):
     ).filter_by(session_id=shopping_session_id).one_or_none()
 
     return session_totals
+
+# TODO: Query leather goods by ID
+
+# TODO: Query leather color by ID
+
+# TODO: Query metal color by ID
+
+# TODO: Query goods size by ID
+
+def find_option_text(product_id, option_id):
+    """Find text for an option based on ID"""
+    
+    option = None
+    
+    if product_id == 1:
+        # Leather items
+        
+        try:
+            option_results = shop_session.query(
+                sh.LeatherGoods
+            ).filter_by(leather_item_id=option_id).first()
+
+            if option_results is None:
+                print("No matching leather good found")
+            
+            option = option_results.item
+            print(f"Option: {option}")
+        
+        except Exception as e:
+            print(f"Exception: {e}")
+        
+    elif product_id == 2 or product_id == 3:
+        # Written items      
+        
+        try:
+            option_results = shop_session.query(
+                sh.WritingOptions
+            ).filter_by(option_id=option_id).first()
+        
+            if option_results is None:
+                print("No matching writing option found")
+
+                
+            option = option_results.product_type
+            
+            print(f"Option: {option}")
+
+        except Exception as e:
+            print(f"Exception: {e}")
+        
+    elif product_id == 4:
+        # Software items
+        
+        try:
+            option_results = shop_session.query(
+                sh.SoftwareOptions
+            ).filter_by(option_id=option_id).first()
+
+            if option_results is None:
+                print("No matching software option found")
+                
+
+            option = option_results.product_type
+            
+            print(f"Option: {option}")
+        
+        except Exception as e:
+            print(f"Exception: {e}")
+            
+    return option
+    

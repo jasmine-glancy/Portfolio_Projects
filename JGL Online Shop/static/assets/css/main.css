@@ -2343,3 +2343,7 @@ input[type="text"],
 			flex-direction: column;
 			justify-content: center;
 		}
+
+	.product_option, .product_quantity {
+		margin-left: 1vw;
+	}
