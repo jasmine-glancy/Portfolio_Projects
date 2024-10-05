@@ -120,6 +120,40 @@ def update_unique_items(unique_items, item_key, quantity):
         unique_items[item_key] = quantity
     return unique_items
 
+@app.template_filter("display_price")
+def display_price(item_id):
+    """Finds the rate of a project or service"""
+    
+    product_or_service = q.find_product_by_id(item_id)
+    
+    rate = product_or_service.rate
+    
+    # Format the total price to two decimal places
+    formatted_rate = f"{rate:.2f}"
+    
+    return formatted_rate
+
+@app.template_filter("display_unit")
+def display_unit(item_id):
+    """Finds the rate unit of a project or service"""
+    
+    product_or_service = q.find_product_by_id(item_id)
+    
+    rate_unit = product_or_service.rate_unit
+    
+    return rate_unit
+
+@app.template_filter("display_leather_notes")
+def display_leather_notes(item_id):
+    """Finds the rate unit of a project or service"""
+    
+    product_or_service = q.find_product_by_id(item_id)
+    
+    notes = product_or_service.notes
+    
+    return notes
+    
+
 # Register the blueprint for routes 
 app.register_blueprint(main_bp)
 

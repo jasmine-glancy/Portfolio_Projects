@@ -2335,15 +2335,76 @@ input[type="text"],
 	
 		.cart_img {
 			width: 12vw;
+			height: 10vh;
 			margin-right: 2vw;
+			margin-top: 0;
 		}
-
 		.product_info {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 		}
+		
+		.product_details {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+		}
+		
+		.product_option, .product_color, .size {
+			margin-left: 1vw;
+		}
+		
+		.smaller-name, .longest-name, .product_name, .longer-name {
+			flex-grow: 1;
+			flex-shrink: 0;
+		}
+		
+		.product_name, .longer-name {
+			padding-right: 6vw;
+		}
 
-	.product_option, .product_quantity, .product_color, .metal_color, .size {
-		margin-left: 1vw;
-	}
+		.smaller-name {
+			padding-right: 6.25vw;
+		}
+
+		.longest-name {
+			padding-right: 4.75vw;
+		}
+		
+		.product_quantity {
+			display: flex;
+			margin-left: 10vw;
+		}
+
+		.quantity_dropdown {
+			display: inline;
+			margin-left: 0.75vw;
+			padding: 0.15vw 0.25vw;
+		}
+
+			
+
+.cart_table {
+	width: 100%;
+}
+
+	.column_one {
+		width: 70%
+	} 
+
+	.column_two {
+		width: 30%
+	} 
+
+	.leather_column_one {
+		width: 65%
+	} 
+
+	.leather_column_two {
+		width: 45%
+	} 
+
+.rate {
+	font-weight: 600;
+}

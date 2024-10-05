@@ -112,21 +112,29 @@ def for_sale_info(product_id):
     if request.method == "POST":
         print("posted")
         if "add_to_cart" in request.form:
+            item_quantity = int(request.form.get("quantity"))
+            
+            print(item_quantity, type(item_quantity))
+            
             print("Add to Cart button clicked")
             
             # Calculate price
-            item_price = q.find_product_price(id)
+            price = q.find_product_price(id)
             
-            print(f"Item Price: {item_price}")
+            print(f"Item Price: {price} type: {type(price)}")
             
             # If there is a shopping session, reference it
             if "shopping_session" in session and session.get("shopping_session"):
                 print("Shopping session found!")
                 
-                if session.get("user_id") and item_price:
+                if session.get("user_id") and price:
                     # Find existing shopping session total
                     shopping_session = q.shopping_session_search(session["shopping_session"])
                     session_total = shopping_session.total
+                    
+                    # Modify price by quantity
+                    item_price = price * item_quantity
+                    print(f"Item Price {item_price}")
                     
                     # Update the total
                     new_price = session_total + item_price
@@ -143,12 +151,12 @@ def for_sale_info(product_id):
             else:
                 
                 # If there isn't a shopping session already, create one
-                if session.get("user_id") and item_price:
+                if session.get("user_id") and price:
                     
                     try:
                         new_shopping_session = ShoppingSessions(
                             user_id=session["user_id"],
-                            total=item_price,
+                            total=price,
                             created_at=datetime.now(),
                             modified_at=datetime.now()
                         )
