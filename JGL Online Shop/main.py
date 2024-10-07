@@ -152,6 +152,7 @@ def display_leather_notes(item_id):
     notes = product_or_service.notes
     
     return notes
+
     
 
 # Register the blueprint for routes 
