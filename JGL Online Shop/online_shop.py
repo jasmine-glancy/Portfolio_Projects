@@ -62,6 +62,7 @@ class ProductsAndServices(Base):
     # Define the relationships
     cart_items = relationship("CartItems", back_populates="product")
     order_items = relationship("OrderItems", back_populates="product")
+    saved_items = relationship("SavedItems", back_populates="product")
 
     
 class LeatherColors(Base):
@@ -117,7 +118,26 @@ class PaymentDetails(Base):
     
     # Define the relationships
     order_details = relationship("OrderDetails", back_populates="payment")
-
+    
+class SavedItems(Base):
+    __tablename__ = "saved_items"
+    id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
+    session_id = Column(Integer, ForeignKey("shopping_sessions.session_id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products_and_services.service_product_id"), nullable=False)
+    quantity = Column(Integer)
+    created_at = Column(DateTime, nullable=False)
+    modified_at = Column(DateTime, nullable=False)
+    leather_good_id = Column(Integer, ForeignKey("leather_goods.leather_item_id"))
+    leather_color_id = Column(Integer, ForeignKey("leather_colors.leather_color_id"))
+    metal_color_id = Column(Integer, ForeignKey("metal_colors.metal_color_id"))
+    leather_goods_size_id = Column(Integer, ForeignKey("sizes.size_id"))
+    writing_option_id = Column(Integer, ForeignKey("writing_options.option_id"))
+    software_id = Column(Integer, ForeignKey("software_options.option_id"))
+    
+    # Define the relationship to ProductsAndServices
+    product = relationship("ProductsAndServices", back_populates="saved_items")
+    session = relationship("ShoppingSessions", back_populates="saved_items")
+    
 class ShoppingSessions(Base):
     __tablename__ = "shopping_sessions"
     session_id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
@@ -129,6 +149,7 @@ class ShoppingSessions(Base):
     # Define the relationship
     user = relationship("Users", back_populates="shopping_sessions")
     cart_items = relationship("CartItems", back_populates="session")
+    saved_items = relationship("SavedItems", back_populates="session")
     
 class Sizes(Base):
     __tablename__ = "sizes"

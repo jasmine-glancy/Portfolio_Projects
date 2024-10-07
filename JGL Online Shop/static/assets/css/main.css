@@ -2441,11 +2441,11 @@ input[type="text"],
 	color: #546b76 !important;
 }
 
-.edit_remove, .leather_edit_remove {
-    text-align: right;
+.edit_remove {
+	margin-left: 1vw;
 }
 
-	.leather_edit_remove {
-		transform: translateY(-50%);
-		margin-right: 1vw;
-	}
+.save_for_later {
+	margin-left: 1vw;
+	margin-top: 0.25vw;
+}

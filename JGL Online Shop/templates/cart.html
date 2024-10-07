@@ -49,6 +49,14 @@
 																		<img src="{{ url_for('static', filename=item_key[0]|image) }}" 
 																			alt="{{ item_key[0]|get_image_alt }}" 
 																			class="cart_img"/>
+
+																		<div class="save_for_later">
+																			Save for later
+																		</div>
+																		
+																		<div class="edit_remove">
+																			edit | remove
+																		</div>
 																	</td>
 																	<td>
 																		<div class="product_info">
@@ -160,10 +168,6 @@
 																					</tr>
 																				</table>  
 																			{% endif %}
-																			
-																			<div class="{% if item_key[0] == 1 %}leather_edit_remove{% else %}edit_remove{% endif %}">
-																				edit | remove
-																			</div>
 																			
 																			<!-- TODO: Allow user to save items for later -->
 														
