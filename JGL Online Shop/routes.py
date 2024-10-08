@@ -276,7 +276,7 @@ def cart():
     
     cart_items = None
     if "shopping_session" in session and session["shopping_session"]:
-        # TODO: Query database for the user's cart
+        # Query database for the user's cart
         cart_items = q.find_cart(session["shopping_session"])
         
     # TODO: Add shopping cart total
@@ -432,3 +432,13 @@ def login():
             return redirect(url_for("main.login"))
      
     return render_template("login.html", socials=JGL_SOCIALS)
+
+@bp.route("/save", methods=["GET", "POST"])
+def save_for_later():
+    """Saves the item preferences so the user 
+    can buy it later"""
+    
+    # TODO: Display saved item preferences 
+    
+    
+    return redirect(url_for("cart"))

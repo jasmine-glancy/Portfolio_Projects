@@ -51,7 +51,9 @@
 																			class="cart_img"/>
 
 																		<div class="save_for_later">
-																			Save for later
+																			<a href="{{ url_for('main.save_for_later', product_id=item_key[0]) }}" class="cart_link">
+																				Save for later
+																			</a>
 																		</div>
 																		
 																		<div class="edit_remove">

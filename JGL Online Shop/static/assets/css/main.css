@@ -2428,16 +2428,12 @@ input[type="text"],
 	font-weight: 600;
 }
 
-.smaller-name .cart_link,
-.longer-name .cart_link,
-.longest-name .cart_link,
-.product_name .cart_link {
+
+.cart_link {
 	text-decoration-line: none;
 }
-.smaller-name .cart_link:hover,
-.longer-name .cart_link:hover,
-.longest-name .cart_link:hover,
-.product_name .cart_link:hover {
+
+.cart_link:hover {
 	color: #546b76 !important;
 }
 
