@@ -2267,6 +2267,7 @@ input[type="text"],
 	.form-group .form-label {
 		margin-right: 2vw;
 	}
+	
 
 	.form-select {
 		background-color: #f8f8f8;
@@ -2275,8 +2276,6 @@ input[type="text"],
 
 	#quantity {
 		width: 11vw;
-		margin-top: 1vw;
-		margin-bottom: 1vw;
 	}
 
 /* Login and Register  */
@@ -2346,7 +2345,13 @@ input[type="text"],
 			margin-left: 1vw;
 		}
 
-		.product_info {
+		.saved_cart_img {
+			width: auto;
+			height: 8vh;
+			padding-right: 1vw;
+		}
+
+		.product_info, .saved_product_info {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
@@ -2358,11 +2363,24 @@ input[type="text"],
 			width: 100%;
 			transform: translateY(-175%);
 		}
+
+		.saved_product_details {
+			display: flex;
+			width: 100%;
+		}
 		
-		.product_option, .product_color, .size {
+		.product_option, .product_color, 
+		.size, .notes {
 			margin-left: 1vw;
 		}
 		
+			.product_option {
+				display: inline-block;
+				max-width: fit-content;
+				/* Prevent text wrapping */
+				white-space: nowrap; 
+			}
+
 		.smaller-name, .longest-name, .product_name, .longer-name {
 			flex-grow: 1;
 			flex-shrink: 0;
@@ -2372,8 +2390,20 @@ input[type="text"],
 			padding-right: 6vw;
 		}
 
+		.saved-product_name, .saved-longer-name {
+			padding-right: 2vw;
+		}
+
 		.smaller-name {
 			padding-right: 6.5vw;
+		}
+
+		.saved-smaller-name {
+			padding-right: 2vw;
+		}
+		
+		.saved-smaller-name {
+			padding-right: 2vw;
 		}
 
 		.longest-name {
@@ -2400,6 +2430,11 @@ input[type="text"],
 			margin-bottom: 0;
 		}
 
+		.mb-3 {
+			margin-top: 0.5vw;
+			margin-bottom: 0.5vw;
+		}
+
 			
 
 .cart_table, .leather_cart_table {
@@ -2407,7 +2442,7 @@ input[type="text"],
 	margin-bottom: 0;
 }
 	.cart_table {
-		transform: translateY(-100%);
+		transform: translateY(-70%);
 	}
 
 	.leather_cart_table {
@@ -2429,11 +2464,15 @@ input[type="text"],
 }
 
 
-.cart_link {
+.cart_link, .saved_cart_link {
 	text-decoration-line: none;
 }
 
-.cart_link:hover {
+	.saved_cart_link {
+		width: 200px;
+	}
+
+.cart_link:hover, .saved_cart_link:hover {
 	color: #546b76 !important;
 }
 
@@ -2441,7 +2480,11 @@ input[type="text"],
 	margin-left: 1vw;
 }
 
-.save_for_later {
+.save_for_later, .move_to_cart {
 	margin-left: 1vw;
 	margin-top: 0.25vw;
+}
+
+.order_notes {
+	margin-bottom: 1vw;
 }

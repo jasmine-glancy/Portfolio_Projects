@@ -142,6 +142,34 @@ def find_cart(shopping_session_id):
     
     return cart_items
 
+def find_cart_item(cart_item_id):
+    """Returns the cart item associated with its ID"""
+    
+    cart_items = shop_session.query(
+        sh.CartItems
+    ).filter_by(id=cart_item_id).one_or_none()
+    
+    return cart_items
+
+def find_saved_item(cart_item_id):
+    """Returns the saved cart item associated with its ID"""
+    
+    cart_items = shop_session.query(
+        sh.SavedItems
+    ).filter_by(id=cart_item_id).one_or_none()
+    
+    return cart_items
+
+def find_all_saved_items(shopping_session_id):
+    """Returns the saved cart items associated 
+    with a shopping session"""  
+    
+    saved_items = shop_session.query(
+        sh.SavedItems
+    ).filter_by(session_id=shopping_session_id).all()
+    
+    return saved_items
+
 def cart_price(shopping_session_id):
     """Grabs the total of the cart"""
     

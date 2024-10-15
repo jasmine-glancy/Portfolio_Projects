@@ -140,7 +140,12 @@
                                         <label for="product_quantity" class="form-label">
                                             Quantity:
                                         </label>
+                                        
                                         <input type="number" id="quantity" name="quantity" min="1" max="10"></input>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <textarea name="order_notes" placeholder="Please explain the product or service you would like (including themes/topics/etc)" class="order_notes"></textarea>
                                     </div>
                                     
                                 </div>
@@ -213,7 +218,7 @@
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="name" placeholder="Name" /></div>
                                         <div class="col-12 col-6-medium col-12-mobile"><input type="text" name="email" placeholder="Email" /></div>
                                         <div class="col-12">
-                                            <textarea name="message" placeholder="Message">Re: {{ product.name }}</textarea>
+                                            <textarea name="message">Re: {{ product.name }}</textarea>
                                         </div>
                                         <div class="col-12">
                                             <button type="submit" class="button" name="send_message">Send Message</button>

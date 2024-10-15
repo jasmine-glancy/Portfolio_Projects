@@ -32,6 +32,7 @@ class CartItems(Base):
     leather_goods_size_id = Column(Integer, ForeignKey("sizes.size_id"))
     writing_option_id = Column(Integer, ForeignKey("writing_options.option_id"))
     software_id = Column(Integer, ForeignKey("software_options.option_id"))
+    product_order_notes = Column(String(1000))
     
     # Define the relationship to ProductsAndServices
     product = relationship("ProductsAndServices", back_populates="cart_items")
@@ -133,6 +134,7 @@ class SavedItems(Base):
     leather_goods_size_id = Column(Integer, ForeignKey("sizes.size_id"))
     writing_option_id = Column(Integer, ForeignKey("writing_options.option_id"))
     software_id = Column(Integer, ForeignKey("software_options.option_id"))
+    product_order_notes = Column(String(1000))
     
     # Define the relationship to ProductsAndServices
     product = relationship("ProductsAndServices", back_populates="saved_items")

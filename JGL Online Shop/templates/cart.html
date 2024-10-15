@@ -25,7 +25,9 @@
 											<h2>Shopping Cart</h2>
 
 											<!-- TODO: Enable deselect/delete cart items functionality -->
-											<h3>Deselect all items</h3>
+											{% if session["username"] and session["shopping_session"] %}
+												<h3>Deselect all items</h3>
+											{% endif %}
 										</header>
 										<p>
 											<!-- TODO: Require login for checking out? -->
@@ -36,7 +38,7 @@
 													 recommended by CoPilot -->
 													{% set unique_items = {} %}
 													{% for item in cart_items %}
-														{% set item_key = (item.product_id, item.leather_good_id, item.leather_color_id, item.metal_color_id, item.leather_goods_size_id, item.writing_option_id, item.software_id) %}
+														{% set item_key = (item.product_id, item.leather_good_id, item.leather_color_id, item.metal_color_id, item.leather_goods_size_id, item.writing_option_id, item.software_id, item.id, item.product_order_notes) %}
 														{% set unique_items = unique_items|update_unique_items(item_key, item.quantity) %}
 													{% endfor %}
 
@@ -50,11 +52,9 @@
 																			alt="{{ item_key[0]|get_image_alt }}" 
 																			class="cart_img"/>
 
-																		<div class="save_for_later">
-																			<a href="{{ url_for('main.save_for_later', product_id=item_key[0]) }}" class="cart_link">
-																				Save for later
-																			</a>
-																		</div>
+																			<div class="save_for_later">
+																				<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save for later</a>
+																			</div>
 																		
 																		<div class="edit_remove">
 																			edit | remove
@@ -72,6 +72,236 @@
 																				</div>		
 
 																				<div class="rate">	
+																					{% if item_key[0] == 1 %}
+																						{{ item_key[0]|display_leather_notes }} 
+																					{% endif %}
+																					
+																					
+																					<!-- Display rate and price -->
+																					${{ item_key[0]|display_price }} / {{ item_key[0]|display_unit }}
+																				</div>									
+																			</div>
+																			<!-- Display options -->
+																			<table class="{% if item_key[0] == 1 %}leather_cart_table{% else %}cart_table{% endif %}">
+																				{% if item_key[0] == 1 %}
+																					<tr>
+																						<td class="leather_column_one">
+																							<div class="product_option">
+																								<!-- Leather options -->
+																								{{ item_key[0]|get_option_text(item_key[1])|title }}
+																							</div>
+																						</td>	
+																						<td class="leather_column_two">
+																							<div class="metal_color">
+																								Metal Color: {{ item_key[3]|get_metal_color|title }}
+																							</div>
+																						</td>
+																					</tr>
+																					<tr>
+																						<td class="leather_column_one">
+																							<div class="product_color">
+																								Color: {{ item_key[2]|get_leather_color|title }}
+																							</div>
+																						</td>
+																						<td class="leather_column_two">
+																							Quantity: 
+																							<select name="quantity" class="quantity_dropdown">
+																								{% for i in range(1, 11) %} 
+																									<!-- Creates a quantity dropdown from 1 to 10 -->
+																									<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																								{% endfor %}
+																							</select>
+																						</td>
+																					</tr>
+																					<tr>
+																						<td class="leather_column_one">
+																							<div class="size">
+																								Size: {{ item_key[4]|display_size|title }}
+																							</div>
+																						</td>
+																						<td>
+																						</td>
+																					</tr>
+																				{% elif item_key[0] == 2 or item_key[0] == 3 %}
+																					<tr>
+																						<td class="column_one">
+																							<div class="product_option">
+																								<!-- Written options -->
+																								{{ item_key[0]|get_option_text(item_key[5])|title }}
+																							</div>  
+																						</td>	
+																						<td class="column_two">
+																							<div class="product_quantity">
+																								Quantity: 
+																								<select name="quantity" class="quantity_dropdown">
+																									{% for i in range(1, 11) %} 
+																										<!-- Creates a quantity dropdown from 1 to 10 -->
+																										<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																									{% endfor %}
+																								</select>
+																							</div>
+																						</td>
+																					</tr>
+																				{% elif item_key[0] == 4 %}
+																					<tr>
+																						<td class="column_one">
+																							<div class="product_option">
+																								<!-- Software options -->
+																								{{ item_key[0]|get_option_text(item_key[6])|title }}
+																							</div> 
+																						</td>	
+																						<td>
+																							<div class="software_product_quantity">
+																								<!-- TODO: Make quantity a dropdown and allow it to change -->
+
+																								Quantity: 
+																								<select name="quantity" class="quantity_dropdown">
+																									{% for i in range(1, 11) %} 
+																										<!-- Creates a quantity dropdown from 1 to 10 -->
+																										<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																									{% endfor %}
+																								</select>
+																							</div>
+																						</td>
+																					</tr>
+																				{% endif %}
+
+																				{% if item_key[8] != None %}
+																					<tr>
+																						<td>
+																							<div class="notes">
+																								{{ item_key[8] }}
+																							</div>
+																						</td>
+																					</tr>
+																				{% endif %}
+																			</table>  
+																			
+																			<!-- TODO: Allow user to save items for later -->
+														
+																			<!-- TODO: Allow user to remove item -->
+														
+																			<!-- TODO: Allow user to edit item -->
+																		</div>
+																	</td>
+																</tr>
+															</table>
+														</div>
+													{% endfor %}
+
+												{% else %}
+													<div class="cart_icons_container">
+														<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
+														alt="A picture of a King Cobra in a basket" 
+														class="basket_snake"/>
+														<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
+														alt="A cart moving fast" 
+														class="empty_cart"/>
+													</div>
+													<p>Your cart is empty.</p>
+												{% endif %}
+											{% else %}
+												<div class="cart_icons_container">
+													<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
+													alt="A picture of a King Cobra in a basket" 
+													class="basket_snake"/>
+													<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
+													alt="A cart moving fast" 
+													class="empty_cart"/>
+												</div>
+
+												<div class="notification">
+													You are not currently logged in. Please 
+													<a href="{{ url_for('main.login') }}" class="cart_link">log in</a> to continue.
+												</div>
+											{% endif %}
+										</p>
+										
+									</section>
+
+							</div>
+							<div class="col-4 col-12-medium">
+
+								<!-- Sidebar -->
+									<section>
+										<header>
+											{% if cart_items and session["shopping_session"] %}
+												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price }}</h2>
+											{% else %}
+												<h2>Subtotal (0 items): $0.00</h2>
+											{% endif %}
+										</header>
+										<input type="submit" class="button-large" value="Proceed to Checkout"></input>
+									</section>
+
+									{% if related_items %}
+										<section>
+											<header>
+												<!-- TODO: Recommend like items -->
+												<!-- TODO: Only show this section if there are related items in the cart -->
+												<h2>More Items</h2>
+											</header>
+											<p>
+												Lotsa pats aqua doggo fluffer heckin, 
+												you are doing me a frighten such treat 
+												thicc yapper, borkdrive bork. Heckin good boys 
+												and girls puggo such treat long bois maximum borkdrive
+												corgo, many pats ur givin me a spook the neighborhood
+												pupper.  
+											</p>
+											<ul class="link-list">
+												<li><a href="#" class="cart_link">Long bois maximum borkdrive</a></li>
+												<li><a href="#" class="cart_link">Many pats</a></li>
+											</ul>
+										</section>
+									{% endif %}
+
+									{% if saved_items %}
+									
+										<section>
+											<header>
+												<!-- TODO: Display saved for later items -->
+												<!-- TODO: Only show this section if there are related items in the cart -->
+
+												<h2>Saved For Later</h2>
+											</header>
+											{% set unique_saved_items = {} %}
+													{% for item in saved_items %}
+														{% set item_key = (item.product_id, item.leather_good_id, item.leather_color_id, item.metal_color_id, item.leather_goods_size_id, item.writing_option_id, item.software_id, item.id) %}
+														{% set unique_saved_items = unique_saved_items|update_unique_items(item_key, item.quantity) %}
+													{% endfor %}
+
+													<!-- Display unique items with updated quantities -->
+													{% for item_key, quantity in unique_saved_items.items() %}
+														<div class="cart_row {% if loop.index is odd %}odd-row{% else %}even-row{% endif %}">
+															<table>
+																<tr>
+																	<td>
+																		<img src="{{ url_for('static', filename=item_key[0]|image) }}" 
+																			alt="{{ item_key[0]|get_image_alt }}" 
+																			class="saved_cart_img"/>
+
+																			<div class="move_to_cart">
+																				<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save for later</a>
+																			</div>
+																		
+																		<div class="edit_remove">
+																			edit | remove
+																		</div>
+																	</td>
+																	<td>
+																		<div class="saved_product_info">
+																			<div class="saved_product_details">
+
+																				<!-- Displays the service/product text via its index -->
+																				<div class="{% if item_key[0]|get_product_name|length <= 27 %}saved-smaller-name{% elif item_key[0]|get_product_name|length > 27 and item_key[0]|get_product_name|length < 30 %}saved-longer-name{% elif item_key[0]|get_product_name|length > 30 and item_key[0]|get_product_name|length < 35 %}saved-longest-name{% else %}saved-product_name{% endif %}">
+																					<a href="{{ url_for('main.for_sale_info', product_id=item_key[0]) }}" class="saved_cart_link">
+																						{{ item_key[0]|get_product_name }} 
+																					</a>
+																				</div>		
+
+																				<div class="saved_rate">	
+																					<br>
 																					{% if item_key[0] == 1 %}
 																						{{ item_key[0]|display_leather_notes }} 
 																					{% endif %}
@@ -182,90 +412,22 @@
 															</table>
 														</div>
 													{% endfor %}
-
-												{% else %}
-													<div class="cart_icons_container">
-														<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
-														alt="A picture of a King Cobra in a basket" 
-														class="basket_snake"/>
-														<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
-														alt="A cart moving fast" 
-														class="empty_cart"/>
-													</div>
-													<p>Your cart is empty.</p>
-												{% endif %}
-											{% else %}
-												<div class="cart_icons_container">
-													<img src="{{ url_for('static', filename='assets/images/cobra-basket.svg')}}" 
-													alt="A picture of a King Cobra in a basket" 
-													class="basket_snake"/>
-													<img src="{{ url_for('static', filename='assets/images/cart_empty.svg')}}" 
-													alt="A cart moving fast" 
-													class="empty_cart"/>
-												</div>
-
-												<div class="notification">
-													You are not currently logged in. Please 
-													<a href="{{ url_for('main.login') }}">log in</a> to continue.
-												</div>
-											{% endif %}
-										</p>
-										
-									</section>
-
-							</div>
-							<div class="col-4 col-12-medium">
-
-								<!-- Sidebar -->
-									<section>
-										<header>
-											{% if cart_items and session["shopping_session"] %}
-												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price }}</h2>
-											{% else %}
-												<h2>Subtotal (0 items): $0.00</h2>
-											{% endif %}
-										</header>
-										<input type="submit" class="button-large" value="Proceed to Checkout"></input>
-									</section>
-									<section>
-										<header>
-											<!-- TODO: Recommend like items -->
-											<h2>More Items</h2>
-										</header>
-										<p>
-											Lotsa pats aqua doggo fluffer heckin, 
-											you are doing me a frighten such treat 
-											thicc yapper, borkdrive bork. Heckin good boys 
-											and girls puggo such treat long bois maximum borkdrive
-											corgo, many pats ur givin me a spook the neighborhood
-											pupper.  
-										</p>
-										<ul class="link-list">
-											<li><a href="#">Long bois maximum borkdrive</a></li>
-											<li><a href="#">Many pats</a></li>
-										</ul>
-									</section>
-
-									<section>
-										<header>
-											<!-- TODO: Display saved for later items -->
-											<h2>Saved For Later</h2>
-										</header>
-										<p>
-											Squid chia gorpcore neutral milk hotel selvage 
-											ethical, asymmetrical celiac intelligentsia pop-up 
-											paleo tumeric. Blackbird spyplane gochujang you 
-											probably haven't heard of them iPhone umami 
-											skateboard. Selfies edison bulb quinoa adaptogen 
-											8-bit normcore. 90's kale chips lumbersexual palo 
-											santo asymmetrical, tofu keffiyeh DIY mixtape beard 
-											edison bulb whatever messenger bag jawn portland. 
-										</p>
-										<ul class="link-list">
-											<li><a href="#">Long bois maximum borkdrive</a></li>
-											<li><a href="#">Many pats</a></li>
-										</ul>
-									</section>
+											<p>
+												Squid chia gorpcore neutral milk hotel selvage 
+												ethical, asymmetrical celiac intelligentsia pop-up 
+												paleo tumeric. Blackbird spyplane gochujang you 
+												probably haven't heard of them iPhone umami 
+												skateboard. Selfies edison bulb quinoa adaptogen 
+												8-bit normcore. 90's kale chips lumbersexual palo 
+												santo asymmetrical, tofu keffiyeh DIY mixtape beard 
+												edison bulb whatever messenger bag jawn portland. 
+											</p>
+											<ul class="link-list">
+												<li><a href="#" class="cart_link">Long bois maximum borkdrive</a></li>
+												<li><a href="#" class="cart_link">Many pats</a></li>
+											</ul>
+										</section>
+									{% endif %}
 
 							</div>
 						</div>

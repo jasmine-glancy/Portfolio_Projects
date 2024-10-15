@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, flash, render_template, session, \
     redirect, request, url_for
-from online_shop import CartItems, Users, SHOP_SESSION, ShoppingSessions
+from online_shop import CartItems, Users, SHOP_SESSION, SavedItems, ShoppingSessions
 import queries as q
 import helpers as h
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -186,6 +186,8 @@ def for_sale_info(product_id):
             if quantity < 0 or quantity > 10:
                 flash("Please choose a number between 1 and 10", "selection_error")
                     
+            order_notes = request.form.get("order_notes")
+            
             # Add options to the cart
             new_cart_item = CartItems(
                 session_id=session["shopping_session"],
@@ -193,7 +195,7 @@ def for_sale_info(product_id):
                 quantity=quantity,
                 created_at=datetime.now(),
                 modified_at=datetime.now(),
-                
+                product_order_notes=order_notes
             )        
             
             if id == 1:
@@ -278,6 +280,10 @@ def cart():
     if "shopping_session" in session and session["shopping_session"]:
         # Query database for the user's cart
         cart_items = q.find_cart(session["shopping_session"])
+        
+        # Query database for the user's saved items
+        saved_items = q.find_all_saved_items(session["shopping_session"])
+        
         
     # TODO: Add shopping cart total
 
@@ -438,7 +444,56 @@ def save_for_later():
     """Saves the item preferences so the user 
     can buy it later"""
     
+    cart_item_id = request.args.get("cart_item_id")
+    if cart_item_id:
+        # Store the cart_item_id in the session
+        session["cart_item_id"] = cart_item_id
+    
+    # Retrieve the cart_item_id from the session
+    cart_item_id = session.get("cart_item_id")
+    print(cart_item_id)
+    
+    item = q.find_cart_item(cart_item_id)
+    
+    print(f"Item: {item.product_id} quantity: {item.quantity}")
+    
+    saved_item = q.find_saved_item(item.id)
+    
+    if saved_item is not None:
+        # TODO: Add an additional quantity to the existing saved item
+        pass
+    else:
+        print("Saved item not found")
+        
+        # If the saved item isn't already in the database add to SavedItems
+        
+        new_saved_item = SavedItems(
+            id=item.id,
+            session_id=item.session_id,
+            product_id=item.product_id,
+            quantity=item.quantity,
+            created_at=item.created_at,
+            modified_at=item.modified_at,
+            leather_good_id=item.leather_good_id,
+            leather_color_id=item.leather_color_id,
+            metal_color_id=item.metal_color_id,
+            leather_goods_size_id=item.leather_goods_size_id,
+            writing_option_id=item.writing_option_id,
+            software_id=item.software_id
+        )
+        
+        try:
+            SHOP_SESSION.add(new_saved_item)
+            SHOP_SESSION.commit()
+            print("Added saved item!")
+            
+        except Exception as e:
+            SHOP_SESSION.rollback()
+            print(f"Couldn't save the item, exception: {e}")
+
+    
+    
     # TODO: Display saved item preferences 
     
     
-    return redirect(url_for("cart"))
+    return redirect(url_for("main.cart"))
