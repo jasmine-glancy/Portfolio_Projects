@@ -2341,7 +2341,6 @@ input[type="text"],
 			width: 12vw;
 			height: 10vh;
 			margin-right: 1vw;
-			margin-top: 2vw;
 			margin-left: 1vw;
 		}
 
@@ -2357,11 +2356,16 @@ input[type="text"],
 			justify-content: center;
 		}
 		
+			.product_info {
+				margin-top: 0;
+			}
+			
 		.product_details {
 			display: flex;
 			justify-content: space-between;
 			width: 100%;
-			transform: translateY(-175%);
+			transform: translateY(-240%);
+			position: relative;
 		}
 
 		.saved_product_details {
@@ -2380,10 +2384,19 @@ input[type="text"],
 				/* Prevent text wrapping */
 				white-space: nowrap; 
 			}
+			
+			.product_option, .metal_color {
+				margin-top: 0;
+			}
+
+			.size {
+				margin-bottom: 0;
+			}
 
 		.smaller-name, .longest-name, .product_name, .longer-name {
 			flex-grow: 1;
 			flex-shrink: 0;
+			position: relative;
 		}
 		
 		.product_name, .longer-name {
@@ -2416,10 +2429,11 @@ input[type="text"],
 
 			.product_quantity {
 				padding-left: 12.50vw;
+				margin-top: 0;
 			}
 
 		.software_product_quantity {
-			padding-left: 10vw;
+			padding-left: 2vw;
 
 		}
 
@@ -2440,24 +2454,46 @@ input[type="text"],
 .cart_table, .leather_cart_table {
 	width: 100%;
 	margin-bottom: 0;
+	position: relative;
+	margin-top: 0;
 }
 	.cart_table {
-		transform: translateY(-70%);
+		transform: translateY(-150%);
 	}
 
 	.leather_cart_table {
-		transform: translateY(-35%);
+		transform: translateY(-50%);
 	}
 
 	.column_one, .leather_column_one {
-		min-width: 70%;
+		max-width: 70%;
 		margin-bottom: 0;
+		display: inline-block;
+		vertical-align: top;
+		position: relative;
+		word-wrap: break-word;  
+		overflow-wrap: break-word; 
 	} 
 
 	.column_two, .leather_column_two {
-		width: 30%;
+		max-width: 30%; 
 		margin-bottom: 0;
+		vertical-align: top; 
+		position: relative;
+		word-wrap: break-word;  
+		overflow-wrap: break-word; 
 	} 
+
+	.notes {
+		 /* Clear floats to prevent overlap */
+		clear: both;
+		display: block; 
+		position: relative;
+		width: 100%;
+		word-wrap: break-word;  
+		overflow-wrap: break-word; 
+		transform: translateY(-180%);
+	}
 
 .rate {
 	font-weight: 600;

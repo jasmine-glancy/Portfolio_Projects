@@ -125,7 +125,7 @@
 																				{% elif item_key[0] == 2 or item_key[0] == 3 %}
 																					<tr>
 																						<td class="column_one">
-																							<div class="product_option">
+																							<div class="{% if item_key[8] != None %}product_option{% endif %}">
 																								<!-- Written options -->
 																								{{ item_key[0]|get_option_text(item_key[5])|title }}
 																							</div>  
@@ -166,16 +166,18 @@
 																					</tr>
 																				{% endif %}
 
-																				{% if item_key[8] != None %}
+																			</table>  
+
+																			
+																			{% if item_key[8] != None %}
+																				<table>
 																					<tr>
-																						<td>
-																							<div class="notes">
-																								{{ item_key[8] }}
-																							</div>
+																						<td colspan="2" class="notes">
+																							{{ item_key[8] }}
 																						</td>
 																					</tr>
-																				{% endif %}
-																			</table>  
+																				</table>
+																			{% endif %}
 																			
 																			<!-- TODO: Allow user to save items for later -->
 														
