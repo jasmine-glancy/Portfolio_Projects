@@ -303,7 +303,8 @@ def cart():
         # TODO: Go to successfull checkout page
     return render_template("cart.html",
                            socials=JGL_SOCIALS,
-                           cart_items=cart_items)
+                           cart_items=cart_items,
+                           saved_items=saved_items)
     
 
 @bp.route("/register", methods=["GET", "POST"])
