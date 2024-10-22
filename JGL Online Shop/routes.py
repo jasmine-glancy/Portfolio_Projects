@@ -277,6 +277,8 @@ def cart():
     
     
     cart_items = None
+    saved_items = None
+    
     if "shopping_session" in session and session["shopping_session"]:
         # Query database for the user's cart
         cart_items = q.find_cart(session["shopping_session"])
@@ -450,51 +452,62 @@ def save_for_later():
         # Store the cart_item_id in the session
         session["cart_item_id"] = cart_item_id
     
-    # Retrieve the cart_item_id from the session
-    cart_item_id = session.get("cart_item_id")
-    print(cart_item_id)
-    
-    item = q.find_cart_item(cart_item_id)
-    
-    print(f"Item: {item.product_id} quantity: {item.quantity}")
-    
-    saved_item = q.find_saved_item(item.id)
-    
-    if saved_item is not None:
-        # TODO: Add an additional quantity to the existing saved item
-        pass
-    else:
-        print("Saved item not found")
+        item = q.find_cart_item(cart_item_id)
         
-        # If the saved item isn't already in the database add to SavedItems
+        print(f"Item: {item.product_id} quantity: {item.quantity}")
         
-        new_saved_item = SavedItems(
-            id=item.id,
-            session_id=item.session_id,
-            product_id=item.product_id,
-            quantity=item.quantity,
-            created_at=item.created_at,
-            modified_at=item.modified_at,
-            leather_good_id=item.leather_good_id,
-            leather_color_id=item.leather_color_id,
-            metal_color_id=item.metal_color_id,
-            leather_goods_size_id=item.leather_goods_size_id,
-            writing_option_id=item.writing_option_id,
-            software_id=item.software_id
-        )
+        saved_item = q.find_saved_item(item.id)
         
-        try:
-            SHOP_SESSION.add(new_saved_item)
-            SHOP_SESSION.commit()
-            print("Added saved item!")
+        if saved_item is not None:
+            # TODO: Add an additional quantity to the existing saved item
+            pass
+        else:
+            print("Saved item not found")
             
-        except Exception as e:
-            SHOP_SESSION.rollback()
-            print(f"Couldn't save the item, exception: {e}")
+            # If the saved item isn't already in the database add to SavedItems
+            
+            new_saved_item = SavedItems(
+                id=item.id,
+                session_id=item.session_id,
+                product_id=item.product_id,
+                quantity=item.quantity,
+                created_at=item.created_at,
+                modified_at=item.modified_at,
+                leather_good_id=item.leather_good_id,
+                leather_color_id=item.leather_color_id,
+                metal_color_id=item.metal_color_id,
+                leather_goods_size_id=item.leather_goods_size_id,
+                writing_option_id=item.writing_option_id,
+                software_id=item.software_id
+            )
+            
+            try:
+                SHOP_SESSION.add(new_saved_item)
+                SHOP_SESSION.commit()
+                print("Added saved item!")
+                
+            except Exception as e:
+                SHOP_SESSION.rollback()
+                print(f"Couldn't save the item, exception: {e}")
+    else:
+        print("Unable to find cart item ID")
+            
+    return redirect(url_for("main.cart"))
 
+@bp.route("/edit", methods=["GET", "POST"])
+def edit():
+    """Allows the user to edit their cart item"""
     
+    cart_item_id = request.args.get("cart_item_id")
     
-    # TODO: Display saved item preferences 
+    print("editing!")
     
+    return redirect(url_for("main.cart"))
+
+@bp.route("/remove/<int:cart_item_id>", methods=["POST"])
+def remove_cart_item(cart_item_id):
+    """Deletes an item from the cart"""
+    
+    print("deleting!")
     
     return redirect(url_for("main.cart"))

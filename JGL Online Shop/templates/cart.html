@@ -53,11 +53,13 @@
 																			class="cart_img"/>
 
 																			<div class="save_for_later">
-																				<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save for later</a>
+																				<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save For Later</a>
 																			</div>
 																		
 																		<div class="edit_remove">
-																			edit | remove
+																			<a href="{{ url_for('main.edit', cart_item_id=item_key[7]) }}" class="cart_link">Edit</a>
+																			| 
+																			<a href="{{ url_for('main.remove_cart_item', cart_item_id=item_key[7]) }}" class="cart_link">Remove</a>
 																		</div>
 																	</td>
 																	<td>
@@ -179,7 +181,7 @@
 																				</table>
 																			{% endif %}
 																			
-																			<!-- TODO: Allow user to save items for later -->
+																			<!-- TODO: Remove saved items from the cart -->
 														
 																			<!-- TODO: Allow user to remove item -->
 														
@@ -200,7 +202,14 @@
 														alt="A cart moving fast" 
 														class="empty_cart"/>
 													</div>
-													<p>Your cart is empty.</p>
+
+													<div class="notification">
+														Your cart is empty. Please visit the 
+														<a href="{{ url_for('main.products') }}" class="cart_link">
+															products 
+														</a>
+														page to see what's available.
+													</div>
 												{% endif %}
 											{% else %}
 												<div class="cart_icons_container">
@@ -262,8 +271,7 @@
 									
 										<section>
 											<header>
-												<!-- TODO: Display saved for later items -->
-												<!-- TODO: Only show this section if there are related items in the cart -->
+												<!-- Display saved for later items -->
 
 												<h2>Saved For Later</h2>
 											</header>
@@ -344,6 +352,13 @@
 																								</td>
 																							</tr>
 																							<tr>
+																								<td class="saved_leather_column_one">
+																									<div class="saved_size">
+																										Size: {{ item_key[4]|display_size|title }}
+																									</div>
+																								</td>
+																							</tr>
+																							<tr>
 																								<td class="saved_leather_column_two">
 																									Quantity: 
 																									<select name="quantity" class="saved_quantity_dropdown">
@@ -352,13 +367,6 @@
 																											<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
 																										{% endfor %}
 																									</select>
-																								</td>
-																							</tr>
-																							<tr>
-																								<td class="saved_leather_column_one">
-																									<div class="saved_size">
-																										Size: {{ item_key[4]|display_size|title }}
-																									</div>
 																								</td>
 																							</tr>
 																						</table>
@@ -412,11 +420,13 @@
 																						</table>  
 																					{% endif %}
 																					
-																					<!-- TODO: Allow user to save items for later -->
+																					<!-- TODO: Make items that are in the saved list hidden from the cart -->
+																						<!-- TODO: Products that are in the saved list should not 
+																						 count toward the cart total price-->
+
+																					<!-- TODO: Allow user to remove item from saved cart-->
 																
-																					<!-- TODO: Allow user to remove item -->
-																
-																					<!-- TODO: Allow user to edit item -->
+																					<!-- TODO: Allow user to edit item in the saved cart -->
 																				</div>
 																			</td>
 																		</tr>
@@ -425,20 +435,6 @@
 															</li>
 														{% endfor %}
 													</ul>
-											<p>
-												Squid chia gorpcore neutral milk hotel selvage 
-												ethical, asymmetrical celiac intelligentsia pop-up 
-												paleo tumeric. Blackbird spyplane gochujang you 
-												probably haven't heard of them iPhone umami 
-												skateboard. Selfies edison bulb quinoa adaptogen 
-												8-bit normcore. 90's kale chips lumbersexual palo 
-												santo asymmetrical, tofu keffiyeh DIY mixtape beard 
-												edison bulb whatever messenger bag jawn portland. 
-											</p>
-											<ul class="link-list">
-												<li><a href="#" class="cart_link">Long bois maximum borkdrive</a></li>
-												<li><a href="#" class="cart_link">Many pats</a></li>
-											</ul>
 										</section>
 									{% endif %}
 
