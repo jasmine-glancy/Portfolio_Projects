@@ -56,7 +56,7 @@ def get_image_alt(product_id):
     return product_service_alt
 
 @app.template_filter("cart_price")
-def cart_price(session_id):
+def cart_price(session_id, saved_item_ids):
     """Finds the price of the cart as a whole"""
     cart_items = q.cart_price(session_id)
     

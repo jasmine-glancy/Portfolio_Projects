@@ -42,157 +42,162 @@
 														{% set unique_items = unique_items|update_unique_items(item_key, item.quantity) %}
 													{% endfor %}
 
+													<!-- set suggestion recommended by CoPilot -->
+													{% set saved_item_ids = saved_items | map(attribute='id') | list %}
+
 													<!-- Display unique items with updated quantities -->
 													{% for item_key, quantity in unique_items.items() %}
-														<div class="cart_row {% if loop.index is odd %}odd-row{% else %}even-row{% endif %}">
-															<table>
-																<tr>
-																	<td>
-																		<img src="{{ url_for('static', filename=item_key[0]|image) }}" 
-																			alt="{{ item_key[0]|get_image_alt }}" 
-																			class="cart_img"/>
+														{% if item_key[7] not in saved_item_ids %}
+															<div class="cart_row {% if loop.index is odd %}odd-row{% else %}even-row{% endif %}">
+																<table>
+																	<tr>
+																		<td>
+																			<img src="{{ url_for('static', filename=item_key[0]|image) }}" 
+																				alt="{{ item_key[0]|get_image_alt }}" 
+																				class="cart_img"/>
 
-																		<div class="actions">
-																				<div class="save_for_later">
-																					<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save For Later</a>
+																			<div class="actions">
+																					<div class="save_for_later">
+																						<a href="{{ url_for('main.save_for_later', cart_item_id=item_key[7]) }}" class="cart_link">Save For Later</a>
+																					</div>
+																				
+																				<div class="edit_remove">
+																					<a href="{{ url_for('main.edit', cart_item_id=item_key[7]) }}" class="cart_link">Edit</a>
+																					| 
+																					<a href="{{ url_for('main.remove_cart_item', cart_item_id=item_key[7]) }}" class="cart_link">Remove</a>
 																				</div>
-																			
-																			<div class="edit_remove">
-																				<a href="{{ url_for('main.edit', cart_item_id=item_key[7]) }}" class="cart_link">Edit</a>
-																				| 
-																				<a href="{{ url_for('main.remove_cart_item', cart_item_id=item_key[7]) }}" class="cart_link">Remove</a>
 																			</div>
-																		</div>
-																	</td>
-																	<td>
-																		<div class="product_info">
-																			<div class="product_details">
+																		</td>
+																		<td>
+																			<div class="product_info">
+																				<div class="product_details">
 
-																				<!-- Displays the service/product text via its index -->
-																				<div class="{% if item_key[0]|get_product_name|length <= 27 %}smaller-name{% elif item_key[0]|get_product_name|length > 27 and item_key[0]|get_product_name|length < 30 %}longer-name{% elif item_key[0]|get_product_name|length > 30 and item_key[0]|get_product_name|length < 35 %}longest-name{% else %}product_name{% endif %}">
-																					<a href="{{ url_for('main.for_sale_info', product_id=item_key[0]) }}" class="cart_link">
-																						{{ item_key[0]|get_product_name }} 
-																					</a>
-																				</div>		
+																					<!-- Displays the service/product text via its index -->
+																					<div class="{% if item_key[0]|get_product_name|length <= 27 %}smaller-name{% elif item_key[0]|get_product_name|length > 27 and item_key[0]|get_product_name|length < 30 %}longer-name{% elif item_key[0]|get_product_name|length > 30 and item_key[0]|get_product_name|length < 35 %}longest-name{% else %}product_name{% endif %}">
+																						<a href="{{ url_for('main.for_sale_info', product_id=item_key[0]) }}" class="cart_link">
+																							{{ item_key[0]|get_product_name }} 
+																						</a>
+																					</div>		
 
-																				<div class="rate">	
+																					<div class="rate">	
+																						{% if item_key[0] == 1 %}
+																							{{ item_key[0]|display_leather_notes }} 
+																						{% endif %}
+																						
+																						
+																						<!-- Display rate and price -->
+																						${{ item_key[0]|display_price }} / {{ item_key[0]|display_unit }}
+																					</div>									
+																				</div>
+																				<!-- Display options -->
+																				<table class="{% if item_key[0] == 1 %}leather_cart_table{% else %}cart_table{% endif %}">
 																					{% if item_key[0] == 1 %}
-																						{{ item_key[0]|display_leather_notes }} 
+																						<tr>
+																							<td class="leather_column_one">
+																								<div class="product_option">
+																									<!-- Leather options -->
+																									{{ item_key[0]|get_option_text(item_key[1])|title }}
+																								</div>
+																							</td>	
+																							<td class="leather_column_two">
+																								<div class="metal_color">
+																									Metal Color: {{ item_key[3]|get_metal_color|title }}
+																								</div>
+																							</td>
+																						</tr>
+																						<tr>
+																							<td class="leather_column_one">
+																								<div class="product_color">
+																									Color: {{ item_key[2]|get_leather_color|title }}
+																								</div>
+																							</td>
+																							<td class="leather_column_two">
+																								Quantity: 
+																								<select name="quantity" class="quantity_dropdown">
+																									{% for i in range(1, 11) %} 
+																										<!-- Creates a quantity dropdown from 1 to 10 -->
+																										<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																									{% endfor %}
+																								</select>
+																							</td>
+																						</tr>
+																						<tr>
+																							<td class="leather_column_one">
+																								<div class="size">
+																									Size: {{ item_key[4]|display_size|title }}
+																								</div>
+																							</td>
+																							<td>
+																							</td>
+																						</tr>
+																					{% elif item_key[0] == 2 or item_key[0] == 3 %}
+																						<tr>
+																							<td class="column_one">
+																								<div class="{% if item_key[8] != None %}product_option{% endif %}">
+																									<!-- Written options -->
+																									{{ item_key[0]|get_option_text(item_key[5])|title }}
+																								</div>  
+																							</td>	
+																							<td class="column_two">
+																								<div class="product_quantity">
+																									Quantity: 
+																									<select name="quantity" class="quantity_dropdown">
+																										{% for i in range(1, 11) %} 
+																											<!-- Creates a quantity dropdown from 1 to 10 -->
+																											<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																										{% endfor %}
+																									</select>
+																								</div>
+																							</td>
+																						</tr>
+																					{% elif item_key[0] == 4 %}
+																						<tr>
+																							<td class="column_one">
+																								<div class="product_option">
+																									<!-- Software options -->
+																									{{ item_key[0]|get_option_text(item_key[6])|title }}
+																								</div> 
+																							</td>	
+																							<td>
+																								<div class="software_product_quantity">
+																									<!-- TODO: Make quantity a dropdown and allow it to change -->
+
+																									Quantity: 
+																									<select name="quantity" class="quantity_dropdown">
+																										{% for i in range(1, 11) %} 
+																											<!-- Creates a quantity dropdown from 1 to 10 -->
+																											<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
+																										{% endfor %}
+																									</select>
+																								</div>
+																							</td>
+																						</tr>
 																					{% endif %}
-																					
-																					
-																					<!-- Display rate and price -->
-																					${{ item_key[0]|display_price }} / {{ item_key[0]|display_unit }}
-																				</div>									
-																			</div>
-																			<!-- Display options -->
-																			<table class="{% if item_key[0] == 1 %}leather_cart_table{% else %}cart_table{% endif %}">
-																				{% if item_key[0] == 1 %}
-																					<tr>
-																						<td class="leather_column_one">
-																							<div class="product_option">
-																								<!-- Leather options -->
-																								{{ item_key[0]|get_option_text(item_key[1])|title }}
-																							</div>
-																						</td>	
-																						<td class="leather_column_two">
-																							<div class="metal_color">
-																								Metal Color: {{ item_key[3]|get_metal_color|title }}
-																							</div>
-																						</td>
-																					</tr>
-																					<tr>
-																						<td class="leather_column_one">
-																							<div class="product_color">
-																								Color: {{ item_key[2]|get_leather_color|title }}
-																							</div>
-																						</td>
-																						<td class="leather_column_two">
-																							Quantity: 
-																							<select name="quantity" class="quantity_dropdown">
-																								{% for i in range(1, 11) %} 
-																									<!-- Creates a quantity dropdown from 1 to 10 -->
-																									<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
-																								{% endfor %}
-																							</select>
-																						</td>
-																					</tr>
-																					<tr>
-																						<td class="leather_column_one">
-																							<div class="size">
-																								Size: {{ item_key[4]|display_size|title }}
-																							</div>
-																						</td>
-																						<td>
-																						</td>
-																					</tr>
-																				{% elif item_key[0] == 2 or item_key[0] == 3 %}
-																					<tr>
-																						<td class="column_one">
-																							<div class="{% if item_key[8] != None %}product_option{% endif %}">
-																								<!-- Written options -->
-																								{{ item_key[0]|get_option_text(item_key[5])|title }}
-																							</div>  
-																						</td>	
-																						<td class="column_two">
-																							<div class="product_quantity">
-																								Quantity: 
-																								<select name="quantity" class="quantity_dropdown">
-																									{% for i in range(1, 11) %} 
-																										<!-- Creates a quantity dropdown from 1 to 10 -->
-																										<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
-																									{% endfor %}
-																								</select>
-																							</div>
-																						</td>
-																					</tr>
-																				{% elif item_key[0] == 4 %}
-																					<tr>
-																						<td class="column_one">
-																							<div class="product_option">
-																								<!-- Software options -->
-																								{{ item_key[0]|get_option_text(item_key[6])|title }}
-																							</div> 
-																						</td>	
-																						<td>
-																							<div class="software_product_quantity">
-																								<!-- TODO: Make quantity a dropdown and allow it to change -->
 
-																								Quantity: 
-																								<select name="quantity" class="quantity_dropdown">
-																									{% for i in range(1, 11) %} 
-																										<!-- Creates a quantity dropdown from 1 to 10 -->
-																										<option value="{{ i }}" {% if i == quantity %}selected{% endif %}>{{ i }}</option>
-																									{% endfor %}
-																								</select>
-																							</div>
-																						</td>
-																					</tr>
+																				</table>  
+
+																				
+																				{% if item_key[8] != None %}
+																					<table>
+																						<tr>
+																							<td colspan="2" class="notes">
+																								{{ item_key[8] }}
+																							</td>
+																						</tr>
+																					</table>
 																				{% endif %}
-
-																			</table>  
-
-																			
-																			{% if item_key[8] != None %}
-																				<table>
-																					<tr>
-																						<td colspan="2" class="notes">
-																							{{ item_key[8] }}
-																						</td>
-																					</tr>
-																				</table>
-																			{% endif %}
-																			
-																			<!-- TODO: Remove saved items from the cart -->
-														
-																			<!-- TODO: Allow user to remove item -->
-														
-																			<!-- TODO: Allow user to edit item -->
-																		</div>
-																	</td>
-																</tr>
-															</table>
-														</div>
+																				
+																				<!-- TODO: Remove saved items from the cart -->
+															
+																				<!-- TODO: Allow user to remove item -->
+															
+																				<!-- TODO: Allow user to edit item -->
+																			</div>
+																		</td>
+																	</tr>
+																</table>
+															</div>
+														{% endif %}
 													{% endfor %}
 
 												{% else %}
@@ -238,8 +243,9 @@
 								<!-- Sidebar -->
 									<section>
 										<header>
+											<!-- TODO: Change total to account for items that are no longer in the cart -->
 											{% if cart_items and session["shopping_session"] %}
-												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price }}</h2>
+												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price(saved_item_ids) }}</h2>
 											{% else %}
 												<h2>Subtotal (0 items): $0.00</h2>
 											{% endif %}

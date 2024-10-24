@@ -112,9 +112,15 @@ def for_sale_info(product_id):
     if request.method == "POST":
         print("posted")
         if "add_to_cart" in request.form:
-            item_quantity = int(request.form.get("quantity"))
             
-            print(item_quantity, type(item_quantity))
+            try: 
+                
+                item_quantity = int(request.form.get("quantity"))
+                
+                print(item_quantity, type(item_quantity))
+            except ValueError:
+                flash("Please enter a quantity between 1 and 10.", "selection_error")
+                return redirect(url_for("main.for_sale_info", product_id=product_id))
             
             print("Add to Cart button clicked")
             
@@ -141,6 +147,19 @@ def for_sale_info(product_id):
                     shopping_session.total = new_price
                     shopping_session.modified_at = datetime.now()
                     
+                    order_notes = request.form.get("order_notes")
+            
+                    # Add options to the cart
+                    new_cart_item = CartItems(
+                        session_id=session["shopping_session"],
+                        product_id=id,
+                        quantity=item_quantity,
+                        created_at=datetime.now(),
+                        modified_at=datetime.now(),
+                        product_order_notes=order_notes
+                    )        
+            
+                    
                     try:
                         print(f"Updated total: {new_price} type: {type(new_price)}")
                         SHOP_SESSION.commit()
@@ -148,9 +167,10 @@ def for_sale_info(product_id):
                     except Exception as e:
                         SHOP_SESSION.rollback()
                         flash(f"Unable to update shopping session. Exception: {e}")
+                        return redirect(url_for("main.for_sale_info", product_id=product_id))
             else:
                 
-                # If there isn't a shopping session already, create one
+                # If there isn't a shopping session already, create one if the user is logged in
                 if session.get("user_id") and price:
                     
                     try:
@@ -176,28 +196,16 @@ def for_sale_info(product_id):
                     except Exception as e:
                         SHOP_SESSION.rollback()
                         
-                        flash(f"Unable to add shopping session. Exception: {e}")
+                        flash(f"Unable to add shopping session. Exception: {e}", "selection_error")
                     
-                        return redirect(url_for("main.for_sale_info"))
-            
-            
-            quantity = int(request.form.get("quantity"))
-            
-            if quantity < 0 or quantity > 10:
-                flash("Please choose a number between 1 and 10", "selection_error")
+                        return redirect(url_for("main.for_sale_info", product_id=product_id))
+                else:
+                    flash("Please log in to add items to your cart.")
                     
-            order_notes = request.form.get("order_notes")
-            
-            # Add options to the cart
-            new_cart_item = CartItems(
-                session_id=session["shopping_session"],
-                product_id=id,
-                quantity=quantity,
-                created_at=datetime.now(),
-                modified_at=datetime.now(),
-                product_order_notes=order_notes
-            )        
-            
+                    return redirect(url_for("main.login"))
+
+                    
+
             if id == 1:
                 # For leather goods
                 good = request.form.get("leather_product")
@@ -286,7 +294,13 @@ def cart():
         # Query database for the user's saved items
         saved_items = q.find_all_saved_items(session["shopping_session"])
         
-        
+        saved_item_ids = [item.id for item in saved_items]
+    
+        return render_template("cart.html",
+                        socials=JGL_SOCIALS,
+                        cart_items=cart_items,
+                        saved_items=saved_items,
+                        saved_item_ids=saved_item_ids)
     # TODO: Add shopping cart total
 
         # TODO: Query database for prices
@@ -489,6 +503,33 @@ def save_for_later():
             except Exception as e:
                 SHOP_SESSION.rollback()
                 print(f"Couldn't save the item, exception: {e}")
+                
+        # TODO: Adjust session price
+        
+        # Find the product ID of the cart item id
+        cart_item = q.find_cart_item(cart_item_id)
+        
+        try:
+            cart_item_product_id = cart_item.product_id
+            print(f"Cart Item Product ID: {cart_item_product_id}")
+            
+            # Call the price by item ID
+            item_price = q.find_product_price(cart_item_product_id)
+            print(f"Item Price: {item_price}")
+            
+            # Find the current shopping session total
+            shopping_session = q.shopping_session_search(session["shopping_session"])
+            session_total = shopping_session.total
+            
+            # Change shopping session total
+            # Update the total
+            new_price = session_total - item_price
+            shopping_session.total = new_price
+            shopping_session.modified_at = datetime.now()
+        except Exception as e:
+            print(f"Unable to update session total. Exception: {e}")
+            
+        
     else:
         print("Unable to find cart item ID")
             
