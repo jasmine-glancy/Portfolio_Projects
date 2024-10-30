@@ -129,6 +129,8 @@ def for_sale_info(product_id):
             
             print(f"Item Price: {price} type: {type(price)}")
             
+            order_notes = None 
+            
             # If there is a shopping session, reference it
             if "shopping_session" in session and session.get("shopping_session"):
                 print("Shopping session found!")
@@ -149,17 +151,6 @@ def for_sale_info(product_id):
                     
                     order_notes = request.form.get("order_notes")
             
-                    # Add options to the cart
-                    new_cart_item = CartItems(
-                        session_id=session["shopping_session"],
-                        product_id=id,
-                        quantity=item_quantity,
-                        created_at=datetime.now(),
-                        modified_at=datetime.now(),
-                        product_order_notes=order_notes
-                    )        
-            
-                    
                     try:
                         print(f"Updated total: {new_price} type: {type(new_price)}")
                         SHOP_SESSION.commit()
@@ -204,8 +195,16 @@ def for_sale_info(product_id):
                     
                     return redirect(url_for("main.login"))
 
-                    
-
+            # Add options to the cart
+            new_cart_item = CartItems(
+                session_id=session["shopping_session"],
+                product_id=id,
+                quantity=item_quantity,
+                created_at=datetime.now(),
+                modified_at=datetime.now(),
+                product_order_notes=order_notes
+            )        
+            
             if id == 1:
                 # For leather goods
                 good = request.form.get("leather_product")

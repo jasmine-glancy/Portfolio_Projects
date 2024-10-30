@@ -35,11 +35,11 @@
                             {% with messages = get_flashed_messages(category_filter=["selection_error"]) %}
                                 {% if messages %}
                                     {% for message in messages %}
-                                        <p class="flash">
+                                        <div class="flash">
                                             <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
                                             {{ message }} 
                                             <img src="{{ url_for('static', filename='assets/images/warning.svg')}}" class="warning" alt="Error">
-                                        </p>
+                                        </div>
                                     {% endfor %}
                                 {% endif %}
                             {% endwith %}

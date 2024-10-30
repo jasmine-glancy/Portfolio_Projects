@@ -56,7 +56,7 @@ def get_image_alt(product_id):
     return product_service_alt
 
 @app.template_filter("cart_price")
-def cart_price(session_id, saved_item_ids):
+def cart_price(session_id):
     """Finds the price of the cart as a whole"""
     cart_items = q.cart_price(session_id)
     
@@ -153,6 +153,13 @@ def display_leather_notes(item_id):
     
     return notes
 
+@app.template_filter("cart_length")
+def cart_length(cart_items, saved_item_ids):
+    """Calculates the cart length"""
+    
+    length = sum(1 for item in cart_items if item.id not in saved_item_ids)
+    
+    return length
     
 
 # Register the blueprint for routes 

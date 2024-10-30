@@ -133,9 +133,11 @@
 																					{% elif item_key[0] == 2 or item_key[0] == 3 %}
 																						<tr>
 																							<td class="column_one">
-																								<div class="{% if item_key[8] != None %}product_option{% endif %}">
+																								<div class="product_option">
 																									<!-- Written options -->
-																									{{ item_key[0]|get_option_text(item_key[5])|title }}
+																									<div class="smaller_space">
+																										{{ item_key[0]|get_option_text(item_key[5])|title }}
+																									</div>
 																								</div>  
 																							</td>	
 																							<td class="column_two">
@@ -187,8 +189,6 @@
 																					</table>
 																				{% endif %}
 																				
-																				<!-- TODO: Remove saved items from the cart -->
-															
 																				<!-- TODO: Allow user to remove item -->
 															
 																				<!-- TODO: Allow user to edit item -->
@@ -243,9 +243,19 @@
 								<!-- Sidebar -->
 									<section>
 										<header>
-											<!-- TODO: Change total to account for items that are no longer in the cart -->
-											{% if cart_items and session["shopping_session"] %}
-												<h2>Subtotal ({{ cart_items|length }} items): ${{ session["shopping_session"]|cart_price(saved_item_ids) }}</h2>
+											<!-- Change total to account for items that are no longer in the cart -->
+											{% if cart_items not in saved_items and session["shopping_session"] %}
+												<h2>
+													Subtotal 
+													<!-- Calculate the cart total without also including saved items -->
+													({{ cart_items|cart_length(saved_item_ids) }} 
+														{% if cart_items|cart_length(saved_item_ids) > 1 %}
+															items):
+														{% else %}
+															item):
+														{% endif %}
+													${{ session["shopping_session"]|cart_price }}
+												</h2>
 											{% else %}
 												<h2>Subtotal (0 items): $0.00</h2>
 											{% endif %}
@@ -431,8 +441,7 @@
 																						</table>  
 																					{% endif %}
 																					
-																					<!-- TODO: Make items that are in the saved list hidden from the cart -->
-																						<!-- TODO: Products that are in the saved list should not 
+																					<!-- TODO: Products that are in the saved list should not 
 																						 count toward the cart total price-->
 
 																					<!-- TODO: Allow user to remove item from saved cart-->
