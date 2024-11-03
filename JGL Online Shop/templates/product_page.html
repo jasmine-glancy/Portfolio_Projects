@@ -46,14 +46,14 @@
 
                             <form id="colorForm" action="{{ url_for('main.for_sale_info', product_id=product.service_product_id) }}" method="POST">
                                 <div class="form-group">
-                                    {% if leather_options and leather_colors and metal_colors and sizes %}
+                                    {% if product.service_product_id == 1 %}
                                         <div class="mb-3">
                                             <label for="leather_goods" class="form-label">
                                                 Leather Goods Type:
                                             </label>
-                                            <select class="form-select" aria-label="leather" name="leather_product">
+                                            <select class="form-select" aria-label="leather" name="leather_product" required>
                                                 {% for option in leather_options %}
-                                                    <option value="{{ option.leather_item_id }}">{{ option.item|title }}</option>
+                                                    <option value="{{ option.leather_item_id }}"{% if option.leather_item_id == cart_item.leather_good_id %}selected{% endif %}>{{ option.item|title }}</option>
                                                 {% endfor %}
                                                 <option value="default" selected>Please make a selection</option>
                                             </select>
@@ -63,7 +63,7 @@
                                             <label for="leather_goods" class="form-label">
                                                 Leather Colors:
                                             </label>
-											<select id="leather_colors" class="form-select" name="leather_color">
+											<select id="leather_colors" class="form-select" name="leather_color" required>
 												<option value="default" selected>Please make a selection</option>
 												{% for color in leather_colors %}
 													<option value="{{ color.leather_color_id }}" style="background-color: {{ color.hex_code }}; color: {{ color.hex_code }};">
@@ -77,7 +77,7 @@
                                             <label for="metal_color_choices" class="form-label">
                                                 Metal Colors:
                                             </label>
-											<select id="metal_colors" class="form-select" name="metal_color">
+											<select id="metal_colors" class="form-select" name="metal_color" required>
 												<option value="default" selected>Please make a selection</option>
 												{% for color in metal_colors %}
 													<option value="{{ color.metal_color_id }}">
@@ -91,7 +91,7 @@
                                             <label for="leather_sizes" class="form-label">
                                                 Choose a Size:
                                             </label>
-											<select id="leather_colors" class="form-select" name="size">
+											<select id="leather_colors" class="form-select" name="size" required>
 												<option value="default" selected>Please make a selection</option>
 												{% for size in sizes %}
 													<option value="{{ size.size_id }}">
@@ -106,7 +106,7 @@
                                                 Choose an Option:
                                             </label>
 											{% if fiction %}
-												<select class="form-select" aria-label="writing" name="writing_options">
+												<select class="form-select" aria-label="writing" name="writing_options" required>
 													{% for option in fiction %}
 														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
 													{% endfor %}
@@ -114,7 +114,7 @@
 												</select>
 											{% endif %}
 											{% if nonfiction %}
-												<select class="form-select" aria-label="writing" name="writing_options">
+												<select class="form-select" aria-label="writing" name="writing_options" required>
 													{% for option in nonfiction %}
 														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
 													{% endfor %}
@@ -127,7 +127,7 @@
 											<label for="software_option" class="form-label">
 												Choose an Option:
 											</label>
-											<select class="form-select" aria-label="writing" name="software_options">
+											<select class="form-select" aria-label="writing" name="software_options" required>
 												{% for option in software %}
 													<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
 												{% endfor %}

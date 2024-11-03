@@ -45,7 +45,7 @@ def products():
 def for_sale_info(product_id):
     """Provides more info on each product"""
     
-        # Fetch product information based on product_id
+    # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     print(f"Product ID: {product.service_product_id}")
     print(f"Product Name: {product.name}")
@@ -59,6 +59,8 @@ def for_sale_info(product_id):
     if product:
         id = product.service_product_id
         print(f"ID: {id}")
+        
+    # TODO: refactor to remove duplication possibility in edit
         
     leather_options = None
     leather_colors = None
@@ -106,6 +108,8 @@ def for_sale_info(product_id):
         # For software-based services
         
         software = q.software()
+        
+    
         
     print(product)
     
@@ -502,9 +506,7 @@ def save_for_later():
             except Exception as e:
                 SHOP_SESSION.rollback()
                 print(f"Couldn't save the item, exception: {e}")
-                
-        # TODO: Adjust session price
-        
+                        
         # Find the product ID of the cart item id
         cart_item = q.find_cart_item(cart_item_id)
         
@@ -542,7 +544,24 @@ def edit():
     
     print("editing!")
     
-    return redirect(url_for("main.cart"))
+    try:
+        cart_item = q.find_cart_item(cart_item_id)
+    
+        print(cart_item.leather_good_id)
+        
+        # Fetch product information based on product_id
+        product = q.find_product_by_id(cart_item.product_id)
+    
+    except Exception as e:
+        flash(f"Can't find cart item. Exception: {e}")
+    
+    # TODO: Call existing options in the template 
+    
+    return render_template("product_page.html",
+                           date=JGL_CURRENT_YEAR,
+                           socials=JGL_SOCIALS,
+                           product=product,
+                           cart_item=cart_item)
 
 @bp.route("/remove/<int:cart_item_id>", methods=["POST"])
 def remove_cart_item(cart_item_id):
