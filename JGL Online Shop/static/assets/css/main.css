@@ -2460,7 +2460,22 @@ input[type="text"],
 			margin-bottom: 0.5vw;
 		}
 
-			
+		.inline-form, .edit_remove a, .edit_remove form {
+			display: inline;
+			margin: 0;
+			padding: 0;
+		}
+
+		.link-button {
+			background: none;
+			border: none;
+			cursor: pointer;
+			font-size: inherit;		
+			font-style: normal;
+			font-weight: 200;
+			padding: 0;
+			margin: 0;
+		}
 
 .cart_table, .leather_cart_table {
 	width: 100%;
@@ -2524,15 +2539,18 @@ input[type="text"],
 	}
 
 
-.cart_link, .saved_cart_link {
+.cart_link, .saved_cart_link, .link-button, 
+.edit_remove a, .edit_remove form {
 	text-decoration-line: none;
+	color: #18448D;
 }
 
 	.saved_cart_link {
 		width: 200px;
 	}
 
-.cart_link:hover, .saved_cart_link:hover {
+.cart_link:hover, .saved_cart_link:hover, .link-button:hover,
+.edit_remove a:hover, .edit_remove form:hover {
 	color: #546b76 !important;
 }
 	.saved_actions, .actions {

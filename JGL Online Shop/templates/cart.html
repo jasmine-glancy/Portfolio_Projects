@@ -64,7 +64,13 @@
 																				<div class="edit_remove">
 																					<a href="{{ url_for('main.edit', cart_item_id=item_key[7]) }}" class="cart_link">Edit</a>
 																					| 
-																					<a href="{{ url_for('main.remove_cart_item', cart_item_id=item_key[7]) }}" class="cart_link">Remove</a>
+																					<form id="remove_cart_item_{{ item_key[8] }}"action="{{ url_for('main.remove_cart_item', cart_item_id=item_key[7]) }}" class="inline-form" method="post">
+																						<input type="hidden" name="_method" value="DELETE">
+																						<input type="hidden" name="api_key" value="{{ api }}">
+																						<button type="submit" class="link-button">
+																							Remove
+																						</button>
+																					</form>
 																				</div>
 																			</div>
 																		</td>
@@ -162,8 +168,6 @@
 																							</td>	
 																							<td>
 																								<div class="software_product_quantity">
-																									<!-- TODO: Make quantity a dropdown and allow it to change -->
-
 																									Quantity: 
 																									<select name="quantity" class="quantity_dropdown">
 																										{% for i in range(1, 11) %} 
@@ -244,7 +248,7 @@
 									<section>
 										<header>
 											<!-- Change total to account for items that are no longer in the cart -->
-											{% if cart_items not in saved_items and session["shopping_session"] %}
+											{% if session["shopping_session"] and cart_items not in saved_items %}
 												<h2>
 													Subtotal 
 													<!-- Calculate the cart total without also including saved items -->

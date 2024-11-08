@@ -4,6 +4,7 @@ from flask import Blueprint, flash, render_template, session, \
 from online_shop import CartItems, Users, SHOP_SESSION, SavedItems, ShoppingSessions
 import queries as q
 import helpers as h
+import os
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -12,7 +13,7 @@ bp = Blueprint("main", __name__)
 
 JGL_CURRENT_YEAR = h.current_year()
 JGL_SOCIALS = h.social_links()
-
+API_KEY = os.environ.get("api_key")
 
 # ----------------------- Routes ----------------------- #
 
@@ -59,58 +60,18 @@ def for_sale_info(product_id):
     if product:
         id = product.service_product_id
         print(f"ID: {id}")
-        
-    # TODO: refactor to remove duplication possibility in edit
-        
-    leather_options = None
-    leather_colors = None
-    metal_colors = None
-    sizes = None
-    nonfiction = None
-    fiction = None 
-    software = None
             
-    if product_id == 1:
-        # Leather options
-        
-        # Fetch leather goods for dropdown
-        leather_options = q.find_leather_goods()
-        
-        # Fetch leather color for dropdown
-        leather_colors = q.look_up_leather_colors()
+    # Find options based on product_id
+    options = q.search_options(product_id)
     
-        # Fetch metal color for dropdown
-        metal_colors = q.look_up_metal_colors()
-        
-        # Fetch sizes for dropdown
-        sizes = q.find_sizes()  
-    elif product_id == 2:
-        # For non-fiction written services
-        
-        # IDs non-fiction services
-        nonfiction_service_options = [1, 2, 3, 7]
-        nonfiction = q.writing(nonfiction_service_options)
-        
-        # for option in nonfiction:
-        #     print("Non-fiction options:", option)
+    leather_options = options.get("leather_options", None)
+    leather_colors = options.get("leather_colors", None)
+    metal_colors = options.get("metal_colors", None)
+    sizes = options.get("sizes", None)
+    nonfiction = options.get("nonfiction", None)
+    fiction = options.get("fiction", None) 
+    software = options.get("software", None)
 
-    elif product_id == 3:
-        # For fiction written services
-        
-        # IDs of fiction services
-        fiction_service_options = [4, 5, 6, 7]
-        fiction = q.writing(fiction_service_options)
-    
-        # for option in fiction:
-        #     print("Fiction options:", option)
-
-    elif product_id == 4:
-        # For software-based services
-        
-        software = q.software()
-        
-    
-        
     print(product)
     
     if request.method == "POST":
@@ -547,21 +508,69 @@ def edit():
     try:
         cart_item = q.find_cart_item(cart_item_id)
     
-        print(cart_item.leather_good_id)
+        print(cart_item.leather_good_id, cart_item.leather_color_id, cart_item.metal_color_id, cart_item.leather_goods_size_id, cart_item.writing_option_id, cart_item.software_id)
         
         # Fetch product information based on product_id
         product = q.find_product_by_id(cart_item.product_id)
-    
+        
+        # Find options based on product_id
+        options = q.search_options(product.service_product_id)
+        
+        leather_options = options.get("leather_options", None)
+        leather_colors = options.get("leather_colors", None)
+        metal_colors = options.get("metal_colors", None)
+        sizes = options.get("sizes", None)
+        nonfiction = options.get("nonfiction", None)
+        fiction = options.get("fiction", None) 
+        software = options.get("software", None)
+        
+        print(leather_options, leather_colors, metal_colors, sizes, nonfiction, fiction, software)
+        
+                # Debugging: Print the types of the objects being stored in the session
+        print(f"Types: {type(leather_options)}, {type(leather_colors)}, {type(metal_colors)}, {type(sizes)}, {type(nonfiction)}, {type(fiction)}, {type(software)}")
+        
+        # Store info in the session
+        session["product_info"] = {
+            "product_id": cart_item.product_id,
+            "leather_options": leather_options,
+            "leather_colors": leather_colors,
+            "metal_colors": metal_colors,
+            "sizes": sizes,
+            "nonfiction": nonfiction,
+            "fiction": fiction,
+            "software": software
+        }
+        
+        for option in leather_options:
+            print(f"Leather option type: {type(option)}")
+        for color in leather_colors:
+            print(f"Leather color type: {type(color)}")
+        for color in metal_colors:
+            print(f"Metal color type: {type(color)}")
+        for size in sizes:
+            print(f"Size type: {type(size)}")
+        for option in nonfiction:
+            print(f"Nonfiction option type: {type(option)}")
+        for option in fiction:
+            print(f"Fiction option type: {type(option)}")
+        for option in software:
+            print(f"Software option type: {type(option)}")
     except Exception as e:
-        flash(f"Can't find cart item. Exception: {e}")
+        print(f"Can't find cart item. Exception: {e}")
+        
+        return redirect(url_for("main.cart"))
     
     # TODO: Call existing options in the template 
     
-    return render_template("product_page.html",
-                           date=JGL_CURRENT_YEAR,
-                           socials=JGL_SOCIALS,
-                           product=product,
-                           cart_item=cart_item)
+    return redirect(url_for("main.for_sale_info",
+                            product_id=cart_item.product_id,                 
+                           leather_options=leather_options,
+                           leather_colors=leather_colors,
+                           metal_colors=metal_colors,
+                           sizes=sizes,
+                           nonfiction=nonfiction,
+                           fiction=fiction,
+                           software=software))
 
 @bp.route("/remove/<int:cart_item_id>", methods=["POST"])
 def remove_cart_item(cart_item_id):
@@ -569,4 +578,12 @@ def remove_cart_item(cart_item_id):
     
     print("deleting!")
     
+    if request.form.get("method") == "DELETE" and \
+        request.form.get("api_key") == API_KEY:
+            try:
+               q.delete_cart_item(cart_item_id)
+
+               return redirect(url_for("main.cart"))
+            except Exception as e:
+                print(f"Couldn't delete cart item. Exception: {e}")
     return redirect(url_for("main.cart"))

@@ -308,3 +308,92 @@ def get_size(size_id):
         print(f"Exception: {e}")
         
     return size
+
+def delete_cart_item(cart_item_id):
+    """Delete an item from the cart"""
+    
+    try:
+        # Find the cart item
+        cart_item = find_cart_item(cart_item_id)
+        
+        if cart_item is not None:
+             
+            # Delete the item
+            shop_session.delete(cart_item)
+            
+            # Commit the transaction
+            shop_session.commit()
+            
+            print("Item deleted")
+        
+    except Exception as e:
+        # Rollback the transaction if 
+        # there is an error
+        shop_session.rollback()
+        print(f"Exception: {e}")
+
+def search_options(product_id):
+    """Find all options under a product or service"""
+    
+    product_service_options = {
+        "leather_options": [],
+        "leather_colors": [],
+        "metal_colors": [],
+        "sizes": [],
+        "nonfiction": [],
+        "fiction": [],
+        "software": []
+    }
+            
+    if product_id == 1:
+        # Leather options
+        
+        # Fetch leather goods for dropdown
+        leather_options = find_leather_goods()
+        
+        # Fetch leather color for dropdown
+        leather_colors = look_up_leather_colors()
+    
+        # Fetch metal color for dropdown
+        metal_colors =look_up_metal_colors()
+        
+        # Fetch sizes for dropdown
+        sizes = find_sizes()  
+        
+        product_service_options["leather_options"] = leather_options
+        product_service_options["leather_colors"] = leather_colors
+        product_service_options["metal_colors"] = metal_colors
+        product_service_options["sizes"] = sizes
+        
+    elif product_id == 2:
+        # For non-fiction written services
+        
+        # IDs non-fiction services
+        nonfiction_service_options = [1, 2, 3, 7]
+        nonfiction = writing(nonfiction_service_options)
+        
+        # for option in nonfiction:
+        #     print("Non-fiction options:", option)
+        
+        product_service_options["nonfiction"] = nonfiction
+
+    elif product_id == 3:
+        # For fiction written services
+        
+        # IDs of fiction services
+        fiction_service_options = [4, 5, 6, 7]
+        fiction = writing(fiction_service_options)
+    
+        # for option in fiction:
+        #     print("Fiction options:", option)
+        
+        product_service_options["fiction"] = fiction
+
+    elif product_id == 4:
+        # For software-based services
+        
+        software_options = software() 
+        
+        product_service_options["software"] = software_options        
+    
+    return product_service_options

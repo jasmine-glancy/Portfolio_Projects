@@ -53,25 +53,26 @@
                                             </label>
                                             <select class="form-select" aria-label="leather" name="leather_product" required>
                                                 {% for option in leather_options %}
-                                                    <option value="{{ option.leather_item_id }}"{% if option.leather_item_id == cart_item.leather_good_id %}selected{% endif %}>{{ option.item|title }}</option>
+                                                    <option value="{{ option.leather_item_id }}" {% if cart_item is defined and option.leather_item_id == cart_item.leather_good_id %}selected{% endif %}>
+                                                        {{ option.item|title }}
+                                                    </option>
                                                 {% endfor %}
-                                                <option value="default" selected>Please make a selection</option>
+                                                <option value="default" {% if cart_item is not defined or cart_item.leather_good_id is none %}selected{% endif %}>Please make a selection</option>
                                             </select>
-                                        </div>
-										
-                                        <div class="mb-3">
-                                            <label for="leather_goods" class="form-label">
-                                                Leather Colors:
-                                            </label>
-											<select id="leather_colors" class="form-select" name="leather_color" required>
-												<option value="default" selected>Please make a selection</option>
-												{% for color in leather_colors %}
-													<option value="{{ color.leather_color_id }}" style="background-color: {{ color.hex_code }}; color: {{ color.hex_code }};">
-														{{ color.color_string|title }}
-													</option>
-												{% endfor %}
-											</select>
-                                        </div>	
+                                            
+                                            <div class="mb-3">
+                                                <label for="leather_goods" class="form-label">
+                                                    Leather Colors:
+                                                </label>
+                                                <select id="leather_colors" class="form-select" name="leather_color" required>
+                                                    <option value="default" {% if cart_item is not defined or cart_item.leather_color_id is none %}selected{% endif %}>Please make a selection</option>
+                                                    {% for color in leather_colors %}
+                                                        <option value="{{ color.leather_color_id }}" {% if cart_item is defined and color.leather_color_id == cart_item.leather_color_id %}selected{% endif %}>
+                                                            {{ color.color_string|title }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
 
                                         <div class="mb-3">
                                             <label for="metal_color_choices" class="form-label">
