@@ -46,6 +46,13 @@ def products():
 def for_sale_info(product_id):
     """Provides more info on each product"""
     
+    referrer = request.referrer
+    print(f"Referrer URL: {referrer}")
+    
+    if referrer and "cart" not in referrer:
+        # If the user is coming from anywhere but the edit page, reset the variable
+        session["product_info"]["cart_item"] = False
+    
     # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     print(f"Product ID: {product.service_product_id}")
@@ -532,45 +539,26 @@ def edit():
         # Store info in the session
         session["product_info"] = {
             "product_id": cart_item.product_id,
-            "leather_options": leather_options,
-            "leather_colors": leather_colors,
-            "metal_colors": metal_colors,
-            "sizes": sizes,
-            "nonfiction": nonfiction,
-            "fiction": fiction,
-            "software": software
+            "leather_options": cart_item.leather_good_id,
+            "leather_colors": cart_item.leather_color_id,
+            "metal_colors": cart_item.metal_color_id,
+            "sizes": cart_item.leather_goods_size_id,
+            "nonfiction": cart_item.writing_option_id,
+            "fiction": cart_item.writing_option_id,
+            "software": cart_item.software_id,
+            "quantity": cart_item.quantity,
+            "notes": cart_item.product_order_notes,
+            "cart_item": True
         }
         
-        for option in leather_options:
-            print(f"Leather option type: {type(option)}")
-        for color in leather_colors:
-            print(f"Leather color type: {type(color)}")
-        for color in metal_colors:
-            print(f"Metal color type: {type(color)}")
-        for size in sizes:
-            print(f"Size type: {type(size)}")
-        for option in nonfiction:
-            print(f"Nonfiction option type: {type(option)}")
-        for option in fiction:
-            print(f"Fiction option type: {type(option)}")
-        for option in software:
-            print(f"Software option type: {type(option)}")
+        
     except Exception as e:
         print(f"Can't find cart item. Exception: {e}")
         
         return redirect(url_for("main.cart"))
     
-    # TODO: Call existing options in the template 
-    
     return redirect(url_for("main.for_sale_info",
-                            product_id=cart_item.product_id,                 
-                           leather_options=leather_options,
-                           leather_colors=leather_colors,
-                           metal_colors=metal_colors,
-                           sizes=sizes,
-                           nonfiction=nonfiction,
-                           fiction=fiction,
-                           software=software))
+                            product_id=cart_item.product_id))
 
 @bp.route("/remove/<int:cart_item_id>", methods=["POST"])
 def remove_cart_item(cart_item_id):

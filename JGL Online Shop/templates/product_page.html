@@ -53,11 +53,19 @@
                                             </label>
                                             <select class="form-select" aria-label="leather" name="leather_product" required>
                                                 {% for option in leather_options %}
-                                                    <option value="{{ option.leather_item_id }}" {% if cart_item is defined and option.leather_item_id == cart_item.leather_good_id %}selected{% endif %}>
+                                                    <option value="{{ option.leather_item_id }}" 
+                                                        {% if session["product_info"]["leather_options"] and option.leather_item_id == session["product_info"]["leather_options"] %}
+                                                            selected
+                                                        {% endif %}>
                                                         {{ option.item|title }}
                                                     </option>
                                                 {% endfor %}
-                                                <option value="default" {% if cart_item is not defined or cart_item.leather_good_id is none %}selected{% endif %}>Please make a selection</option>
+                                                <option value="default" 
+                                                    {% if not session["product_info"]["leather_options"] or session["product_info"]["leather_options"] is none %}
+                                                        selected
+                                                    {% endif %}>
+                                                    Please make a selection
+                                                </option>
                                             </select>
                                             
                                             <div class="mb-3">
@@ -65,9 +73,17 @@
                                                     Leather Colors:
                                                 </label>
                                                 <select id="leather_colors" class="form-select" name="leather_color" required>
-                                                    <option value="default" {% if cart_item is not defined or cart_item.leather_color_id is none %}selected{% endif %}>Please make a selection</option>
+                                                    <option value="default" 
+                                                        {% if not session["product_info"]["leather_colors"] or session["product_info"]["leather_colors"] is none %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Please make a selection
+                                                    </option>
                                                     {% for color in leather_colors %}
-                                                        <option value="{{ color.leather_color_id }}" {% if cart_item is defined and color.leather_color_id == cart_item.leather_color_id %}selected{% endif %}>
+                                                        <option value="{{ color.leather_color_id }}" 
+                                                            {% if session["product_info"]["leather_colors"] and color.leather_color_id == session["product_info"]["leather_colors"] %}
+                                                                selected
+                                                            {% endif %}>
                                                             {{ color.color_string|title }}
                                                         </option>
                                                     {% endfor %}
@@ -79,9 +95,17 @@
                                                 Metal Colors:
                                             </label>
 											<select id="metal_colors" class="form-select" name="metal_color" required>
-												<option value="default" selected>Please make a selection</option>
+												<option value="default" 
+                                                    {% if not session["product_info"]["metal_colors"] or session["product_info"]["metal_colors"] is none %}
+                                                        selected
+                                                    {% endif %}>
+                                                    Please make a selection
+                                                </option>
 												{% for color in metal_colors %}
-													<option value="{{ color.metal_color_id }}">
+													<option value="{{ color.metal_color_id }}" 
+                                                        {% if session["product_info"]["metal_colors"] and color.metal_color_id == session["product_info"]["metal_colors"] %}
+                                                            selected
+                                                        {% endif %}> 
 														{{ color.metal_type|title }}
 													</option>
 												{% endfor %}
@@ -92,10 +116,18 @@
                                             <label for="leather_sizes" class="form-label">
                                                 Choose a Size:
                                             </label>
-											<select id="leather_colors" class="form-select" name="size" required>
-												<option value="default" selected>Please make a selection</option>
+											<select id="sizes" class="form-select" name="size" required>
+												<option value="default" 
+                                                    {% if not session["product_info"]["sizes"] or session["product_info"]["metal_colors"] is none %}
+                                                        selected
+                                                    {% endif %}>
+                                                    Please make a selection
+                                                </option>
 												{% for size in sizes %}
-													<option value="{{ size.size_id }}">
+													<option value="{{ size.size_id }}" 
+                                                        {% if session["product_info"]["sizes"] and size.size_id == session["product_info"]["sizes"] %}
+                                                            selected
+                                                        {% endif %}>
 														{{ size.size_inches }} inches ({{ size.size_centimeters }} centimeters)
 													</option>
 												{% endfor %}
@@ -109,17 +141,36 @@
 											{% if fiction %}
 												<select class="form-select" aria-label="writing" name="writing_options" required>
 													{% for option in fiction %}
-														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
+														<option value="{{ option.option_id }}"
+                                                            {% if session["product_info"]["fiction"] and option.option_id == session["product_info"]["fiction"] %}
+                                                                selected
+                                                            {% endif %}>
+                                                        {{ option.product_type|title }}</option>
 													{% endfor %}
-													<option value="default" selected>Please make a selection</option>
+													<option value="default" 
+                                                        {% if not session["product_info"]["fiction"] or session["product_info"]["fiction"] is none %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Please make a selection
+                                                    </option>
 												</select>
 											{% endif %}
 											{% if nonfiction %}
 												<select class="form-select" aria-label="writing" name="writing_options" required>
 													{% for option in nonfiction %}
-														<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
+														<option value="{{ option.option_id }}"
+                                                            {% if session["product_info"]["nonfiction"] and option.option_id == session["product_info"]["nonfiction"] %}
+                                                                selected
+                                                            {% endif %}>
+                                                            {{ option.product_type|title }}
+                                                        </option>
 													{% endfor %}
-													<option value="default" selected>Please make a selection</option>
+													<option value="default"
+                                                        {% if not session["product_info"]["fiction"] or session["product_info"]["fiction"] is none %}
+                                                            selected
+                                                        {% endif %}>
+                                                        Please make a selection
+                                                    </option>
 												</select>
 											{% endif %}
                                         </div>
@@ -132,7 +183,12 @@
 												{% for option in software %}
 													<option value="{{ option.option_id }}">{{ option.product_type|title }}</option>
 												{% endfor %}
-												<option value="default" selected>Please make a selection</option>
+												<option value="default" 
+                                                    {% if not session["product_info"]["software"] or session["product_info"]["software"] is none %}
+                                                        selected
+                                                    {% endif %}>
+                                                    Please make a selection
+                                                </option>
 											</select>
 										</div>
 								    {% endif %}
@@ -142,11 +198,18 @@
                                             Quantity:
                                         </label>
                                         
-                                        <input type="number" id="quantity" name="quantity" min="1" max="10"></input>
+                                        <input type="number" id="quantity" name="quantity" min="1" max="10"
+                                            {% if session["product_info"]["cart_item"] and session["product_info"]["quantity"] %}
+                                                value="{{ session["product_info"]["quantity"] }}"
+                                            {% endif %}></input>
                                     </div>
 
                                     <div class="col-12">
-                                        <textarea name="order_notes" placeholder="Please explain the product or service you would like (including themes/topics/etc)" class="order_notes"></textarea>
+                                        <textarea name="order_notes" placeholder="Please explain the product or service you would like (including themes/topics/etc)" class="order_notes">
+                                            {% if session["product_info"]["cart_item"] and session["product_info"]["notes"] %}
+                                                {{ session["product_info"]["notes"] }}
+                                            {% endif %}
+                                        </textarea>
                                     </div>
                                     
                                 </div>
