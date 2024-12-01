@@ -40,49 +40,44 @@ class JglPlayer2():
         possible_moves = [x for x, letter in enumerate(jgl_board) if letter == "___" and x != 0]
         move = 0 
         
-        for letter in ["O", "X"]:
+        for combination in jgl_winning_combos:
             for i in possible_moves:
-                jgl_board[i] = letter
                 
-                if self.jgl_cpu_can_win(jgl_board, letter):
+                jgl_board[i] = f"_{self.jgl_cpu_symbol}_"
+                
+                # Win: If there's a move that will allow the computer to win the game, it should take it.
+                if self.jgl_cpu_can_win(jgl_board, self.jgl_cpu_symbol):
                     move = i
                     return self.jgl_cpu_mark_box(move, jgl_empty_boxes)
                 
                 jgl_board[i] = "___"
+            
+        # Block: If the opponent has two in a row, the computer should play the third to block the opponent.
+ 
+        for combination in jgl_winning_combos: 
+            for i in possible_moves:
+                if self.jgl_cpu_can_block(combination, jgl_winning_combos):
+                    jgl_blocking_box = combination.index("___")
+                    return self.jgl_cpu_mark_box(jgl_box, jgl_blocking_box)    
+                
+                jgl_board[i] = "___"       
                 
         # Center: If the center square is free, the computer should take it.
         if jgl_board[4] == "___":
             return self.jgl_cpu_mark_box(4, jgl_empty_boxes)
-            
-        # If a side box is free, take it
-        for jgl_box in [1, 3, 5, 7]:
-            if jgl_box in jgl_empty_boxes and self.jgl_user_can_win_next_turn(jgl_box):
-                return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)                
-        # If a corner box is free, take it
-        for jgl_box in [0, 2, 6, 8]:
-            if jgl_box in jgl_empty_boxes and self.jgl_user_can_win_next_turn(jgl_box):
-                return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)
-                
+        
+        else:    
+            # If a side box is free, take it
+            for jgl_box in [1, 3, 5, 7]:
+                if jgl_box in jgl_empty_boxes and self.jgl_user_can_win_next_turn(jgl_box):
+                    return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)                
+            # If a corner box is free, take it
+            for jgl_box in [0, 2, 6, 8]:
+                if jgl_box in jgl_empty_boxes and self.jgl_user_can_win_next_turn(jgl_box):
+                    return self.jgl_cpu_mark_box(jgl_box, jgl_empty_boxes)
+                    
         print(jgl_empty_boxes)
-        for combination in jgl_winning_combos:
-            if "___" in combination:
-            
-                jgl_board[combination.index("___")] = f"_{self.jgl_user_symbol}_"
-                
-                # Win: If there's a move that will allow the computer to win the game, it should take it.
-                if all(jgl_board.get(i, None) == f"_{self.jgl_user_symbol}_" \
-                    for combination in jgl_winning_combos for i in combination):
-                    # All condition suggested by CoPilot
-                    jgl_winning_box = combination.index("___")
-                    return self.jgl_cpu_mark_box(jgl_box, jgl_winning_box)
 
-            
-        for combination in jgl_winning_combos:    
-            # Block: If the opponent has two in a row, the computer should play the third to block the opponent.
-            
-            if self.jgl_cpu_can_block(combination, jgl_winning_combos):
-                jgl_blocking_box = combination.index("___")
-                return self.jgl_cpu_mark_box(jgl_box, jgl_blocking_box)
             
     def jgl_cpu_mark_box(self, jgl_box, jgl_empty_boxes):
         """Marks a certain box with the computer's symbol"""
@@ -99,6 +94,7 @@ class JglPlayer2():
     def jgl_cpu_can_win(self, board, letter):
         """Checks if the computer can win"""
         
+        # TODO: Prioritize winning over blocking
             
         return ((board[1] == letter and board[2] == letter and board[3] == letter) \
              or (board[4] == letter and board[5] == letter and board[6] == letter) or \
@@ -131,12 +127,6 @@ class JglPlayer2():
 
         # Check if this will allow the user to win
         for winning_combo in self.jgl_game.jgl_winning_combinations:
-            
-            if "___" in winning_combo: 
-                # Mark the empty box in the combination
-                jgl_board_copy[winning_combo.index("___")] = f"_{self.jgl_user_symbol}_"
-            
-            
             if all(jgl_board_copy[i] == f"_{self.jgl_user_symbol}_" for i in winning_combo):
                 return True
         return False

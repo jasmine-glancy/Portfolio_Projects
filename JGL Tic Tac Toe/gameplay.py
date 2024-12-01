@@ -39,11 +39,11 @@ class JglTicTacToe():
         """Checks if the board is filled or not"""
         
         # Iterate over the board and return false if the board has an empty sign
-        for spot in self.jgl_game_board:
-            if self.jgl_game_board[spot] == "___":
+        for key, spot in self.jgl_game_board.items():
+            if spot == "___":
                 return False
-            else:
-                return True
+            
+        return True
 
 
     def jgl_check_for_wins(self):
@@ -52,41 +52,34 @@ class JglTicTacToe():
         winner_found = False
         
         for combo in self.jgl_winning_combinations:
-            if self.jgl_game_board[combo[0]] == self.jgl_game_board[combo[1]] == self.jgl_game_board[combo[2]] != '___':
-                winner_found = True
+            spot_1 = self.jgl_game_board[combo[0]]
+            spot_2 = self.jgl_game_board[combo[1]]
+            spot_3 = self.jgl_game_board[combo[2]]
+            
+            if spot_1 == spot_2 == spot_3 != "___":
+                
+                if spot_1 == spot_2 == spot_3:
+                    # If all spots match, the winner was found
+                    winner_found = True
+                    
+                    try:
+                        # Grab the winning character
+                        winning_character = spot_1.split("_")[1]
+
+                        print(f"Winner found! {winning_character}s win!")
+                    except Exception as e:
+                        print(f"Exception: {e}")
         return winner_found
-        
-        # TODO: Write a new function to check whether a player has won or not 
-            # TODO: Check for all the rows, columns, and the two diagonals
-      
-    # def jgl_update_winning_combos(self):
-    #     """Updates winning combinations after each turn, suggested by CoPilot"""
-           
-           
-    #     # Assign variable for readability
-    #     jgl_board = self.jgl_game_board
-
-    #     # Update rows
-    #     for i in range(3):
-    #         self.jgl_winning_combinations[i] = jgl_board[i]
-
-    #     # Update columns
-    #     for i in range(3):
-    #         self.jgl_winning_combinations[i+3] = [jgl_board[j][i] for j in range(3)]
-
-    #     # Update diagonals
-    #     self.jgl_winning_combinations[6] = [jgl_board[i][i] for i in range(3)]
-    #     self.jgl_winning_combinations[7] = [jgl_board[i][2-i] for i in range(3)]
-        
+    
+    
     def jgl_get_combinations_and_positions(self, jgl_position):
         """Get winning combinations and positions on the game board"""
         
-        # TODO: Keep track of player positions and computer positions
+        # Keep track of player positions and computer positions
         jgl_combos_with_positions = []
         for combo in self.jgl_winning_combinations:
             if jgl_position in combo:
                 jgl_combos_with_positions.append(combo)
         return jgl_combos_with_positions
     
-        # TODO: Keep track of possible winning combos for computer logic
         

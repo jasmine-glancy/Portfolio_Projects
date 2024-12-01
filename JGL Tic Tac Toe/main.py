@@ -29,29 +29,34 @@ jgl_player_2.jgl_computer_symbol()
 
 # Winner found
 winner_found = jgl_game.jgl_check_for_wins()
-while jgl_game.jgl_is_board_filled != False or winner_found == False:
-    
+board_filled = jgl_game.jgl_is_board_filled()
+
+# print(winner_found, board_filled)
+while not board_filled and not winner_found: 
     
     # Mark the boxes
     jgl_player_1.jgl_box_mark(jgl_empty_boxes)
-    jgl_game.jgl_check_for_wins()
+    winner_found = jgl_game.jgl_check_for_wins()
 
     # Print board and update winning combinations
     jgl_game.jgl_print_board()
-    jgl_game.jgl_check_for_wins()
-
+    winner_found = jgl_game.jgl_check_for_wins() 
+    board_filled = jgl_game.jgl_is_board_filled()
+    
+    if winner_found:
+        break
+    elif board_filled:
+        print("It's a draw!")
+        break
+    
     # Computer picks a mark
     jgl_player_2.jgl_computer_choice(jgl_winning_combos, jgl_empty_boxes)
     jgl_game.jgl_print_board()
-    jgl_game.jgl_check_for_wins()
-# TODO: If the current player won the game, then print a winning message and break the infinite loop.
-
-
-# Goal is to place respective signs completely row-wise, column-wise, or diagonally
-
-# TODO: Game continues until it ends in a draw or a win
-    # It's a draw if all the boxes are filled without either player getting a winning match
+    winner_found = jgl_game.jgl_check_for_wins() 
+    board_filled = jgl_game.jgl_is_board_filled()
     
-    # TODO: If the board is filled, then print the draw message and break the infinite loop.
-
-    # TODO: Finally, show the user the final view of the board.
+    if winner_found:
+        break
+    elif board_filled:
+        print("It's a draw!")
+        break
