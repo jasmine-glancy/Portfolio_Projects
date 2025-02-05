@@ -4,10 +4,6 @@ from player_1 import JglPlayer1
 from player_2 import JglPlayer2
 from gameplay import JglTicTacToe
 
-# Two players, x and o
-
-# There's a board with 9 boxes +/- nested array?
-
 print("Welcome to Text-Based Tic Tac Toe! Try to beat the computer. ✗ ❤︎ 0")
 
 # Print game board

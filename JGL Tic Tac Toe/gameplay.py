@@ -71,15 +71,3 @@ class JglTicTacToe():
                         print(f"Exception: {e}")
         return winner_found
     
-    
-    def jgl_get_combinations_and_positions(self, jgl_position):
-        """Get winning combinations and positions on the game board"""
-        
-        # Keep track of player positions and computer positions
-        jgl_combos_with_positions = []
-        for combo in self.jgl_winning_combinations:
-            if jgl_position in combo:
-                jgl_combos_with_positions.append(combo)
-        return jgl_combos_with_positions
-    
-        
