@@ -44,7 +44,7 @@ class JglPlayer2():
             spot_2 = jgl_board[combo[1]]
             spot_3 = jgl_board[combo[2]]
             
-            print(spot_1, spot_2, spot_3)
+            # print(spot_1, spot_2, spot_3)
             self.row = [spot_1, spot_2, spot_3]           
             
             # Win: If there's a move that will allow the computer to win the game, it should take it.
