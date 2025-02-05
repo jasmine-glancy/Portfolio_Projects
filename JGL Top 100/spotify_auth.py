@@ -26,3 +26,5 @@ def Jg_Authenticate_Spotify():
     print(jg_spotify_response.text)
 
 Jg_Authenticate_Spotify()
+
+
