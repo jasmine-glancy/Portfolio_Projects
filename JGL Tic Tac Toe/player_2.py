@@ -33,9 +33,7 @@ class JglPlayer2():
         
         # Assign variables for readability, copy suggested by CoPilot
         jgl_board = self.jgl_game.jgl_game_board.copy()
-        possible_moves = [x for x, letter in jgl_board.items() if letter == "___"]
         move = None 
-        
         
         # Center: If the center square is free, the computer should take it.
         if jgl_board[4] == "___":
@@ -51,14 +49,14 @@ class JglPlayer2():
             
             # Win: If there's a move that will allow the computer to win the game, it should take it.
             if self.row.count(f"_{self.jgl_cpu_symbol}_") == 2 and self.row.count("___") == 1:
-                print("Computer can win!")
+                # print("Computer can win!")
                 empty_index = self.row.index("___")
                 move = combo[empty_index]
                 return self.jgl_cpu_mark_box(move, jgl_empty_boxes)
                         
             # Block: If the opponent has two in a row, the computer should play the third to block the opponent.
             if self.row.count(f"_{self.jgl_user_symbol}_") == 2 and self.row.count("___") == 1:
-                print("Computer can block!")
+                # print("Computer can block!")
                 empty_index = self.row.index("___")
                 move = combo[empty_index]
                 return self.jgl_cpu_mark_box(move, jgl_empty_boxes)      
@@ -83,8 +81,8 @@ class JglPlayer2():
         if jgl_box in jgl_empty_boxes:
             jgl_empty_boxes.pop(jgl_box)
     
-        print(f"Marked box {jgl_box} with {self.jgl_cpu_symbol}")
-        print(f"Updated game board: {self.jgl_game.jgl_game_board}")
-        print(f"Updated empty boxes: {jgl_empty_boxes}")
+        # print(f"Marked box {jgl_box} with {self.jgl_cpu_symbol}")
+        # print(f"Updated game board: {self.jgl_game.jgl_game_board}")
+        # print(f"Updated empty boxes: {jgl_empty_boxes}")
 
     
