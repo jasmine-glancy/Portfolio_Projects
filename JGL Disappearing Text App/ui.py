@@ -2,6 +2,7 @@
     The UI for the Writer's Block Buster!
 """
 import tkinter as tk
+from tkinter.constants import CENTER
 
 class JglWritersBlockBuster():
     def __init__(self):
@@ -11,6 +12,7 @@ class JglWritersBlockBuster():
         self.jgl_window.title("Writer's Block Buster")
         self.jgl_window.geometry("700x500")
         self.jgl_load_colors()
+        self.jgl_instructions()
         self.jgl_window.config(padx=20, pady=20, background=self.russian_violet)
         self.jgl_window.mainloop()
 
@@ -22,6 +24,25 @@ class JglWritersBlockBuster():
         self.tekhelet = "#532B88"
         self.amethyst = "#9B72CF"
         self.wisteria = "#C8B1E4"
+        
+    def jgl_instructions(self):
+        
+        self.jgl_instructions = tk.Label()
+        self.jgl_instructions.config(
+            text="Type as much as you can!",
+            bg=self.russian_violet,
+            fg=self.amethyst,
+            font=("Helvetica Monospaced", 14, "normal"))
+        self.jgl_instructions.place(relx=0.5, rely=0.4, anchor=CENTER)
+        
+        self.jgl_warning = tk.Label()
+        self.jgl_warning.config(
+            text="If you stop for more than 5 seconds, the words are wiped.",
+            bg=self.russian_violet,
+            fg=self.amethyst,
+            font=("Helvetica Monospaced", 14, "normal"))
+        self.jgl_warning.place(relx=0.5, rely=0.5, anchor=CENTER)
+
     
 
 # TODO: When the start button is clicked, the application begins
