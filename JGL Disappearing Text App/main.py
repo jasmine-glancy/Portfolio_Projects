@@ -8,3 +8,4 @@ from ui import JglWritersBlockBuster
 
 # Create the GUI
 jgl_ui = JglWritersBlockBuster()
+
