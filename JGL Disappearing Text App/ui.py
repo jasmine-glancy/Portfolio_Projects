@@ -4,6 +4,8 @@
 import tkinter as tk
 from tkinter.constants import CENTER
 
+FONT_CHOICE = ("Helvetica Monospaced", 20, "bold")
+
 class JglWritersBlockBuster():
     def __init__(self):
         """Loads the window and the functions"""
@@ -13,6 +15,7 @@ class JglWritersBlockBuster():
         self.jgl_window.geometry("700x500")
         self.jgl_load_colors()
         self.jgl_instructions()
+        self.jgl_start_button()
         self.jgl_window.config(padx=20, pady=20, background=self.russian_violet)
         self.jgl_window.mainloop()
 
@@ -42,10 +45,23 @@ class JglWritersBlockBuster():
             fg=self.amethyst,
             font=("Helvetica Monospaced", 14, "normal"))
         self.jgl_warning.place(relx=0.5, rely=0.5, anchor=CENTER)
+        
+    def jgl_start_button(self):
+        """When the start button is clicked, the application begins"""
 
+        self.start_button = tk.Button(text="Start Writing!",
+                                      width=35,
+                                      highlightthickness=0,
+                                      bg=self.tekhelet,
+                                      fg=self.wisteria,
+                                      activebackground=self.amethyst,
+                                      activeforeground=self.magnolia,
+                                      pady=10,
+                                      padx=10,
+                                      font=FONT_CHOICE)
+        self.start_button.place(relx=0.5, rely=0.75, anchor=CENTER)
     
 
-# TODO: When the start button is clicked, the application begins
 
 # TODO: Load a cursor that moves to reveal typed text
 
