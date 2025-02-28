@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
+
 <div>
-    <h1>here</h1>
+    <h1>Welcome to the Picture Palette Picker!</h1>
+
+    <!-- Creates an HTML form so the user can upload a file -->
+     <!-- Multipart/form-data suggested by W3Schools -->
+    <form action="upload.php" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file_to_upload" id="fileToUpload">
+        <input type="submit" value="Upload Image" name="submit">
+    </form>
 </div>
 {% endblock %}

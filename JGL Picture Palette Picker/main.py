@@ -11,8 +11,9 @@ app = f.Flask(__name__)
 @app.route("/")
 def home():
     
+    # TODO: Handle the file upload
+    
     return f.render_template("index.html")
 
-# TODO: Allow user to upload an image
 
 # TODO: Use NumPy to find the most common colors in the uploaded image
