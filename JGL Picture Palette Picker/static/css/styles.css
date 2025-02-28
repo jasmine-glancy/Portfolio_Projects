@@ -1,0 +1,77 @@
+:root {
+    --forest_green: #397367;
+    --robin_egg_blue: #5DA399;
+    --keppel: #5DA399;
+    --dark_cyan: #428c82;
+    --onyx: #35393C;
+}
+
+body {
+    padding-top: 20vh;
+    background-color: var(--forest_green);
+}
+    .container-lg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: var(--keppel);
+        width: 80%;
+        height: 60vh;
+        border-radius: 25px;
+    }
+
+h1 {
+    font-weight: 700;
+    padding-top: 5vh;
+    color: var(--forest_green);
+}
+
+form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    margin-bottom: 0;
+    padding-top: 2vh;
+    color: var(--onyx);
+}
+
+    input[type="file"] {
+        position: absolute;
+        left: -999999rem;
+    }
+
+    .custom-upload-button, input[type="submit"] {
+        background-color: var(--forest_green);
+        color: var(--keppel);
+        border: 1px solid var(--keppel);
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 20px;
+    }
+
+    .custom-upload-button:hover {
+        background-color: var(--dark_cyan);
+        color: var(--onyx);
+    }
+
+
+
+table {
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    width: 75%;
+    height: 60%;
+    border-spacing: 1vw;
+}
+
+    td {
+        border: 1px solid var(--dark_cyan);
+        width: 20%;
+    }
+
+
