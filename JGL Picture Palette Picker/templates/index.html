@@ -7,43 +7,7 @@
 <div class="container-lg">
     <h1>Welcome to the Picture Palette Picker!</h1>
 
-    <!-- TODO: Load uploaded image colors into the boxes-->
-    <table>
-        <tr>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-        <tr>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-            <td>
-                
-            </td>
-        </tr>
-    </table>
+
 
     <!-- Creates an HTML form so the user can upload a file -->
      <!-- Multipart/form-data suggested by W3Schools -->
@@ -54,5 +18,24 @@
         <input type="file" name="file_to_upload" id="fileToUpload">
         <input type="submit" value="Upload Image" name="submit">
     </form>
+
+    
+    <div class="cards-wrapper">
+        {% for i in range(5) %}
+            <div class="color-container">
+                <div class="flip-card">
+                    <div class="side a">
+                        <!-- TODO: Load uploaded image colors into the box-->
+                        front
+                    </div>
+                    <div class="side b">
+                        <!-- TODO: Load hex color code into side 2 -->
+                        back
+                    </div>
+                </div>    
+            </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}

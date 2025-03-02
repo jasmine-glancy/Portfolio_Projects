@@ -54,24 +54,78 @@ form {
         border-radius: 20px;
     }
 
-    .custom-upload-button:hover {
+    .custom-upload-button:hover, input[type="submit"]:hover {
         background-color: var(--dark_cyan);
         color: var(--onyx);
     }
 
+/* Color Codes */
+/* Card Flip CSS suggested by @tjegan */
 
-
-table {
-    padding-top: 2vh;
-    padding-bottom: 2vh;
+.cards-wrapper {
+    padding-top: 5vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    perspective: 1000px;
     width: 75%;
     height: 60%;
+    margin: 0 auto;
+
+}
+
+.color-container {
+    margin: 0 auto;
+    height: 10%;
+    border: 1px solid var(--dark_cyan);
+    padding: 20px 90px 70px 70px;
+}
+    .color-container.flip .flip-card {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card {
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.75s;
+    }
+
+    /* Card styles */
+    .side {
+        backface-visibility: hidden;
+        position:absolute;
+        top: 0;
+        left: 0;
+    }
+
+        .side.a, .side.b {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 20%;
+            height: 8vh;
+        }
+
+        .side.a {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+
+        .side.b {
+            transform: rotateY(180deg);
+        }
+
+table {
+
+    padding-bottom: 2vh;
+
     border-spacing: 1vw;
 }
 
     td {
         border: 1px solid var(--dark_cyan);
-        width: 20%;
+        
     }
 
 
