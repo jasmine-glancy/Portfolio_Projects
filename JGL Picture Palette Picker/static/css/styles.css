@@ -18,7 +18,7 @@ body {
         margin-right: auto;
         background-color: var(--keppel);
         width: 80%;
-        height: 60vh;
+        min-height: 60vh;
         border-radius: 25px;
     }
 
@@ -37,6 +37,7 @@ form {
     justify-content: center;
     margin-bottom: 0;
     padding-top: 2vh;
+    padding-bottom: 5vh;
     color: var(--onyx);
 }
 
@@ -63,23 +64,24 @@ form {
 /* Card Flip CSS suggested by @tjegan */
 
 .cards-wrapper {
-    padding-top: 5vh;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     perspective: 1000px;
     width: 75%;
-    height: 60%;
+    height: 50%;
     margin: 0 auto;
-
+    padding-bottom: 2vh;
 }
 
 .color-container {
     margin: 0 auto;
     height: 10%;
     border: 1px solid var(--dark_cyan);
-    padding: 20px 90px 70px 70px;
+    padding: 30px 140px 90px 80px;
+    transform: translateY(5%);
 }
+
     .color-container.flip .flip-card {
         transform: rotateY(180deg);
     }
@@ -93,7 +95,7 @@ form {
     /* Card styles */
     .side {
         backface-visibility: hidden;
-        position:absolute;
+        position: absolute;
         top: 0;
         left: 0;
     }
@@ -110,11 +112,13 @@ form {
         .side.a {
             z-index: 2;
             transform: rotateY(0deg);
+            box-shadow: 20px var(--onyx);
         }
 
         .side.b {
             transform: rotateY(180deg);
         }
+
 
 table {
 
