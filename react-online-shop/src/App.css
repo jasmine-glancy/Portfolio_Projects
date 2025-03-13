@@ -1,0 +1,14 @@
+nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+nav div {
+  width: 25%;
+  display: flex;
+  justify-content: space-between;
+}
+
+img {
+  width: 75%;
+}
