@@ -37,28 +37,30 @@ form {
     justify-content: center;
     margin-bottom: 0;
     padding-top: 2vh;
-    padding-bottom: 5vh;
+    padding-bottom: 2vh;
     color: var(--onyx);
 }
-
-    input[type="file"] {
-        position: absolute;
-        left: -999999rem;
-    }
-
-    .custom-upload-button, input[type="submit"] {
-        background-color: var(--forest_green);
-        color: var(--keppel);
+    
+    input[type="file"]::file-selector-button, input[type="submit"] {
         border: 1px solid var(--keppel);
-        padding: 5px 10px;
-        cursor: pointer;
+        background: var(--forest_green);
+        color: var(--keppel);
         border-radius: 20px;
+        padding: 8px 10px;
+        text-align: center;
+
     }
 
-    .custom-upload-button:hover, input[type="submit"]:hover {
-        background-color: var(--dark_cyan);
-        color: var(--onyx);
-    }
+    input[type="file"]::file-selector-button:hover, input[type="submit"]:hover {
+    background-color: var(--dark_cyan);
+    color: var(--onyx);
+    cursor: pointer;
+}
+
+
+#file-upload {
+    position: relative;
+}
 
 /* Color Codes */
 /* Card Flip CSS suggested by @tjegan */
@@ -71,6 +73,7 @@ form {
     width: 75%;
     height: 50%;
     margin: 0 auto;
+    padding-top: 2vh;
     padding-bottom: 2vh;
 }
 

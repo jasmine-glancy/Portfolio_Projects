@@ -11,12 +11,19 @@
 
     <!-- Creates an HTML form so the user can upload a file -->
      <!-- Multipart/form-data suggested by W3Schools -->
-    <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
-        <label for="fileToUpload" class="custom-upload-button">
+    <!-- <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
+        <label for="fileToUpload">
             Browse
         </label>
         <input type="file" name="file_to_upload" id="fileToUpload">
         <input type="submit" value="Upload Image" name="submit">
+    </form> 
+-->
+    <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
+        <div id="file-upload">
+            <input id="original" type="file" />
+            <input type="submit" value="Upload Image" name="submit">
+        </div>
     </form>
 
     {% for i in range(2) %}
