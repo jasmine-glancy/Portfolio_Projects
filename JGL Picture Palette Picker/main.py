@@ -8,9 +8,16 @@ import flask as f
 
 app = f.Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home():
     
+    if f.request.method == "POST":
+        chosen_file = f.request.form.get("submit")
+        image = f"Your image: {chosen_file}"
+        
+        return f.render_template("index.html", image=image)
+        
+        
     # If posted... 
         # TODO: Handle the file upload
         

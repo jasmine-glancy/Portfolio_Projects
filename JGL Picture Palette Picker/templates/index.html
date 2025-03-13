@@ -7,18 +7,8 @@
 <div class="container-lg">
     <h1>Welcome to the Picture Palette Picker!</h1>
 
-
-
     <!-- Creates an HTML form so the user can upload a file -->
      <!-- Multipart/form-data suggested by W3Schools -->
-    <!-- <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
-        <label for="fileToUpload">
-            Browse
-        </label>
-        <input type="file" name="file_to_upload" id="fileToUpload">
-        <input type="submit" value="Upload Image" name="submit">
-    </form> 
--->
     <form action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
         <div id="file-upload">
             <input id="original" type="file" />
@@ -26,24 +16,29 @@
         </div>
     </form>
 
-    {% for i in range(2) %}
-        <div class="cards-wrapper">
-            {% for i in range(5) %}
-                <div class="color-container">
-                    <div class="flip-card">
-                        <div class="side a">
-                            <!-- TODO: Load uploaded image colors into the box-->
-                            front
-                        </div>
-                        <div class="side b">
-                            <!-- TODO: Load hex color code into side 2 -->
-                          #000000
-                        </div>
-                    </div>    
-                </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+    <!-- TODO: Show color boxes when the user uploads an image -->
+
+    {% if image %}
+    {{ image }}
+        {% for i in range(2) %}
+            <div class="cards-wrapper">
+                {% for i in range(5) %}
+                    <div class="color-container">
+                        <div class="flip-card">
+                            <div class="side a">
+                                <!-- TODO: Load uploaded image colors into the box-->
+                                front
+                            </div>
+                            <div class="side b">
+                                <!-- TODO: Load hex color code into side 2 -->
+                            #000000
+                            </div>
+                        </div>    
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% endif %}
 
 </div>
 {% endblock %}
