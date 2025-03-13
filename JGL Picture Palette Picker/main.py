@@ -35,8 +35,19 @@ def home():
             image = f"Your image: {chosen_file}"
             
             print(f"Most common colors: {top_10_colors}")
+            
+            new_color_dict = h.pick_colors(top_10_colors)
+            
+            print(f"New dictionary: {new_color_dict}")
+            
+            formatted_colors = h.format_colors(top_10_colors)
 
-        return f.render_template("index.html", colors=top_10_colors, chosen_file=chosen_file, image=image)
+            print(formatted_colors)
+        return f.render_template("index.html",
+                                 formatted_colors=formatted_colors,
+                                 colors=new_color_dict,
+                                 chosen_file=chosen_file,
+                                 zip=zip)
    
     return f.render_template("index.html")
 
