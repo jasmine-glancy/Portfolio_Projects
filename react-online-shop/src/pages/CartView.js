@@ -11,12 +11,28 @@ function CartView () {
         margin: "3% 0 10%"
     };
 
-    let labelStyle = {
+    let cityInputStyle = {
+        width: "50%",
+        padding: "3% 15%",
+        margin: "3% 0 10%"
+    }
 
+    let labelStyle = {
+        padding: "3% 10%",
+        marginTop: "15px"
     };
+    
 
     let btnStyle1 = {
-
+        padding: "1% 7%",
+        border: "none",
+        width: "100%",
+        color: "#000",
+        background: "#fff",
+        border: "0.5px solid #000",
+        fontWeight: 100,
+        fontSize: "1.5rem",
+        margin: "5% 7%"
     };
 
     let btnStyle2 = {
@@ -29,7 +45,7 @@ function CartView () {
             <div id="cart-cont"> 
                 <div id="cart-view">
                    <form id="cart-form">
-                        <Input labelName={"City"} placeholder={"Enter City"} labelStyle={labelStyle} inputStyle={inputStyle} />
+                        <Input labelName={"City"} placeholder={"Enter City"} labelStyle={labelStyle} inputStyle={cityInputStyle} />
                         <Input labelName={"Address"} placeholder={"Enter Address"}  labelStyle={labelStyle} inputStyle={inputStyle} />
                         <Input labelName={"Recipient Details"} placeholder={"Enter Recipient Details"}  labelStyle={labelStyle} inputStyle={inputStyle} />
                         <Input labelName={"Phone"} placeholder={"Enter Phone"}  labelStyle={labelStyle} inputStyle={inputStyle} />
@@ -38,9 +54,16 @@ function CartView () {
                         <div>
                             <h2> Payment Method </h2>
                             
-                            <Button buttonStyle={btnStyle1} buttonName={"Payment Card"} />
-                            <Button buttonStyle={btnStyle2} buttonName={"Cash on Delivery"} />
+                            <div id="payment-buttons">
+                                <Button buttonStyle={btnStyle1} buttonName={"Payment Card"} />
+                                <Button buttonStyle={btnStyle1} buttonName={"Cash on Delivery"} />
+                            </div>
                         </div>
+
+                        <p>
+                            <input type="checkbox" />
+                            I agree to the terms of the offer and the loyalty policy
+                        </p>
                    </form>
                 </div>
 

@@ -8,13 +8,13 @@ function NavBar () {
             <div>
                 <img src={Logo} alt="Fable" />
             </div>
-            <div>
-                <p>Collections</p>
-                <p>Customizer</p>
-                <p>Sale</p>
+            <div id="page-links">
+                <a href="/">COLLECTIONS</a>
+                <a href="/">CUSTOMIZER</a>
+                <a href="/">SALE</a>
             </div>
-            <div>
-                <p>Items</p>
+            <div id="view-cart">
+                <a href="/">ITEMS</a>
             </div>
         </nav>
     )
