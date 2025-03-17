@@ -24,9 +24,8 @@ function CartView () {
     
 
     let btnStyle1 = {
-        padding: "1% 7%",
-        border: "none",
-        width: "100%",
+        padding: "2% 7%",
+        width: "260%",
         color: "#000",
         background: "#fff",
         border: "0.5px solid #000",
@@ -36,7 +35,14 @@ function CartView () {
     };
 
     let btnStyle2 = {
-
+        padding: "2% 7%",
+        border: "none",
+        width: "118%",
+        color: "#fff",
+        background: "rgb(156, 156, 156)",
+        fontWeight: 100,
+        fontSize: "1.5rem",
+        margin: "2% 3%"
     };
 
     return (
@@ -60,10 +66,11 @@ function CartView () {
                             </div>
                         </div>
 
-                        <p>
+                        <div id="agree">
                             <input type="checkbox" />
-                            I agree to the terms of the offer and the loyalty policy
-                        </p>
+                            <p>I agree to the terms of the offer and the loyalty policy</p>
+                        </div>
+                        <Button buttonStyle={btnStyle2} buttonName={"Place an Order"} />
                    </form>
                 </div>
 
