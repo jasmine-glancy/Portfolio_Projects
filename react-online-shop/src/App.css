@@ -96,17 +96,6 @@ h1 h4 {
   text-align: center;
 }
 
-#cart-cont {
-  display: flex;
-  justify-content: space-evenly;
-  margin-top: 0;
-  width: 45%;
-}
-
-/* #cart-form, #cart-view {
-  
-} */
-
 #view-product-cont {
   display: flex;
 }
@@ -120,6 +109,17 @@ h1 h4 {
  }
 
  /* Cart */
+ #cart-cont {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0;
+  margin-left: 5%;
+  position: relative;
+}
+
+  #cart-view {
+    display: grid;
+  }
 
  #city {
   width: 50%;
@@ -131,7 +131,7 @@ h1 h4 {
  }
 
   #agree {
-    margin-top: 10%;
+    margin-top: 5%;
     margin-bottom: 5%;
     padding-left: 2%;
     width: 150%;
@@ -140,4 +140,21 @@ h1 h4 {
   #agree p {
     display: inline;
     margin: 5% 2%;
+  }
+
+  #cart-form-cont {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 100px;
+  }
+
+  #cart-form-a {
+    width: 55%;
+  }
+
+  #cart-form-b {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10%;
   }
