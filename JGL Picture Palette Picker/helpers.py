@@ -34,18 +34,31 @@ def most_frequest_colors(image_file):
     print(type(cluster_centers))
     return cluster_centers
 
-def pick_colors(color_dict):
+def first_5_colors(color_dict):
     """Grabs the individual RGB values from the array"""
     
-    new_color_dict = []
+    new_color_dict_1 = []
     
-    for color in color_dict:
+    for color in color_dict[:5]:
         
         r, g, b = color
         
-        new_color_dict.append(f"R: {r} G: {g} B: {b}")
+        new_color_dict_1.append(f"R: {r} G: {g} B: {b}")
         
-    return new_color_dict
+    return new_color_dict_1
+
+def last_5_colors(color_dict):
+    """Grabs the individual RGB values from the array"""
+    
+    new_color_dict_2 = []
+    
+    for color in color_dict[:5]:
+        
+        r, g, b = color
+        
+        new_color_dict_2.append(f"R: {r} G: {g} B: {b}")
+        
+    return new_color_dict_2
 
 def format_colors(color_dict):
     """Outputs colors as R: x G: x B: x"""

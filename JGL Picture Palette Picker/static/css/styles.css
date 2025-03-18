@@ -20,6 +20,7 @@ body {
         width: 80%;
         min-height: 60vh;
         border-radius: 25px;
+        margin-bottom: 10vh;
     }
 
 h1 {
@@ -64,24 +65,29 @@ form {
 
 /* Color Codes */
 /* Card Flip CSS suggested by @tjegan */
+.outside-div {
+    display: flex;
+    flex-direction: column;
+}
 
 .cards-wrapper {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: 10vh;
     justify-content: center;
     perspective: 1000px;
     width: 75%;
-    height: 50%;
     margin: 0 auto;
     padding-top: 2vh;
     padding-bottom: 2vh;
 }
 
 .color-container {
+    display: flex;
     margin-left: auto;
     margin-right: auto;
     height: 10%;
-    margin-bottom: 15vh;
+    margin-bottom: 2vh;
     transform: translateY(5%);
 
 }
@@ -94,7 +100,8 @@ form {
         position: relative;
         transform-style: preserve-3d;
         transition: transform 0.75s;
-        
+        width: 150px;
+        height: 8vh;
     }
 
     /* Card styles */
@@ -103,18 +110,17 @@ form {
         position: absolute;
         top: 0;
         left: 0;
+        width: 100%;
+        height: 100%;
     }
 
         .side.a, .side.b {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            width: 150px;
-            height: 8vh;
-            margin-bottom: 5vh;
+            justify-content: center;
             border: 1px solid var(--dark_cyan);
-            padding: 25px 25px 20px 50px;
+            padding: 25px;
         }
 
         .side.a {
