@@ -1,6 +1,9 @@
 import NavBar from "../components/NavBar";
-import Product1 from "../assets/Foto.png";
+import ProductA from "../assets/Foto2.png";
+import ProductB from "../assets/Cart-Foto.png";
+import ProductC from "../assets/Cart-Foto-2.png";
 import Button from "../components/Button";
+import CartItem from "../components/CartItem";
 import Input from "../components/Input";
 
 function CartView () {
@@ -14,7 +17,7 @@ function CartView () {
     let cityInputStyle = {
         width: "50%",
         padding: "3% 15%",
-        margin: "3% 0 10%"
+        margin: "3% 0"
     }
 
     let labelStyle = {
@@ -25,7 +28,7 @@ function CartView () {
 
     let btnStyle1 = {
         padding: "3% 7%",
-        width: "460%",
+        width: "470%",
         color: "#000",
         background: "#fff",
         border: "0.5px solid #000",
@@ -38,7 +41,7 @@ function CartView () {
     let btnStyle2 = {
         padding: "2% 7%",
         border: "none",
-        width: "142%",
+        width: "115%",
         color: "#fff",
         background: "rgb(156, 156, 156)",
         fontWeight: "100",
@@ -76,8 +79,11 @@ function CartView () {
                             <Button buttonStyle={btnStyle2} buttonName={"Place an Order"} />
                         </div>
                         <div id="cart-form-b">
-                            <div>product box</div>
-
+                            <div>
+                                <CartItem ProductImg={ProductA} ProductName={"Jacket KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"H0522001"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€105"}/>
+                                <CartItem ProductImg={ProductB} ProductName={"Shirt KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"M0592001"} ProductSize={"M"} ProductColor={"White"} ProductQuantity={"1"} ProductPrice={"€125"}/>
+                                <CartItem ProductImg={ProductC} ProductName={"Trouser KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"A0521005"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€110"}/>
+                            </div>
                             <table id="line-item-prices">
                                 <td>
                                     <tr>Summary:</tr>

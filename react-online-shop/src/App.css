@@ -146,15 +146,54 @@ h1 h4 {
     display: flex;
     width: 100%;
     justify-content: space-between;
-    gap: 100px;
+    gap: 2px;
   }
 
   #cart-form-a {
-    width: 55%;
+    width: 50%;
   }
 
   #cart-form-b {
     display: flex;
     flex-direction: column;
     margin-left: 10%;
+  }
+
+/* Product box list  */
+
+#cart-item-list, #cart-item-details, #price-and-control {
+  display: flex;
+}
+
+#cart-item-image {
+  padding-top: 3%;
+  width: 25%;
+  height: 100%;
+}
+
+  #cart-item-info {
+    padding-left: 0;
+  }
+
+  #cart-item-details {
+    gap: 50px;
+  }
+
+  #price-and-control {
+    gap: 250px;
+  }
+
+    #cart-item-details h3, #price-and-control h3 {
+      font-weight: 600;
+    }
+
+  #collection-name, #article-name {
+    font-weight: 400;
+  }
+
+    #delete-item {
+      color: rgb(151, 151, 151);
+    }
+  table {
+    width: 125%;
   }
