@@ -20,6 +20,11 @@ function CartView () {
         margin: "3% 0"
     }
 
+    let promoCodeInputStyle = {
+        width: "60%",
+        padding: "3% 5%",
+    }
+
     let labelStyle = {
         padding: "3% 10%",
         marginTop: "15px"
@@ -35,7 +40,7 @@ function CartView () {
         fontWeight: "100",
         fontSize: "1.5rem",
         margin: "5% 3%",
-        cursor: "pointer",
+        cursor: "pointer"
     };
 
     let btnStyle2 = {
@@ -47,7 +52,18 @@ function CartView () {
         fontWeight: "100",
         fontSize: "1.5rem",
         margin: "2% 3%",
-        cursor: "pointer",
+        cursor: "pointer"
+    };
+
+    let btnStyle3 = {
+        padding: "2% 7%",
+        border: "none",
+        width: "50%",
+        color: "#fff",
+        background: "#000",
+        fontWeight: "100",
+        fontSize: "1.5rem",
+        cursor: "pointer"
     };
 
     return (
@@ -80,9 +96,9 @@ function CartView () {
                         </div>
                         <div id="cart-form-b">
                             <div>
-                                <CartItem ProductImg={ProductA} ProductName={"Jacket KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"H0522001"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€105"}/>
-                                <CartItem ProductImg={ProductB} ProductName={"Shirt KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"M0592001"} ProductSize={"M"} ProductColor={"White"} ProductQuantity={"1"} ProductPrice={"€125"}/>
-                                <CartItem ProductImg={ProductC} ProductName={"Trouser KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"A0521005"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€110"}/>
+                                <CartItem ProductImg={ProductA} ProductName={"Jacket KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"H0522001"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€105"} alt="Person wearing a black blazer and cap, with a white T-shirt, standing against a gray background."/>
+                                <CartItem ProductImg={ProductB} ProductName={"Shirt KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"M0592001"} ProductSize={"M"} ProductColor={"White"} ProductQuantity={"1"} ProductPrice={"€125"} alt="Person wearing a white shirt with a black peace symbol."/>
+                                <CartItem ProductImg={ProductC} ProductName={"Trouser KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"A0521005"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€110"} alt="Person wearing black pants and black shoes standing against a light gray background."/>
                             </div>
                             <table id="line-item-prices">
                                 <td>
@@ -102,6 +118,12 @@ function CartView () {
                                     <td>
                                         <tr>€340</tr>
                                     </td>
+                                    <tr>
+                                        <div id="promo-code">
+                                            <Input placeholder={"Enter Promocode"} inputStyle={promoCodeInputStyle} />
+                                            <Button buttonStyle={btnStyle3} buttonName={"Apply"} />
+                                        </div>
+                                    </tr>
                                 </tfoot>
                             </table>
                         </div>

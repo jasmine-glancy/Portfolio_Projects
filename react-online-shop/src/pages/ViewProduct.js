@@ -18,7 +18,7 @@ function ViewProduct() {
             <NavBar />
             <div id="view-product-cont"> 
                 <div id="product-img-cont">
-                    <img src={Product} alt="a woman in a beige long-sleeved jacket" />
+                    <img src={Product} alt="Person wearing a beige blazer over a white shirt." />
                 </div>
                 <div id="product-view-info">
                     <h1 id="product-heading">JAСKET KLS</h1>

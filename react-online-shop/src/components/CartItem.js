@@ -7,7 +7,7 @@ function CartItem ({ProductImg, ProductName,
             <table>
                 <tr id="cart-item-details">
                     <td id="cart-item-image">
-                        <img src={ProductImg}/>
+                        <img src={ProductImg} alt="A person wearing a light beige suit jacket and trousers with a white top, standing in profile against a white background."/>
                     </td>
                     <td id="cart-item-info">
                         <h2 id="item-name">{ProductName}</h2>

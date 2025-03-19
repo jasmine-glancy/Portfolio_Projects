@@ -118,7 +118,7 @@ h1 h4 {
 }
 
   #cart-view {
-    display: grid;
+    display: flex;
   }
 
  #city {
@@ -194,6 +194,68 @@ h1 h4 {
     #delete-item {
       color: rgb(151, 151, 151);
     }
+
   table {
-    width: 125%;
+    width: 100%;
+  }
+
+
+  #promo-code {
+    display: flex;
+    align-items: center;
+    gap: 100px;
+  }
+
+    #promo-code input {
+      flex: 1;
+    }
+
+    #promo-code button {
+      flex-shrink: 0;
+    }
+
+  #line-item-prices td {
+    margin-right: 500px;
+  }
+
+
+/* Order Page */
+
+#order-page-container {
+  padding-left: 5%;
+}
+
+  #card-container {
+    width: 25%;
+    background-color: gainsboro;
+  }
+
+  #card-container img {
+    padding-top: 5%;
+  }
+
+  #card-container div {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+
+#card-info, #card-benefit-info {
+  display: flex;
+  gap: 45%;
+}
+  #card-info h3 {
+    font-weight: 300;
+  }
+
+    #points-earned {
+      padding-left: 5%;
+    }
+
+  #card-benefit-info h5 {
+    margin-top: 0%;
+    color: gray;
+  }
+
+  #benefit-percentage {
+    padding-left: 30%;
   }
