@@ -150,7 +150,7 @@ h1 h4 {
   }
 
   #cart-form-a {
-    width: 50%;
+    width: 40%;
   }
 
   #cart-form-b {
@@ -171,8 +171,7 @@ h1 h4 {
 
 #cart-item-image {
   padding-top: 3%;
-  width: 25%;
-  height: 250%;
+  width: 40%;
 }
 
   #cart-item-info {
@@ -206,9 +205,12 @@ h1 h4 {
     }
 
   table {
-    width: 50%;
+    width: 70%;
   }
 
+    td {
+      padding-left: 2%;
+    }
 
   #promo-code {
     display: flex;

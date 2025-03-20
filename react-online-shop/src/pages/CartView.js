@@ -1,4 +1,4 @@
-import NavBar from "../components/NavBar";
+import React from "react"
 import ProductA from "../assets/Foto2.png";
 import ProductB from "../assets/Cart-Foto.png";
 import ProductC from "../assets/Cart-Foto-2.png";
@@ -53,7 +53,6 @@ function CartView () {
 
     return (
         <div>
-            <NavBar />
             <div id="cart-cont"> 
                 <div id="cart-view">
                    <form id="cart-form-cont">

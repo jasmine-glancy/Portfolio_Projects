@@ -1,6 +1,6 @@
+import React from "react"
 import Product from "../assets/Product-Foto.png";
 import Button from "../components/Button";
-import NavBar from "../components/NavBar";
 
 function ViewProduct() {
     
@@ -15,7 +15,6 @@ function ViewProduct() {
 
     return (
         <div>
-            <NavBar />
             <div id="view-product-cont"> 
                 <div id="product-img-cont">
                     <img src={Product} alt="Person wearing a beige blazer over a white shirt." />
@@ -25,7 +24,7 @@ function ViewProduct() {
                     <h3 id="price">€105</h3>
                 
 
-                <Button buttonName={"Add to Cart"} buttonStyle={btnStyle} />
+                <Button buttonName={"Add to Cart"} buttonStyle={btnStyle} linkTo={"cart"} />
                 
                 <div id="name-and-description">
                     <h5 id="info">Product Info</h5>

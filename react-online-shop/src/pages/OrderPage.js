@@ -1,11 +1,10 @@
-import NavBar from "../components/NavBar"
+import React from "react"
 import Card from "../assets/Fable-Card.png"
 import Table from "../components/Table";
 
 function OrderPage () {
     return(
         <div>
-            <NavBar />
             <div id="order-page-container">
                 <div id="order-info">
                     <h2 id="customer-greeting">Hello, Darya!</h2>

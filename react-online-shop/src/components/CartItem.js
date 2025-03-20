@@ -1,3 +1,5 @@
+import React from "react"
+
 function CartItem ({ProductImg, ProductName,
                     ProductCollection, ProductArticle,
                     ProductSize, ProductColor,
