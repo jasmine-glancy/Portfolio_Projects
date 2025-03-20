@@ -21,7 +21,7 @@ function CartItem ({ProductImg, ProductName,
                             <h3 id="item-color">Color: {ProductColor}</h3>
 
                             <h3 id="item-quantity">
-                                Quantity: - {ProductQuantity} +
+                                Quantity: <span>-</span> {ProductQuantity} <span>+</span>
                             </h3>
                         </div>
                         <div id="price-and-control">

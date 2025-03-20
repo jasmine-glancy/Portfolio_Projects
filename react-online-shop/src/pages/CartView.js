@@ -5,6 +5,7 @@ import ProductC from "../assets/Cart-Foto-2.png";
 import Button from "../components/Button";
 import CartItem from "../components/CartItem";
 import Input from "../components/Input";
+import SummaryCont from "../components/SummaryCont";
 
 function CartView () {
     
@@ -18,11 +19,6 @@ function CartView () {
         width: "50%",
         padding: "3% 15%",
         margin: "3% 0"
-    }
-
-    let promoCodeInputStyle = {
-        width: "60%",
-        padding: "3% 5%",
     }
 
     let labelStyle = {
@@ -52,17 +48,6 @@ function CartView () {
         fontWeight: "100",
         fontSize: "1.5rem",
         margin: "2% 3%",
-        cursor: "pointer"
-    };
-
-    let btnStyle3 = {
-        padding: "2% 7%",
-        border: "none",
-        width: "50%",
-        color: "#fff",
-        background: "#000",
-        fontWeight: "100",
-        fontSize: "1.5rem",
         cursor: "pointer"
     };
 
@@ -100,32 +85,8 @@ function CartView () {
                                 <CartItem ProductImg={ProductB} ProductName={"Shirt KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"M0592001"} ProductSize={"M"} ProductColor={"White"} ProductQuantity={"1"} ProductPrice={"€125"} alt="Person wearing a white shirt with a black peace symbol."/>
                                 <CartItem ProductImg={ProductC} ProductName={"Trouser KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"A0521005"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€110"} alt="Person wearing black pants and black shoes standing against a light gray background."/>
                             </div>
-                            <table id="line-item-prices">
-                                <td>
-                                    <tr>Summary:</tr>
-                                    <tr>Delivery:</tr>
-                                    <tr>Discounts:</tr>
-                                </td>
-                                <td>
-                                    <tr>€340</tr>
-                                    <tr>€0</tr>
-                                    <tr>€0</tr>
-                                </td>
-                                <tfoot>
-                                    <td>
-                                        <tr>Total: </tr>
-                                    </td>
-                                    <td>
-                                        <tr>€340</tr>
-                                    </td>
-                                    <tr>
-                                        <div id="promo-code">
-                                            <Input placeholder={"Enter Promocode"} inputStyle={promoCodeInputStyle} />
-                                            <Button buttonStyle={btnStyle3} buttonName={"Apply"} />
-                                        </div>
-                                    </tr>
-                                </tfoot>
-                            </table>
+
+                            <SummaryCont />
                         </div>
                    </form>
                 </div>

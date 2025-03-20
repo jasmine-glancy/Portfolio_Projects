@@ -165,10 +165,14 @@ h1 h4 {
   display: flex;
 }
 
+  #price-and-control {
+    margin-top: 0;
+  }
+
 #cart-item-image {
   padding-top: 3%;
   width: 25%;
-  height: 100%;
+  height: 250%;
 }
 
   #cart-item-info {
@@ -177,10 +181,12 @@ h1 h4 {
 
   #cart-item-details {
     gap: 50px;
+    margin-top: 0;
   }
 
   #price-and-control {
     gap: 250px;
+    top: 0;
   }
 
     #cart-item-details h3, #price-and-control h3 {
@@ -191,12 +197,16 @@ h1 h4 {
     font-weight: 400;
   }
 
+    #article-name, #item-size {
+      margin-bottom: 0;
+    }
+
     #delete-item {
       color: rgb(151, 151, 151);
     }
 
   table {
-    width: 100%;
+    width: 50%;
   }
 
 
@@ -259,3 +269,31 @@ h1 h4 {
   #benefit-percentage {
     padding-left: 30%;
   }
+
+#promo-codes {
+  display: flex;
+}
+
+#summary-cont {
+  width: 100%;
+  margin-bottom: 10%;
+}
+
+
+#summary-cont #first {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+
+  #first div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+#summary-cont .second {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
