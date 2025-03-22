@@ -36,16 +36,34 @@ def home():
             
             print(f"Most common colors: {top_10_colors}")
             
-            new_color_dict = h.pick_colors(top_10_colors)
+            first_five_colors = h.first_5_colors(top_10_colors)
             
-            print(f"New dictionary: {new_color_dict}")
+            print(f"First 5 colors: {first_five_colors}")
             
-            formatted_colors = h.format_colors(top_10_colors)
+            next_five_colors = h.last_5_colors(top_10_colors)
+            
+            print(f"Next 5 colors: {next_five_colors}")
+            
+            first_5_rgb = h.individual_rgb_values(first_five_colors)
+            
+            print(first_5_rgb)
+            
+            next_5_rgb = h.individual_rgb_values(next_five_colors)
+            print(next_5_rgb)
+            formatted_first_five_colors = h.format_colors(first_five_colors)
+            
+            print(f"Formatted 1st 5 colors: {formatted_first_five_colors}")
+            
+            formatted_last_five_colors = h.format_colors(next_five_colors)
+            
+            print(f"Formatted next 5 colors: {formatted_last_five_colors}")
+            
 
-            print(formatted_colors)
         return f.render_template("index.html",
-                                 formatted_colors=formatted_colors,
-                                 colors=new_color_dict,
+                                 first_five_colors=first_5_rgb,
+                                 next_five_colors=next_5_rgb,
+                                 formatted_first_five_colors=formatted_first_five_colors,
+                                 formatted_last_five_colors=formatted_last_five_colors,
                                  chosen_file=chosen_file,
                                  zip=zip)
    
