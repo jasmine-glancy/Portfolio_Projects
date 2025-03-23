@@ -147,6 +147,7 @@ h1 h4 {
     width: 100%;
     justify-content: space-between;
     gap: 2px;
+    padding-left: 50px;
   }
 
   #cart-form-a {
@@ -156,7 +157,8 @@ h1 h4 {
   #cart-form-b {
     display: flex;
     flex-direction: column;
-    margin-left: 10%;
+    margin-left: 12%;
+    width: 75%;
   }
 
 /* Product box list  */
@@ -171,7 +173,8 @@ h1 h4 {
 
 #cart-item-image {
   padding-top: 3%;
-  width: 40%;
+  width: 25%;
+  height: 50%;
 }
 
   #cart-item-info {
@@ -184,6 +187,7 @@ h1 h4 {
   }
 
   #price-and-control {
+    display: flex;
     gap: 250px;
     top: 0;
   }
@@ -196,12 +200,16 @@ h1 h4 {
     font-weight: 400;
   }
 
-    #article-name, #item-size {
+    #article-name {
       margin-bottom: 0;
     }
 
     #delete-item {
       color: rgb(151, 151, 151);
+    }
+
+    #cart-item-details {
+      margin-top: 0;
     }
 
   table {
@@ -229,6 +237,7 @@ h1 h4 {
   #line-item-prices td {
     margin-right: 500px;
   }
+
 
 
 /* Order Page */
@@ -286,7 +295,7 @@ h1 h4 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 100%;
+  width: 80%;
 }
 
   #first div {
@@ -297,5 +306,5 @@ h1 h4 {
 #summary-cont .second {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 80%;
 }

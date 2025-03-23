@@ -10,9 +10,10 @@ function SummaryCont () {
 
     
     let btnStyle3 = {
-        padding: "2% 7%",
+        padding: "15% 8%",
+        marginRight: "50px",
         border: "none",
-        width: "30%",
+        width: "125%",
         color: "#fff",
         background: "#000",
         fontWeight: "100",

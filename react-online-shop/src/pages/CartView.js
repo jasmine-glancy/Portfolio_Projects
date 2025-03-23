@@ -42,7 +42,7 @@ function CartView () {
     let btnStyle2 = {
         padding: "2% 7%",
         border: "none",
-        width: "115%",
+        width: "120%",
         color: "#fff",
         background: "rgb(156, 156, 156)",
         fontWeight: "100",
