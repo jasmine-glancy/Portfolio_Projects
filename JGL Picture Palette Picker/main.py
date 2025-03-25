@@ -32,13 +32,13 @@ def home():
 
             top_10_colors = h.most_frequest_colors(chosen_file)
             
-            print(f"Most common colors: {top_10_colors}")
+            # print(f"Most common colors: {top_10_colors}")
             
             first_five_colors = h.first_5_colors(top_10_colors)
             
             next_five_colors = h.last_5_colors(top_10_colors)
             
-            print(f"First 5 colors: {first_five_colors}", f"Next 5 colors: {next_five_colors}")
+            # print(f"First 5 colors: {first_five_colors}", f"Next 5 colors: {next_five_colors}")
             
             first_5_rgb = h.individual_rgb_values(first_five_colors)
                         
