@@ -1,153 +1,158 @@
 :root {
-    --forest_green: #397367;
-    --robin_egg_blue: #5DA399;
-    --keppel: #5DA399;
-    --dark_cyan: #428c82;
-    --onyx: #35393C;
+  --forest_green: #397367;
+  --robin_egg_blue: #5da399;
+  --keppel: #5da399;
+  --dark_cyan: #428c82;
+  --onyx: #35393c;
 }
 
 body {
-    padding-top: 20vh;
-    background-color: var(--forest_green);
+  padding-top: 20vh;
+  background-color: var(--forest_green);
 }
-    .container-lg {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-left: auto;
-        margin-right: auto;
-        background-color: var(--keppel);
-        width: 80%;
-        min-height: 60vh;
-        border-radius: 25px;
-        margin-bottom: 10vh;
-    }
+
+.container-lg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--keppel);
+  width: 80%;
+  min-height: 60vh;
+  border-radius: 25px;
+  margin-bottom: 10vh;
+}
 
 h1 {
-    font-weight: 700;
-    padding-top: 5vh;
-    color: var(--forest_green);
+  font-weight: 700;
+  padding-top: 5vh;
+  color: var(--forest_green);
 }
 
 form {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
-    justify-content: center;
-    margin-bottom: 0;
-    padding-top: 2vh;
-    padding-bottom: 2vh;
-    color: var(--onyx);
-}
-    
-    input[type="file"]::file-selector-button, input[type="submit"] {
-        border: 1px solid var(--keppel);
-        background: var(--forest_green);
-        color: var(--keppel);
-        border-radius: 20px;
-        padding: 8px 10px;
-        text-align: center;
-
-    }
-
-    input[type="file"]::file-selector-button:hover, input[type="submit"]:hover {
-    background-color: var(--dark_cyan);
-    color: var(--onyx);
-    cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  margin-bottom: 0;
+  padding-top: 2vh;
+  padding-bottom: 2vh;
+  color: var(--onyx);
 }
 
+input[type="file"]::file-selector-button,
+input[type="submit"] {
+  border: 1px solid var(--keppel);
+  background: var(--forest_green);
+  color: var(--keppel);
+  border-radius: 20px;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+input[type="file"]::file-selector-button:hover,
+input[type="submit"]:hover {
+  background-color: var(--dark_cyan);
+  color: var(--onyx);
+  cursor: pointer;
+}
 
 #file-upload {
-    position: relative;
+  position: relative;
 }
 
 /* Color Codes */
 /* Card Flip CSS suggested by @tjegan */
 .outside-div {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-    .outside-div, .cards-wrapper, .color-container{
-        justify-content: center;
-    }
+.outside-div,
+.cards-wrapper,
+.color-container {
+  justify-content: center;
+}
 
 .cards-wrapper {
-    perspective: 1000px;
-    width: 75%;
-    margin: 0 auto;
-    padding-top: 2vh;
-    padding-bottom: 2vh;
+  perspective: 1000px;
+  width: 75%;
+  margin: 0 auto;
+  padding-top: 2vh;
+  padding-bottom: 2vh;
 }
 
 .color-container {
-    margin-left: auto;
-    margin-right: auto;
-    height: 10%;
-    margin-bottom: 2vh;
-    transform: translateY(5%);
-
+  margin-left: auto;
+  margin-right: auto;
+  height: 10%;
+  margin-bottom: 2vh;
+  transform: translateY(5%);
 }
 
-    .color-container.flip .flip-card {
-        transform: rotateY(180deg);
-    }
+.color-container.flip .flip-card {
+  transform: rotateY(180deg);
+}
 
-    .flip-card {
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 0.75s;
-        width: 150px;
-        height: 8vh;
-        justify-content: center;
-    }
+.flip-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.75s;
+  width: 150px;
+  height: 8vh;
+  justify-content: center;
+}
 
-    /* Card styles */
-    .side {
-        backface-visibility: hidden;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
+/* Card styles */
+.side {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 
-        .side.a, .side.b {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--dark_cyan);
-            padding: 25px;
-        }
+.side.a,
+.side.b {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--dark_cyan);
+  padding: 25px;
+}
 
-        .side.a {
-            z-index: 2;
-            transform: rotateY(0deg);
-        }
+.side.a {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
 
-        .side.b {
-            transform: rotateY(180deg);
-            margin-right: 15%;
-        }
+.side.b {
+  transform: rotateY(180deg) translateX(50px);
+  margin-right: 250%;
+}
 
-        .side.b p {
-            display: inline;
-            
-        }
+.side.b p {
+  display: inline;
+}
 
 table {
+  padding-bottom: 2vh;
 
-    padding-bottom: 2vh;
-
-    border-spacing: 1vw;
+  border-spacing: 1vw;
 }
 
-    td {
-        border: 1px solid var(--dark_cyan);
-        
-    }
+td {
+  border: 1px solid var(--dark_cyan);
+}
 
-
+.row-1,
+.row-2 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: 70%;
+}

@@ -31,7 +31,7 @@ def most_frequest_colors(image_file):
     cluster_centers = kmeans.cluster_centers_
     cluster_centers = cluster_centers.astype(int)
     
-    print(type(cluster_centers))
+    # print(type(cluster_centers))
     return cluster_centers
 
 def first_5_colors(color_dict):
