@@ -1,18 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import React from "react";
 import ProductCard from "../components/ProductCard";
-import fetchProductAsync from "../features/productSlice";
+import { fetchProductsAsync } from "../features/productSlice";
 
 function Landing () {
 
     const dispatch = useDispatch()
 
-    const {items:products, status, error} = useSelector((state)=> state.products)
+    const {items: products, status, error} = useSelector((state) => { return state.products; });
 
+    const [loading, setLoading] = useState(status); 
+    
     useEffect(() => {
-        dispatch(fetchProductAsync)
-    })
+        dispatch(fetchProductsAsync());
+    }, [dispatch]);
+
+    if (status === "loading") return <div>loading</div>;
 
     console.log(products, status, error)
 
@@ -26,19 +30,26 @@ function Landing () {
             </div>
 
             <div id="products">
-                {products.map((item, index) => {
+                {/* products?.map only maps the items if they are found */}
+                {products.length > 0 ? products.map((item, index) => {
                     return (
                         <ProductCard
-                        ProductImg={item.img}
+                        ProductImg={item.image}
                         ProductName={item.name}
-                        ProductPrice={item.price}
+                        ProductPrice={item.amount}
+                        ProductDesc={item.description}
+                        ProductId={item.id}
+
+                        key={index}
                         />
                     );
-                    })}                
+                    // If the condition is not met, return no data
+                    }): 'no data'
+                }       
+                         
             </div>
-
         </div>
-    )
+    );
 }
 
 export default Landing;

@@ -1,51 +1,70 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import { getProducts } from "../api/productApi";
+import { getProductsById } from "../api/productApi";
 
 // createAsyncThunk receives the API
 
 export const fetchProductsAsync = createAsyncThunk(
-    // Defines the route
     'products/getProduct',
     async () => {
         const response = await getProducts()
+        return response
+    }
+)
+
+export const fetchProductsByIdAsync = createAsyncThunk(
+    // Defines the route
+    'products/getProduct/id',
+    async (payload) => {
+
+        const {id} = payload
+        const response = await getProductsById()
 
         return response
     }
 )
 
 
+
 // Slice holds states 
 
 const productSlice = createSlice({
     name: 'products',
-    initialState: {
+    initialState:{
         items: [],
-        // Idle is the default state
         status: 'idle',
         error: null
     },
+    reducers: {
 
-    // Reducers hold functions
-    reducers: {},
+    },
+    extraReducers: (builder) => {
 
-    // Allows us to handle different cases
-    extraRedcers: (builder) => {
         builder
-            .addCase(fetchProductsAsync.pending, (state) => {
-                // If the state status is pending, pass loading as the status
+            .addCase(fetchProductsAsync.pending, (state) =>{
                 state.status = 'loading'
             })
-
-            .addCase(fetchProductsAsync.fulfilled, (state) => {
-                // If the state status is completed, pass succeeded as the status
+            .addCase(fetchProductsAsync.fulfilled, (state, action) =>{
                 state.status = 'succeeded'
+                state.items = action.payload
+            })
+            .addCase(fetchProductsAsync.rejected, (state) =>{
+                state.status = 'failed'
+                state.error = 'something went wrong'
+            })
+            .addCase(fetchProductsByIdAsync.pending, (state) =>{
+                state.status = 'loading'
+            })
+            .addCase(fetchProductsByIdAsync.fulfilled, (state, action) =>{
+                state.status = 'succeeded'
+                state.items = action.payload
+            })
+            .addCase(fetchProductsByIdAsync.rejected, (state) =>{
+                state.status = 'failed'
+                state.error = 'something went wrong'
             })
 
-            .addCase(fetchProductsAsync.rejected, (state) => {
-                // If the state status encounters an error, pass failed as the status
-                state.status = 'failed'
-            })
     }
 })
 

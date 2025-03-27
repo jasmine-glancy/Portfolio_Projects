@@ -1,10 +1,10 @@
 import React from "react"
 
-function Input ({placeholder, inputStyle, labelName, labelStyle}) {
+function Input ({placeholder, inputStyle, labelName, labelStyle, func}) {
     return (
         <div>
             <label style={labelStyle}> {labelName} </label>
-            <input style={inputStyle} placeholder={placeholder} />
+            <input onChange={func} style={inputStyle} placeholder={placeholder} />
         </div>
     );
 }

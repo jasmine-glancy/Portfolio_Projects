@@ -1,13 +1,56 @@
 import React from "react"
-import ProductA from "../assets/Foto2.png";
-import ProductB from "../assets/Cart-Foto.png";
-import ProductC from "../assets/Cart-Foto-2.png";
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import CartItem from "../components/CartItem";
 import Input from "../components/Input";
 import SummaryCont from "../components/SummaryCont";
+import { useSelector, useDispatch } from "react-redux";
+
+import { fetchCartAsync } from "../features/cartSlice";
 
 function CartView () {
+
+    const dispatch = useDispatch();
+    
+    const [userdata, setUserData] = useState({});
+
+    const {
+        items: cart, 
+        status, 
+        error,
+    } = useSelector((state)=> { 
+        return state.cart; 
+    });
+    
+    const [loading, setLoading] = useState(status);
+
+    useEffect(() => {
+        dispatch(fetchCartAsync());
+    }, [dispatch]);
+
+    const handleCity = (e) => {
+        // Add info to user data
+        setUserData({...userdata, city: e.target.value})
+    }
+
+    const handleAddress = (e) => {
+        setUserData({...userdata, address: e.target.value})
+    }
+
+    const handleName = (e) => {
+        setUserData({...userdata, name: e.target.value})
+    }
+
+    const handlePhone = (e) => {
+        setUserData({...userdata, phone: e.target.value})
+    }
+
+    const handleEmail = (e) => {
+        setUserData({...userdata, email: e.target.value})
+        console.log(userdata)
+    }
+
+    if (status === "loading") return <div>loading</div>;
     
     let inputStyle = {
         width: "700px",
@@ -57,11 +100,11 @@ function CartView () {
                 <div id="cart-view">
                    <form id="cart-form-cont">
                         <div id="cart-form-a">
-                            <Input labelName={"City"} placeholder={"Enter City"} labelStyle={labelStyle} inputStyle={cityInputStyle} />
-                            <Input labelName={"Address"} placeholder={"Enter Address"}  labelStyle={labelStyle} inputStyle={inputStyle} />
-                            <Input labelName={"Recipient Details"} placeholder={"Enter Recipient Details"}  labelStyle={labelStyle} inputStyle={inputStyle} />
-                            <Input labelName={"Phone"} placeholder={"Enter Phone"}  labelStyle={labelStyle} inputStyle={inputStyle} />
-                            <Input labelName={"Email"} placeholder={"Enter Email"}  labelStyle={labelStyle} inputStyle={inputStyle} />
+                            <Input func={handleCity} labelName={"City"} placeholder={"Enter City"} labelStyle={labelStyle} inputStyle={cityInputStyle} />
+                            <Input func={handleAddress} labelName={"Address"} placeholder={"Enter Address"}  labelStyle={labelStyle} inputStyle={inputStyle} />
+                            <Input func={handleName} labelName={"Recipient Details"} placeholder={"Enter Recipient Details"}  labelStyle={labelStyle} inputStyle={inputStyle} />
+                            <Input func={handlePhone} labelName={"Phone"} placeholder={"Enter Phone"}  labelStyle={labelStyle} inputStyle={inputStyle} />
+                            <Input  func={handleEmail} labelName={"Email"} placeholder={"Enter Email"}  labelStyle={labelStyle} inputStyle={inputStyle} />
 
                             <div>
                                 <h2> Payment Method </h2>
@@ -80,9 +123,12 @@ function CartView () {
                         </div>
                         <div id="cart-form-b">
                             <div>
-                                <CartItem ProductImg={ProductA} ProductName={"Jacket KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"H0522001"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€105"} alt="Person wearing a black blazer and cap, with a white T-shirt, standing against a gray background."/>
-                                <CartItem ProductImg={ProductB} ProductName={"Shirt KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"M0592001"} ProductSize={"M"} ProductColor={"White"} ProductQuantity={"1"} ProductPrice={"€125"} alt="Person wearing a white shirt with a black peace symbol."/>
-                                <CartItem ProductImg={ProductC} ProductName={"Trouser KLS"} ProductCollection={"KLASSIK OF FABLE"} ProductArticle={"A0521005"} ProductSize={"M"} ProductColor={"Black"} ProductQuantity={"1"} ProductPrice={"€110"} alt="Person wearing black pants and black shoes standing against a light gray background."/>
+                                {
+                                    cart?.items?.length > 0 
+                                    ? cart.items.map((item, index) => {
+                                        return <CartItem item={item}/>
+                                    }) : "no data"
+                                }
                             </div>
 
                             <SummaryCont />
