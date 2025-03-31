@@ -1,5 +1,7 @@
 from PIL import Image, ImageGrab
 
+
+
 def grab_pixel(img, x, y):
     """Function recommeneded by GeeksForGeeks"""
     
