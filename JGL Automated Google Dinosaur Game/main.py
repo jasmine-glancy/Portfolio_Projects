@@ -19,5 +19,6 @@ while game_on:
     # Start the game
     gamePlay.start_game()
     imageProcessing.find_cactus()
+    imageProcessing.find_birds()
 
 

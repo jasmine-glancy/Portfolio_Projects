@@ -15,9 +15,15 @@ class processImage():
         
         for i in range(530, 610):
             for j in range(130, 160):
-                self.image[i, j] = 0
+                self.image_data[i, j] = 0
 
         self.image.show()
+        
+    def find_birds(self):
+        """Search the sky for pterodactyl"""
+        for i in range(530, 560):
+            for j in range (100, 125):
+                self.image_data[i, j] = 171
         
         
 
