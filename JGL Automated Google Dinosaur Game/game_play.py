@@ -1,4 +1,3 @@
-import imageProcessing as ip
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
@@ -8,13 +7,16 @@ DINO_GAME_URL = "https://elgoog.im/dinosaur-game/"
 
 class gamePlay():
     def __init__(self):
+        pass 
+    
+    def add_driver(self):
         # Set up Selenium
 
         options = Options()
 
         options.add_experimental_option("detach", True)
         options.add_argument("--incognito")
-
+    
         driver = webdriver.Chrome(options=options)
 
         # Open the game
@@ -22,10 +24,10 @@ class gamePlay():
         driver.get(DINO_GAME_URL)
 
         time.sleep(3)
-
-        driver.maximize_window()
-        time.sleep(1)
-
+ 
+        # driver.maximize_window()
+        # time.sleep(1)
+     
 
     def start_game(self):
 
@@ -35,14 +37,7 @@ class gamePlay():
         self.jump()
 
     def jump(self):
-        # Start the game
+        
         pag.keyDown("space")
-        pag.keyUp("space")
  
 
-# TODO: Allow the t-rex to jump over obstacles
-
-# TODO: Keep track of score
-
-    # TODO: Each milisecond should add 1 to the score
-    
