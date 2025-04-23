@@ -49,10 +49,13 @@ def for_sale_info(product_id):
     referrer = request.referrer
     print(f"Referrer URL: {referrer}")
     
-    if referrer and "cart" not in referrer:
-        # If the user is coming from anywhere but the edit page, reset the variable
-        session["product_info"]["cart_item"] = False
-    
+    try:
+        if referrer and "cart" not in referrer and session["product_info"]:
+            # If the user is coming from anywhere but the edit page, reset the variable
+            session["product_info"]["cart_item"] = False
+    except Exception as e:
+        print(f"Can't find product info")
+        
     # Fetch product information based on product_id
     product = q.find_product_by_id(product_id)
     print(f"Product ID: {product.service_product_id}")
@@ -355,6 +358,19 @@ def register():
                 SHOP_SESSION.commit()
                 
                 session["username"] = new_user.username
+                
+                try:
+                    # Get the user id and save it to the session
+                    look_up_id = q.find_user_id(session["username"])
+                    
+                    if look_up_id is not None:
+                        print(look_up_id["user_id"])
+                        
+                        # Remember which user has logged in
+                        session["user_id"] = look_up_id["user_id"]
+                                            
+                except Exception as e:
+                    print("Can't find user ID")
 
             except Exception as e:
                 SHOP_SESSION.rollback()
@@ -362,18 +378,7 @@ def register():
                 flash(f"Can't insert new user into database, exception: {e}")
                 return redirect(url_for("main.register"))
                 
-            try:
-                # Get the user id and save it to the session
-                look_up_id = q.find_user_id(username)
-                
-                if look_up_id is not None:
-                    print(look_up_id["user_id"])
-                    
-                    # Remember which user has logged in
-                    session["user_id"] = look_up_id["user_id"]
-                                        
-            except Exception as e:
-                print("Can't find user ID")
+
                 
             # Redirect to home
             return redirect(url_for("main.home"))

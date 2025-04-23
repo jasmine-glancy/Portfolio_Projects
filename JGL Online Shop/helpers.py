@@ -21,6 +21,7 @@ def social_links():
     fiverr = os.environ.get("fiverr")
     email = os.environ.get("email")
     youtube = os.environ.get("youtube")
+    patreon = os.environ.get("patreon")
     
     socials = {
         "github_link": github,
@@ -28,7 +29,8 @@ def social_links():
         "discord_link": discord,
         "fiverr_link": fiverr,
         "email_address": email,
-        "youtube_link": youtube
+        "youtube_link": youtube,
+        "patreon": patreon
         }
     
     return socials

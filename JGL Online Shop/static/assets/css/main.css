@@ -1397,6 +1397,7 @@ input, select, textarea {
 
 	.quote-list li {
 		padding: 1em 0 1em 0;
+		margin-left: 1vw;
 		overflow: hidden;
 	}
 

@@ -107,6 +107,7 @@ def find_user_id(username):
         sh.Users
     ).filter_by(username=username).first()
     
+    print(f"User search: {user_search}")
     return user_search
 
 def find_product_price(product_id):

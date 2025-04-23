@@ -159,14 +159,14 @@
 												<select class="form-select" aria-label="writing" name="writing_options" required>
 													{% for option in nonfiction %}
 														<option value="{{ option.option_id }}"
-                                                            {% if session["product_info"]["nonfiction"] and option.option_id == session["product_info"]["nonfiction"] %}
+                                                            {% if session.get("product_info") and session["product_info"].get("nonfiction") and option.option_id == session["product_info"]["nonfiction"] %}
                                                                 selected
                                                             {% endif %}>
                                                             {{ option.product_type|title }}
                                                         </option>
 													{% endfor %}
 													<option value="default"
-                                                        {% if not session["product_info"]["fiction"] or session["product_info"]["fiction"] is none %}
+                                                        {% if session.get("product_info") and (not session["product_info"].get("fiction") or session["product_info"]["fiction"] is none) %}
                                                             selected
                                                         {% endif %}>
                                                         Please make a selection
@@ -199,15 +199,15 @@
                                         </label>
                                         
                                         <input type="number" id="quantity" name="quantity" min="1" max="10"
-                                            {% if session["product_info"]["cart_item"] and session["product_info"]["quantity"] %}
-                                                value="{{ session["product_info"]["quantity"] }}"
+                                            {% if session.get("product_info") and session["product_info"].get("cart_item") and session["product_info"].get("quantity") %}
+                                                value="{{ session["product_info"].get("quantity") }}"
                                             {% endif %}></input>
                                     </div>
 
                                     <div class="col-12">
                                         <textarea name="order_notes" placeholder="Please explain the product or service you would like (including themes/topics/etc)" class="order_notes">
-                                            {% if session["product_info"]["cart_item"] and session["product_info"]["notes"] %}
-                                                {{ session["product_info"]["notes"] }}
+                                            {% if session.get("product_info") and session["product_info"].get("notes") %}
+                                                {{ session["product_info"].get("notes") }}
                                             {% endif %}
                                         </textarea>
                                     </div>

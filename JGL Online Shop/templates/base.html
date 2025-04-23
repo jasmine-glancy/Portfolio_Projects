@@ -65,7 +65,7 @@
                             <a href="{{ url_for('main.home') }}">Home</a>
                             <a href="{{ url_for('main.products') }}">Products</a>
                             
-                            {% if session["user_id"] %}
+                            {% if session["username"] %}
                                 <a href="{{ url_for('main.logout') }}">Log Out</a>
                             {% else %}
                                 <a href="{{ url_for('main.login') }}">Login</a>
@@ -108,13 +108,14 @@
                                     <div class="row">
                                         <div class="col-6 col-12-small">
                                             <ul class="link-list last-child">
-                                                <li><a href="{{ socials.fiverr_link }}">Fiverr</a></li>
+                                                <li><a href="{{ socials.patreon }}">Patreon</a></li>
                                                 <li><a href="{{ socials.discord_link }}">Discord</a></li>
                                                 <li><a href="{{ socials.linkedin_link }}">Linkedin</a></li>
                                             </ul>
                                         </div>
                                         <div class="col-6 col-12-small">
                                             <ul class="link-list last-child">
+                                                <li><a href="{{ socials.fiverr_link }}">Fiverr</a></li>
                                                 <li><a href="{{ socials.github_link }}">GitHub</a></li>
                                                 <li><a href="{{ socials.youtube_link }}">YouTube</a></li>
                                             </ul>
