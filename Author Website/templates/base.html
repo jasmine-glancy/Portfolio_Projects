@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    
+    {% block styles %}
+
+    <!-- Load Bootstrap-Flask CSS if desired -->
+
+    <!-- Link to the styles.css here to apply styling to all the child templates. -->
+    <link
+      href="{{ url_for('static', filename='dist/output.css') }}"
+      rel="stylesheet"
+    />
+
+    <!-- Load in favicon -->
+
+    {% endblock %}
+
+    <title>
+      {% block title %}
+      {% endblock %}
+    </title>
+
+    </head>
+    <body>
+        <!-- Header -->
+        <section id="header">
+            <!-- Navigation Bar -->
+             
+
+            <nav class="bg-[var(--dusk_blue)] border-[var(--dusk_blue)] text-[var(--blue_white)] dark:border-gray-600 dark:bg-[var(--blue_white)]">
+                <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
+                    <a href="https://flowbite.com" class="flex items-center space-x-3 rtl:space-x-reverse">
+                        icon goes here
+                    </a>
+                    <button data-collapse-toggle="mega-menu-full" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-[var(--forest_green)] rounded-lg md:hidden hover:bg-[var(--steel_blue)] focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="mega-menu-full" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                        </svg>
+                    </button>
+                    <div id="mega-menu-full" class="items-center justify-between font-medium hidden w-full md:flex md:w-auto md:order-1">
+                        <ul class="flex flex-col p-4 md:p-0 mt-4 border border-[var(--steel_blue)] rounded-lg bg-[var(--dusk_blue)] md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:[var(--dusk_blue)]">
+                            <li>
+                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0" aria-current="page">Home</a>
+                            </li>
+                            <li>
+                                <button id="mega-menu-full-dropdown-button" data-collapse-toggle="mega-menu-full-dropdown" class="flex items-center justify-between w-full py-2 px-3 text-[var(--dull_green)] rounded-sm md:w-auto hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:border-0 md:hover:text-[var(--forest_green)] md:p-0">Palo santo <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+            </svg></button>
+                            </li>
+                            <li>
+                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Selvage health</a>
+                            </li>
+                            <li>
+                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Taxidermy yuccie</a>
+                            </li>
+                            <li>
+                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Dummy text</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="mega-menu-full-dropdown" class="mt-1 border-[var(--dusk_blue)] shadow-xs bg-[var(--dusk_blue)] md:bg-[var(--dusk_blue)] border-y">
+                    <div class="grid max-w-screen-xl px-4 py-5 mx-auto text-[var(--blue_white)] sm:grid-cols-2 md:px-6">
+                        <ul>
+                            <li>
+                                <a href="#" class="block p-3 rounded-lg hover:bg-[var(--steel_blue)]">
+                                    <div class="font-semibold">Etsy cornhole</div>
+                                    <span class="text-sm text-[var(--seal)]">Gentrify subway tile DSA, cray yuccie pickled artisan jianbing</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <a href="#" class="block p-3 rounded-lg hover:bg-[var(--steel_blue)]">
+                                    <div class="font-semibold">Neutra typewriter</div>
+                                    <span class="text-sm text-[var(--seal)]">Taxidermy selfies pinterest tumblr beard farm-to-table poke.</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+
+        </section>
+        {% block content %}
+        
+        {% endblock %}
+
+
+        <!-- Footer -->
+        <section id="footer">
+
+        </section>
+
+        <!-- Copyright -->
+        <div id="copyright">
+            &copy; Jasmine Glancy {{ date }}. All rights reserved.
+        </div>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    </body>
+</html>

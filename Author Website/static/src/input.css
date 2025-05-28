@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
+
+/* npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch */
+
+:root {
+    --midnight_blue: #0E1018;
+    --dusk_blue: #202432;
+    --steel_blue: #2D384C;
+    --seal: #676D8B;
+    --blue_white: #CDD1EA;
+    --forest_green: #2E4744;
+    --dull_green: #3F585B;
+}
