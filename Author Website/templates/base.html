@@ -36,8 +36,14 @@
 
             <nav class="bg-[var(--dusk_blue)] border-[var(--dusk_blue)] text-[var(--blue_white)] dark:border-gray-600 dark:bg-[var(--blue_white)]">
                 <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
-                    <a href="https://flowbite.com" class="flex items-center space-x-3 rtl:space-x-reverse">
-                        icon goes here
+                    <a href="{{ url_for('main.home') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
+                        <img 
+                            src="{{ url_for('static', filename='assets/images/icon.svg') }}"
+                            class="w-[4em]"
+                        /> 
+                        <div class="p-[2em]">
+                            Jasmine Glancy
+                        </div>
                     </a>
                     <button data-collapse-toggle="mega-menu-full" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-[var(--forest_green)] rounded-lg md:hidden hover:bg-[var(--steel_blue)] focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="mega-menu-full" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
@@ -48,21 +54,21 @@
                     <div id="mega-menu-full" class="items-center justify-between font-medium hidden w-full md:flex md:w-auto md:order-1">
                         <ul class="flex flex-col p-4 md:p-0 mt-4 border border-[var(--steel_blue)] rounded-lg bg-[var(--dusk_blue)] md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:[var(--dusk_blue)]">
                             <li>
-                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0" aria-current="page">Home</a>
+                                <a href="#" class="block py-2 px-3 text-[var(--blue_white)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--seal)] md:p-0" aria-current="page">Home</a>
                             </li>
                             <li>
-                                <button id="mega-menu-full-dropdown-button" data-collapse-toggle="mega-menu-full-dropdown" class="flex items-center justify-between w-full py-2 px-3 text-[var(--dull_green)] rounded-sm md:w-auto hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:border-0 md:hover:text-[var(--forest_green)] md:p-0">Palo santo <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <button id="mega-menu-full-dropdown-button" data-collapse-toggle="mega-menu-full-dropdown" class="flex items-center justify-between w-full py-2 px-3 text-[var(--blue_white)] rounded-sm md:w-auto hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:border-0 md:hover:text-[var(--seal)] md:p-0">Palo santo <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
             </svg></button>
                             </li>
                             <li>
-                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Selvage health</a>
+                                <a href="#" class="block py-2 px-3 text-[var(--blue_white)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--seal)] md:p-0">Selvage health</a>
                             </li>
                             <li>
-                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Taxidermy yuccie</a>
+                                <a href="#" class="block py-2 px-3 text-[var(--blue_white)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--seal)] md:p-0">Taxidermy yuccie</a>
                             </li>
                             <li>
-                                <a href="#" class="block py-2 px-3 text-[var(--dull_green)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--forest_green)] md:p-0">Dummy text</a>
+                                <a href="#" class="block py-2 px-3 text-[var(--blue_white)] rounded-sm hover:bg-[var(--steel_blue)] md:hover:bg-transparent md:hover:text-[var(--seal)] md:p-0">Dummy text</a>
                             </li>
                         </ul>
                     </div>
@@ -102,7 +108,7 @@
         </section>
 
         <!-- Copyright -->
-        <div id="copyright">
+        <div class="text-center bg-[var(--dusk_blue)] text-[var(--blue_white)] p-5">
             &copy; Jasmine Glancy {{ date }}. All rights reserved.
         </div>
 
